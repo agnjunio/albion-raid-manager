@@ -72,7 +72,8 @@ export default {
         },
       },
       fontFamily: {
-        system: "Roboto",
+        sans: ["var(--font-roboto)"],
+        mono: ["var(--font-roboto-mono)"],
       },
     },
   },

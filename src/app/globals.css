@@ -7,6 +7,6 @@
   body {
     @apply text-primary-gray dark:text-white;
     @apply bg-white dark:bg-primary-gray;
-    @apply font-system;
+    @apply font-sans;
   }
 }
