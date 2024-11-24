@@ -22,9 +22,10 @@ model Guild {
 model Raid {
   id            Int         @id @default(autoincrement())
   description   String
+  status        RaidStatus  @default(SCHEDULED)
   date          DateTime
-  guild         Guild?      @relation(fields: [guildId], references: [id])
-  guildId       Int?
+  guild         Guild       @relation(fields: [guildId], references: [id])
+  guildId       Int
   composition   Composition @relation(fields: [compositionId], references: [id])
   compositionId Int
 }
@@ -33,4 +34,28 @@ model Composition {
   id   Int    @id @default(autoincrement())
   name String
   Raid Raid[]
+}
+
+model Build {
+  id   Int    @id @default(autoincrement())
+  name String
+  role Role?
+}
+
+enum Role {
+  CALLER
+  TANK
+  SUPPORT
+  HEALER
+  RANGED_DPS
+  MEELE_DPS
+  BATTLEMOUNT
+}
+
+enum RaidStatus {
+  SCHEDULED
+  OPEN
+  CLOSED
+  ONGOING
+  FINISHED
 }
