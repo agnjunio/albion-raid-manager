@@ -1,19 +1,19 @@
 import Link from "next/link";
-import React, { Suspense } from "react";
+import React from "react";
 
 type LayoutProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
   children: React.ReactNode;
 };
 
-export default function Layout({ params, children }: LayoutProps) {
-  const { id } = params;
+export default async function Layout({ params, children }: LayoutProps) {
+  const { id } = await params;
 
   return (
     <div className="flex p-2">
-      <div className="sidebar">
+      <div>
         <ul>
           <li>
             <Link href={`/guilds/${id}/raids`}>Raids</Link>
@@ -30,9 +30,7 @@ export default function Layout({ params, children }: LayoutProps) {
         </ul>
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className="grow">{children}</div>
-      </Suspense>
+      <div className="grow">{children}</div>
     </div>
   );
 }
