@@ -1,3 +1,4 @@
+import Footer from "@components/Footer";
 import Header from "@components/Header";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
@@ -56,7 +57,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
         <Header />
-        {children}
+        <main className="container mx-auto">{children}</main>
+        <Footer />
       </body>
     </html>
   );

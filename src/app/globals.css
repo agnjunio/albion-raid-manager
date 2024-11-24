@@ -2,11 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-/* TODO */
 @layer base {
   body {
     @apply text-primary-gray dark:text-white;
     @apply bg-white dark:bg-primary-gray;
     @apply font-sans;
+  }
+}
+
+@layer components {
+  button {
+    @apply text-primary-gray dark:text-white;
+    @apply bg-primary-yellow hover:bg-primary-yellow-400 active:bg-primary-yellow-300;
+    @apply px-4 py-2;
+    @apply rounded;
   }
 }
