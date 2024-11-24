@@ -48,6 +48,7 @@ export default function CreateRaidPage({ params }: CreateRaidPageParams) {
               type="text"
               className="w-full"
               value={description}
+              placeholder="Enter raid description..."
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>

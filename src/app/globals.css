@@ -44,4 +44,22 @@
     @apply hover:text-primary-yellow;
     @apply transition-colors duration-500;
   }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  input[type="date"],
+  select {
+    @apply bg-primary-gray-300;
+    @apply text-primary-gray placeholder:text-primary-gray-300/75;
+    @apply rounded-lg border-0;
+    @apply ring-2 ring-primary-gray-800;
+    @apply font-mono text-base;
+    @apply px-2 py-1;
+
+    &:focus {
+      @apply outline-none ring-primary-yellow;
+    }
+  }
 }
