@@ -6,7 +6,19 @@
   body {
     @apply text-primary-gray dark:text-white;
     @apply bg-white dark:bg-primary-gray;
-    @apply font-sans;
+    @apply font-sans font-normal text-base;
+  }
+
+  ::selection {
+    @apply bg-secondary-violet-100 text-secondary-violet;
+  }
+
+  * {
+    @apply outline-0 outline-offset-4 ring-0 outline-primary-yellow;
+
+    &:focus-visible {
+      @apply outline outline-1;
+    }
   }
 }
 
