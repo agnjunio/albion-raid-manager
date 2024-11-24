@@ -1,8 +1,9 @@
 import { prisma } from "@lib/prisma";
+import { Guild } from "@prisma/client";
 import GuildCard from "./GuildCard";
 
 export default async function GuildsPage() {
-  const guilds = await prisma.guild.findMany();
+  const guilds: Guild[] = await prisma.guild.findMany();
 
   return (
     <div className="p-4 space-y-2">
