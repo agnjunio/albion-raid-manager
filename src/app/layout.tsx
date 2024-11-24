@@ -55,9 +55,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${robotoMono.variable} antialiased`}>
+      <body className={`${roboto.variable} ${robotoMono.variable} antialiased flex flex-col h-screen`}>
         <Header />
-        <main className="container mx-auto">{children}</main>
+        <main className="grow container mx-auto">{children}</main>
         <Footer />
       </body>
     </html>
