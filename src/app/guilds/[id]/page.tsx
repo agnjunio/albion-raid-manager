@@ -1,4 +1,5 @@
 import { prisma } from "@lib/prisma";
+import { redirect } from "next/navigation";
 
 type GuildPageParams = {
   params: Promise<{
@@ -16,7 +17,7 @@ export default async function GuildPage({ params }: GuildPageParams) {
   });
 
   if (!guild) {
-    return <div>Guild not found</div>;
+    redirect("/guilds");
   }
 
   return (
