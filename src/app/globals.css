@@ -30,6 +30,10 @@
     @apply rounded;
     @apply flex items-center gap-x-2;
 
+    &.btn-secondary-violet {
+      @apply bg-secondary-violet hover:bg-secondary-violet-400 active:bg-secondary-violet-300;
+    }
+
     svg {
       @apply size-6;
     }
