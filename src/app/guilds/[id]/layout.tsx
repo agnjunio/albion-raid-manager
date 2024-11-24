@@ -2,21 +2,16 @@ import Link from "next/link";
 import React from "react";
 
 type LayoutProps = {
-  params: Promise<{
-    id: string;
-  }>;
   children: React.ReactNode;
 };
 
-export default async function Layout({ params, children }: LayoutProps) {
-  const { id } = await params;
-
+export default async function Layout({ children }: LayoutProps) {
   return (
     <div className="flex p-2">
       <div>
         <ul>
           <li>
-            <Link href={`/guilds/${id}/raids`}>Raids</Link>
+            <Link href="raids">Raids</Link>
           </li>
           <li>
             <Link href="compositions">Compositions</Link>
