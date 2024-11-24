@@ -30,4 +30,10 @@
     @apply rounded;
     @apply flex items-center space-x-4;
   }
+
+  a {
+    @apply text-primary-gray dark:text-white text-base;
+    @apply hover:text-primary-yellow;
+    @apply transition-colors duration-500;
+  }
 }
