@@ -30,6 +30,10 @@
     @apply rounded;
     @apply flex items-center gap-x-2;
 
+    &.btn-primary-yellow {
+      @apply bg-primary-yellow hover:bg-primary-yellow-400 active:bg-primary-yellow-300;
+    }
+
     &.btn-secondary-violet {
       @apply bg-secondary-violet hover:bg-secondary-violet-400 active:bg-secondary-violet-300;
     }
@@ -52,7 +56,7 @@
   input[type="date"],
   select {
     @apply bg-primary-gray-300;
-    @apply text-primary-gray placeholder:text-primary-gray-300/75;
+    @apply text-primary-gray placeholder:text-primary-gray-800/60 placeholder:text-sm;
     @apply rounded-lg border-0;
     @apply ring-2 ring-primary-gray-800;
     @apply font-mono text-base;
@@ -60,6 +64,51 @@
 
     &:focus {
       @apply outline-none ring-primary-yellow;
+    }
+  }
+
+  div[role="combobox"] {
+    input {
+      &:focus + button {
+        @apply bg-primary-yellow hover:bg-primary-yellow-400 active:bg-primary-yellow-300;
+      }
+    }
+
+    button {
+      @apply absolute right-0 inset-y-0;
+      @apply p-1;
+      @apply rounded rounded-tl-none rounded-bl-none;
+      @apply bg-secondary-violet hover:bg-secondary-violet-400 active:bg-secondary-violet-300;
+    }
+  }
+
+  div[role="listbox"] {
+    @apply w-[var(--input-width)] rounded-xl border border-primary-gray-50/15 bg-primary-gray-800 empty:invisible;
+    @apply transition duration-100 ease-in data-[leave]:data-[closed]:opacity-0 mt-2;
+
+    div[role="option"] {
+      @apply cursor-default select-none;
+      @apply rounded-xl;
+      @apply px-2 py-1.5;
+      @apply data-[focus]:bg-secondary-violet/90;
+
+      &:not(:first-child) {
+        @apply rounded-tl-none rounded-tr-none;
+      }
+
+      &:not(:last-child) {
+        @apply rounded-bl-none rounded-br-none;
+      }
+
+      &[data-selected] {
+        svg[role="img"] {
+          @apply visible;
+        }
+      }
+
+      svg[role="img"] {
+        @apply invisible;
+      }
     }
   }
 }
