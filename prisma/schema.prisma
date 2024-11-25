@@ -14,9 +14,10 @@ datasource db {
 }
 
 model Guild {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  raids Raid[]
+  id        Int    @id @default(autoincrement())
+  name      String @unique
+  raids     Raid[]
+  discordId String
 }
 
 model Raid {
@@ -31,25 +32,31 @@ model Raid {
 }
 
 model Composition {
-  id   Int    @id @default(autoincrement())
-  name String
-  Raid Raid[]
+  id       Int    @id @default(autoincrement())
+  name     String
+  Raid     Raid[]
+  Quantity Int
+}
+
+model Player {
+  id       Int    @id @default(autoincrement())
+  nickname String @unique
 }
 
 model Build {
-  id   Int    @id @default(autoincrement())
-  name String
-  role Role?
-}
-
-enum Role {
-  CALLER
-  TANK
-  SUPPORT
-  HEALER
-  RANGED_DPS
-  MEELE_DPS
-  BATTLEMOUNT
+  id       Int    @id @default(autoincrement())
+  name     String
+  role     Role?
+  mainhand String
+  offhand  String
+  head     String
+  armor    String
+  shoes    String
+  cape     String
+  bag      String
+  mount    String
+  food     String
+  potion   String
 }
 
 enum RaidStatus {
@@ -58,4 +65,14 @@ enum RaidStatus {
   CLOSED
   ONGOING
   FINISHED
+}
+
+enum Role {
+  TANK
+  STOPPER
+  SUPPORT
+  HEALER
+  MEELE_DPS
+  RANGED_DPS
+  BATTLEMOUNT
 }
