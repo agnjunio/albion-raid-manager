@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node .",
-    "start:dev": "nodemon --config nodemon.json",
+    "dev": "nodemon --config nodemon.json",
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
     "prettier": "prettier -c src/",
