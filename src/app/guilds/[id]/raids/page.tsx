@@ -17,7 +17,7 @@ export default async function GuildPage({ params }: GuildPageParams) {
 
   return (
     <div className="p-4 space-y-2">
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-row-reverse">
         <Link href={`create`}>
           <button>Create Raid</button>
         </Link>

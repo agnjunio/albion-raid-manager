@@ -75,6 +75,9 @@ export default {
         sans: ["var(--font-roboto)"],
         mono: ["var(--font-roboto-mono)"],
       },
+      backgroundImage: {
+        ["wallpapper"]: "url('/wallpapper.jpeg')",
+      },
     },
   },
   plugins: [],
