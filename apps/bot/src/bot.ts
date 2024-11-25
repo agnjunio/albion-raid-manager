@@ -39,9 +39,7 @@ process.on("uncaughtException", async (error) => {
 
 client.on(Events.ShardReady, async (shardId) => {
   process.env.SHARD = shardId.toString();
-  logger.info(
-    `Shard online! Bot user: ${client.user?.tag}. Guild count: ${client.guilds.cache.size}`
-  );
+  logger.info(`Shard online! Bot user: ${client.user?.tag}. Guild count: ${client.guilds.cache.size}`);
 
   if (!init) {
     await loadControllers(client);

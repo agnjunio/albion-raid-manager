@@ -1,8 +1,7 @@
 import logger from "@black-river-gaming/logger";
 import { CronJob } from "cron";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SchedulerCallback = (fnOpts: any) => Promise<void>;
+type SchedulerCallback = () => Promise<void>;
 
 // Flag to keep infinite loops until program is closed
 let running = true;
@@ -53,9 +52,9 @@ export function timeout(fn: SchedulerCallback, milliseconds: number) {
   return Promise.race([fn, timeout]);
 }
 
-async function execFn(name: string, fn: SchedulerCallback, fnOpts: unknown) {
+async function execFn(name: string, fn: SchedulerCallback) {
   try {
-    return await fn(fnOpts);
+    return await fn();
   } catch (e) {
     logger.error(`An error ocurred in routine "${name}":`, e);
   }
@@ -65,14 +64,13 @@ async function execFn(name: string, fn: SchedulerCallback, fnOpts: unknown) {
 // then waits (Default: 30 seconds) and repeat until process stops
 export async function runInterval(
   name: string,
-  fn: SchedulerCallback,
-  fnOpts: unknown,
+  callback: SchedulerCallback,
   { interval = 30000, runOnStart = false } = {},
 ) {
-  if (!fn) return;
+  if (!callback) return;
   if (runOnStart) {
-    runInterval(name, fn, fnOpts, { interval, runOnStart: false });
-    return await execFn(name, fn, fnOpts);
+    runInterval(name, callback, { interval, runOnStart: false });
+    return await execFn(name, callback);
   }
 
   logger.debug(`Scheduling interval function: ${name}`, {
@@ -82,29 +80,34 @@ export async function runInterval(
   });
   while (running) {
     await sleep(interval);
-    await execFn(name, fn, fnOpts);
+    await execFn(name, callback);
   }
 }
 
-// Wrapper around cron which saves the jobs for halting
-export function runCronjob(
-  name: string,
-  cronTime: string,
-  fn: SchedulerCallback,
-  fnOpts: unknown,
-  { runOnStart = false } = {},
-) {
-  if (!fn) return;
+export function runCronjob({
+  name,
+  cron,
+  callback,
+  runOnStart = false,
+}: {
+  name: string;
+  cron: string;
+  callback: SchedulerCallback;
+  runOnStart?: boolean;
+}) {
+  if (!callback) return;
 
   logger.debug(`Scheduling cronjob function: ${name}`, {
     name,
-    cronTime,
+    cron,
     runOnStart,
   });
+
   const onTick = async () => {
-    await execFn(name, fn, fnOpts);
+    await execFn(name, callback);
   };
-  const cronjob = new CronJob(cronTime, onTick, null, true, "utc", null, runOnStart);
+
+  const cronjob = new CronJob(cron, onTick, null, true, "utc", null, runOnStart);
 
   cronjobs.add(cronjob);
 }
