@@ -1,13 +1,8 @@
+import { PageProps } from "@/app/types";
 import { prisma } from "@/lib/prisma";
 import CreateRaid from "./CreateRaid";
 
-type CreateRaidPageParams = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function CreateRaidPage({ params }: CreateRaidPageParams) {
+export default async function CreateRaidPage({ params }: PageProps) {
   const { id } = await params;
   const compositions = await prisma.composition.findMany({});
 

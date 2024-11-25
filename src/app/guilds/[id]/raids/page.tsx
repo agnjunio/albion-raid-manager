@@ -1,13 +1,8 @@
+import { PageProps } from "@/app/types";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
-type GuildPageParams = {
-  params: Promise<{
-    id: string;
-  }>;
-};
-
-export default async function GuildPage({ params }: GuildPageParams) {
+export default async function GuildPage({ params }: PageProps) {
   const { id } = await params;
   const raids = await prisma.raid.findMany({
     where: {
@@ -18,7 +13,7 @@ export default async function GuildPage({ params }: GuildPageParams) {
   return (
     <div className="p-4 space-y-2">
       <div className="flex gap-2 flex-row-reverse">
-        <Link href={`create`}>
+        <Link href="raids/create">
           <button>Create Raid</button>
         </Link>
       </div>
@@ -27,6 +22,7 @@ export default async function GuildPage({ params }: GuildPageParams) {
       <ul className="space-y-2">
         {raids.map((raid) => (
           <li key={raid.id} className="border p-2 rounded">
+            {raid.status}
             <h3 className="text-lg font-semibold">{raid.description}</h3>
             <p>{new Date(raid.date).toLocaleDateString()}</p>
           </li>

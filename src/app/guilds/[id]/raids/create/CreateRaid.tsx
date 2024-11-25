@@ -75,7 +75,7 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
               aria-expanded={filteredCompositions.length > 0}
             >
               <ComboboxInput
-                displayValue={(composition) => composition?.name}
+                displayValue={(composition: Composition) => composition?.name}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full"
                 placeholder="Select a composition..."
