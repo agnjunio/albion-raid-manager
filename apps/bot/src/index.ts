@@ -1,4 +1,4 @@
-import logger from "@black-river-gaming/logger";
+import logger from "@albion-raid-manager/logger";
 import bot from "./bot";
 import shard from "./shard";
 
@@ -11,7 +11,8 @@ async function start() {
   try {
     const mode = (process.env.MODE || Mode.BOT) as Mode;
     if (!mode) throw new Error("Mode not defined");
-    if (!Object.values(Mode).includes(mode)) throw new Error("Mode not supported");
+    if (!Object.values(Mode).includes(mode))
+      throw new Error("Mode not supported");
 
     const { run, cleanup } = {
       [Mode.SHARD]: shard,
