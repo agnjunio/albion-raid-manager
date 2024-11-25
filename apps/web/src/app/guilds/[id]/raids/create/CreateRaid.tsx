@@ -1,9 +1,9 @@
 "use client";
 
+import { Composition } from "@albion-raid-manager/database";
 import { faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
-import { Composition } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useMemo } from "react";

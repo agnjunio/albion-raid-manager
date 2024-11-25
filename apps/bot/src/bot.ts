@@ -1,4 +1,4 @@
-import logger from "@black-river-gaming/logger";
+import logger from "@albion-raid-manager/logger";
 import config from "config";
 import { Client, Events, Partials } from "discord.js";
 import { loadControllers } from "./controllers";

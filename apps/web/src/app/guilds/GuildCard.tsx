@@ -1,4 +1,4 @@
-import { Guild } from "@prisma/client";
+import { Guild } from "@albion-raid-manager/database";
 import Link from "next/link";
 import React from "react";
 

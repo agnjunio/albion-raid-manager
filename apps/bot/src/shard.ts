@@ -1,4 +1,4 @@
-import logger from "@black-river-gaming/logger";
+import logger from "@albion-raid-manager/logger";
 import config from "config";
 import { ShardingManager } from "discord.js";
 import path from "path";
@@ -16,8 +16,12 @@ export async function run() {
 
   manager = new ShardingManager(bot, {
     token: config.get("discord.token"),
-    totalShards: config.has("bot.shards.total") ? config.get("bot.shards.total") : undefined,
-    shardList: config.has("bot.shards.list") ? config.get("bot.shards.list") : undefined,
+    totalShards: config.has("bot.shards.total")
+      ? config.get("bot.shards.total")
+      : undefined,
+    shardList: config.has("bot.shards.list")
+      ? config.get("bot.shards.list")
+      : undefined,
     respawn: true,
     execArgv: ["-r", "ts-node/esm"],
   });
