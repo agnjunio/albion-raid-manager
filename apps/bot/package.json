@@ -1,0 +1,23 @@
+{
+  "name": "@albion-raid-manager/bot",
+  "version": "1.0.0",
+  "description": "Discord bot for Albion Raid Manager.",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node .",
+    "start:dev": "nodemon --config nodemon.json",
+    "lint": "eslint src/",
+    "lint:fix": "eslint --fix src/",
+    "prettier": "prettier -c src/",
+    "prettier:fix": "prettier --write src/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@albion-raid-manager/common": "workspace:*",
+    "@albion-raid-manager/logger": "workspace:*",
+    "discord.js": "^14.15.2"
+  }
+}

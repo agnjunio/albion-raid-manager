@@ -1,0 +1,20 @@
+{
+  "name": "@albion-raid-manager/logger",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
+    "prettier": "prettier -c .",
+    "prettier:fix": "prettier --write .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^3.3.11",
+    "winston": "^3.13.0"
+  }
+}

@@ -1,0 +1,21 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    image: albion-raid-manager-bot
+    command: turbo start:dev
+    env_file: apps/bot/.env
+    develop:
+      watch:
+        - action: rebuild
+          path: ./apps/bot/package.json
+        - action: sync
+          path: ./apps/bot/src
+          target: /app/apps/bot/src
+        - action: sync
+          path: ./packages/common/src
+          target: /app/packages/common/src
+        - action: sync
+          path: ./packages/logger/src
+          target: /app/packages/logger/src
