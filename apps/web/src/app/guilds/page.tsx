@@ -1,5 +1,5 @@
+import { Guild } from "@albion-raid-manager/database";
 import { prisma } from "@lib/prisma";
-import { Guild } from "@prisma/client";
 import GuildCard from "./GuildCard";
 
 export default async function GuildsPage() {
