@@ -4,7 +4,7 @@ import { Client } from "discord.js";
 import { Controller } from ".";
 
 const announceRaids = async ({ client }: { client: Client }) => {
-  logger.info("Running the daily   cronjob");
+  logger.info("Checking for raid announcements");
 };
 
 const Raids: Controller = {
@@ -12,7 +12,7 @@ const Raids: Controller = {
   init: async (client: Client) => {
     runCronjob({
       name: "Announce Raids",
-      cron: "0 0 * * *",
+      cron: "*/30 * * * *", // Every 30 minutes
       callback: () => announceRaids({ client }),
       runOnStart: true,
     });

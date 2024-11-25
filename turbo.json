@@ -2,11 +2,21 @@
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
     "start": {},
-    "start:dev": {
+    "dev": {
+      "dependsOn": ["^db:generate"],
       "cache": false,
       "persistent": true
     },
+
     "lint": {},
-    "prettier": {}
+
+    "prettier": {},
+
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
+    }
   }
 }

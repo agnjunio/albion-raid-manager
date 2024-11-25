@@ -1,14 +1,14 @@
 import logger from "@albion-raid-manager/logger";
 import { Client } from "discord.js";
-import Raids from "./raids";
+import raids from "./raids";
+
+const controllers: Controller[] = [raids];
 
 export type Controller = {
   name: string;
   preinit?: (client: Client) => Promise<void>;
   init: (client: Client) => Promise<void>;
 };
-
-const controllers: Controller[] = [Raids];
 
 export async function loadControllers(client: Client) {
   for (const controller of controllers) {
