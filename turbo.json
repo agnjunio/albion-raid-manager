@@ -7,9 +7,11 @@
       "cache": false,
       "persistent": true
     },
+    "build": {
+      "dependsOn": ["^db:generate"]
+    },
 
     "lint": {},
-
     "prettier": {},
 
     "db:generate": {
