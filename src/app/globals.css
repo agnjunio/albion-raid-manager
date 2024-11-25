@@ -43,6 +43,12 @@
     }
   }
 
+  button[role="icon-button"] {
+    @apply p-2;
+    @apply rounded-full;
+    @apply bg-transparent hover:bg-primary-gray-400/50 active:bg-primary-gray-500 transition-colors duration-100 ease-in;
+  }
+
   a {
     @apply text-primary-gray dark:text-white text-base;
     @apply hover:text-primary-yellow;
