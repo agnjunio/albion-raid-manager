@@ -39,8 +39,8 @@ export default async function Layout({ params, children }: LayoutProps) {
   }
 
   return (
-    <div className="flex">
-      <div className="w-48 sm:w-64 md:w-72 lg:w-80 h-screen bg-primary-gray-900/50 text-white">
+    <div className="grow flex">
+      <div className="w-48 sm:w-64 md:w-72 lg:w-80 bg-primary-gray-900/50 text-white">
         <div className="p-4 pr-2 flex justify-between items-center bg-secondary-violet-800">
           <div className="text-lg font-medium">{guild.name}</div>
           <Link href=".." tabIndex={-1}>

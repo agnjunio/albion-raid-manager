@@ -57,7 +57,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${roboto.variable} ${robotoMono.variable} antialiased flex flex-col h-screen`}>
         <Header />
-        <main className="grow container mx-auto">{children}</main>
+        <main className="grow flex flex-col container mx-auto">{children}</main>
         <Footer />
       </body>
     </html>
