@@ -15,7 +15,8 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^db:generate"]
+      "dependsOn": ["^db:generate"],
+      "env": ["DATABASE_URL"]
     },
 
     "lint": {},
