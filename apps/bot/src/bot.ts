@@ -1,4 +1,4 @@
-import logger from "@black-river-gaming/logger";
+import logger from "@albion-raid-manager/logger";
 import config from "config";
 import { Client, Events, Partials } from "discord.js";
 import { loadControllers } from "./controllers";
@@ -39,7 +39,9 @@ process.on("uncaughtException", async (error) => {
 
 client.on(Events.ShardReady, async (shardId) => {
   process.env.SHARD = shardId.toString();
-  logger.info(`Shard online! Bot user: ${client.user?.tag}. Guild count: ${client.guilds.cache.size}`);
+  logger.info(
+    `Shard online! Bot user: ${client.user?.tag}. Guild count: ${client.guilds.cache.size}`
+  );
 
   if (!init) {
     await loadControllers(client);

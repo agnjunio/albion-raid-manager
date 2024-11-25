@@ -1,6 +1,5 @@
-import logger from "@black-river-gaming/logger";
+import logger from "@albion-raid-manager/logger";
 import { Client } from "discord.js";
-import purge from "./purge";
 
 export type Controller = {
   name: string;
@@ -8,7 +7,7 @@ export type Controller = {
   init: (client: Client) => Promise<void>;
 };
 
-const controllers: Controller[] = [purge];
+const controllers: Controller[] = [];
 
 export async function loadControllers(client: Client) {
   for (const controller of controllers) {
@@ -18,7 +17,10 @@ export async function loadControllers(client: Client) {
     } catch (error) {
       let message = "Unknown error";
       if (error instanceof Error) message = error.message;
-      logger.error(`Error loading controller ${controller.name}: ${message}`, error);
+      logger.error(
+        `Error loading controller ${controller.name}: ${message}`,
+        error
+      );
     }
   }
 
@@ -28,7 +30,10 @@ export async function loadControllers(client: Client) {
     } catch (error) {
       let message = "Unknown error";
       if (error instanceof Error) message = error.message;
-      logger.error(`Error in controller init ${controller.name}: ${message}`, error);
+      logger.error(
+        `Error in controller init ${controller.name}: ${message}`,
+        error
+      );
     }
   }
 }
