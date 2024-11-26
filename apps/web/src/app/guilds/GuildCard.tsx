@@ -1,4 +1,4 @@
-import { Guild } from "@albion-raid-manager/database";
+import { Guild } from "@albion-raid-manager/database/models";
 import Link from "next/link";
 import React from "react";
 

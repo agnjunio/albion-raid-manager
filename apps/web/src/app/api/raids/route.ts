@@ -1,6 +1,6 @@
-import { PrismaClientValidationError } from "@albion-raid-manager/database/library";
-import { logger } from "@lib/logger";
-import { prisma } from "@lib/prisma";
+import { prisma } from "@albion-raid-manager/database";
+import { PrismaClientValidationError } from "@albion-raid-manager/database/errors";
+import logger from "@albion-raid-manager/logger";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {

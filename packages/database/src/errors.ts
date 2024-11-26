@@ -1,1 +1,1 @@
-export type { PrismaClientValidationError } from "@prisma/client/runtime/library";
+export { PrismaClientValidationError } from "@prisma/client/runtime/library";

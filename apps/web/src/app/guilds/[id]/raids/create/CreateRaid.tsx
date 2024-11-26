@@ -1,6 +1,6 @@
 "use client";
 
-import { Composition } from "@albion-raid-manager/database";
+import { Composition } from "@albion-raid-manager/database/models";
 import { faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
