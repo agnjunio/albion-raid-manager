@@ -1,10 +1,11 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist"
-  },
-  "include": [
-    "src",
-    "config"
-  ]
+    "extends": "../../tsconfig.json",
+    "include": [
+        "config/**/*",
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
 }
