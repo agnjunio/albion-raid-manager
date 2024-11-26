@@ -1,5 +1,5 @@
 import { PageProps } from "@/app/types";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@albion-raid-manager/database";
 import CreateRaid from "./CreateRaid";
 
 export default async function CreateRaidPage({ params }: PageProps) {

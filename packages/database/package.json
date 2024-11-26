@@ -4,7 +4,8 @@
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./library": "./src/library.ts"
+    "./errors": "./src/errors.ts",
+    "./models": "./src/models.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

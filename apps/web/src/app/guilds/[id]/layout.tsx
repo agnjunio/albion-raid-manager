@@ -1,3 +1,4 @@
+import { prisma } from "@albion-raid-manager/database";
 import {
   faArrowRightFromBracket,
   faFlag,
@@ -6,7 +7,6 @@ import {
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { prisma } from "@lib/prisma";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";

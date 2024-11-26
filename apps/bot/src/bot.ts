@@ -3,7 +3,7 @@ import config from "config";
 import { Client, Events, Partials } from "discord.js";
 import { loadControllers } from "./controllers";
 
-const client = new Client({
+const discord = new Client({
   intents: [],
   partials: [
     Partials.Channel,
@@ -24,12 +24,12 @@ export async function run() {
   }
 
   logger.info("Starting the Bot Client.");
-  await client.login(config.get("discord.token"));
+  await discord.login(config.get("discord.token"));
 }
 
 export async function cleanup() {
   logger.info("Shutting down Bot Client.");
-  await client.destroy();
+  await discord.destroy();
 }
 
 // Since each bot spawns in it's own process, we need this to catch uncaught exceptions
@@ -37,12 +37,12 @@ process.on("uncaughtException", async (error) => {
   logger.error(`Uncaught exception: ${error.message}`, { error });
 });
 
-client.on(Events.ShardReady, async (shardId) => {
+discord.on(Events.ShardReady, async (shardId) => {
   process.env.SHARD = shardId.toString();
-  logger.info(`Shard online! Bot user: ${client.user?.tag}. Guild count: ${client.guilds.cache.size}`);
+  logger.info(`Shard online! Bot user: ${discord.user?.tag}. Guild count: ${discord.guilds.cache.size}`);
 
   if (!init) {
-    await loadControllers(client);
+    await loadControllers(discord);
     init = true;
   }
 });
