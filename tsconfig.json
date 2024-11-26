@@ -2,9 +2,5 @@
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist"
-  },
-  "include": [
-    "src",
-    "config"
-  ]
+  }
 }
