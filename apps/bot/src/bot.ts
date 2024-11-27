@@ -43,7 +43,7 @@ discord.on(Events.ShardReady, async (shardId) => {
   logger.info(`Shard online! Bot user: ${discord.user?.tag}. Guild count: ${discord.guilds.cache.size}`);
 
   if (!init) {
-    await loadControllers(discord);
+    await loadControllers({ discord });
     init = true;
   }
 });
