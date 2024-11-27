@@ -41,6 +41,33 @@ async function main() {
     },
   });
 
+  const mdps = await prisma.build.upsert({
+    where: { id: 4 },
+    update: {},
+    create: {
+      name: "DPS Melee Genérico",
+      role: Role.MEELE_DPS,
+    },
+  });
+
+  const support = await prisma.build.upsert({
+    where: { id: 5 },
+    update: {},
+    create: {
+      name: "Support Genérico",
+      role: Role.SUPPORT,
+    },
+  });
+
+  const bmount = await prisma.build.upsert({
+    where: { id: 6 },
+    update: {},
+    create: {
+      name: "Montaria de Batalha",
+      role: Role.BATTLEMOUNT,
+    },
+  });
+
   const composition = await prisma.composition.upsert({
     where: { id: 1 },
     update: {},
@@ -48,7 +75,7 @@ async function main() {
       name: "Ava Roads 10p",
       guildId: guild.id,
       builds: {
-        connectOrCreate: [tank, healer, healer, rdps, rdps, rdps, rdps].map((build, i) => ({
+        connectOrCreate: [tank, healer, healer, mdps, rdps, rdps, rdps, support, bmount].map((build, i) => ({
           where: { id: i + 1 },
           create: {
             buildId: build.id,
