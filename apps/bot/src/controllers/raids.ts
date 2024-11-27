@@ -86,7 +86,7 @@ const handleSignup = async ({ interaction }: { discord: Client; interaction: Int
         guild: true,
         composition: {
           include: {
-            compositionBuilds: {
+            slots: {
               include: {
                 Build: true,
               },
@@ -99,7 +99,7 @@ const handleSignup = async ({ interaction }: { discord: Client; interaction: Int
     if (!raid) throw new Error("Raid not found");
     if (raid.status !== RaidStatus.OPEN) throw new Error("Raid is not open for signups");
 
-    await interaction.reply(createRaidSignupReply(raid, raid.composition.compositionBuilds));
+    await interaction.reply(createRaidSignupReply(raid, raid.composition.slots));
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
@@ -134,7 +134,7 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
       },
     });
 
-    if (existingSignups.some((signup) => signup.compositionBuildId === slot && signup.userId !== interaction.user.id)) {
+    if (existingSignups.some((signup) => signup.slotId === slot && signup.userId !== interaction.user.id)) {
       throw new ClientError(ErrorCodes.SLOT_TAKEN, "Slot already taken, please select another one.");
     }
 
@@ -144,12 +144,12 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
         userId: interaction.user.id,
       },
       update: {
-        compositionBuildId: slot,
+        slotId: slot,
       },
       create: {
         raidId: raid.id,
         userId: interaction.user.id,
-        compositionBuildId: slot,
+        slotId: slot,
       },
     });
 

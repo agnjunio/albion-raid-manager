@@ -1,5 +1,5 @@
 import raidsController from "@/controllers/raids";
-import { Build, CompositionBuild, Raid, Role } from "@albion-raid-manager/database/models";
+import { Build, CompositionSlot, Raid, Role } from "@albion-raid-manager/database/models";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -35,7 +35,7 @@ export const createRaidAnnouncementMessage = (raid: Raid): MessageCreateOptions 
 
 export const createRaidSignupReply = (
   raid: Raid,
-  builds: (CompositionBuild & { Build: Build })[],
+  builds: (CompositionSlot & { Build: Build })[],
 ): InteractionReplyOptions => {
   const menu = new StringSelectMenuBuilder()
     .setCustomId(`${raidsController.id}:select:${raid.id}`)
