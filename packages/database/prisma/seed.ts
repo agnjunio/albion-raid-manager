@@ -74,7 +74,7 @@ async function main() {
     create: {
       name: "Ava Roads 10p",
       guildId: guild.id,
-      compositionBuilds: {
+      slots: {
         connectOrCreate: [tank, healer, healer, mdps, rdps, rdps, rdps, support, bmount].map((build, i) => ({
           where: { id: i + 1 },
           create: {

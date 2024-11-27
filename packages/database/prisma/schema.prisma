@@ -39,13 +39,13 @@ model Raid {
 }
 
 model Composition {
-  id                Int                @id @default(autoincrement())
-  name              String
-  Guild             Guild              @relation(fields: [guildId], references: [id])
-  guildId           Int
-  compositionBuilds CompositionBuild[]
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id        Int               @id @default(autoincrement())
+  name      String
+  Guild     Guild             @relation(fields: [guildId], references: [id])
+  guildId   Int
+  slots     CompositionSlot[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 
   Raid Raid[]
 }
@@ -57,10 +57,10 @@ model Build {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  CompositionBuild CompositionBuild[]
+  CompositionSlots CompositionSlot[]
 }
 
-model CompositionBuild {
+model CompositionSlot {
   id            Int         @id @default(autoincrement())
   Composition   Composition @relation(fields: [compositionId], references: [id])
   compositionId Int
@@ -73,14 +73,14 @@ model CompositionBuild {
 }
 
 model RaidSignup {
-  id                 Int              @id @default(autoincrement())
-  userId             String
-  raid               Raid             @relation(fields: [raidId], references: [id])
-  raidId             Int
-  CompositionBuild   CompositionBuild @relation(fields: [compositionBuildId], references: [id])
-  compositionBuildId Int
-  createdAt          DateTime         @default(now())
-  updatedAt          DateTime         @updatedAt
+  id        Int             @id @default(autoincrement())
+  userId    String
+  raid      Raid            @relation(fields: [raidId], references: [id])
+  raidId    Int
+  Slot      CompositionSlot @relation(fields: [slotId], references: [id])
+  slotId    Int
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 }
 
 enum Role {
