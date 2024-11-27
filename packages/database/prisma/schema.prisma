@@ -38,35 +38,48 @@ model Raid {
 }
 
 model Composition {
-  id        Int      @id @default(autoincrement())
+  id        Int                @id @default(autoincrement())
   name      String
-  Guild     Guild    @relation(fields: [guildId], references: [id])
+  Guild     Guild              @relation(fields: [guildId], references: [id])
   guildId   Int
-  Builds    Build[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Raid      Raid[]
+  builds    CompositionBuild[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  Raid Raid[]
 }
 
 model Build {
-  id          Int           @id @default(autoincrement())
-  name        String
-  role        Role?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  RaidSignup  RaidSignup[]
-  Composition Composition[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  CompositionBuild CompositionBuild[]
+}
+
+model CompositionBuild {
+  id            Int         @id @default(autoincrement())
+  Composition   Composition @relation(fields: [compositionId], references: [id])
+  compositionId Int
+  Build         Build       @relation(fields: [buildId], references: [id])
+  buildId       Int
+  comment       String?
+  assignedAt    DateTime    @default(now())
+
+  RaidSignup RaidSignup[]
 }
 
 model RaidSignup {
-  id        Int      @id @default(autoincrement())
-  userId    String
-  raid      Raid     @relation(fields: [raidId], references: [id])
-  raidId    Int
-  build     Build    @relation(fields: [buildId], references: [id])
-  buildId   Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 Int              @id @default(autoincrement())
+  userId             String
+  raid               Raid             @relation(fields: [raidId], references: [id])
+  raidId             Int
+  CompositionBuild   CompositionBuild @relation(fields: [compositionBuildId], references: [id])
+  compositionBuildId Int
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }
 
 enum Role {

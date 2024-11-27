@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { PrismaClient, Role } from "@prisma/client";
 
 const prisma = new PrismaClient({});
@@ -13,23 +14,46 @@ async function main() {
     },
   });
 
+  const tank = await prisma.build.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      name: "Mace PvE",
+      role: Role.TANK,
+    },
+  });
+
+  const healer = await prisma.build.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      name: "Queda Santa",
+      role: Role.HEALER,
+    },
+  });
+
+  const rdps = await prisma.build.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+      name: "DPS Ranged Genérico",
+      role: Role.RANGED_DPS,
+    },
+  });
+
   const composition = await prisma.composition.upsert({
     where: { id: 1 },
     update: {},
     create: {
       name: "Ava Roads 10p",
       guildId: guild.id,
-      Builds: {
-        create: [
-          {
-            name: "Mace PvE",
-            role: Role.TANK,
+      builds: {
+        connectOrCreate: [tank, healer, healer, rdps, rdps, rdps, rdps].map((build, i) => ({
+          where: { id: i + 1 },
+          create: {
+            buildId: build.id,
           },
-          {
-            name: "Healer Holy",
-            role: Role.HEALER,
-          },
-        ],
+        })),
       },
     },
   });
@@ -49,9 +73,11 @@ async function main() {
 
 main()
   .then(async () => {
+    console.log("Seed successful.");
     await prisma.$disconnect();
   })
-  .catch(async () => {
+  .catch(async (error) => {
+    console.log(error);
     await prisma.$disconnect();
     process.exit(1);
   });
