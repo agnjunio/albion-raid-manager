@@ -1,4 +1,4 @@
-import { getEmbedRaidAnnouncement } from "@/embeds/raids";
+import { createRaidAnnouncementMessage } from "@/messages/raids";
 import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { getErrorMessage } from "@albion-raid-manager/common/utils";
 import { prisma } from "@albion-raid-manager/database";
@@ -52,7 +52,7 @@ const announceRaids = async ({ discord }: { discord: Client }) => {
       if (!channel.isTextBased())
         throw new Error(`Announcement channel is not a text channel: ${raid.guild.announcementChannelId}`);
 
-      await channel.send({ embeds: [getEmbedRaidAnnouncement(raid)] });
+      await channel.send(createRaidAnnouncementMessage(raid));
     } catch (error) {
       logger.warn(`Failed to announce raid: ${raid.id} (${getErrorMessage(error)})`, {
         raid,
