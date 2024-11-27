@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 
 const prisma = new PrismaClient({});
 
@@ -8,7 +8,8 @@ async function main() {
     update: {},
     create: {
       name: "Black River",
-      discordId: "180716126400020481",
+      discordId: "738365346855256107",
+      announcementChannelId: "815639086882095115",
     },
   });
 
@@ -18,6 +19,18 @@ async function main() {
     create: {
       name: "Ava Roads 10p",
       guildId: guild.id,
+      Builds: {
+        create: [
+          {
+            name: "Mace PvE",
+            role: Role.TANK,
+          },
+          {
+            name: "Healer Holy",
+            role: Role.HEALER,
+          },
+        ],
+      },
     },
   });
 
