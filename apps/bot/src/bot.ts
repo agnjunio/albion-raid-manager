@@ -29,6 +29,7 @@ export async function run() {
 
 export async function cleanup() {
   logger.info("Shutting down Bot Client.");
+  discord.removeAllListeners();
   await discord.destroy();
 }
 

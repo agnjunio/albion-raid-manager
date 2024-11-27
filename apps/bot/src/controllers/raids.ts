@@ -1,14 +1,14 @@
-import { createRaidAnnouncementMessage } from "@/messages/raids";
+import { createRaidAnnouncementMessage, createRaidSignupReply } from "@/messages/raids";
 import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { getErrorMessage } from "@albion-raid-manager/common/utils";
 import { prisma } from "@albion-raid-manager/database";
 import { RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
 import { differenceInMinutes } from "date-fns";
-import { Client } from "discord.js";
+import { Client, Events, Interaction } from "discord.js";
 import { Controller } from ".";
 
-const announceRaids = async ({ discord }: { discord: Client }) => {
+const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
   logger.verbose("Checking for raid announcements");
 
   const now = new Date();
@@ -36,10 +36,10 @@ const announceRaids = async ({ discord }: { discord: Client }) => {
     try {
       logger.info(`Announcing raid: ${raid.id}`, { raid });
 
-      // await prisma.raid.update({
-      //   where: { id: raid.id },
-      //   data: { status: RaidStatus.OPEN },
-      // });
+      await prisma.raid.update({
+        where: { id: raid.id },
+        data: { status: RaidStatus.OPEN },
+      });
 
       if (!raid.guild.announcementChannelId)
         throw new Error(`Announcement channel not set for guild: ${raid.guild.name}`);
@@ -63,16 +63,97 @@ const announceRaids = async ({ discord }: { discord: Client }) => {
   }
 };
 
-const Raids: Controller = {
-  name: "Raids",
+const handleSignup = async ({ discord, interaction }: { discord: Client; interaction: Interaction }) => {
+  try {
+    if (!interaction.isButton()) throw new Error("Invalid interaction type");
+
+    const raidId = interaction.customId.split(":")[2];
+    if (!raidId) throw new Error("Missing raid id");
+
+    const raid = await prisma.raid.findUnique({
+      where: { id: Number(raidId) },
+      include: {
+        guild: true,
+        composition: {
+          include: {
+            builds: {
+              include: {
+                Build: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!raid) throw new Error("Raid not found");
+    if (raid.status !== RaidStatus.OPEN) throw new Error("Raid is not open for signups");
+
+    const guild = discord.guilds.cache.get(raid.guild.discordId);
+    if (!guild) throw new Error("Guild not found");
+
+    const member = await guild.members.fetch(interaction.user.id);
+    if (!member) return;
+
+    await interaction.reply(createRaidSignupReply(raid, raid.composition.builds));
+  } catch (error) {
+    if (!interaction.isRepliable()) return;
+    if (interaction.replied) return;
+
+    logger.error(`Failed to sign up for raid: ${getErrorMessage(error)}`, { interaction: interaction.toJSON(), error });
+    await interaction.reply({
+      content: `Failed to sign up for the raid. Please try again later.`,
+      ephemeral: true,
+    });
+  }
+};
+
+const handleSelect = async ({ discord, interaction }: { discord: Client; interaction: Interaction }) => {
+  try {
+    // await prisma.raidSignup.create({
+    //   data: {
+    //     raidId: raid.id,
+    //     userId: member.id,
+    //     buildId: 1, // TODO
+    //   },
+    // });
+  } catch (error) {
+    if (!interaction.isRepliable()) return;
+    if (interaction.replied) return;
+
+    logger.error(`Failed to select build for raid: ${getErrorMessage(error)}`, {
+      interaction: interaction.toJSON(),
+      error,
+    });
+    await interaction.reply({
+      content: `Failed to select build. Please try again later.`,
+      ephemeral: true,
+    });
+  }
+};
+
+const raidsController: Controller = {
+  id: "raids",
   init: async (discord: Client) => {
     runCronjob({
       name: "Announce Raids",
       cron: "*/30 * * * *", // Every 30 minutes
-      callback: () => announceRaids({ discord }),
+      callback: () => handleAnnounceRaids({ discord }),
       runOnStart: true,
+    });
+
+    discord.on(Events.InteractionCreate, async (interaction) => {
+      if (!interaction.isMessageComponent()) return;
+
+      const [controllerId, action] = interaction.customId.split(":");
+
+      if (controllerId !== raidsController.id) return;
+      if (action === "signup") return handleSignup({ discord, interaction });
+      if (action === "select") return handleSelect({ discord, interaction });
+
+      logger.warn(`Unknown action: ${interaction.customId}`, { interaction: interaction.toJSON() });
     });
   },
 };
 
-export default Raids;
+export default raidsController;

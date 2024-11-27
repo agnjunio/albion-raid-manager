@@ -1,11 +1,11 @@
 import logger from "@albion-raid-manager/logger";
 import { Client } from "discord.js";
-import raids from "./raids";
+import raidsController from "./raids";
 
-const controllers: Controller[] = [raids];
+const controllers: Controller[] = [raidsController];
 
 export type Controller = {
-  name: string;
+  id: string;
   preinit?: (client: Client) => Promise<void>;
   init: (client: Client) => Promise<void>;
 };
@@ -13,12 +13,12 @@ export type Controller = {
 export async function loadControllers(discord: Client) {
   for (const controller of controllers) {
     try {
-      logger.debug(`Controller loaded: ${controller.name}`);
+      logger.debug(`Controller loaded: ${controller.id}`);
       if (controller.preinit) await controller.preinit(discord);
     } catch (error) {
       let message = "Unknown error";
       if (error instanceof Error) message = error.message;
-      logger.error(`Error loading controller ${controller.name}: ${message}`, error);
+      logger.error(`Error loading controller ${controller.id}: ${message}`, error);
     }
   }
 
@@ -28,7 +28,7 @@ export async function loadControllers(discord: Client) {
     } catch (error) {
       let message = "Unknown error";
       if (error instanceof Error) message = error.message;
-      logger.error(`Error in controller init ${controller.name}: ${message}`, error);
+      logger.error(`Error in controller init ${controller.id}: ${message}`, error);
     }
   }
 }
