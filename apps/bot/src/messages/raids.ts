@@ -1,5 +1,5 @@
 import raidsController from "@/controllers/raids";
-import { Build, CompositionBuild, Raid } from "@albion-raid-manager/database/models";
+import { Build, CompositionBuild, Raid, Role } from "@albion-raid-manager/database/models";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -40,8 +40,22 @@ export const createRaidSignupReply = (
     .setCustomId(`${raidsController.id}:select:${raid.id}`)
     .setPlaceholder("Select a build");
 
+  const emojis = {
+    [Role.CALLER]: "🧠",
+    [Role.TANK]: "🛡️",
+    [Role.HEALER]: "💚",
+    [Role.MEELE_DPS]: "⚔️",
+    [Role.RANGED_DPS]: "🏹",
+    [Role.SUPPORT]: "💊",
+    [Role.BATTLEMOUNT]: "🐎",
+  };
+
   for (const build of builds) {
-    const option = new StringSelectMenuOptionBuilder().setValue(`${build.id}`).setLabel(build.Build.name);
+    const { name, role } = build.Build;
+    const option = new StringSelectMenuOptionBuilder()
+      .setValue(`${build.id}`)
+      .setLabel(name)
+      .setEmoji(emojis[role] || "❔");
     menu.addOptions(option);
   }
 
