@@ -14,7 +14,7 @@ const config: Config = {
   },
 
   logger: {
-    level: "debug",
+    level: "info",
   },
 };
 

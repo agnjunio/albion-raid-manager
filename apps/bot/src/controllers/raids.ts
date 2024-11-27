@@ -1,4 +1,3 @@
-import { Controller } from "@/controllers";
 import { getEmbedRaidAnnouncement } from "@/embeds/raids";
 import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { getErrorMessage } from "@albion-raid-manager/common/utils";
@@ -7,6 +6,7 @@ import { RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
 import { differenceInMinutes } from "date-fns";
 import { Client } from "discord.js";
+import { Controller } from ".";
 
 const announceRaids = async ({ discord }: { discord: Client }) => {
   logger.verbose("Checking for raid announcements");
