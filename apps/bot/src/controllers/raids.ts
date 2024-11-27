@@ -53,7 +53,12 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
       if (!channel.isTextBased())
         throw new Error(`Announcement channel is not a text channel: ${raid.guild.announcementChannelId}`);
 
-      await channel.send(createRaidAnnouncementMessage(raid));
+      const message = await channel.send(createRaidAnnouncementMessage(raid));
+
+      await prisma.raid.update({
+        where: { id: raid.id },
+        data: { announcementMessageId: message.id },
+      });
     } catch (error) {
       logger.warn(`Failed to announce raid: ${raid.id} (${getErrorMessage(error)})`, {
         raid,
