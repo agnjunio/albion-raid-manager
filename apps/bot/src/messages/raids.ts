@@ -16,6 +16,7 @@ export const createRaidAnnouncementMessage = (raid: Raid): MessageCreateOptions 
     .setColor("#ffbd59")
     .setTitle("Raid Announcement")
     .setDescription(`A new raid has been scheduled. Click sign up to join.`)
+    .setFields([{ name: "Description", value: raid.description }])
     .setTimestamp(new Date(raid.date));
 
   const confirm = new ButtonBuilder()

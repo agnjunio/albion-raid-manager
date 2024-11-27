@@ -7,7 +7,10 @@ import { RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
 import { differenceInMinutes } from "date-fns";
 import { Client, Events, Interaction } from "discord.js";
+import { EventEmitter } from "stream";
 import { Controller } from ".";
+
+const raidEvents = new EventEmitter();
 
 const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
   logger.verbose("Checking for raid announcements");
@@ -59,6 +62,7 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
         where: { id: raid.id },
         data: { announcementMessageId: message.id },
       });
+      raidEvents.emit("raidAnnounced", { raid, message });
     } catch (error) {
       logger.warn(`Failed to announce raid: ${raid.id} (${getErrorMessage(error)})`, {
         raid,
@@ -134,7 +138,7 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
       throw new ClientError(ErrorCodes.SLOT_TAKEN, "Slot already taken, please select another one.");
     }
 
-    await prisma.raidSignup.upsert({
+    const signup = await prisma.raidSignup.upsert({
       where: {
         id: raid.id,
         userId: interaction.user.id,
@@ -152,6 +156,11 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
     await interaction.update({
       content: `You have signed up for the raid! Good luck!`,
       components: [],
+    });
+    raidEvents.emit("raidSignup", {
+      raid,
+      user: interaction.user,
+      signup,
     });
   } catch (error) {
     if (!interaction.isRepliable()) return;
@@ -175,7 +184,7 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
 
 const raidsController: Controller = {
   id: "raids",
-  init: async (discord: Client) => {
+  init: async ({ discord }) => {
     runCronjob({
       name: "Announce Raids",
       cron: "*/30 * * * *", // Every 30 minutes
@@ -193,6 +202,18 @@ const raidsController: Controller = {
       if (action === "select") return handleSelect({ discord, interaction });
 
       logger.warn(`Unknown action: ${interaction.customId}`, { interaction: interaction.toJSON() });
+    });
+
+    raidEvents.on("raidAnnounced", ({ raid, message }) => {
+      logger.info(`Raid announced: ${raid.id}`, { raid, message: message.toJSON() });
+    });
+
+    raidEvents.on("raidSignup", ({ signup, raid, user }) => {
+      logger.info(`User ${user.displayName} signed up for raid: ${raid.id}`, {
+        signup,
+        raid,
+        user: user.toJSON(),
+      });
     });
   },
 };

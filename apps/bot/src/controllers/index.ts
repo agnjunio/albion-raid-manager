@@ -6,15 +6,16 @@ const controllers: Controller[] = [raidsController];
 
 export type Controller = {
   id: string;
-  preinit?: (client: Client) => Promise<void>;
-  init: (client: Client) => Promise<void>;
+  preinit?: ({ discord }: ControllerParams) => Promise<void>;
+  init: ({ discord }: ControllerParams) => Promise<void>;
 };
+export type ControllerParams = { discord: Client };
 
-export async function loadControllers(discord: Client) {
+export async function loadControllers({ discord }: ControllerParams) {
   for (const controller of controllers) {
     try {
       logger.debug(`Controller loaded: ${controller.id}`);
-      if (controller.preinit) await controller.preinit(discord);
+      if (controller.preinit) await controller.preinit({ discord });
     } catch (error) {
       let message = "Unknown error";
       if (error instanceof Error) message = error.message;
@@ -24,7 +25,7 @@ export async function loadControllers(discord: Client) {
 
   for (const controller of controllers) {
     try {
-      if (controller.init) await controller.init(discord);
+      if (controller.init) await controller.init({ discord });
     } catch (error) {
       let message = "Unknown error";
       if (error instanceof Error) message = error.message;
