@@ -76,7 +76,7 @@ const handleSignup = async ({ discord, interaction }: { discord: Client; interac
         guild: true,
         composition: {
           include: {
-            builds: {
+            compositionBuilds: {
               include: {
                 Build: true,
               },
@@ -95,7 +95,7 @@ const handleSignup = async ({ discord, interaction }: { discord: Client; interac
     const member = await guild.members.fetch(interaction.user.id);
     if (!member) return;
 
-    await interaction.reply(createRaidSignupReply(raid, raid.composition.builds));
+    await interaction.reply(createRaidSignupReply(raid, raid.composition.compositionBuilds));
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
