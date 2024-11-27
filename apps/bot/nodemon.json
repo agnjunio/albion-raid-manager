@@ -3,5 +3,5 @@
   "watch": ["config", "src"],
   "ext": "ts, json",
   "ignore": ["node_modules", "__tests__"],
-  "delay": 10
+  "delay": 3
 }
