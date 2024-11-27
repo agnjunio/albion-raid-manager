@@ -9,7 +9,9 @@
   },
   "scripts": {
     "db:generate": "prisma generate",
-    "db:push": "prisma db push --skip-generate"
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push --skip-generate",
+    "db:seed": "prisma db seed --environment development"
   },
   "prisma": {
     "seed": "pnpx ts-node prisma/seed.ts"
