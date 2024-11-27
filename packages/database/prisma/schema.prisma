@@ -14,11 +14,13 @@ datasource db {
 }
 
 model Guild {
-  id           Int           @id @default(autoincrement())
-  name         String        @unique
-  discordId    String
-  raids        Raid[]
-  compositions Composition[]
+  id                    Int           @id @default(autoincrement())
+  name                  String
+  icon                  String?
+  discordId             String
+  announcementChannelId String?
+  raids                 Raid[]
+  compositions          Composition[]
 }
 
 model Raid {
