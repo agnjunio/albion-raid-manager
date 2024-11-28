@@ -1,0 +1,6 @@
+{
+  "logger": {
+    "level": "error",
+    "file": false
+  }
+}
