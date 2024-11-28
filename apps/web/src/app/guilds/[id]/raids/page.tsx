@@ -33,8 +33,8 @@ export default function GuildPage() {
   }, []);
 
   return (
-    <div className="grow h-full flex flex-col gap-5 px-4 py-1">
-      <h2 className="text-2xl font-semibold text-center">Raids</h2>
+    <div className="grow h-full flex flex-col px-4">
+      <h2 className="text-2xl font-semibold text-center py-4">Raids</h2>
 
       <RaidList raids={raids} loading={loading} onRefresh={() => fetchRaids()} />
     </div>

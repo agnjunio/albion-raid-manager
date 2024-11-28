@@ -14,9 +14,9 @@ interface RaidListProps {
 
 const statusColors = {
   [RaidStatus.SCHEDULED]: "bg-secondary-violet-800",
-  [RaidStatus.OPEN]: "bg-green-900",
+  [RaidStatus.OPEN]: "bg-green-800",
   [RaidStatus.CLOSED]: "bg-red-900",
-  [RaidStatus.ONGOING]: "bg-primary-yellow-900",
+  [RaidStatus.ONGOING]: "bg-primary-yellow-800",
   [RaidStatus.FINISHED]: "bg-primary-gray-500",
 };
 
@@ -33,8 +33,8 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
   if (loading) return <Loading />;
   return (
     <div className="h-full flex flex-col gap-3">
-      <div className="flex justify-between">
-        <div className="flex gap-2">
+      <div className="flex justify-between items-center gap-2">
+        <div className="flex gap-2 flex-wrap">
           {["ALL", ...Object.keys(RaidStatus)].map((status) => {
             const colors =
               filter === status
@@ -43,7 +43,7 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
             return (
               <button
                 key={status}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors cursor-pointer select-none uppercase ${colors}`}
+                className={`rounded-full px-4 py-1 text-sm font-semibold transition-colors cursor-pointer select-none uppercase shadow-sm ${colors}`}
                 onClick={() => setFilter(status)}
               >
                 {status}
@@ -54,7 +54,7 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
 
         <div className="flex gap-2 flex-row-reverse">
           <Link href="raids/create" tabIndex={-1}>
-            <button>Create Raid</button>
+            <button className="whitespace-nowrap">New Raid</button>
           </Link>
 
           <button role="icon-button" onClick={onRefresh}>
@@ -80,14 +80,14 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
                 })}
               </div>
               <div
-                className={`select-none basis-24 text-center p-1 text-xs uppercase rounded-lg font-semibold ${statusColors[raid.status]}`}
+                className={`select-none basis-24 text-center p-1 text-xs uppercase rounded-lg font-semibold shadow-sm ${statusColors[raid.status]}`}
               >
                 {raid.status}
               </div>
             </div>
           </li>
         ))}
-        {filteredRaids.length === 0 && <p className="flex h-24 items-center justify-center">No raids.</p>}
+        {filteredRaids.length === 0 && <p className="flex items-center justify-center">No raids.</p>}
       </ul>
     </div>
   );
