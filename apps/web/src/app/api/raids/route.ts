@@ -13,16 +13,29 @@ export async function POST(req: Request) {
       },
     });
 
-    if (!guild) {
-      return NextResponse.json({ message: "Guild not found" }, { status: 404 });
-    }
+    if (!guild) return NextResponse.json({ message: "Guild not found" }, { status: 404 });
+
+    const composition = await prisma.composition.findUnique({
+      where: {
+        id: compositionId,
+      },
+      include: {
+        slots: true,
+      },
+    });
+
+    if (!composition) return NextResponse.json({ message: "Composition not found" }, { status: 404 });
 
     const raid = await prisma.raid.create({
       data: {
         description,
         date: new Date(date),
-        compositionId,
         guildId,
+        slots: {
+          create: composition.slots.map((slot) => ({
+            buildId: slot.buildId,
+          })),
+        },
       },
     });
 
