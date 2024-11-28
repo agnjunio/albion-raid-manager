@@ -2,6 +2,5 @@
   "exec": "ts-node -r dotenv/config .",
   "watch": ["config", "src"],
   "ext": "ts, json",
-  "ignore": ["node_modules", "__tests__"],
-  "delay": 10
+  "ignore": ["node_modules", "__tests__"]
 }

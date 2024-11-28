@@ -1,3 +1,4 @@
+export * from "./errors";
 export * from "./files";
 export * from "./math";
 export * from "./objects";

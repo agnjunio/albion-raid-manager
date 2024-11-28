@@ -11,8 +11,7 @@ async function start() {
   try {
     const mode = (process.env.MODE || Mode.BOT) as Mode;
     if (!mode) throw new Error("Mode not defined");
-    if (!Object.values(Mode).includes(mode))
-      throw new Error("Mode not supported");
+    if (!Object.values(Mode).includes(mode)) throw new Error("Mode not supported");
 
     const { run, cleanup } = {
       [Mode.SHARD]: shard,

@@ -1,11 +1,10 @@
 {
-    "extends": "../../tsconfig.json",
-    "include": [
-        "config/**/*",
-        "src/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["config/**/*", "src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
