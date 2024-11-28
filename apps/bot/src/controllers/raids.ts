@@ -23,6 +23,11 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
       },
       include: {
         guild: true,
+        slots: {
+          include: {
+            build: true,
+          },
+        },
       },
     })
     .then((raids) => {
@@ -56,11 +61,7 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
       if (!channel.isTextBased())
         throw new Error(`Announcement channel is not a text channel: ${raid.guild.announcementChannelId}`);
 
-      const slots = await prisma.compositionSlot.findMany({
-        where: { compositionId: raid.compositionId },
-        include: { Build: true },
-      });
-      const message = await channel.send(getRaidAnnouncementMessage<MessageCreateOptions>(raid, slots));
+      const message = await channel.send(getRaidAnnouncementMessage<MessageCreateOptions>(raid, raid.slots));
 
       await prisma.raid.update({
         where: { id: raid.id },
@@ -77,7 +78,7 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
   }
 };
 
-const handleSignup = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
+const handleSignup = async ({ discord, interaction }: { discord: Client; interaction: Interaction }) => {
   try {
     if (!interaction.isButton()) throw new Error("Invalid interaction type");
 
@@ -88,13 +89,9 @@ const handleSignup = async ({ interaction }: { discord: Client; interaction: Int
       where: { id: Number(raidId) },
       include: {
         guild: true,
-        composition: {
+        slots: {
           include: {
-            slots: {
-              include: {
-                Build: true,
-              },
-            },
+            build: true,
           },
         },
       },
@@ -103,7 +100,10 @@ const handleSignup = async ({ interaction }: { discord: Client; interaction: Int
     if (!raid) throw new Error("Raid not found");
     if (raid.status !== RaidStatus.OPEN) throw new Error("Raid is not open for signups");
 
-    await interaction.reply(createRaidSignupReply(raid, raid.composition.slots));
+    const users = await Promise.all(
+      raid.slots.filter((slot) => !!slot.userId).map(async (slot) => discord.users.fetch(slot.userId as string)),
+    );
+    await interaction.reply(createRaidSignupReply(raid, raid.slots, users));
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
@@ -117,13 +117,16 @@ const handleSignup = async ({ interaction }: { discord: Client; interaction: Int
 };
 
 const handleSelect = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
-  try {
-    if (!interaction.isStringSelectMenu()) throw new Error("Invalid interaction type");
+  if (!interaction.isStringSelectMenu()) return;
 
+  try {
     const raidId = interaction.customId.split(":")[2];
 
     const raid = await prisma.raid.findUnique({
       where: { id: Number(raidId) },
+      include: {
+        slots: true,
+      },
     });
 
     if (!raid) throw new Error("Raid not found");
@@ -132,28 +135,30 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
     const slot = Number(interaction.values[0]);
     if (isNaN(slot)) throw new Error("Invalid slot selected");
 
-    const existingSignups = await prisma.raidSignup.findMany({
-      where: {
-        raidId: raid.id,
-      },
-    });
-
-    if (existingSignups.some((signup) => signup.slotId === slot && signup.userId !== interaction.user.id)) {
+    if (
+      raid.slots.some((raidSlot) => raidSlot.id === slot && raidSlot.userId && raidSlot.userId !== interaction.user.id)
+    ) {
       throw new ClientError(ErrorCodes.SLOT_TAKEN, "Slot already taken, please select another one.");
     }
 
-    const signup = await prisma.raidSignup.upsert({
+    const currentSlotId = raid.slots.find((raidSlot) => raidSlot.userId === interaction.user.id)?.id;
+    if (currentSlotId) {
+      await prisma.raidSlot.update({
+        where: {
+          id: currentSlotId,
+        },
+        data: {
+          userId: null,
+        },
+      });
+    }
+
+    await prisma.raidSlot.update({
       where: {
-        id: raid.id,
-        userId: interaction.user.id,
+        id: slot,
       },
-      update: {
-        slotId: slot,
-      },
-      create: {
-        raidId: raid.id,
+      data: {
         userId: interaction.user.id,
-        slotId: slot,
       },
     });
 
@@ -175,9 +180,8 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
       error instanceof ClientError
         ? `Failed to select build: ${error.message}`
         : `Failed to select build. Please try again later.`;
-    await interaction.reply({
+    await interaction.update({
       content,
-      ephemeral: true,
     });
   }
 };
@@ -227,14 +231,11 @@ const raidsController: Controller = {
       const message = await channel.messages.fetch(raid.announcementMessageId);
       if (!message) return;
 
-      const signups = await prisma.raidSignup.findMany({
+      const slots = await prisma.raidSlot.findMany({
         where: { raidId: raid.id },
+        include: { build: true },
       });
-      const slots = await prisma.compositionSlot.findMany({
-        where: { compositionId: raid.compositionId },
-        include: { Build: true },
-      });
-      await message.edit(getRaidAnnouncementMessage<MessageEditOptions>(raid, slots, signups));
+      await message.edit(getRaidAnnouncementMessage<MessageEditOptions>(raid, slots));
     });
   },
 };

@@ -68,7 +68,7 @@ async function main() {
     },
   });
 
-  const composition = await prisma.composition.upsert({
+  await prisma.composition.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -93,7 +93,14 @@ async function main() {
       status: "SCHEDULED",
       date: new Date(),
       guildId: guild.id,
-      compositionId: composition.id,
+      slots: {
+        connectOrCreate: [tank, healer, healer, mdps, rdps, rdps, rdps, support, bmount].map((build, i) => ({
+          where: { id: i + 1 },
+          create: {
+            buildId: build.id,
+          },
+        })),
+      },
     },
   });
 }
