@@ -54,13 +54,17 @@ export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | Mess
       .join("\n"),
   });
 
-  const confirm = new ButtonBuilder()
+  const signupButton = new ButtonBuilder()
     .setCustomId(`${raidsController.id}:signup:${raid.id}`)
     .setLabel("Sign Up")
-    .setEmoji("📜")
-    .setStyle(ButtonStyle.Primary);
+    .setStyle(ButtonStyle.Success);
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(confirm);
+  const signoutButon = new ButtonBuilder()
+    .setCustomId(`${raidsController.id}:signout:${raid.id}`)
+    .setLabel("Leave")
+    .setStyle(ButtonStyle.Danger);
+
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(signupButton, signoutButon);
 
   return {
     embeds: [embed],

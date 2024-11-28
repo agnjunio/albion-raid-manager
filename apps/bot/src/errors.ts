@@ -1,5 +1,7 @@
 export enum ErrorCodes {
   SLOT_TAKEN,
+  RAID_NOT_OPEN,
+  USER_NOT_SIGNED,
 }
 
 export class ClientError extends Error {
