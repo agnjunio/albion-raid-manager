@@ -1,5 +1,5 @@
 import raidsController from "@/controllers/raids";
-import { Build, CompositionSlot, Raid, RaidSignup, Role } from "@albion-raid-manager/database/models";
+import { Build, Raid, RaidSlot, Role } from "@albion-raid-manager/database/models";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -10,6 +10,7 @@ import {
   MessageEditOptions,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
+  User,
 } from "discord.js";
 
 const emojis = {
@@ -24,8 +25,7 @@ const emojis = {
 
 export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
   raid: Raid,
-  slots: (CompositionSlot & { Build: Build })[],
-  signups?: RaidSignup[],
+  slots: (RaidSlot & { build: Build })[],
 ): T => {
   const embed = new EmbedBuilder()
     .setColor("#ffbd59")
@@ -37,26 +37,34 @@ export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | Mess
     .setTimestamp(new Date(raid.date));
 
   embed.addFields({
-    name: `Composition (${signups?.length || 0}/${slots.length})`,
+    name: "Status",
+    value: raid.status,
+  });
+
+  const signups = slots.filter((slot) => !!slot.userId);
+  embed.addFields({
+    name: `Composition (${signups.length}/${slots.length})`,
     value: slots
+      .sort((a, b) => a.id - b.id)
       .map((slot) => {
-        let row = `${emojis[slot.Build.role]} ${slot.Build.name}`;
-
-        const signup = signups?.find((signup) => signup.slotId === slot.id);
-        if (signup) row += ` - <@${signup.userId}>`;
-
+        let row = `${emojis[slot.build.role]} ${slot.build.name}`;
+        if (slot.userId) row += ` - <@${slot.userId}>`;
         return row;
       })
       .join("\n"),
   });
 
-  const confirm = new ButtonBuilder()
+  const signupButton = new ButtonBuilder()
     .setCustomId(`${raidsController.id}:signup:${raid.id}`)
     .setLabel("Sign Up")
-    .setEmoji("📜")
-    .setStyle(ButtonStyle.Primary);
+    .setStyle(ButtonStyle.Success);
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(confirm);
+  const signoutButon = new ButtonBuilder()
+    .setCustomId(`${raidsController.id}:signout:${raid.id}`)
+    .setLabel("Leave")
+    .setStyle(ButtonStyle.Danger);
+
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(signupButton, signoutButon);
 
   return {
     embeds: [embed],
@@ -66,17 +74,24 @@ export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | Mess
 
 export const createRaidSignupReply = (
   raid: Raid,
-  builds: (CompositionSlot & { Build: Build })[],
+  slots: (RaidSlot & { build: Build })[],
+  users?: User[],
 ): InteractionReplyOptions => {
   const menu = new StringSelectMenuBuilder()
     .setCustomId(`${raidsController.id}:select:${raid.id}`)
     .setPlaceholder("Select a build");
 
-  for (const build of builds) {
-    const { name, role } = build.Build;
+  for (const slot of slots.sort((a, b) => a.id - b.id)) {
+    const { name, role } = slot.build;
+    let label = name;
+    if (slot.userId) {
+      label += ` - `;
+      const user = users?.find((user) => user.id === slot.userId);
+      label += user ? `[${user.displayName}]` : `[Taken]`;
+    }
     const option = new StringSelectMenuOptionBuilder()
-      .setValue(`${build.id}`)
-      .setLabel(name)
+      .setValue(`${slot.id}`)
+      .setLabel(label)
       .setEmoji(emojis[role] || "❔");
     menu.addOptions(option);
   }

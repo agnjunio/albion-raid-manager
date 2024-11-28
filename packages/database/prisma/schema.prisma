@@ -24,13 +24,13 @@ model Guild {
 }
 
 model Build {
-  id        Int      @id @default(autoincrement())
-  name      String
-  role      Role
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id               Int               @id @default(autoincrement())
+  name             String
+  role             Role
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   CompositionSlots CompositionSlot[]
+  RaidSlot         RaidSlot[]
 }
 
 model Composition {
@@ -41,8 +41,6 @@ model Composition {
   slots     CompositionSlot[]
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
-
-  Raid Raid[]
 }
 
 model CompositionSlot {
@@ -53,34 +51,29 @@ model CompositionSlot {
   buildId       Int
   comment       String?
   assignedAt    DateTime    @default(now())
-
-  RaidSignup RaidSignup[]
 }
 
 model Raid {
-  id                    Int          @id @default(autoincrement())
+  id                    Int        @id @default(autoincrement())
   description           String
-  status                RaidStatus   @default(SCHEDULED)
+  status                RaidStatus @default(SCHEDULED)
   announcementMessageId String?
   date                  DateTime
-  guild                 Guild        @relation(fields: [guildId], references: [id])
+  guild                 Guild      @relation(fields: [guildId], references: [id])
   guildId               Int
-  composition           Composition  @relation(fields: [compositionId], references: [id])
-  compositionId         Int
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
-  RaidSignup            RaidSignup[]
+  slots                 RaidSlot[]
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
 }
 
-model RaidSignup {
-  id        Int             @id @default(autoincrement())
-  userId    String
-  raid      Raid            @relation(fields: [raidId], references: [id])
-  raidId    Int
-  Slot      CompositionSlot @relation(fields: [slotId], references: [id])
-  slotId    Int
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+model RaidSlot {
+  id         Int      @id @default(autoincrement())
+  raid       Raid     @relation(fields: [raidId], references: [id])
+  raidId     Int
+  build      Build    @relation(fields: [buildId], references: [id])
+  buildId    Int
+  userId     String?
+  assignedAt DateTime @default(now())
 }
 
 enum Role {
