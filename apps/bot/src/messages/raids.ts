@@ -1,5 +1,5 @@
 import raidsController from "@/controllers/raids";
-import { Build, CompositionSlot, Raid, Role } from "@albion-raid-manager/database/models";
+import { Build, CompositionSlot, Raid, RaidSignup, Role } from "@albion-raid-manager/database/models";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -7,17 +7,48 @@ import {
   EmbedBuilder,
   InteractionReplyOptions,
   MessageCreateOptions,
+  MessageEditOptions,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 
-export const createRaidAnnouncementMessage = (raid: Raid): MessageCreateOptions => {
+const emojis = {
+  [Role.CALLER]: "🧠",
+  [Role.TANK]: "🛡️",
+  [Role.HEALER]: "💚",
+  [Role.MEELE_DPS]: "⚔️",
+  [Role.RANGED_DPS]: "🏹",
+  [Role.SUPPORT]: "💊",
+  [Role.BATTLEMOUNT]: "🐎",
+};
+
+export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
+  raid: Raid,
+  slots: (CompositionSlot & { Build: Build })[],
+  signups?: RaidSignup[],
+): T => {
   const embed = new EmbedBuilder()
     .setColor("#ffbd59")
-    .setTitle("Raid Announcement")
-    .setDescription(`A new raid has been scheduled. Click sign up to join.`)
-    .setFields([{ name: "Description", value: raid.description }])
+    .setTitle(raid.description)
+    .setDescription(`Raid is open for registration! Click sign up to join.`)
+    .setFooter({
+      text: "Powered by Albion Raid Manager",
+    })
     .setTimestamp(new Date(raid.date));
+
+  embed.addFields({
+    name: `Composition (${signups?.length || 0}/${slots.length})`,
+    value: slots
+      .map((slot) => {
+        let row = `${emojis[slot.Build.role]} ${slot.Build.name}`;
+
+        const signup = signups?.find((signup) => signup.slotId === slot.id);
+        if (signup) row += ` - <@${signup.userId}>`;
+
+        return row;
+      })
+      .join("\n"),
+  });
 
   const confirm = new ButtonBuilder()
     .setCustomId(`${raidsController.id}:signup:${raid.id}`)
@@ -30,7 +61,7 @@ export const createRaidAnnouncementMessage = (raid: Raid): MessageCreateOptions 
   return {
     embeds: [embed],
     components: [row],
-  };
+  } as unknown as T;
 };
 
 export const createRaidSignupReply = (
@@ -40,16 +71,6 @@ export const createRaidSignupReply = (
   const menu = new StringSelectMenuBuilder()
     .setCustomId(`${raidsController.id}:select:${raid.id}`)
     .setPlaceholder("Select a build");
-
-  const emojis = {
-    [Role.CALLER]: "🧠",
-    [Role.TANK]: "🛡️",
-    [Role.HEALER]: "💚",
-    [Role.MEELE_DPS]: "⚔️",
-    [Role.RANGED_DPS]: "🏹",
-    [Role.SUPPORT]: "💊",
-    [Role.BATTLEMOUNT]: "🐎",
-  };
 
   for (const build of builds) {
     const { name, role } = build.Build;

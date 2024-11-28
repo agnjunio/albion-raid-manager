@@ -1,12 +1,12 @@
 import { ClientError, ErrorCodes } from "@/errors";
-import { createRaidAnnouncementMessage, createRaidSignupReply } from "@/messages/raids";
+import { createRaidSignupReply, getRaidAnnouncementMessage } from "@/messages/raids";
 import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { getErrorMessage } from "@albion-raid-manager/common/utils";
 import { prisma } from "@albion-raid-manager/database";
-import { RaidStatus } from "@albion-raid-manager/database/models";
+import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
 import { differenceInMinutes } from "date-fns";
-import { Client, Events, Interaction } from "discord.js";
+import { Client, Events, Interaction, MessageCreateOptions, MessageEditOptions, User } from "discord.js";
 import { EventEmitter } from "stream";
 import { Controller } from ".";
 
@@ -56,13 +56,17 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
       if (!channel.isTextBased())
         throw new Error(`Announcement channel is not a text channel: ${raid.guild.announcementChannelId}`);
 
-      const message = await channel.send(createRaidAnnouncementMessage(raid));
+      const slots = await prisma.compositionSlot.findMany({
+        where: { compositionId: raid.compositionId },
+        include: { Build: true },
+      });
+      const message = await channel.send(getRaidAnnouncementMessage<MessageCreateOptions>(raid, slots));
 
       await prisma.raid.update({
         where: { id: raid.id },
         data: { announcementMessageId: message.id },
       });
-      raidEvents.emit("raidAnnounced", { raid, message });
+      raidEvents.emit("raidAnnounced", raid);
     } catch (error) {
       logger.warn(`Failed to announce raid: ${raid.id} (${getErrorMessage(error)})`, {
         raid,
@@ -157,11 +161,7 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
       content: `You have signed up for the raid! Good luck!`,
       components: [],
     });
-    raidEvents.emit("raidSignup", {
-      raid,
-      user: interaction.user,
-      signup,
-    });
+    raidEvents.emit("raidSignup", raid, interaction.user);
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
@@ -204,16 +204,37 @@ const raidsController: Controller = {
       logger.warn(`Unknown action: ${interaction.customId}`, { interaction: interaction.toJSON() });
     });
 
-    raidEvents.on("raidAnnounced", ({ raid, message }) => {
-      logger.info(`Raid announced: ${raid.id}`, { raid, message: message.toJSON() });
+    raidEvents.on("raidAnnounced", (raid: Raid) => {
+      logger.info(`Raid announced: ${raid.id}`, { raid });
     });
 
-    raidEvents.on("raidSignup", ({ signup, raid, user }) => {
+    raidEvents.on("raidSignup", async (raid: Raid, user: User) => {
       logger.info(`User ${user.displayName} signed up for raid: ${raid.id}`, {
-        signup,
         raid,
         user: user.toJSON(),
       });
+
+      if (!raid.announcementMessageId) return;
+
+      const guild = await prisma.guild.findUnique({
+        where: { id: raid.guildId },
+      });
+      if (!guild || !guild.announcementChannelId) return;
+
+      const channel = discord.channels.cache.get(guild.announcementChannelId);
+      if (!channel?.isTextBased()) return;
+
+      const message = await channel.messages.fetch(raid.announcementMessageId);
+      if (!message) return;
+
+      const signups = await prisma.raidSignup.findMany({
+        where: { raidId: raid.id },
+      });
+      const slots = await prisma.compositionSlot.findMany({
+        where: { compositionId: raid.compositionId },
+        include: { Build: true },
+      });
+      await message.edit(getRaidAnnouncementMessage<MessageEditOptions>(raid, slots, signups));
     });
   },
 };
