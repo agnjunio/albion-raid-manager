@@ -65,11 +65,11 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
 
       <ul className="space-y-2">
         {filteredRaids.map((raid) => (
-          <li
-            key={raid.id}
-            className="p-2 rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors"
-          >
-            <div className="flex justify-between gap-4 p-2 items-center">
+          <li key={raid.id}>
+            <Link
+              href={`raids/${raid.id}`}
+              className="flex justify-between gap-4 p-4 items-center rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors outline-offset-0"
+            >
               <div className="grow text-lg font-semibold">{raid.description}</div>
               <div>
                 {new Date(raid.date).toLocaleString(navigator.language, {
@@ -84,7 +84,7 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
               >
                 {raid.status}
               </div>
-            </div>
+            </Link>
           </li>
         ))}
         {filteredRaids.length === 0 && <p className="flex items-center justify-center">No raids.</p>}

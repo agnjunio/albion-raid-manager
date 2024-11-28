@@ -16,7 +16,7 @@ export default function GuildPage() {
       const res = await fetch(
         `/api/raids?` +
           new URLSearchParams({
-            guildId: params.id as string,
+            guildId: params.guildId as string,
           }).toString(),
       );
 

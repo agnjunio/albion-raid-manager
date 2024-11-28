@@ -9,14 +9,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import React from "react";
-
-type LayoutProps = {
-  params: Promise<{
-    id: string;
-  }>;
-  children: React.ReactNode;
-};
+import { GuildLayoutProps } from "./types";
 
 const links = [
   { href: "raids", label: "Raids", icon: faFlag },
@@ -25,11 +18,11 @@ const links = [
   { href: "settings", label: "Settings", icon: faGear },
 ];
 
-export default async function Layout({ params, children }: LayoutProps) {
-  const { id } = await params;
+export default async function Layout({ params, children }: GuildLayoutProps) {
+  const { guildId } = await params;
   const guild = await prisma.guild.findUnique({
     where: {
-      id: Number(id),
+      id: Number(guildId),
     },
     include: { raids: true },
   });
