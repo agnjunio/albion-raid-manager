@@ -60,6 +60,8 @@
   input[type="email"],
   input[type="number"],
   input[type="date"],
+  input[type="datetime"],
+  input[type="datetime-local"],
   select {
     @apply bg-primary-gray-300;
     @apply text-primary-gray placeholder:text-primary-gray-800/60 placeholder:text-sm;
