@@ -54,7 +54,7 @@ export default async function Layout({ params, children }: LayoutProps) {
             <li key={link.label}>
               <Link
                 href={`/guilds/${guild.id}/${link.href}`}
-                className="px-4 py-2 hover:bg-primary-yellow-600/25 flex gap-4 items-center"
+                className="px-4 py-2 flex gap-4 items-center hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors"
               >
                 <FontAwesomeIcon icon={link.icon} width={16} height={16} className="-mt-[1px]" />
                 {link.label}
