@@ -1,9 +1,28 @@
+import { getErrorMessage } from "@albion-raid-manager/common/utils";
 import { prisma } from "@albion-raid-manager/database";
 import { PrismaClientValidationError } from "@albion-raid-manager/database/errors";
 import logger from "@albion-raid-manager/logger";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function GET(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const guildId = url.searchParams.get("guildId");
+
+    const raids = await prisma.raid.findMany({
+      where: {
+        guildId: Number(guildId),
+      },
+    });
+
+    return NextResponse.json(raids);
+  } catch (error) {
+    logger.error(`Failed to retrieve raids. (${getErrorMessage(error)})`, { error });
+    return NextResponse.json({ message: "Failed to retrieve raids" }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
   try {
     const { guildId, description, date, compositionId } = await req.json();
 
@@ -12,7 +31,6 @@ export async function POST(req: Request) {
         id: guildId,
       },
     });
-
     if (!guild) return NextResponse.json({ message: "Guild not found" }, { status: 404 });
 
     const composition = await prisma.composition.findUnique({
@@ -23,7 +41,6 @@ export async function POST(req: Request) {
         slots: true,
       },
     });
-
     if (!composition) return NextResponse.json({ message: "Composition not found" }, { status: 404 });
 
     const raid = await prisma.raid.create({

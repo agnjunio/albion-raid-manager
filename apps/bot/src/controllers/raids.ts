@@ -5,7 +5,6 @@ import { getErrorMessage } from "@albion-raid-manager/common/utils";
 import { prisma } from "@albion-raid-manager/database";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
-import { differenceInMinutes } from "date-fns";
 import { Client, Events, Interaction, MessageCreateOptions, MessageEditOptions, User } from "discord.js";
 import { EventEmitter } from "stream";
 import { Controller } from ".";
@@ -15,26 +14,19 @@ const raidEvents = new EventEmitter();
 const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
   logger.verbose("Checking for raid announcements");
 
-  const now = new Date();
-  const raids = await prisma.raid
-    .findMany({
-      where: {
-        status: RaidStatus.SCHEDULED,
-      },
-      include: {
-        guild: true,
-        slots: {
-          include: {
-            build: true,
-          },
+  const raids = await prisma.raid.findMany({
+    where: {
+      status: RaidStatus.SCHEDULED,
+    },
+    include: {
+      guild: true,
+      slots: {
+        include: {
+          build: true,
         },
       },
-    })
-    .then((raids) => {
-      return raids.filter((raid) => {
-        return differenceInMinutes(new Date(raid.date), now) < 30;
-      });
-    });
+    },
+  });
   if (!raids.length) return;
 
   logger.debug(`Announcing ${raids.length} scheuled raids.`, {

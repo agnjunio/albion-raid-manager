@@ -2,17 +2,11 @@ import config from "config";
 import path from "node:path";
 import { createLogger, format, transports } from "winston";
 
-const level: string = config.has("logger.level")
-  ? config.get("logger.level")
-  : "debug";
+const level: string = config.has("logger.level") ? config.get("logger.level") : "debug";
 
 const logger = createLogger({
   level: "debug",
-  format: format.combine(
-    format.timestamp(),
-    format.errors({ stack: true }),
-    format.json()
-  ),
+  format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
   defaultMeta: {
     get service() {
       return process.env.SERVICE;
@@ -39,11 +33,11 @@ const logger = createLogger({
   ],
 });
 
-const consoleFormat = format.printf(({ level, message, timestamp, shard }) => {
+const consoleFormat = format.printf(({ level, [Symbol.for("level")]: logLevel, message, timestamp, shard }) => {
   const printSpace = (count: number) => " ".repeat(Math.max(count, 0));
 
   const maxLen = "verbose".length;
-  const count = maxLen - level.length;
+  const count = maxLen - (logLevel as string).length;
   const spacing = printSpace(count);
   const shardStr = shard ? `[#${shard}] ` : "";
   return `${timestamp} [${level}] ${spacing}: ${shardStr}${message}`;
@@ -52,13 +46,9 @@ const consoleFormat = format.printf(({ level, message, timestamp, shard }) => {
 if (process.env.NODE_ENV !== "production") {
   logger.add(
     new transports.Console({
-      format: format.combine(
-        format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        format.colorize(),
-        consoleFormat
-      ),
+      format: format.combine(format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), format.colorize(), consoleFormat),
       level,
-    })
+    }),
   );
 }
 

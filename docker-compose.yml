@@ -19,3 +19,27 @@ services:
         - action: sync
           path: ./packages/logger/src
           target: /app/packages/logger/src
+
+  database:
+    image: postgres
+    user: postgres
+    volumes:
+      - database-data:/var/lib/postgresql/data
+    secrets:
+      - database-password
+    environment:
+      - POSTGRES_DB=albion-raid-manager
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  database-data:
+
+
+secrets:
+  database-password:
+    external: true

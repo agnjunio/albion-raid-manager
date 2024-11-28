@@ -4,6 +4,7 @@ import { Composition } from "@albion-raid-manager/database/models";
 import { faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
+import { addMinutes, format } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useMemo } from "react";
@@ -14,8 +15,14 @@ type CreateRaidProps = {
 };
 
 export default function CreateRaid({ id, compositions }: CreateRaidProps) {
+  const getNext30MinuteStep = () => {
+    const now = new Date();
+    const rounded = addMinutes(now, 30 - (now.getMinutes() % 30));
+    return format(rounded, "yyyy-MM-dd'T'HH:mm");
+  };
+
   const [description, setDescription] = React.useState("");
-  const [date, setDate] = React.useState("");
+  const [date, setDate] = React.useState(getNext30MinuteStep());
   const [composition, setComposition] = React.useState<Composition | null>(null);
   const [query, setQuery] = React.useState("");
   const router = useRouter();
@@ -50,9 +57,11 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
     <>
       <form onSubmit={createRaid} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium">Description</label>
+          <label htmlFor="description" className="block text-sm font-medium">
+            Description
+          </label>
           <input
-            name="description"
+            id="description"
             type="text"
             className="w-full"
             value={description}
@@ -60,13 +69,26 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium">Date</label>
-          <input name="date" type="date" className="w-full" value={date} onChange={(e) => setDate(e.target.value)} />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Composition</label>
 
+        <div>
+          <label htmlFor="start" className="block text-sm font-medium">
+            Start Time
+          </label>
+          <input
+            id="start"
+            type="datetime-local"
+            className="w-full"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            step="1800" // 30 minutes in seconds
+            min={new Date().toISOString().split("T")[0] + "T00:00"}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="composition" className="block text-sm font-medium">
+            Composition
+          </label>
           <Combobox value={composition} onChange={(value) => setComposition(value)} onClose={() => setQuery("")}>
             <div
               className="relative w-full flex group"
@@ -75,6 +97,7 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
               aria-expanded={filteredCompositions.length > 0}
             >
               <ComboboxInput
+                id="composition"
                 displayValue={(composition: Composition) => composition?.name}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full"
