@@ -6,7 +6,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: "standalone",
   webpack: (config, { isServer }) => {
-    if (isServer) {
+    // See more: https://www.prisma.io/docs/orm/more/help-and-troubleshooting/help-articles/nextjs-prisma-client-monorepo
+    if (isServer && process.env.NODE_ENV === "production") {
       config.plugins.push(new PrismaPlugin());
     }
 
