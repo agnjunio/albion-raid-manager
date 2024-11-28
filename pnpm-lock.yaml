@@ -108,6 +108,9 @@ importers:
         specifier: 19.0.0-rc-66855b96-20241106
         version: 19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106)
     devDependencies:
+      '@prisma/nextjs-monorepo-workaround-plugin':
+        specifier: ^5.22.0
+        version: 5.22.0
       '@types/node':
         specifier: ^20.17.6
         version: 20.17.7
@@ -572,6 +575,9 @@ packages:
 
   '@prisma/get-platform@5.22.0':
     resolution: {integrity: sha512-pHhpQdr1UPFpt+zFfnPazhulaZYCUqeIcPpJViYoq9R+D/yw4fjE+CtnsnKzPYm0ddUbeXUzjGVGIRVgPDCk4Q==}
+
+  '@prisma/nextjs-monorepo-workaround-plugin@5.22.0':
+    resolution: {integrity: sha512-wuKp7FqhETHP2MJJu5y//ac83/EpDpoupcjlmp/Ijv3fnG576EIxY4SU4j24xXPIBOTuApkCk4RkgonkeAOXuQ==}
 
   '@react-aria/focus@3.19.0':
     resolution: {integrity: sha512-hPF9EXoUQeQl1Y21/rbV2H4FdUR2v+4/I0/vB+8U3bT1CJ+1AFj1hc/rqx2DqEwDlEwOHN+E4+mRahQmlybq0A==}
@@ -3017,6 +3023,8 @@ snapshots:
   '@prisma/get-platform@5.22.0':
     dependencies:
       '@prisma/debug': 5.22.0
+
+  '@prisma/nextjs-monorepo-workaround-plugin@5.22.0': {}
 
   '@react-aria/focus@3.19.0(react@19.0.0-rc-66855b96-20241106)':
     dependencies:
