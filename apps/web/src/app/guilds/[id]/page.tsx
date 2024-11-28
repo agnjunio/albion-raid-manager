@@ -3,5 +3,5 @@ import { redirect } from "next/navigation";
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
-  redirect(`${id}/raids`);
+  redirect(`/guilds/${id}/raids`);
 }
