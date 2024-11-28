@@ -18,6 +18,15 @@ const logger = createLogger({
   },
 });
 
+if (process.env.VERCEL_ENV) {
+  logger.add(
+    new transports.Console({
+      format: format.combine(format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), format.json()),
+      level,
+    }),
+  );
+}
+
 if (process.env.NODE_ENV !== "production") {
   const consoleFormat = format.printf(({ level, [Symbol.for("level")]: logLevel, message, timestamp, shard }) => {
     const printSpace = (count: number) => " ".repeat(Math.max(count, 0));
