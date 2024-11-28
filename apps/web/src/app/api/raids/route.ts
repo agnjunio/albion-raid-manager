@@ -31,7 +31,6 @@ export async function POST(req: NextRequest) {
         id: guildId,
       },
     });
-
     if (!guild) return NextResponse.json({ message: "Guild not found" }, { status: 404 });
 
     const composition = await prisma.composition.findUnique({
@@ -42,7 +41,6 @@ export async function POST(req: NextRequest) {
         slots: true,
       },
     });
-
     if (!composition) return NextResponse.json({ message: "Composition not found" }, { status: 404 });
 
     const raid = await prisma.raid.create({

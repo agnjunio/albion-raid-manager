@@ -19,6 +19,7 @@
     "seed": "pnpx ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@albion-raid-manager/logger": "workspace:^",
     "@prisma/client": "5.22.0"
   },
   "devDependencies": {

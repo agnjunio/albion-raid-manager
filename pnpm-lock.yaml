@@ -150,6 +150,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@albion-raid-manager/logger':
+        specifier: workspace:^
+        version: link:../logger
       '@prisma/client':
         specifier: 5.22.0
         version: 5.22.0(prisma@5.22.0)
