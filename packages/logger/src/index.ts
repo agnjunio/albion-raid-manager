@@ -3,7 +3,7 @@ import path from "node:path";
 import { createLogger, format, transports } from "winston";
 
 const level: string = config.has("logger.level") ? config.get("logger.level") : "debug";
-const file: boolean = config.has("logger.file") ? config.get("logger.file") : true;
+const file: boolean = config.has("logger.file") ? config.get("logger.file") : false;
 
 const logger = createLogger({
   level: "debug",
