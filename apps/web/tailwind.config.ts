@@ -78,6 +78,9 @@ export default {
       backgroundImage: {
         ["wallpapper"]: "url('/wallpapper.jpeg')",
       },
+      gridTemplateColumns: {
+        ["auto_1fr"]: "auto 1fr",
+      },
     },
   },
   plugins: [],

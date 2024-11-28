@@ -1,4 +1,5 @@
 import Loading from "@/components/Loading";
+import RaidStatusBadge from "@/components/RaidStatusBadge";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,14 +12,6 @@ interface RaidListProps {
   loading: boolean;
   onRefresh: () => Promise<void>;
 }
-
-const statusColors = {
-  [RaidStatus.SCHEDULED]: "bg-secondary-violet-800",
-  [RaidStatus.OPEN]: "bg-green-800",
-  [RaidStatus.CLOSED]: "bg-red-900",
-  [RaidStatus.ONGOING]: "bg-primary-yellow-800",
-  [RaidStatus.FINISHED]: "bg-primary-gray-500",
-};
 
 const statusOrder = [RaidStatus.SCHEDULED, RaidStatus.OPEN, RaidStatus.CLOSED, RaidStatus.ONGOING, RaidStatus.FINISHED];
 
@@ -79,11 +72,7 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
                   minute: "2-digit",
                 })}
               </div>
-              <div
-                className={`select-none basis-24 text-center p-1 text-xs uppercase rounded-lg font-semibold shadow-sm ${statusColors[raid.status]}`}
-              >
-                {raid.status}
-              </div>
+              <RaidStatusBadge raid={raid} />
             </Link>
           </li>
         ))}
