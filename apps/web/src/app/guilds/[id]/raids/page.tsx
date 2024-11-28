@@ -1,9 +1,6 @@
 "use client";
 
 import { Raid } from "@albion-raid-manager/database/models";
-import { faRefresh } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import RaidList from "./RaidList";
@@ -36,20 +33,10 @@ export default function GuildPage() {
   }, []);
 
   return (
-    <div className="grow h-full flex flex-col gap-2 p-4">
-      <h2 className="text-xl font-semibold text-center">Raids</h2>
+    <div className="grow h-full flex flex-col gap-5 px-4 py-1">
+      <h2 className="text-2xl font-semibold text-center">Raids</h2>
 
-      <div className="flex gap-2 flex-row-reverse">
-        <Link href="raids/create" tabIndex={-1}>
-          <button>Create Raid</button>
-        </Link>
-
-        <button role="icon-button" onClick={() => fetchRaids()}>
-          <FontAwesomeIcon icon={faRefresh} />
-        </button>
-      </div>
-
-      <RaidList raids={raids} loading={loading} />
+      <RaidList raids={raids} loading={loading} onRefresh={() => fetchRaids()} />
     </div>
   );
 }
