@@ -23,11 +23,27 @@ export default function RaidPage() {
   const { raidId } = params;
 
   const fetchRaid = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const res = await fetch(`/api/raids/${raidId}`);
       if (!res.ok) throw new Error(`Failed to fetch raid ${raidId}`);
+      const data = await res.json();
+      setRaid(data);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const updateRaidStatus = async (status: RaidStatus) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/raids/${raidId}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          status,
+        }),
+      });
+      if (!res.ok) throw new Error(`Failed to set raid status ${raidId}`);
       const data = await res.json();
       setRaid(data);
     } finally {
@@ -52,6 +68,10 @@ export default function RaidPage() {
     BATTLEMOUNT: "bg-role-battlemount/25",
   };
 
+  const hasStatus = (...statuses: RaidStatus[]) => {
+    return statuses.includes(raid.status);
+  };
+
   return (
     <div className="grow h-full flex flex-col p-4 gap-4">
       <Card title="Raid Details">
@@ -74,9 +94,26 @@ export default function RaidPage() {
 
       <Card title="Raid Actions">
         <div className="flex gap-2">
-          {raid.status === RaidStatus.OPEN && <button className="btn-secondary-violet">Close Registration</button>}
-          {raid.status === RaidStatus.CLOSED && <button className="btn-secondary-violet">Open Registration</button>}
-          <button className="btn-primary-yellow">Start Raid</button>
+          {hasStatus(RaidStatus.SCHEDULED, RaidStatus.CLOSED) && (
+            <button className="btn-primary-yellow" onClick={() => updateRaidStatus(RaidStatus.OPEN)}>
+              Open Registration
+            </button>
+          )}
+          {hasStatus(RaidStatus.OPEN) && (
+            <button className="btn-primary-yellow" onClick={() => updateRaidStatus(RaidStatus.CLOSED)}>
+              Close Registration
+            </button>
+          )}
+          {hasStatus(RaidStatus.OPEN, RaidStatus.CLOSED, RaidStatus.FINISHED) && (
+            <button className="btn-primary-yellow" onClick={() => updateRaidStatus(RaidStatus.ONGOING)}>
+              Start Raid
+            </button>
+          )}
+          {hasStatus(RaidStatus.ONGOING) && (
+            <button className="btn-primary-yellow" onClick={() => updateRaidStatus(RaidStatus.FINISHED)}>
+              Finish Raid
+            </button>
+          )}
         </div>
       </Card>
 
