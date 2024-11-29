@@ -4,7 +4,7 @@ import Card from "@/components/Card";
 import Loading from "@/components/Loading";
 import RaidStatusBadge from "@/components/RaidStatusBadge";
 import { discord } from "@albion-raid-manager/common/helpers";
-import { Prisma, Role } from "@albion-raid-manager/database/models";
+import { Prisma, RaidStatus, Role } from "@albion-raid-manager/database/models";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "next/navigation";
@@ -69,6 +69,14 @@ export default function RaidPage() {
               timeStyle: "short",
             })}
           </div>
+        </div>
+      </Card>
+
+      <Card title="Raid Actions">
+        <div className="flex gap-2">
+          {raid.status === RaidStatus.OPEN && <button className="btn-secondary-violet">Close Registration</button>}
+          {raid.status === RaidStatus.CLOSED && <button className="btn-secondary-violet">Open Registration</button>}
+          <button className="btn-primary-yellow">Start Raid</button>
         </div>
       </Card>
 
