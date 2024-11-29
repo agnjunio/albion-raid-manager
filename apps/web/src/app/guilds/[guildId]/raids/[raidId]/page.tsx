@@ -63,7 +63,12 @@ export default function RaidPage() {
             <RaidStatusBadge raid={raid} />
           </div>
           <div>Start date:</div>
-          <div>{new Date(raid.date).toString()}</div>
+          <div>
+            {new Date(raid.date).toLocaleString(navigator.language, {
+              dateStyle: "medium",
+              timeStyle: "short",
+            })}
+          </div>
         </div>
       </Card>
 
@@ -88,10 +93,13 @@ export default function RaidPage() {
                   {slot.user ? (
                     <div className="flex items-center gap-2">
                       <div>{slot.user.username}</div>
-                      <img
-                        src={discord.getUserPictureUrl(slot.user.id, slot.user.avatar)}
-                        className="size-8 rounded-full"
-                      />
+                      <picture>
+                        <img
+                          src={discord.getUserPictureUrl(slot.user.id, slot.user.avatar)}
+                          className="size-8 rounded-full select-none"
+                          alt={slot.user.username}
+                        />
+                      </picture>
                     </div>
                   ) : (
                     <div className="text-xs">Empty</div>
