@@ -16,6 +16,7 @@ export async function GET(req: NextRequest, { params }: RaidRouteProps) {
         slots: {
           include: {
             build: true,
+            user: true,
           },
         },
       },
