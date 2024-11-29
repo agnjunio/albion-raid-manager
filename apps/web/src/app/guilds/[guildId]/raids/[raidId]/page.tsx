@@ -81,20 +81,20 @@ export default function RaidPage() {
             .map((slot) => (
               <div
                 key={slot.id}
-                className={`rounded px-4 py-2 flex justify-between ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
+                className={`min-h-12 rounded px-4 py-2 flex justify-between items-center ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
               >
                 <div className="font-semibold">{slot.build.name}</div>
                 <div>
                   {slot.user ? (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
+                      <div>{slot.user.username}</div>
                       <img
                         src={discord.getUserPictureUrl(slot.user.id, slot.user.avatar)}
                         className="size-8 rounded-full"
                       />
-                      <div>{slot.user.username}</div>
                     </div>
                   ) : (
-                    <div>Empty</div>
+                    <div className="text-xs">Empty</div>
                   )}
                 </div>
               </div>
