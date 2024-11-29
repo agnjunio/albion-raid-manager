@@ -145,12 +145,25 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
       });
     }
 
+    const user = await prisma.user.upsert({
+      where: { id: interaction.user.id },
+      update: {
+        username: interaction.user.username,
+        avatar: interaction.user.avatar,
+      },
+      create: {
+        id: interaction.user.id,
+        username: interaction.user.username,
+        avatar: interaction.user.avatar,
+      },
+    });
+
     await prisma.raidSlot.update({
       where: {
         id: slot,
       },
       data: {
-        userId: interaction.user.id,
+        userId: user.id,
       },
     });
 

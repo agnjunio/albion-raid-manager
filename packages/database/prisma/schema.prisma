@@ -23,6 +23,13 @@ model Guild {
   compositions          Composition[]
 }
 
+model User {
+  id       String     @id
+  username String
+  avatar   String?
+  RaidSlot RaidSlot[]
+}
+
 model Build {
   id               Int               @id @default(autoincrement())
   name             String
@@ -72,6 +79,7 @@ model RaidSlot {
   raidId     Int
   build      Build    @relation(fields: [buildId], references: [id])
   buildId    Int
+  user       User?    @relation(fields: [userId], references: [id])
   userId     String?
   assignedAt DateTime @default(now())
 }
