@@ -9,14 +9,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import React from "react";
-
-type LayoutProps = {
-  params: Promise<{
-    id: string;
-  }>;
-  children: React.ReactNode;
-};
+import { GuildLayoutProps } from "./types";
 
 const links = [
   { href: "raids", label: "Raids", icon: faFlag },
@@ -25,11 +18,11 @@ const links = [
   { href: "settings", label: "Settings", icon: faGear },
 ];
 
-export default async function Layout({ params, children }: LayoutProps) {
-  const { id } = await params;
+export default async function Layout({ params, children }: GuildLayoutProps) {
+  const { guildId } = await params;
   const guild = await prisma.guild.findUnique({
     where: {
-      id: Number(id),
+      id: Number(guildId),
     },
     include: { raids: true },
   });
@@ -40,7 +33,7 @@ export default async function Layout({ params, children }: LayoutProps) {
 
   return (
     <div className="grow flex">
-      <div className="w-48 sm:w-64 md:w-72 lg:w-80 bg-primary-gray-900/50 text-white">
+      <div className="min-w-48 sm:w-64 md:w-72 lg:w-80 bg-primary-gray-900/50 text-white drop-shadow-lg">
         <div className="p-4 pr-2 flex justify-between items-center bg-secondary-violet-800">
           <div className="text-lg font-medium">{guild.name}</div>
           <Link href="/guilds" tabIndex={-1}>
@@ -54,7 +47,7 @@ export default async function Layout({ params, children }: LayoutProps) {
             <li key={link.label}>
               <Link
                 href={`/guilds/${guild.id}/${link.href}`}
-                className="px-4 py-2 hover:bg-primary-yellow-600/25 flex gap-4 items-center"
+                className="px-4 py-2 flex gap-4 items-center hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors outline-offset-0"
               >
                 <FontAwesomeIcon icon={link.icon} width={16} height={16} className="-mt-[1px]" />
                 {link.label}

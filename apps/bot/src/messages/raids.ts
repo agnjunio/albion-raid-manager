@@ -17,7 +17,7 @@ const emojis = {
   [Role.CALLER]: "🧠",
   [Role.TANK]: "🛡️",
   [Role.HEALER]: "💚",
-  [Role.MEELE_DPS]: "⚔️",
+  [Role.MELEE_DPS]: "⚔️",
   [Role.RANGED_DPS]: "🏹",
   [Role.SUPPORT]: "💊",
   [Role.BATTLEMOUNT]: "🐎",

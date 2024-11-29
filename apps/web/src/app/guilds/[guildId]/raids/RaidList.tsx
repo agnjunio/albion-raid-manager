@@ -1,4 +1,5 @@
 import Loading from "@/components/Loading";
+import RaidStatusBadge from "@/components/RaidStatusBadge";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,14 +12,6 @@ interface RaidListProps {
   loading: boolean;
   onRefresh: () => Promise<void>;
 }
-
-const statusColors = {
-  [RaidStatus.SCHEDULED]: "bg-secondary-violet-800",
-  [RaidStatus.OPEN]: "bg-green-900",
-  [RaidStatus.CLOSED]: "bg-red-900",
-  [RaidStatus.ONGOING]: "bg-primary-yellow-900",
-  [RaidStatus.FINISHED]: "bg-primary-gray-500",
-};
 
 const statusOrder = [RaidStatus.SCHEDULED, RaidStatus.OPEN, RaidStatus.CLOSED, RaidStatus.ONGOING, RaidStatus.FINISHED];
 
@@ -33,8 +26,8 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
   if (loading) return <Loading />;
   return (
     <div className="h-full flex flex-col gap-3">
-      <div className="flex justify-between">
-        <div className="flex gap-2">
+      <div className="flex justify-between items-center gap-2">
+        <div className="flex gap-2 flex-wrap">
           {["ALL", ...Object.keys(RaidStatus)].map((status) => {
             const colors =
               filter === status
@@ -43,7 +36,7 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
             return (
               <button
                 key={status}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors cursor-pointer select-none uppercase ${colors}`}
+                className={`rounded-full px-4 py-1 text-sm font-semibold transition-colors cursor-pointer select-none uppercase shadow-sm ${colors}`}
                 onClick={() => setFilter(status)}
               >
                 {status}
@@ -54,7 +47,7 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
 
         <div className="flex gap-2 flex-row-reverse">
           <Link href="raids/create" tabIndex={-1}>
-            <button>Create Raid</button>
+            <button className="whitespace-nowrap">New Raid</button>
           </Link>
 
           <button role="icon-button" onClick={onRefresh}>
@@ -65,11 +58,11 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
 
       <ul className="space-y-2">
         {filteredRaids.map((raid) => (
-          <li
-            key={raid.id}
-            className="p-2 rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors"
-          >
-            <div className="flex justify-between gap-4 p-2 items-center">
+          <li key={raid.id}>
+            <Link
+              href={`raids/${raid.id}`}
+              className="flex justify-between gap-4 p-4 items-center rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors outline-offset-0"
+            >
               <div className="grow text-lg font-semibold">{raid.description}</div>
               <div>
                 {new Date(raid.date).toLocaleString(navigator.language, {
@@ -79,15 +72,11 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
                   minute: "2-digit",
                 })}
               </div>
-              <div
-                className={`select-none basis-24 text-center p-1 text-xs uppercase rounded-lg font-semibold ${statusColors[raid.status]}`}
-              >
-                {raid.status}
-              </div>
-            </div>
+              <RaidStatusBadge raid={raid} />
+            </Link>
           </li>
         ))}
-        {filteredRaids.length === 0 && <p className="flex h-24 items-center justify-center">No raids.</p>}
+        {filteredRaids.length === 0 && <p className="flex items-center justify-center">No raids.</p>}
       </ul>
     </div>
   );

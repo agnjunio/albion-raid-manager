@@ -70,6 +70,15 @@ export default {
           asia: "#cc3f0c",
           europe: "#3b68a3",
         },
+        role: {
+          tank: "#3b68a3",
+          caller: "#9f86c0",
+          melee: "#c42936",
+          ranged: "#ff7f00",
+          support: "#ffbd59",
+          healer: "#33673b",
+          battlemount: "#cccccc",
+        },
       },
       fontFamily: {
         sans: ["var(--font-roboto)"],
@@ -77,6 +86,9 @@ export default {
       },
       backgroundImage: {
         ["wallpapper"]: "url('/wallpapper.jpeg')",
+      },
+      gridTemplateColumns: {
+        ["auto_1fr"]: "auto 1fr",
       },
     },
   },

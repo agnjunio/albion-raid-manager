@@ -1,2 +1,2 @@
-export { RaidStatus, Role } from "@prisma/client";
+export { Prisma, RaidStatus, Role } from "@prisma/client";
 export type { Build, Composition, CompositionSlot, Guild, Raid, RaidSlot } from "@prisma/client";

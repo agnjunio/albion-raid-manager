@@ -2,10 +2,11 @@
   "name": "@albion-raid-manager/common",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
   "exports": {
-    "./utils": "./src/utils/index.ts",
-    "./scheduler": "./src/scheduler.ts"
+    ".": "./src/index.ts",
+    "./helpers": "./src/helpers/index.ts",
+    "./scheduler": "./src/scheduler.ts",
+    "./utils": "./src/utils/index.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -18,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@albion-raid-manager/logger": "link:../logger",
+    "@albion-raid-manager/logger": "workspace:*",
     "cron": "^3.1.7"
   }
 }

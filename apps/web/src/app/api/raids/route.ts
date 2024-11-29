@@ -3,6 +3,7 @@ import { prisma } from "@albion-raid-manager/database";
 import { PrismaClientValidationError } from "@albion-raid-manager/database/errors";
 import logger from "@albion-raid-manager/logger";
 import { NextRequest, NextResponse } from "next/server";
+import { notifyClients } from "./events";
 
 export async function GET(req: NextRequest) {
   try {
@@ -55,6 +56,8 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    notifyClients(raid);
 
     return NextResponse.json(raid, { status: 201 });
   } catch (error) {
