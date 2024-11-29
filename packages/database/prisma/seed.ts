@@ -46,7 +46,7 @@ async function main() {
     update: {},
     create: {
       name: "DPS Melee Genérico",
-      role: Role.MEELE_DPS,
+      role: Role.MELEE_DPS,
     },
   });
 
