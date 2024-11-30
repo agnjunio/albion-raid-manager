@@ -1,16 +1,22 @@
 "use server";
 
 import { prisma } from "@albion-raid-manager/database";
-import { Composition } from "@albion-raid-manager/database/models";
 import CompositionList from "./CompositionList";
 import { CompositionPageProps } from "./types";
 
 export default async function CompositionsPage({ params }: CompositionPageProps) {
   const { guildId } = await params;
 
-  const compositions = await prisma.composition.findMany<Composition[]>({
+  const compositions = await prisma.composition.findMany({
     where: {
       guildId: Number(guildId),
+    },
+    include: {
+      _count: {
+        select: {
+          slots: true,
+        },
+      },
     },
   });
 

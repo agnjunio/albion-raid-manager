@@ -1,15 +1,27 @@
 "use client";
 
-import { Composition } from "@albion-raid-manager/database/models";
+import { Prisma } from "@albion-raid-manager/database/models";
 import { compareAsc } from "date-fns";
 import { distance } from "fastest-levenshtein";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-export default function CompositionList({ compositions }: { compositions: Composition[] }) {
+type CompositionListProps = {
+  compositions: Prisma.CompositionGetPayload<{
+    include: {
+      _count: {
+        select: {
+          slots: true;
+        };
+      };
+    };
+  }>[];
+};
+
+export default function CompositionList({ compositions }: CompositionListProps) {
   const [filter, setFilter] = useState("");
 
-  const filteredCompositions = useMemo<Composition[]>(() => {
+  const filteredCompositions = useMemo(() => {
     return compositions
       .map((composition) => ({
         ...composition,
@@ -45,7 +57,10 @@ export default function CompositionList({ compositions }: { compositions: Compos
               href={`compositions/${composition.id}`}
               className="flex justify-between gap-4 p-4 items-center rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors outline-offset-0"
             >
-              <div className="grow text-lg font-semibold">{composition.name}</div>
+              <div>
+                <div className="grow text-lg/tight font-semibold">{composition.name}</div>
+                <div className="text-xs text-secondary-violet">Size: {composition._count.slots}</div>
+              </div>
               <div>
                 Last Update:{" "}
                 {new Date(composition.updatedAt).toLocaleString(navigator.language, {
