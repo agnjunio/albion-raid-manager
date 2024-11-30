@@ -3,9 +3,7 @@
   "tasks": {
     "db:generate": {
       "inputs": ["prisma/schema.prisma"],
-      "outputs": ["node_modules/.prisma", "node_modules/@prisma/client"]
-    },
-    "db:push": {
+      "outputs": ["node_modules/.prisma", "node_modules/@prisma/client"],
       "cache": false
     },
 
@@ -19,7 +17,6 @@
       "dependsOn": ["^db:generate"],
       "env": ["DATABASE_URL"]
     },
-
     "lint": {},
     "prettier": {}
   }
