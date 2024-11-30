@@ -3,7 +3,7 @@
 import Card from "@/components/Card";
 import Loading from "@/components/Loading";
 import { Prisma, Role } from "@albion-raid-manager/database/models";
-import { faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -29,7 +29,7 @@ export default function RaidPage() {
   const fetchComposition = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/composition/${compositionId}`);
+      const res = await fetch(`/api/compositions/${compositionId}`);
       if (!res.ok) throw new Error(`Failed to fetch composition ${compositionId}`);
       const data = await res.json();
       setComposition(data);
@@ -43,7 +43,7 @@ export default function RaidPage() {
   }, []);
 
   if (loading) return <Loading />;
-  if (!composition) return <div>Composition not found</div>;
+  if (!composition) return <div className="flex h-full justify-center items-center">Composition not found.</div>;
 
   const roleBg: { [key in Role]: string } = {
     TANK: "bg-role-tank/25",
@@ -57,6 +57,12 @@ export default function RaidPage() {
 
   return (
     <div className="grow h-full flex flex-col p-4 gap-4">
+      <div>
+        <button role="icon-button" onClick={() => window.history.back()}>
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+      </div>
+
       <Card title="Composition Details">
         <div className="grid grid-cols-auto_1fr gap-x-4 gap-y-2">
           <div>Name:</div>
@@ -74,14 +80,14 @@ export default function RaidPage() {
       <Card
         title="Composition Slots"
         actions={
-          <>
+          <div className="flex gap-2 flex-row-reverse">
             <button role="icon-button">
               <FontAwesomeIcon icon={faPlus} />
             </button>
             <button role="icon-button" onClick={() => fetchComposition()}>
               <FontAwesomeIcon icon={faRefresh} />
             </button>
-          </>
+          </div>
         }
       >
         <div className="flex flex-col gap-2">
@@ -95,6 +101,7 @@ export default function RaidPage() {
                 <div className="font-semibold">{slot.build.name}</div>
               </div>
             ))}
+          {composition.slots.length === 0 && <div className="text-center">No slots available.</div>}
         </div>
       </Card>
     </div>

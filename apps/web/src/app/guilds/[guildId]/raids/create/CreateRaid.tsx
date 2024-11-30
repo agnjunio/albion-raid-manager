@@ -1,6 +1,7 @@
 "use client";
 
 import Loading from "@/components/Loading";
+import { filterCompositions } from "@/helpers/compositions";
 import { Composition } from "@albion-raid-manager/database/models";
 import { faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,15 +25,14 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
 
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(getNext30MinuteStep());
-  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [composition, setComposition] = useState<Composition | null>(null);
   const router = useRouter();
 
-  const filteredCompositions = useMemo<typeof compositions>(() => {
-    if (!query) return compositions;
-    return compositions.filter((composition) => composition.name.toLowerCase().includes(query.toLowerCase()));
-  }, [query, compositions]);
+  const filteredCompositions = useMemo(() => {
+    return filterCompositions(compositions, filter);
+  }, [compositions, filter]);
 
   const createRaid: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -88,7 +88,7 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
         <label htmlFor="composition" className="block text-sm font-medium">
           Composition
         </label>
-        <Combobox value={composition} onChange={(value) => setComposition(value)} onClose={() => setQuery("")}>
+        <Combobox value={composition} onChange={(value) => setComposition(value)} onClose={() => setFilter("")}>
           <div
             className="relative w-full flex group"
             role="combobox"
@@ -98,7 +98,7 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
             <ComboboxInput
               id="composition"
               displayValue={(composition: Composition) => composition?.name}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => setFilter(e.target.value)}
               className="w-full"
               placeholder="Select a composition..."
             />
@@ -111,9 +111,14 @@ export default function CreateRaid({ id, compositions }: CreateRaidProps) {
             {filteredCompositions.map((composition) => (
               <ComboboxOption key={composition.id} value={composition} className="flex gap-2 items-center">
                 <FontAwesomeIcon icon={faCheck} className="basis-6" />
-                <div className="text-sm/6 text-white">{composition.name}</div>
+                <div className="text-sm/6">{composition.name}</div>
               </ComboboxOption>
             ))}
+            {filteredCompositions.length === 0 && (
+              <ComboboxOption disabled value={null}>
+                <div className="text-sm/6">No compositions found</div>
+              </ComboboxOption>
+            )}
           </ComboboxOptions>
         </Combobox>
       </div>

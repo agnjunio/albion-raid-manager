@@ -1,8 +1,7 @@
 "use client";
 
+import { filterCompositions } from "@/helpers/compositions";
 import { Prisma } from "@albion-raid-manager/database/models";
-import { compareAsc } from "date-fns";
-import { distance } from "fastest-levenshtein";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -22,15 +21,8 @@ export default function CompositionList({ compositions }: CompositionListProps) 
   const [filter, setFilter] = useState("");
 
   const filteredCompositions = useMemo(() => {
-    return compositions
-      .map((composition) => ({
-        ...composition,
-        distance: composition.name.length - distance(composition.name.toLowerCase(), filter.toLowerCase()),
-      }))
-      .filter((composition) => composition.distance >= 0)
-      .sort((a, b) => compareAsc(new Date(a.updatedAt), new Date(b.updatedAt)))
-      .sort((a, b) => b.distance - a.distance);
-  }, [compositions, filter]);
+    return filterCompositions(compositions, filter);
+  }, [compositions, filter]) as unknown as typeof compositions;
 
   return (
     <div className="h-full flex flex-col gap-3">
@@ -73,7 +65,7 @@ export default function CompositionList({ compositions }: CompositionListProps) 
             </Link>
           </li>
         ))}
-        {compositions.length === 0 && <p className="flex items-center justify-center">No compositions.</p>}
+        {filteredCompositions.length === 0 && <p className="flex items-center justify-center">No compositions.</p>}
       </ul>
     </div>
   );

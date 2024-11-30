@@ -5,7 +5,7 @@ import Loading from "@/components/Loading";
 import RaidStatusBadge from "@/components/RaidStatusBadge";
 import { discord } from "@albion-raid-manager/common/helpers";
 import { Prisma, RaidStatus, Role } from "@albion-raid-manager/database/models";
-import { faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -74,6 +74,12 @@ export default function RaidPage() {
 
   return (
     <div className="grow h-full flex flex-col p-4 gap-4">
+      <div>
+        <button role="icon-button" onClick={() => window.history.back()}>
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </button>
+      </div>
+
       <Card title="Raid Details">
         <div className="grid grid-cols-auto_1fr gap-x-4 gap-y-2">
           <div>Description:</div>
@@ -152,6 +158,7 @@ export default function RaidPage() {
                 </div>
               </div>
             ))}
+          {raid.slots.length === 0 && <div className="text-center">No slots available.</div>}
         </div>
       </Card>
     </div>
