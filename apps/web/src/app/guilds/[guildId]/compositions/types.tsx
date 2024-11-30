@@ -1,6 +1,6 @@
 export type CompositionParams = {
   guildId: string;
-  raidId: string;
+  compositionId: string;
 };
 
 export type CompositionPageProps = {

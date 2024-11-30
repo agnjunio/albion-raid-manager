@@ -24,46 +24,31 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { guildId, description, date, compositionId } = await req.json();
+    const { guildId, name } = await req.json();
 
-    const guild = await prisma.guild.findUnique({
+    let composition = await prisma.composition.findFirst({
       where: {
-        id: guildId,
+        guildId: Number(guildId),
+        name,
       },
     });
-    if (!guild) return NextResponse.json({ message: "Guild not found" }, { status: 404 });
-
-    const composition = await prisma.composition.findUnique({
-      where: {
-        id: compositionId,
-      },
-      include: {
-        slots: true,
-      },
-    });
-    if (!composition) return NextResponse.json({ message: "Composition not found" }, { status: 404 });
-
-    const raid = await prisma.raid.create({
-      data: {
-        description,
-        date: new Date(date),
-        guildId,
-        slots: {
-          create: composition.slots.map((slot) => ({
-            buildId: slot.buildId,
-          })),
-        },
-      },
-    });
-
-    notifyClients(raid);
-
-    return NextResponse.json(raid, { status: 201 });
-  } catch (error) {
-    logger.error("Failed to create raid:", { error });
-    if (error instanceof PrismaClientValidationError) {
-      return NextResponse.json({ message: "Invalid raid data" }, { status: 400 });
+    if (composition) {
+      return NextResponse.json({ message: "A composition with this name already exists." }, { status: 422 });
     }
-    return NextResponse.json({ message: "Failed to create raid" }, { status: 500 });
+
+    composition = await prisma.composition.create({
+      data: {
+        guildId: Number(guildId),
+        name,
+      },
+    });
+
+    return NextResponse.json(composition, { status: 201 });
+  } catch (error) {
+    logger.error("Failed to create composition:", { error });
+    if (error instanceof PrismaClientValidationError) {
+      return NextResponse.json({ message: "Invalid composition data" }, { status: 400 });
+    }
+    return NextResponse.json({ message: "Failed to create composition" }, { status: 500 });
   }
 }
