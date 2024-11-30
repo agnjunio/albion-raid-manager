@@ -1,12 +1,30 @@
-import React from "react";
+"use server";
 
-const CompositionPage: React.FC = () => {
+import { prisma } from "@albion-raid-manager/database";
+import CompositionList from "./CompositionList";
+import { CompositionPageProps } from "./types";
+
+export default async function CompositionsPage({ params }: CompositionPageProps) {
+  const { guildId } = await params;
+
+  const compositions = await prisma.composition.findMany({
+    where: {
+      guildId: Number(guildId),
+    },
+    include: {
+      _count: {
+        select: {
+          slots: true,
+        },
+      },
+    },
+  });
+
   return (
-    <div>
-      <h1>Guild Composition</h1>
-      <p>This is the composition page for the guild.</p>
+    <div className="grow h-full flex flex-col px-4">
+      <h2 className="text-2xl font-semibold text-center py-4">Compositions</h2>
+
+      <CompositionList compositions={compositions} />
     </div>
   );
-};
-
-export default CompositionPage;
+}

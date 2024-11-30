@@ -54,7 +54,7 @@ model CompositionSlot {
   id            Int         @id @default(autoincrement())
   Composition   Composition @relation(fields: [compositionId], references: [id])
   compositionId Int
-  Build         Build       @relation(fields: [buildId], references: [id])
+  build         Build       @relation(fields: [buildId], references: [id])
   buildId       Int
   comment       String?
   assignedAt    DateTime    @default(now())

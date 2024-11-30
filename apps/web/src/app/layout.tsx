@@ -1,5 +1,5 @@
-import Footer from "@components/Footer";
-import Header from "@components/Header";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 
