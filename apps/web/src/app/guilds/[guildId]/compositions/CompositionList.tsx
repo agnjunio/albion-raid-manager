@@ -1,0 +1,65 @@
+"use client";
+
+import { Composition } from "@albion-raid-manager/database/models";
+import { compareAsc } from "date-fns";
+import { distance } from "fastest-levenshtein";
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
+export default function CompositionList({ compositions }: { compositions: Composition[] }) {
+  const [filter, setFilter] = useState("");
+
+  const filteredCompositions = useMemo<Composition[]>(() => {
+    return compositions
+      .map((composition) => ({
+        ...composition,
+        distance: composition.name.length - distance(composition.name.toLowerCase(), filter.toLowerCase()),
+      }))
+      .filter((composition) => composition.distance >= 0)
+      .sort((a, b) => compareAsc(new Date(a.updatedAt), new Date(b.updatedAt)))
+      .sort((a, b) => b.distance - a.distance);
+  }, [compositions, filter]);
+
+  return (
+    <div className="h-full flex flex-col gap-3">
+      <div className="flex justify-between items-center gap-2">
+        <input
+          type="text"
+          placeholder="Search..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="rounded-lg p-2"
+        />
+
+        <div className="flex gap-2 flex-row-reverse">
+          <Link href="compositions/create" tabIndex={-1}>
+            <button className="whitespace-nowrap">New Composition</button>
+          </Link>
+        </div>
+      </div>
+
+      <ul className="space-y-2">
+        {filteredCompositions.map((composition) => (
+          <li key={composition.id}>
+            <Link
+              href={`compositions/${composition.id}`}
+              className="flex justify-between gap-4 p-4 items-center rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors outline-offset-0"
+            >
+              <div className="grow text-lg font-semibold">{composition.name}</div>
+              <div>
+                Last Update:{" "}
+                {new Date(composition.updatedAt).toLocaleString(navigator.language, {
+                  day: "numeric",
+                  month: "2-digit",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </div>
+            </Link>
+          </li>
+        ))}
+        {compositions.length === 0 && <p className="flex items-center justify-center">No compositions.</p>}
+      </ul>
+    </div>
+  );
+}

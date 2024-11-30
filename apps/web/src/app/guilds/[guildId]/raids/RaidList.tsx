@@ -5,7 +5,7 @@ import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { compareAsc } from "date-fns";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface RaidListProps {
   raids: Raid[];
@@ -18,10 +18,14 @@ const statusOrder = [RaidStatus.SCHEDULED, RaidStatus.OPEN, RaidStatus.CLOSED, R
 export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
   const [filter, setFilter] = useState("ALL");
 
-  const filteredRaids = raids
-    .filter((raid) => filter === "ALL" || raid.status === filter)
-    .sort((a, b) => compareAsc(new Date(a.date), new Date(b.date)))
-    .sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status));
+  const filteredRaids = useMemo(
+    () =>
+      raids
+        .filter((raid) => filter === "ALL" || raid.status === filter)
+        .sort((a, b) => compareAsc(new Date(a.date), new Date(b.date)))
+        .sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)),
+    [raids, filter],
+  );
 
   if (loading) return <Loading />;
   return (
