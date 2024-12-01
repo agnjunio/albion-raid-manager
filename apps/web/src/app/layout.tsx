@@ -2,6 +2,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Roboto, Roboto_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
 
 const roboto = Roboto({
   display: "swap",
@@ -56,9 +57,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} ${robotoMono.variable} antialiased flex flex-col h-screen`}>
-        <Header />
-        <main className="bg-primary-gray-200/5 grow flex flex-col container mx-auto shadow-lg">{children}</main>
-        <Footer />
+        <Providers>
+          <Header />
+          <main className="bg-primary-gray-200/5 grow flex flex-col container mx-auto shadow-lg">{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
