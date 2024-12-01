@@ -4,14 +4,14 @@ import { NextAuthOptions } from "next-auth";
 import Discord from "next-auth/providers/discord";
 
 if (!config.discord.clientId || !config.discord.clientSecret) {
-  throw new Error("Missing Discord client ID or secret");
+  logger.warn("Missing Discord client ID or secret");
 }
 
 export const nextAuthOptions: NextAuthOptions = {
   providers: [
     Discord({
-      clientId: config.discord.clientId,
-      clientSecret: config.discord.clientSecret,
+      clientId: config.discord.clientId ?? "",
+      clientSecret: config.discord.clientSecret ?? "",
     }),
   ],
   callbacks: {
