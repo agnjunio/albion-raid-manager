@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "config": "^3.3.11",
+    "@albion-raid-manager/config": "workspace:^",
     "winston": "^3.13.0"
   }
 }

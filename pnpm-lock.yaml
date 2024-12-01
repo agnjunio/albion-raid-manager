@@ -14,9 +14,6 @@ importers:
       '@tsconfig/node20':
         specifier: ^20.1.4
         version: 20.1.4
-      '@types/config':
-        specifier: ^3.3.5
-        version: 3.3.5
       '@types/node':
         specifier: ^20.17.8
         version: 20.17.8
@@ -56,6 +53,9 @@ importers:
       '@albion-raid-manager/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@albion-raid-manager/config':
+        specifier: workspace:^
+        version: link:../../packages/config
       '@albion-raid-manager/database':
         specifier: workspace:^
         version: link:../../packages/database
@@ -157,6 +157,12 @@ importers:
         specifier: ^3.1.7
         version: 3.2.1
 
+  packages/config:
+    dependencies:
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
+
   packages/database:
     dependencies:
       '@albion-raid-manager/logger':
@@ -172,9 +178,9 @@ importers:
 
   packages/logger:
     dependencies:
-      config:
-        specifier: ^3.3.11
-        version: 3.3.12
+      '@albion-raid-manager/config':
+        specifier: workspace:^
+        version: link:../config
       winston:
         specifier: ^3.13.0
         version: 3.17.0
@@ -663,9 +669,6 @@ packages:
 
   '@tsconfig/node20@20.1.4':
     resolution: {integrity: sha512-sqgsT69YFeLWf5NtJ4Xq/xAF8p4ZQHlmGW74Nu2tD4+g5fAsposc4ZfaaPixVu4y01BEiDCWLRDCvDM5JOsRxg==}
-
-  '@types/config@3.3.5':
-    resolution: {integrity: sha512-itq2HtXQBrNUKwMNZnb9mBRE3T99VYCdl1gjST9rq+9kFaB1iMMGuDeZnP88qid73DnpAMKH9ZolqDpS1Lz7+w==}
 
   '@types/eslint-scope@3.7.7':
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
@@ -2643,6 +2646,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -3113,8 +3119,6 @@ snapshots:
   '@tsconfig/node16@1.0.4': {}
 
   '@tsconfig/node20@20.1.4': {}
-
-  '@types/config@3.3.5': {}
 
   '@types/eslint-scope@3.7.7':
     dependencies:
@@ -5458,3 +5462,5 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@3.23.8: {}

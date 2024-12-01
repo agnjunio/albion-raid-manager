@@ -17,6 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "@albion-raid-manager/common": "workspace:*",
+    "@albion-raid-manager/config": "workspace:^",
     "@albion-raid-manager/database": "workspace:^",
     "@albion-raid-manager/logger": "workspace:*",
     "date-fns": "^4.1.0",

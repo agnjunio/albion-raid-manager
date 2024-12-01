@@ -5,6 +5,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["config/**/*", "src/**/*"],
+  "include": ["config/**/*", "src/**/*", "../../packages/config/src/parsers.ts"],
   "exclude": ["node_modules", "dist"]
 }

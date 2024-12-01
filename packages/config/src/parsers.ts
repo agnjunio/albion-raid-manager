@@ -15,3 +15,10 @@ export function parseShardList(SHARDS_SPAWN?: string) {
   if (shardList.some((x) => isNaN(x))) return "auto";
   return shardList;
 }
+
+export function parseBool(value: unknown) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string")
+    return value.toLowerCase() === "true" || value === "1" || value.toLowerCase() === "yes";
+  return null;
+}

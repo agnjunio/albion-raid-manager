@@ -1,5 +1,5 @@
+import config from "@albion-raid-manager/config";
 import logger from "@albion-raid-manager/logger";
-import config from "config";
 import { Client, Events, Partials } from "discord.js";
 import { loadControllers } from "./controllers";
 
@@ -19,12 +19,12 @@ const discord = new Client({
 let init = false;
 
 export async function run() {
-  if (!config.has("discord.token")) {
+  if (!config.discord.token) {
     throw new Error("Please define the discord token.");
   }
 
   logger.info("Starting the Bot Client.");
-  await discord.login(config.get("discord.token"));
+  await discord.login(config.discord.token);
 }
 
 export async function cleanup() {

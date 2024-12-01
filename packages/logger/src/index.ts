@@ -1,17 +1,9 @@
-import config from "config";
-import path from "node:path";
+import config from "@albion-raid-manager/config";
+import path from "path";
 import { createLogger, format, transports } from "winston";
 
-const level: string = config.has("logger.level") ? config.get("logger.level") : "debug";
-const file: boolean = config.has("logger.file") ? config.get("logger.file") : false;
-
-const defaultTransport = new transports.Console({
-  format: format.combine(format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), format.json()),
-  level,
-});
-
 const logger = createLogger({
-  level: "debug",
+  level: config.logger.level,
   format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
   defaultMeta: {
     get service() {
@@ -21,10 +13,12 @@ const logger = createLogger({
       return process.env.SHARD;
     },
   },
-  transports: [defaultTransport],
+  transports: [],
 });
 
-if (process.env.NODE_ENV !== "production") {
+if (!config.logger.pretty) {
+  logger.add(new transports.Console());
+} else {
   const consoleFormat = format.printf(({ level, [Symbol.for("level")]: logLevel, message, timestamp, shard }) => {
     const printSpace = (count: number) => " ".repeat(Math.max(count, 0));
 
@@ -35,16 +29,14 @@ if (process.env.NODE_ENV !== "production") {
     return `${timestamp} [${level}] ${spacing}: ${shardStr}${message}`;
   });
 
-  logger.remove(defaultTransport);
   logger.add(
     new transports.Console({
       format: format.combine(format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), format.colorize(), consoleFormat),
-      level,
     }),
   );
 }
 
-if (file) {
+if (config.logger.files) {
   logger.add(
     new transports.File({
       filename: path.join("logs", "debug.log"),
@@ -54,6 +46,7 @@ if (file) {
       tailable: true,
     }),
   );
+
   logger.add(
     new transports.File({
       filename: path.join("logs", "error.log"),

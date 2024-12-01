@@ -1,12 +1,12 @@
+import config from "@albion-raid-manager/config";
 import logger from "@albion-raid-manager/logger";
-import config from "config";
 import { ShardingManager } from "discord.js";
 import path from "path";
 
 let manager: ShardingManager;
 
 export async function run() {
-  if (!config.has("discord.token")) {
+  if (!config.discord?.token) {
     throw new Error("Please define the discord token.");
   }
 
@@ -15,13 +15,9 @@ export async function run() {
   const bot = path.join(__dirname, "bot.ts");
 
   manager = new ShardingManager(bot, {
-    token: config.get("discord.token"),
-    totalShards: config.has("bot.shards.total")
-      ? config.get("bot.shards.total")
-      : undefined,
-    shardList: config.has("bot.shards.list")
-      ? config.get("bot.shards.list")
-      : undefined,
+    token: config.discord.token,
+    totalShards: config.bot?.shards?.total,
+    shardList: config.bot?.shards?.list,
     respawn: true,
     execArgv: ["-r", "ts-node/esm"],
   });
