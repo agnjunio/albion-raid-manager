@@ -1,12 +1,13 @@
 import { prisma } from "@albion-raid-manager/database";
 import { Guild } from "@albion-raid-manager/database/models";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { nextAuthOptions } from "../lib/next-auth";
 import GuildCard from "./GuildCard";
 
 export default async function GuildsPage() {
-  const session = await getSession();
-  console.log(session);
-  // if (!session) return redirect("/");
+  const session = await getServerSession(nextAuthOptions);
+  if (!session) return redirect("/");
 
   const guilds: Guild[] = await prisma.guild.findMany();
 
