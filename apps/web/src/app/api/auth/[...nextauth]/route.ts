@@ -15,10 +15,8 @@ export const nextAuthOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    session({ session, user }) {
-      console.log(`session: ${session}`);
-      console.log(`user: ${user}`);
-      return session;
+    redirect: async ({ baseUrl }) => {
+      return `${baseUrl}/guilds`;
     },
   },
   logger: {
