@@ -25,6 +25,7 @@
     "react-dom": "19.0.0-rc-66855b96-20241106"
   },
   "devDependencies": {
+    "@albion-raid-manager/config": "workspace:^",
     "@prisma/nextjs-monorepo-workaround-plugin": "^5.22.0",
     "@types/node": "^20.17.6",
     "@types/react": "^18.3.12",
