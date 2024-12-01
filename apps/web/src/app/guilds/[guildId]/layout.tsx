@@ -7,6 +7,7 @@ import {
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getSession } from "next-auth/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { GuildLayoutProps } from "./types";
@@ -19,6 +20,9 @@ const links = [
 ];
 
 export default async function Layout({ params, children }: GuildLayoutProps) {
+  const session = await getSession();
+  if (!session) return redirect("/");
+
   const { guildId } = await params;
   const guild = await prisma.guild.findUnique({
     where: {
