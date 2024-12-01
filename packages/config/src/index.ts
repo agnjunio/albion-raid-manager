@@ -11,6 +11,8 @@ const schema = z.object({
 
   discord: z.object({
     token: z.string().optional(),
+    clientId: z.string().optional(),
+    clientSecret: z.string().optional(),
   }),
 
   logger: z.object({
@@ -31,6 +33,8 @@ const config = schema.safeParse({
 
   discord: {
     token: process.env.DISCORD_TOKEN,
+    clientId: process.env.DISCORD_CLIENT_ID,
+    clientSecret: process.env.DISCORD_CLIENT_SECRET,
   },
 
   logger: {

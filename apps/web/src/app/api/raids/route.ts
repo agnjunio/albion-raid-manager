@@ -5,9 +5,9 @@ import logger from "@albion-raid-manager/logger";
 import { NextRequest, NextResponse } from "next/server";
 import { notifyClients } from "./events";
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const url = new URL(req.url);
+    const url = new URL(request.url);
     const guildId = url.searchParams.get("guildId");
 
     const raids = await prisma.raid.findMany({

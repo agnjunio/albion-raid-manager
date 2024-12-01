@@ -1,3 +1,4 @@
+import { nextAuthOptions } from "@/app/lib/next-auth";
 import { prisma } from "@albion-raid-manager/database";
 import {
   faArrowRightFromBracket,
@@ -7,6 +8,7 @@ import {
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { GuildLayoutProps } from "./types";
@@ -19,6 +21,9 @@ const links = [
 ];
 
 export default async function Layout({ params, children }: GuildLayoutProps) {
+  const session = await getServerSession(nextAuthOptions);
+  if (!session) return redirect("/");
+
   const { guildId } = await params;
   const guild = await prisma.guild.findUnique({
     where: {
