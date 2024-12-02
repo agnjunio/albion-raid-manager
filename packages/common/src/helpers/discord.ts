@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;
 
 export const getDiscordOAuthUrl = (clientId: string, redirectUri: string) =>
@@ -24,3 +25,42 @@ export const getServerInviteUrl = (clientId: string, serverId?: string) => {
 export const CHANNEL_TYPES = {
   TEXT: 0,
 };
+
+// TODO: Move this to a suitable place
+export function transformUser(user: any) {
+  return {
+    id: user.id,
+    username: user.global_name,
+    avatar: user.avatar,
+    locale: user.locale,
+  };
+}
+
+export function transformGuild(guild: any) {
+  const transformedGuild = {
+    id: guild.id,
+    name: guild.name,
+    icon: guild.icon,
+    owner: guild.owner,
+  } as any;
+
+  if (guild.owner) {
+    transformedGuild.owner = guild.owner;
+  }
+
+  // FIXME
+  // if (guild.permissions) {
+  //   transformedGuild.admin = isServerAdmin(guild.permissions);
+  // }
+
+  return transformedGuild;
+}
+
+export function transformChannel(channel: any) {
+  return {
+    id: channel.id,
+    name: channel.name,
+    type: channel.type,
+    parentId: channel.parent_id,
+  };
+}
