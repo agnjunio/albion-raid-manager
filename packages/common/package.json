@@ -4,9 +4,9 @@
   "description": "",
   "exports": {
     ".": "./src/index.ts",
-    "./helpers": "./src/helpers/index.ts",
+    "./helpers/*": "./src/helpers/*.ts",
     "./scheduler": "./src/scheduler.ts",
-    "./utils": "./src/utils/index.ts"
+    "./utils/*": "./src/utils/*.ts"
   },
   "scripts": {
     "lint": "eslint .",

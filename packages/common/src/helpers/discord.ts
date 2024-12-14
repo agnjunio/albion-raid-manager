@@ -23,7 +23,7 @@ export const getServerInviteUrl = (clientId: string, serverId?: string) => {
   return `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot&permissions=2147534848${serverParam}`;
 };
 
-const checkFlag = (bit: string, flag: bigint) => (BigInt(bit) & flag) === flag;
+export const checkFlag = (bit: string, flag: bigint) => (BigInt(bit) & flag) === flag;
 
 export function transformUser(user: APIUser) {
   return {

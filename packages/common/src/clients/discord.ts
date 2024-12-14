@@ -1,4 +1,4 @@
-import { sleep } from "@/scheduler";
+import { sleep } from "@albion-raid-manager/common/scheduler";
 import config from "@albion-raid-manager/config";
 import logger from "@albion-raid-manager/logger";
 import axios from "axios";

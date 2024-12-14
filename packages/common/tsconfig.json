@@ -1,11 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "nodenext",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*.ts"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../apps/web/src/clients"],
   "exclude": ["node_modules", "dist"]
 }
