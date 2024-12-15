@@ -4,6 +4,7 @@
   "description": "",
   "exports": {
     ".": "./src/index.ts",
+    "./errors": "./src/errors.ts",
     "./helpers/*": "./src/helpers/*.ts",
     "./scheduler": "./src/scheduler.ts",
     "./utils/*": "./src/utils/*.ts"
