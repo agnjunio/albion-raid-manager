@@ -6,11 +6,12 @@ import { Guild } from "@albion-raid-manager/database/models";
 import GuildCard from "./GuildCard";
 
 export default function GuildsPage() {
-  const { response, loading } = useFetch("/api/guilds");
+  const { response, loading, error } = useFetch("/api/guilds");
   const guilds = response as Guild[];
 
   if (loading) return <Loading />;
-  if (!guilds) throw new Error("Failed to load guilds. Please try again later.");
+  if (error) throw new Error("Failed to load guilds. Please try again later.");
+  if (!guilds) return null;
 
   return (
     <div className="p-4 space-y-2">
