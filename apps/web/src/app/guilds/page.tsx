@@ -1,9 +1,16 @@
-import { prisma } from "@albion-raid-manager/database";
+"use client";
+
+import Loading from "@/components/Loading";
+import useFetch from "@/hooks/useFetch";
 import { Guild } from "@albion-raid-manager/database/models";
 import GuildCard from "./GuildCard";
 
-export default async function GuildsPage() {
-  const guilds: Guild[] = await prisma.guild.findMany();
+export default function GuildsPage() {
+  const { response, loading } = useFetch("/api/guilds");
+  const guilds = response as Guild[];
+
+  if (loading) return <Loading />;
+  if (!guilds) throw new Error("Failed to load guilds. Please try again later.");
 
   return (
     <div className="p-4 space-y-2">
