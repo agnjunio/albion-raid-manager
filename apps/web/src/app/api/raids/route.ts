@@ -1,4 +1,4 @@
-import { getErrorMessage } from "@albion-raid-manager/common/utils";
+import { getErrorMessage } from "@albion-raid-manager/common/errors";
 import { prisma } from "@albion-raid-manager/database";
 import { PrismaClientValidationError } from "@albion-raid-manager/database/errors";
 import logger from "@albion-raid-manager/logger";
