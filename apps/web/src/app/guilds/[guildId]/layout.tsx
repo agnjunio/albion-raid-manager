@@ -1,4 +1,4 @@
-import { nextAuthOptions } from "@/app/lib/next-auth";
+import { nextAuthOptions } from "@/lib/next-auth";
 import { prisma } from "@albion-raid-manager/database";
 import {
   faArrowRightFromBracket,

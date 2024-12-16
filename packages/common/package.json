@@ -4,9 +4,10 @@
   "description": "",
   "exports": {
     ".": "./src/index.ts",
-    "./helpers": "./src/helpers/index.ts",
+    "./errors": "./src/errors.ts",
+    "./helpers/*": "./src/helpers/*.ts",
     "./scheduler": "./src/scheduler.ts",
-    "./utils": "./src/utils/index.ts"
+    "./utils/*": "./src/utils/*.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -19,7 +20,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@albion-raid-manager/config": "workspace:^",
     "@albion-raid-manager/logger": "workspace:*",
-    "cron": "^3.1.7"
+    "axios": "^1.7.8",
+    "cron": "^3.1.7",
+    "discord-api-types": "^0.37.110"
   }
 }

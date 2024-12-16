@@ -2,7 +2,9 @@
   "name": "@albion-raid-manager/logger",
   "version": "1.0.0",
   "private": true,
-  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
