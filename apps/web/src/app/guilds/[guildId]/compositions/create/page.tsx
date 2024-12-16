@@ -1,9 +1,9 @@
 import Card from "@/components/Card";
+import CreateComposition from "@/components/compositions/CreateComposition";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { CompositionPageProps } from "../types";
-import CreateComposition from "./CreateComposition";
 
 export default async function CreateCompositionPage({ params }: CompositionPageProps) {
   const { guildId } = await params;

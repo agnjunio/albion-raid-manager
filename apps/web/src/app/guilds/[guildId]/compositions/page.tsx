@@ -1,7 +1,7 @@
 "use server";
 
+import CompositionList from "@/components/compositions/CompositionList";
 import { prisma } from "@albion-raid-manager/database";
-import CompositionList from "./CompositionList";
 import { CompositionPageProps } from "./types";
 
 export default async function CompositionsPage({ params }: CompositionPageProps) {

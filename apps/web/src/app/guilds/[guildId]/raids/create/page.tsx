@@ -1,10 +1,10 @@
 import { GuildPageProps } from "@/app/guilds/[guildId]/types";
 import Card from "@/components/Card";
+import CreateRaid from "@/components/raids/CreateRaid";
 import { prisma } from "@albion-raid-manager/database";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import CreateRaid from "./CreateRaid";
 
 export default async function CreateRaidPage({ params }: GuildPageProps) {
   const { guildId } = await params;

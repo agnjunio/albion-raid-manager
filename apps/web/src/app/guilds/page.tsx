@@ -1,9 +1,9 @@
 "use client";
 
+import GuildCard from "@/components/guilds/GuildCard";
 import Loading from "@/components/Loading";
 import useFetch from "@/hooks/useFetch";
 import { Guild } from "@albion-raid-manager/database/models";
-import GuildCard from "./GuildCard";
 
 export default function GuildsPage() {
   const { response, loading, error } = useFetch("/api/guilds");

@@ -2,7 +2,7 @@
 
 import Card from "@/components/Card";
 import Loading from "@/components/Loading";
-import RaidStatusBadge from "@/components/RaidStatusBadge";
+import RaidStatusBadge from "@/components/raids/RaidStatusBadge";
 import { getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import { Prisma, RaidStatus, Role } from "@albion-raid-manager/database/models";
 import { faArrowLeft, faRefresh } from "@fortawesome/free-solid-svg-icons";

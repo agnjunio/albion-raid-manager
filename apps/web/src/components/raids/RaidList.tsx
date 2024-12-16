@@ -1,5 +1,5 @@
 import Loading from "@/components/Loading";
-import RaidStatusBadge from "@/components/RaidStatusBadge";
+import RaidStatusBadge from "@/components/raids/RaidStatusBadge";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,10 +1,10 @@
 "use client";
 
 import Loading from "@/components/Loading";
+import RaidList from "@/components/raids/RaidList";
 import useFetch from "@/hooks/useFetch";
 import { Raid } from "@albion-raid-manager/database/models";
 import { useParams } from "next/navigation";
-import RaidList from "./RaidList";
 
 export default function GuildPage() {
   const params = useParams();
