@@ -3,7 +3,7 @@
 import Card from "@/components/Card";
 import Loading from "@/components/Loading";
 import RaidStatusBadge from "@/components/RaidStatusBadge";
-import { discord } from "@albion-raid-manager/common/helpers";
+import { getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import { Prisma, RaidStatus, Role } from "@albion-raid-manager/database/models";
 import { faArrowLeft, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -146,7 +146,7 @@ export default function RaidPage() {
                       <div>{slot.user.username}</div>
                       <picture>
                         <img
-                          src={discord.getUserPictureUrl(slot.user.id, slot.user.avatar)}
+                          src={getUserPictureUrl(slot.user.id, slot.user.avatar)}
                           className="size-8 rounded-full select-none"
                           alt={slot.user.username}
                         />
