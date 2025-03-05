@@ -4,6 +4,15 @@ import { PrismaClient, Role } from "@prisma/client";
 const prisma = new PrismaClient({});
 
 async function main() {
+  const user = await prisma.user.upsert({
+    where: { id: "155377266568855552" },
+    update: {},
+    create: {
+      id: "155377266568855552",
+      username: "anjek",
+    },
+  });
+
   const guild = await prisma.guild.upsert({
     where: { id: 1 },
     update: {},
@@ -11,6 +20,21 @@ async function main() {
       name: "Black River",
       discordId: "738365346855256107",
       announcementChannelId: "815639086882095115",
+      members: {
+        connectOrCreate: {
+          where: {
+            guildId_userId: {
+              guildId: 1,
+              userId: user.id,
+            },
+          },
+          create: {
+            userId: user.id,
+            role: "LEADER",
+            default: true,
+          },
+        },
+      },
     },
   });
 

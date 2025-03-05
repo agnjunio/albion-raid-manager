@@ -20,9 +20,9 @@
   },
   "dependencies": {
     "@albion-raid-manager/logger": "workspace:^",
-    "@prisma/client": "5.22.0"
+    "@prisma/client": "6.4.1"
   },
   "devDependencies": {
-    "prisma": "^5.22.0"
+    "prisma": "^6.4.1"
   }
 }
