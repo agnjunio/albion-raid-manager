@@ -1,3 +1,4 @@
+import Alert from "@/components/Alert";
 import { nextAuthOptions } from "@/lib/next-auth";
 import { prisma } from "@albion-raid-manager/database";
 import {
@@ -29,11 +30,23 @@ export default async function Layout({ params, children }: GuildLayoutProps) {
     where: {
       id: Number(guildId),
     },
-    include: { raids: true },
+    include: { raids: true, members: true },
   });
+
+  const isMember = guild?.members.some((member) => member.userId === session.user.id);
 
   if (!guild) {
     redirect("/guilds");
+  }
+  if (!isMember) {
+    return (
+      <div className="flex flex-col gap-2 justify-center items-center size-full">
+        <Alert>FORBIDDEN: You are not part of this guild.</Alert>
+        <Link href="/guilds" tabIndex={-1}>
+          <button className="py-1">Back</button>
+        </Link>
+      </div>
+    );
   }
 
   return (
