@@ -1,4 +1,5 @@
 import config from "@albion-raid-manager/config";
+import { prisma } from "@albion-raid-manager/database";
 import logger from "@albion-raid-manager/logger";
 import { NextAuthOptions } from "next-auth";
 import Discord from "next-auth/providers/discord";
@@ -15,13 +16,39 @@ export const nextAuthOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      try {
+        await prisma.user.upsert({
+          where: { id: user.id },
+          create: {
+            id: user.id,
+            username: user.name || "Usuário Desconhecido",
+            avatar: user.image,
+          },
+          update: {
+            username: user.name || "Usuário Desconhecido",
+            avatar: user.image,
+          },
+        });
+        return true;
+      } catch (error) {
+        logger.error(`User failed to sign in: ${error}`, {
+          method: "nextAuthOptions.signIn",
+          user,
+          error,
+        });
+        return false;
+      }
+    },
     redirect({ baseUrl }) {
       return `${baseUrl}/guilds`;
     },
-    async session({ session, token }) {
-      // Expose Discord ID in the session object
-      if (token?.sub && session.user) {
-        session.user.id = token.sub;
+    session({ session, token }) {
+      if (token?.sub) {
+        session.user = {
+          ...session.user,
+          id: token.sub,
+        };
       }
       return session;
     },
