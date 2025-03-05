@@ -1,7 +1,7 @@
 import { ClientError, ErrorCodes } from "@/errors";
 import { createRaidSignupReply, getRaidAnnouncementMessage } from "@/messages/raids";
+import { getErrorMessage } from "@albion-raid-manager/common/errors";
 import { runCronjob } from "@albion-raid-manager/common/scheduler";
-import { getErrorMessage } from "@albion-raid-manager/common/utils";
 import { prisma } from "@albion-raid-manager/database";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
