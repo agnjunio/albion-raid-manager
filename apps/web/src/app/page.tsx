@@ -18,13 +18,11 @@ export default function Home() {
 
             <div className="flex items-center gap-2">
               <div>{session.data.user.name}</div>
-              <picture>
-                <img
-                  src={session.data.user.image}
-                  className="size-8 rounded-full select-none"
-                  alt={session.data.user.name}
-                />
-              </picture>
+              {session.data.user.image && (
+                <picture>
+                  <img src={session.data.user.image} className="size-8 rounded-full select-none" />
+                </picture>
+              )}
             </div>
           </div>
 
