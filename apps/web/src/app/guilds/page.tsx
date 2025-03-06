@@ -1,22 +1,27 @@
-"use client";
-
 import GuildCard from "@/components/guilds/GuildCard";
 import { Page, PageTitle } from "@/components/pages/page";
-import Loading from "@/components/ui/loading";
-import useFetch from "@/hooks/useFetch";
-import { Guild } from "@albion-raid-manager/database/models";
+import { nextAuthOptions } from "@/lib/next-auth";
+import { prisma } from "@albion-raid-manager/database";
+import { getServerSession } from "next-auth";
+import { forbidden } from "next/navigation";
 
-export default function GuildsPage() {
-  const { response, loading, error } = useFetch("/api/guilds");
-  const guilds = response as Guild[];
+export default async function GuildsPage() {
+  const session = await getServerSession(nextAuthOptions);
+  if (!session) return forbidden();
 
-  if (loading) return <Loading />;
-  if (error) throw new Error("Failed to load guilds. Please try again later.");
-  if (!guilds) return null;
+  const guilds = await prisma.guild.findMany({
+    where: {
+      members: {
+        some: {
+          userId: session.user.id,
+        },
+      },
+    },
+  });
 
   return (
     <Page>
-      <PageTitle>Your Guilds</PageTitle>
+      <PageTitle>Select a Guild</PageTitle>
 
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {guilds.map((guild) => (
