@@ -1,4 +1,4 @@
-import Loading from "@/components/Loading";
+import Loading from "@/components/ui/loading";
 
 export default async function CompositionsLoading() {
   return <Loading />;

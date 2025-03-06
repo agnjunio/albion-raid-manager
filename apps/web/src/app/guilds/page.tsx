@@ -1,9 +1,8 @@
 "use client";
 
 import GuildCard from "@/components/guilds/GuildCard";
-import Loading from "@/components/Loading";
-import Page from "@/components/pages/Page";
-import PageTitle from "@/components/pages/PageTitle";
+import { Page, PageTitle } from "@/components/pages/page";
+import Loading from "@/components/ui/loading";
 import useFetch from "@/hooks/useFetch";
 import { Guild } from "@albion-raid-manager/database/models";
 

@@ -2,7 +2,6 @@
 
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "@headlessui/react";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 
@@ -27,17 +26,17 @@ export default function Home() {
           </div>
 
           <Link href="/guilds" tabIndex={-1}>
-            <Button>Guilds</Button>
+            <button>Guilds</button>
           </Link>
         </>
       ) : (
         <>
           <div>Not logged in</div>
 
-          <Button onClick={() => signIn("discord")}>
+          <button onClick={() => signIn("discord")}>
             <FontAwesomeIcon icon={faDiscord} />
             Login
-          </Button>
+          </button>
         </>
       )}
     </div>

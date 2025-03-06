@@ -1,8 +1,9 @@
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
+import Footer from "@/components/pages/footer";
+import Header from "@/components/pages/header";
 import { Roboto, Roboto_Mono } from "next/font/google";
-import "./globals.css";
 import { Providers } from "./providers";
+
+import "./globals.css";
 
 const roboto = Roboto({
   display: "swap",
@@ -56,10 +57,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${roboto.variable} ${robotoMono.variable} antialiased flex flex-col h-screen`}>
+      <body className={`${roboto.variable} ${robotoMono.variable} antialiased flex flex-col h-screen items-center`}>
         <Providers>
           <Header />
-          <main className="bg-primary-gray-200/5 grow flex flex-col container mx-auto shadow-lg">{children}</main>
+          <main className="bg-gray-200/5 grow flex flex-col container shadow-lg">{children}</main>
           <Footer />
         </Providers>
       </body>

@@ -1,7 +1,7 @@
 "use client";
 
-import Card from "@/components/Card";
-import Loading from "@/components/Loading";
+import Card from "@/components/ui/card";
+import Loading from "@/components/ui/loading";
 import { Prisma, Role } from "@albion-raid-manager/database/models";
 import { faArrowLeft, faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

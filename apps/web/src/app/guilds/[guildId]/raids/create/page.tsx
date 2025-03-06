@@ -1,6 +1,6 @@
 import { GuildPageProps } from "@/app/guilds/[guildId]/types";
-import Card from "@/components/Card";
 import CreateRaid from "@/components/raids/CreateRaid";
+import Card from "@/components/ui/card";
 import { prisma } from "@albion-raid-manager/database";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

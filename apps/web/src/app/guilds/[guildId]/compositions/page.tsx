@@ -1,8 +1,7 @@
 "use server";
 
 import CompositionList from "@/components/compositions/CompositionList";
-import Page from "@/components/pages/Page";
-import PageTitle from "@/components/pages/PageTitle";
+import { Page, PageTitle } from "@/components/pages/page";
 import { prisma } from "@albion-raid-manager/database";
 import { CompositionPageProps } from "./types";
 

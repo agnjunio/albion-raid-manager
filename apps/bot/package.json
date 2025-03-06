@@ -21,6 +21,6 @@
     "@albion-raid-manager/database": "workspace:^",
     "@albion-raid-manager/logger": "workspace:*",
     "date-fns": "^4.1.0",
-    "discord.js": "^14.15.2"
+    "discord.js": "^14.18.0"
   }
 }

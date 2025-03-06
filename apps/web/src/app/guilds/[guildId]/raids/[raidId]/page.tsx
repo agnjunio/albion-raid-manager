@@ -1,8 +1,8 @@
 "use client";
 
-import Card from "@/components/Card";
-import Loading from "@/components/Loading";
 import RaidStatusBadge from "@/components/raids/RaidStatusBadge";
+import Card from "@/components/ui/card";
+import Loading from "@/components/ui/loading";
 import { getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import { Prisma, RaidStatus, Role } from "@albion-raid-manager/database/models";
 import { faArrowLeft, faRefresh } from "@fortawesome/free-solid-svg-icons";

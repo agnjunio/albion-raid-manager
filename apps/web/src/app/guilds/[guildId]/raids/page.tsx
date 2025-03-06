@@ -1,9 +1,8 @@
 "use client";
 
-import Loading from "@/components/Loading";
-import Page from "@/components/pages/Page";
-import PageTitle from "@/components/pages/PageTitle";
+import { Page, PageTitle } from "@/components/pages/page";
 import RaidList from "@/components/raids/RaidList";
+import Loading from "@/components/ui/loading";
 import useFetch from "@/hooks/useFetch";
 import { Raid } from "@albion-raid-manager/database/models";
 import { useParams } from "next/navigation";

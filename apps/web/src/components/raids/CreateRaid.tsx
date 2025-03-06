@@ -1,6 +1,6 @@
 "use client";
 
-import Loading from "@/components/Loading";
+import Loading from "@/components/ui/loading";
 import { filterCompositions } from "@/helpers/compositions";
 import { Composition } from "@albion-raid-manager/database/models";
 import { faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";

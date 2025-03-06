@@ -3,7 +3,9 @@ import type { NextConfig } from "next";
 import NodeConfigWebpack from "node-config-webpack";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    optimizePackageImports: ["@chakra-ui/react"],
+  },
   output: "standalone",
   webpack: (config, { isServer }) => {
     // See more: https://www.prisma.io/docs/orm/more/help-and-troubleshooting/help-articles/nextjs-prisma-client-monorepo
