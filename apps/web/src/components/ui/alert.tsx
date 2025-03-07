@@ -1,4 +1,4 @@
-import cn from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import React from "react";
 
 interface Props {

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { signIn, useSession } from "next-auth/react";
@@ -26,17 +27,17 @@ export default function Home() {
           </div>
 
           <Link href="/guilds" tabIndex={-1}>
-            <button>Guilds</button>
+            <Button>Guilds</Button>
           </Link>
         </>
       ) : (
         <>
           <div>Not logged in</div>
 
-          <button onClick={() => signIn("discord")}>
+          <Button onClick={() => signIn("discord")}>
             <FontAwesomeIcon icon={faDiscord} />
             Login
-          </button>
+          </Button>
         </>
       )}
     </div>
