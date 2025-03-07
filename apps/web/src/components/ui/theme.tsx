@@ -1,11 +1,16 @@
 "use client";
 
+import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { Button } from "./button";
 
-export function ThemeButton() {
+interface Props {
+  className?: string;
+}
+
+export function ThemeButton({ className }: Props) {
   const [theme, setTheme] = useState(() =>
     typeof window !== "undefined" ? (localStorage.getItem("theme") ?? "dark") : "dark",
   );
@@ -21,7 +26,12 @@ export function ThemeButton() {
   }, [theme]);
 
   return (
-    <Button size="icon" variant="secondary" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+    <Button
+      size="icon"
+      variant="secondary"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className={cn(className)}
+    >
       {theme === "dark" ? <FontAwesomeIcon icon={faMoon} /> : <FontAwesomeIcon icon={faSun} />}
     </Button>
   );
