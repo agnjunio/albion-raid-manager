@@ -1,4 +1,4 @@
-import GuildCard from "@/components/guilds/GuildCard";
+import { GuildCard } from "@/components/guilds/guild-card";
 import { Page, PageTitle } from "@/components/pages/page";
 import { nextAuthOptions } from "@/lib/next-auth";
 import { prisma } from "@albion-raid-manager/database";
@@ -15,6 +15,11 @@ export default async function GuildsPage() {
         some: {
           userId: session.user.id,
         },
+      },
+    },
+    include: {
+      members: {
+        where: { userId: session.user.id },
       },
     },
   });
