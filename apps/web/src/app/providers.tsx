@@ -7,7 +7,7 @@ import { PropsWithChildren } from "react";
 export function Providers({ children }: PropsWithChildren) {
   return (
     <SessionProvider>
-      <SidebarProvider>{children}</SidebarProvider>
+      <SidebarProvider defaultOpen>{children}</SidebarProvider>
     </SessionProvider>
   );
 }

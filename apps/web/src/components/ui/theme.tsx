@@ -3,14 +3,15 @@
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { VariantProps } from "class-variance-authority";
 import { useEffect, useState } from "react";
-import { Button } from "./button";
+import { Button, buttonVariants } from "./button";
 
-interface Props {
+interface Props extends VariantProps<typeof buttonVariants> {
   className?: string;
 }
 
-export function ThemeButton({ className }: Props) {
+export function ThemeButton({ className, variant = "secondary" }: Props) {
   const [theme, setTheme] = useState(() =>
     typeof window !== "undefined" ? (localStorage.getItem("theme") ?? "dark") : "dark",
   );
@@ -28,7 +29,7 @@ export function ThemeButton({ className }: Props) {
   return (
     <Button
       size="icon"
-      variant="secondary"
+      variant={variant}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       className={cn(className)}
     >
