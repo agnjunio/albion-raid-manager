@@ -1,7 +1,7 @@
+import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { Roboto, Roboto_Mono } from "next/font/google";
-import { Providers } from "./providers";
-
 import "./globals.css";
+import { Providers } from "./providers";
 
 const roboto = Roboto({
   display: "swap",
@@ -54,9 +54,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${roboto.variable} ${robotoMono.variable} antialiased flex flex-col h-screen items-center bg-gray-100 dark:bg-black text-black dark:text-gray-50`}
+        className={cn(
+          `antialiased flex flex-col h-screen items-center bg-gray-100 dark:bg-black text-black dark:text-gray-50`,
+          roboto.variable,
+          robotoMono.variable,
+        )}
       >
         <Providers>{children}</Providers>
       </body>

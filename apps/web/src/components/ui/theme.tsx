@@ -1,10 +1,11 @@
 "use client";
 
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faComputer, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { VariantProps } from "class-variance-authority";
-import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
+import { useCallback } from "react";
 import { Button, buttonVariants } from "./button";
 
 interface Props extends VariantProps<typeof buttonVariants> {
@@ -12,28 +13,18 @@ interface Props extends VariantProps<typeof buttonVariants> {
 }
 
 export function ThemeButton({ className, variant = "secondary" }: Props) {
-  const [theme, setTheme] = useState(() =>
-    typeof window !== "undefined" ? (localStorage.getItem("theme") ?? "dark") : "dark",
-  );
+  const { resolvedTheme, setTheme } = useTheme();
 
-  useEffect(() => {
-    if (theme === "dark") {
-      document.body.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.body.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [theme]);
+  const toggleTheme = useCallback(() => {
+    const themes = ["dark", "light"];
+    setTheme(themes[(themes.indexOf(resolvedTheme || themes[0]) + 1) % themes.length]);
+  }, [resolvedTheme]);
 
   return (
-    <Button
-      size="icon"
-      variant={variant}
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className={cn(className)}
-    >
-      {theme === "dark" ? <FontAwesomeIcon icon={faMoon} /> : <FontAwesomeIcon icon={faSun} />}
+    <Button size="icon" variant={variant} onClick={toggleTheme} className={cn(className)}>
+      {resolvedTheme === "dark" && <FontAwesomeIcon icon={faMoon} />}
+      {resolvedTheme === "light" && <FontAwesomeIcon icon={faSun} />}
+      {resolvedTheme === "system" && <FontAwesomeIcon icon={faComputer} />}
     </Button>
   );
 }
