@@ -1,27 +1,34 @@
-import React from "react";
+import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import * as React from "react";
 
-export default function Card({
-  title,
-  actions,
-  children,
-  className,
-}: {
-  title?: string;
-  actions?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  const hasHeader = !!title || !!actions;
-
+function Card({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div className={`p-4 rounded-lg bg-primary-gray-800/25 ${className}`}>
-      {hasHeader && (
-        <div className="flex justify-between items-center mb-4">
-          {title && <h1 className="text-lg font-medium">{title}</h1>}
-          {actions && <div>{actions}</div>}
-        </div>
-      )}
-      {children}
-    </div>
+    <div
+      data-slot="card"
+      className={cn("bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm", className)}
+      {...props}
+    />
   );
 }
+
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return <div data-slot="card-header" className={cn("flex flex-col gap-1.5 px-6", className)} {...props} />;
+}
+
+function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
+  return <div data-slot="card-title" className={cn("leading-none font-semibold", className)} {...props} />;
+}
+
+function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
+  return <div data-slot="card-description" className={cn("text-muted-foreground text-sm", className)} {...props} />;
+}
+
+function CardContent({ className, ...props }: React.ComponentProps<"div">) {
+  return <div data-slot="card-content" className={cn("px-6", className)} {...props} />;
+}
+
+function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return <div data-slot="card-footer" className={cn("flex items-center px-6", className)} {...props} />;
+}
+
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle };
