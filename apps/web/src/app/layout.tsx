@@ -1,19 +1,30 @@
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { Roboto, Roboto_Mono } from "next/font/google";
+import { DM_Mono, DM_Sans, Lora, Pirata_One } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const roboto = Roboto({
-  display: "swap",
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-roboto",
+  variable: "--font-dm-sans",
   weight: "400",
 });
 
-const robotoMono = Roboto_Mono({
-  display: "swap",
+const dmMono = DM_Mono({
   subsets: ["latin"],
-  variable: "--font-roboto-mono",
+  variable: "--font-dm-mono",
+  weight: "400",
+});
+
+const lora = Lora({
+  subsets: ["latin"],
+  variable: "--font-lora",
+  weight: "400",
+});
+
+const pirataOne = Pirata_One({
+  subsets: ["latin"],
+  variable: "--font-pirata-one",
+  weight: "400",
 });
 
 export const metadata = {
@@ -57,9 +68,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          `antialiased flex flex-col h-screen items-center bg-gray-100 dark:bg-black text-black dark:text-gray-50`,
-          roboto.variable,
-          robotoMono.variable,
+          `antialiased flex flex-col h-screen items-center bg-gray-100 dark:bg-black text-black dark:text-gray-50 font-sans`,
+          dmMono.variable,
+          dmSans.variable,
+          lora.variable,
+          pirataOne.variable,
         )}
       >
         <Providers>{children}</Providers>
