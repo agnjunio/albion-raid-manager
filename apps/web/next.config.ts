@@ -5,7 +5,6 @@ import NodeConfigWebpack from "node-config-webpack";
 const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
-    optimizePackageImports: ["@chakra-ui/react"],
   },
   output: "standalone",
   webpack: (config, { isServer }) => {

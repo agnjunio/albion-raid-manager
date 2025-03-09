@@ -18,7 +18,7 @@ export function ThemeButton({ className, variant = "secondary" }: Props) {
   const toggleTheme = useCallback(() => {
     const themes = ["dark", "light"];
     setTheme(themes[(themes.indexOf(resolvedTheme || themes[0]) + 1) % themes.length]);
-  }, [resolvedTheme]);
+  }, [resolvedTheme, setTheme]);
 
   return (
     <Button size="icon" variant={variant} onClick={toggleTheme} className={cn(className)}>
