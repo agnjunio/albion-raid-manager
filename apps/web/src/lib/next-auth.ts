@@ -41,7 +41,7 @@ export const nextAuthOptions: NextAuthOptions = {
       }
     },
     redirect({ baseUrl }) {
-      return `${baseUrl}/guilds`;
+      return `${baseUrl}/dashboard`;
     },
     session({ session, token }) {
       if (token?.sub) {

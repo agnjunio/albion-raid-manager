@@ -1,5 +1,5 @@
+import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { Container } from "@/components/pages/container";
-import { DashboardSidebar } from "@/components/pages/sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeButton } from "@/components/ui/theme";
 import { nextAuthOptions } from "@/lib/next-auth";
