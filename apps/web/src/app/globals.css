@@ -18,7 +18,7 @@
   --accent: #d4af37; /* Accent golden color */
   --border: #2a2a2a; /* Border color */
   --destructive: #e63946; /* Red for destructive actions */
-  --destructive-foreground: #ffffff; /* White foreground for destructive actions */
+  --destructive-foreground: #ff4d4d; /* White foreground for destructive actions */
 
   /* UI Elements */
   --input: #2a2a2a;
@@ -60,7 +60,7 @@
   --accent: #b8860b; /* Darker gold accent */
   --border: #f5e6c1; /* Darker border color */
   --destructive: #e63946; /* Red for destructive actions */
-  --destructive-foreground: #ffffff; /* White foreground for destructive actions */
+  --destructive-foreground: #ff4d4d; /* White foreground for destructive actions */
 
   /* Dark Mode UI Elements */
   --input: #2a2a2a;

@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useDashboardContext } from "./context";
 
 export default function Page() {
@@ -14,10 +15,13 @@ export default function Page() {
   const { selectedGuild } = useDashboardContext();
   const router = useRouter();
 
-  if (selectedGuild && !pathname.includes(`/dashboard/${selectedGuild.id}`)) {
-    return router.replace(`/dashboard/${selectedGuild.id}`);
-  }
+  useEffect(() => {
+    if (selectedGuild && !pathname.includes(`/dashboard/${selectedGuild.id}`)) {
+      return router.replace(`/dashboard/${selectedGuild.id}`);
+    }
+  }, [pathname, router, selectedGuild]);
 
+  if (selectedGuild) return; // Wait for redirect
   return (
     <div className="flex justify-center items-center size-full flex-col gap-2">
       <Card className="max-w-md text-center">
