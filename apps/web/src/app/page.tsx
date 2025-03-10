@@ -13,10 +13,10 @@ export default function Home() {
 
   return (
     <div className="size-full flex justify-center">
-      <div className="basis-1/2 lg:basis-1/3 dark:bg-gray-600/90 bg-gray-600/80 z-10 bg-[url(/wallpapper.jpg)] bg-blend-multiply bg-no-repeat bg-cover bg-[center_center]">
+      <div className="basis-1/2 lg:basis-1/3 dark:bg-secondary/50 bg-secondary/40 z-10 bg-[url(/wallpapper.jpg)] bg-blend-multiply bg-no-repeat bg-cover bg-[center_center]">
         <div className="flex flex-col gap-2 items-center justify-center size-full">
-          <h1 className="text-5xl drop-shadow-lg text-white font-title">Albion Raid Manager</h1>
-          <p className="mt-4 text-lg max-w-md mx-auto text-white">
+          <h1 className="text-5xl drop-shadow-lg text-secondary-foreground font-title">Albion Raid Manager</h1>
+          <p className="mt-4 text-lg max-w-md mx-auto text-secondary-foreground">
             Command every raid with precision. Plan, strategize, and lead your guild to victory.
           </p>
         </div>
@@ -27,7 +27,7 @@ export default function Home() {
         {session.data ? (
           <>
             {session.data.user.image && (
-              <picture>
+              <picture className="shadow-lg shadow-foreground/50 dark:shadow-background rounded-full">
                 <img
                   src={session.data.user.image}
                   className="size-12 rounded-full select-none"
@@ -37,11 +37,11 @@ export default function Home() {
             )}
             <div className="flex gap-1 items-center">
               <div>Authenticated as</div>
-              <div className="font-semibold">@{session.data.user.name}</div>
+              <div className="font-semibold text-secondary dark:text-primary">@{session.data.user.name}</div>
             </div>
 
             <Link href="/dashboard" tabIndex={-1} passHref>
-              <Button>Enter</Button>
+              <Button variant="primary">Enter</Button>
             </Link>
           </>
         ) : (

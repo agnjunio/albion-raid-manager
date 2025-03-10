@@ -12,7 +12,7 @@ interface Props extends VariantProps<typeof buttonVariants> {
   className?: string;
 }
 
-export function ThemeButton({ className, variant = "secondary" }: Props) {
+export function ThemeButton({ className, variant = "outline" }: Props) {
   const { resolvedTheme, setTheme } = useTheme();
 
   const toggleTheme = useCallback(() => {
@@ -21,7 +21,12 @@ export function ThemeButton({ className, variant = "secondary" }: Props) {
   }, [resolvedTheme, setTheme]);
 
   return (
-    <Button size="icon" variant={variant} onClick={toggleTheme} className={cn(className)}>
+    <Button
+      size="icon"
+      variant={variant}
+      onClick={toggleTheme}
+      className={cn("transition-all ease-in-out duration-300", className)}
+    >
       {resolvedTheme === "dark" && <FontAwesomeIcon icon={faMoon} />}
       {resolvedTheme === "light" && <FontAwesomeIcon icon={faSun} />}
       {resolvedTheme === "system" && <FontAwesomeIcon icon={faComputer} />}

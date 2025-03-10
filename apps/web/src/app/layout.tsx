@@ -68,7 +68,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          `antialiased flex flex-col h-screen items-center bg-gray-100 dark:bg-black text-black dark:text-gray-50 font-sans`,
+          `antialiased flex flex-col h-screen items-center bg-background text-foreground font-sans`,
           dmMono.variable,
           dmSans.variable,
           lora.variable,
