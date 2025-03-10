@@ -10,7 +10,11 @@ export const getUserPictureUrl = (id: string, avatar?: string | null) => {
   return `${DISCORD_CDN_URL}/embed/avatars/${Number(id) % 5}.png`;
 };
 
-export const getServerPictureUrl = (id: string, icon?: string, { animated = false }: { animated?: boolean } = {}) => {
+export const getServerPictureUrl = (
+  id: string,
+  icon?: string | null,
+  { animated = false }: { animated?: boolean } = {},
+) => {
   if (icon) {
     const ext = animated && icon.startsWith("a_") ? "gif" : "png";
     return `${DISCORD_CDN_URL}/icons/${id}/${icon}.${ext}`;

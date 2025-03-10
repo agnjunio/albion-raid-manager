@@ -6,6 +6,14 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.discordapp.com",
+      },
+    ],
+  },
   output: "standalone",
   webpack: (config, { isServer }) => {
     // See more: https://www.prisma.io/docs/orm/more/help-and-troubleshooting/help-articles/nextjs-prisma-client-monorepo

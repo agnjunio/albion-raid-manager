@@ -1,10 +1,22 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
+import { useDashboardContext } from "./context";
 
-export default async function Page() {
+export default function Page() {
+  const pathname = usePathname();
+  const { selectedGuild } = useDashboardContext();
+  const router = useRouter();
+
+  if (selectedGuild && !pathname.includes(`/dashboard/${selectedGuild.id}`)) {
+    return router.replace(`/dashboard/${selectedGuild.id}`);
+  }
+
   return (
     <div className="flex justify-center items-center size-full flex-col gap-2">
       <Card className="max-w-md text-center">
