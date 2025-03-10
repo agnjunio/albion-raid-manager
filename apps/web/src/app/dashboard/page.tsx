@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useDashboardContext } from "./context";
 
@@ -26,10 +27,12 @@ export default function Page() {
           </div>
           <CardTitle className="text-2xl">Welcome to Albion Raid Manager</CardTitle>
           <CardDescription className="text-lg">Please select a guild or create one</CardDescription>
-          <Button>
-            <FontAwesomeIcon icon={faPlus} />
-            <div>Create Guild</div>
-          </Button>
+          <Link href="/guilds/create">
+            <Button>
+              <FontAwesomeIcon icon={faPlus} />
+              <div>Create Guild</div>
+            </Button>
+          </Link>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">

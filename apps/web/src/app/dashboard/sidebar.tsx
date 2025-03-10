@@ -4,6 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -26,6 +27,7 @@ import {
   faFlag,
   faGear,
   faPeopleGroup,
+  faPlus,
   faShield,
   faShieldHalved,
   faUsers,
@@ -102,6 +104,13 @@ export function DashboardSidebar() {
                 </DropdownMenuItem>
               </Link>
             ))}
+            <DropdownMenuSeparator />
+            <Link href="/guilds/create">
+              <DropdownMenuItem>
+                <FontAwesomeIcon icon={faPlus} className="size-4" />
+                <div className="leading-normal">Create Guild</div>
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarHeader>
