@@ -1,5 +1,5 @@
 import CreateComposition from "@/components/compositions/CreateComposition";
-import Card from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";

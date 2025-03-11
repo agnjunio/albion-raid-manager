@@ -1,6 +1,13 @@
 import { APIGuild, APIGuildChannel, APIUser, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
 
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;
+export const PERMISSIONS: {
+  [permission: string]: bigint;
+} = {
+  ADMINISTRATOR: BigInt(1 << 3), // 0x00000008
+  MANAGE_GUILD: BigInt(1 << 5), // 0x00000020
+  MANAGE_ROLES: BigInt(1 << 28), // 0x10000000
+};
 
 export const getDiscordOAuthUrl = (clientId: string, redirectUri: string) =>
   `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20guilds`;
@@ -28,6 +35,11 @@ export const getServerInviteUrl = (clientId: string, serverId?: string) => {
 };
 
 export const checkFlag = (bit: string, flag: bigint) => (BigInt(bit) & flag) === flag;
+
+export function hasPermissions(permissions: string | bigint, requiredPermissions: bigint[]): boolean {
+  const permissionBits = BigInt(permissions);
+  return requiredPermissions.every((perm) => (permissionBits & perm) !== 0n);
+}
 
 export function transformUser(user: APIUser) {
   return {
