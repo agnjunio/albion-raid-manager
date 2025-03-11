@@ -13,6 +13,12 @@ const eslintConfig = [
       "react-hooks/exhaustive-deps": "warn",
       "@next/next/no-page-custom-font": "off",
       "no-console": "warn",
+      "no-unused-vars": [
+        "warn",
+        {
+          exclude: ["^_"],
+        },
+      ],
     },
   }),
 ];
