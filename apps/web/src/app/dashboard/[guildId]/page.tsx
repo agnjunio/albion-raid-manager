@@ -1,9 +1,7 @@
-"use client";
+import { redirect } from "next/navigation";
+import { DashboardPageProps } from "../types";
 
-import { useDashboardContext } from "../context";
-
-export default function Page() {
-  const { selectedGuild } = useDashboardContext();
-
-  return <div>Guild: {selectedGuild?.name}</div>;
+export default async function Page({ params }: DashboardPageProps) {
+  const { guildId } = await params;
+  redirect(`/dashboard/${guildId}/raids`);
 }

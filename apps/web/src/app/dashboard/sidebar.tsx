@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +16,7 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
@@ -38,7 +38,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useDashboardContext } from "./context";
 import { GuildWithMembers } from "./types";
@@ -54,34 +53,6 @@ const links = [
 interface GuildSelectionProps {
   guild?: GuildWithMembers;
   icon?: IconDefinition;
-}
-
-export function GuildSelection({ guild, icon }: GuildSelectionProps) {
-  return (
-    <div className="flex items-center gap-2 w-full">
-      <div
-        className={cn(
-          "flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground relative",
-          { "bg-sidebar-primary rounded-lg": !guild },
-        )}
-      >
-        {guild ? (
-          <Image src={getServerPictureUrl(guild.discordId, guild.icon)} alt={guild.name} fill className="rounded-lg" />
-        ) : (
-          <FontAwesomeIcon icon={faShield} className="size-4" />
-        )}
-      </div>
-
-      <div className={cn("flex flex-col leading-right grow whitespace-nowrap min-w-0")}>
-        <span className="font-semibold truncate">{guild ? guild.name : "Select Guild"} </span>
-        <span className="text-xs text-muted-foreground">
-          {guild ? `${guild.members.length} member${guild.members.length !== 1 ? "s" : ""}` : "No Guild Selected"}
-        </span>
-      </div>
-
-      {icon && <FontAwesomeIcon icon={icon} className="ml-auto size-4 data-[state=collapsed]:hidden" />}
-    </div>
-  );
 }
 
 export function DashboardSidebar() {
@@ -139,10 +110,45 @@ export function DashboardSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter>
-        <UserInfo />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <UserInfo />
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
+  );
+}
+
+export function GuildSelection({ guild, icon }: GuildSelectionProps) {
+  return (
+    <div className="flex items-center gap-2 w-full">
+      <div
+        className={cn(
+          "flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground relative",
+          { "bg-sidebar-primary rounded-lg": !guild },
+        )}
+      >
+        {guild ? (
+          <Avatar>
+            <AvatarImage src={getServerPictureUrl(guild.discordId, guild.icon)} />
+            <AvatarFallback>{guild.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        ) : (
+          <FontAwesomeIcon icon={faShield} className="size-4" />
+        )}
+      </div>
+
+      <div className={cn("flex flex-col leading-right grow whitespace-nowrap min-w-0")}>
+        <span className="font-semibold truncate">{guild ? guild.name : "Select Guild"} </span>
+        <span className="text-xs text-muted-foreground">
+          {guild ? `${guild.members.length} member${guild.members.length !== 1 ? "s" : ""}` : "No Guild Selected"}
+        </span>
+      </div>
+
+      {icon && <FontAwesomeIcon icon={icon} className="ml-auto size-4 data-[state=collapsed]:hidden" />}
+    </div>
   );
 }
 
@@ -152,22 +158,20 @@ export function UserInfo() {
 
   const { user } = session.data;
   return (
-    <div className="flex items-center justify-between gap-1 p-2">
+    <>
       <div className="flex items-center gap-2 min-w-0">
         <Avatar>
           <AvatarImage src={user.image || getUserPictureUrl(user.id)} />
           <AvatarFallback>{user.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
         </Avatar>
 
-        <div className="flex flex-col text-sm min-w-0">
-          <span className="font-semibold">@{user.name || "Unknown User"}</span>
+        <div className="flex flex-col text-sm min-w-0 group-data-[collapsible=icon]:hidden">
+          <span className="font-semibold truncate">@{user.name || "Unknown User"}</span>
           <span className="text-xs leading-tight truncate">{user.email}</span>
         </div>
       </div>
 
-      <Button
-        variant="ghost"
-        size="icon"
+      <SidebarMenuAction
         onClick={() =>
           signOut({
             callbackUrl: "/",
@@ -175,7 +179,7 @@ export function UserInfo() {
         }
       >
         <FontAwesomeIcon icon={faArrowRightFromBracket} />
-      </Button>
-    </div>
+      </SidebarMenuAction>
+    </>
   );
 }
