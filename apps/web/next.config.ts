@@ -5,6 +5,9 @@ import NodeConfigWebpack from "node-config-webpack";
 const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
+    turbo: {
+      rules: {},
+    },
   },
   serverExternalPackages: ["winston"],
   images: {

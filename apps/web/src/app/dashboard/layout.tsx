@@ -1,4 +1,5 @@
 import { Container } from "@/components/pages/container";
+import { Footer } from "@/components/pages/footer";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeButton } from "@/components/ui/theme";
 import { nextAuthOptions } from "@/lib/auth";
@@ -37,6 +38,7 @@ export default async function Layout({ children }: Readonly<DashboardLayoutProps
             <ThemeButton variant="ghost" />
           </div>
           <div className="grow">{children}</div>
+          <Footer />
         </Container>
       </SidebarProvider>
     </DashboardProvider>

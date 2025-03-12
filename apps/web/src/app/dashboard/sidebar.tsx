@@ -1,5 +1,7 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +22,9 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { getServerPictureUrl } from "@albion-raid-manager/common/helpers/discord";
+import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import {
+  faArrowRightFromBracket,
   faCheck,
   faChevronDown,
   faFlag,
@@ -34,6 +37,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDashboardContext } from "./context";
@@ -134,8 +138,44 @@ export function DashboardSidebar() {
           </SidebarGroup>
         )}
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <UserInfo />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
+  );
+}
+
+export function UserInfo() {
+  const session = useSession();
+  if (!session?.data?.user) return null;
+
+  const { user } = session.data;
+  return (
+    <div className="flex items-center justify-between gap-1 p-2">
+      <div className="flex items-center gap-2 min-w-0">
+        <Avatar>
+          <AvatarImage src={user.image || getUserPictureUrl(user.id)} />
+          <AvatarFallback>{user.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
+        </Avatar>
+
+        <div className="flex flex-col text-sm min-w-0">
+          <span className="font-semibold">@{user.name || "Unknown User"}</span>
+          <span className="text-xs leading-tight truncate">{user.email}</span>
+        </div>
+      </div>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() =>
+          signOut({
+            callbackUrl: "/",
+          })
+        }
+      >
+        <FontAwesomeIcon icon={faArrowRightFromBracket} />
+      </Button>
+    </div>
   );
 }
