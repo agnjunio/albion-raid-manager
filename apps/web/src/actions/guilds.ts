@@ -31,6 +31,7 @@ export async function createGuild(server: Server, userId: string) {
           create: {
             userId: userId,
             role: "LEADER",
+            default: true,
           },
         },
       },
