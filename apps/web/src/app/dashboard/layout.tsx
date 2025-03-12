@@ -1,13 +1,13 @@
 import { Container } from "@/components/ui/container";
 import { Footer } from "@/components/ui/footer";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { ThemeButton } from "@/components/ui/theme";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { nextAuthOptions } from "@/lib/auth";
 import { prisma } from "@albion-raid-manager/database";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { DashboardProvider } from "./context";
 import { DashboardSidebar } from "./sidebar";
+import { DashboardTitle } from "./title";
 import { DashboardLayoutProps } from "./types";
 
 export default async function Layout({ children }: Readonly<DashboardLayoutProps>) {
@@ -33,10 +33,7 @@ export default async function Layout({ children }: Readonly<DashboardLayoutProps
       <SidebarProvider>
         <DashboardSidebar />
         <Container className="grow flex flex-col">
-          <div className="flex justify-between p-2 sticky top-0">
-            <SidebarTrigger />
-            <ThemeButton variant="ghost" />
-          </div>
+          <DashboardTitle />
           <div className="grow">{children}</div>
           <Footer />
         </Container>
