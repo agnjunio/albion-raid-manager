@@ -1,4 +1,4 @@
-import { Page, PageTitle } from "@/components/pages/page";
+import { Page, PageTitle } from "@/components/ui/page";
 import React from "react";
 
 const BuildsPage: React.FC = () => {

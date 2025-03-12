@@ -1,4 +1,4 @@
-import { Page, PageTitle } from "@/components/pages/page";
+import { Page, PageTitle } from "@/components/ui/page";
 
 export default function MembersPage() {
   return (

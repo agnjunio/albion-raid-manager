@@ -1,5 +1,5 @@
-import { Container } from "@/components/pages/container";
-import { Footer } from "@/components/pages/footer";
+import { Container } from "@/components/ui/container";
+import { Footer } from "@/components/ui/footer";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeButton } from "@/components/ui/theme";
 import { nextAuthOptions } from "@/lib/auth";

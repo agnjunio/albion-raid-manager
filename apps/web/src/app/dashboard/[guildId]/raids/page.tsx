@@ -1,4 +1,4 @@
-import { Page, PageTitle } from "@/components/pages/page";
+import { Page, PageTitle } from "@/components/ui/page";
 import { prisma } from "@albion-raid-manager/database";
 import { RaidsProvider } from "./context";
 import { RaidList } from "./list";

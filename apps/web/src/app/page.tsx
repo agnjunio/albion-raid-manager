@@ -1,7 +1,7 @@
 "use client";
 
-import { Container } from "@/components/pages/container";
 import { Button } from "@/components/ui/button";
+import { Container } from "@/components/ui/container";
 import { ThemeButton } from "@/components/ui/theme";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
