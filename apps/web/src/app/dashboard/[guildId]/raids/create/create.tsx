@@ -1,141 +1,167 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import Loading from "@/components/ui/loading";
+import { DateTimePicker } from "@/components/ui/datetime-picker";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { Composition } from "@albion-raid-manager/database/models";
-import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { addMinutes, format } from "date-fns";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addMonths, startOfDay } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEventHandler, useState } from "react";
-import { Card } from "../../../../../components/ui/card";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 type CreateRaidProps = {
-  id: string;
+  guildId: string;
   compositions: Composition[];
 };
 
-export default function CreateRaid({ id, compositions }: CreateRaidProps) {
-  const getNext30MinuteStep = () => {
-    const now = new Date();
-    const rounded = addMinutes(now, 30 - (now.getMinutes() % 30));
-    return format(rounded, "yyyy-MM-dd'T'HH:mm");
-  };
+const today = startOfDay(Date.now());
+const maxDate = addMonths(today, 2);
 
+const formSchema = z.object({
+  description: z
+    .string()
+    .min(6, { message: "Description should contain at least 6 characters" })
+    .max(50, { message: "Description should not exceed 50 characters." }),
+  date: z
+    .date()
+    .min(today, { message: "Start date must be today or later." })
+    .max(maxDate, { message: "Start date cannot be more than 2 months ahead." }),
+  composition: z.custom<Composition>().refine((val) => val !== undefined, { message: "Please select a composition " }),
+});
+
+export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
   const router = useRouter();
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState(getNext30MinuteStep());
-  const [loading, setLoading] = useState(false);
-
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      description: "",
+      date: today,
+    },
+  });
   const [compositionsOpen, setCompositionsOpen] = useState(false);
-  const [selectedComposition, setSelectedComposition] = useState<Composition | null>(null);
 
-  const createRaid: FormEventHandler = async (event) => {
-    event.preventDefault();
-
-    try {
-      if (!selectedComposition) throw new Error("Composition is required");
-
-      setLoading(true);
-      const response = await fetch(`/api/raids`, {
-        method: "POST",
-        body: JSON.stringify({ description, date, compositionId: selectedComposition.id, guildId: Number(id) }),
-      });
-      if (!response.ok) throw new Error("Failed to create raid");
-      router.push(`/guilds/${id}/raids`);
-    } finally {
-      setLoading(false);
-    }
+  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log(values);
   };
 
-  if (loading) return <Loading />;
   return (
-    <Card>
-      <form onSubmit={createRaid} className="space-y-4">
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium">
-            Description
-          </label>
-          <input
-            id="description"
-            type="text"
-            className="w-full"
-            value={description}
-            placeholder="Enter raid description..."
-            onChange={(e) => setDescription(e.target.value)}
+    <Card className="p-8">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 lg:space-y-8">
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter raid description..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div>
-          <label htmlFor="start" className="block text-sm font-medium">
-            Start Time
-          </label>
-          <input
-            id="start"
-            type="datetime-local"
-            className="w-full"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            step="1800" // 30 minutes in seconds
-            min={new Date().toISOString().split("T")[0] + "T00:00"}
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start Time</FormLabel>
+                <FormControl>
+                  <DateTimePicker
+                    hourCycle={24}
+                    granularity="minute"
+                    displayFormat={{ hour24: "dd/MM/yyyy HH:mm" }}
+                    yearRange={0}
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  The start time is in your local timezone. Conversions will be done automatically.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
 
-        <div>
-          <label htmlFor="composition" className="block text-sm font-medium">
-            Composition
-          </label>
-
-          <Popover open={compositionsOpen} onOpenChange={setCompositionsOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" role="combobox" aria-expanded={compositionsOpen} className="w-full">
-                {selectedComposition ? selectedComposition.name : "Select a composition..."}
-              </Button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Search composition" />
-                <CommandList>
-                  <CommandEmpty>No compositions found.</CommandEmpty>
-                  <CommandGroup>
-                    {compositions.map((composition) => (
-                      <CommandItem
-                        key={composition.id}
-                        value={composition.name}
-                        onSelect={() => {
-                          setSelectedComposition(composition === selectedComposition ? null : composition);
-                          setCompositionsOpen(false);
-                        }}
+          <FormField
+            control={form.control}
+            name="composition"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Composition</FormLabel>
+                <FormControl>
+                  <Popover open={compositionsOpen} onOpenChange={setCompositionsOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        role="combobox"
+                        variant="outline"
+                        aria-expanded={compositionsOpen}
+                        className="w-full justify-start"
+                        disabled={field.disabled}
                       >
-                        <div className="flex justify-center gap-2">
-                          <FontAwesomeIcon
-                            icon={faCheckSquare}
-                            className={cn("size-4 opacity-0", {
-                              "opacity-100": selectedComposition === composition,
-                            })}
-                          />
-                          {composition.name}
+                        <div className="flex items-center gap-2">
+                          <FontAwesomeIcon icon={faPeopleGroup} className="size-4" />
+                          {field.value ? field.value.name : "Select a composition..."}
                         </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="flex gap-2 flex-row-reverse">
-          <button type="submit">Create</button>
-          <Link href={`/guilds/${id}/raids`}>
-            <button className="btn-secondary-violet">Cancel</button>
-          </Link>
-        </div>
-      </form>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0">
+                      <Command>
+                        <CommandInput placeholder="Search composition" />
+                        <CommandList>
+                          <CommandEmpty>No compositions found.</CommandEmpty>
+                          <CommandGroup>
+                            {compositions.map((composition) => (
+                              <CommandItem
+                                key={composition.id}
+                                value={composition.name}
+                                onSelect={() => field.onChange(composition)}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <FontAwesomeIcon
+                                    icon={faCheck}
+                                    className={cn("size-4 opacity-0 transition-all ease-in-out", {
+                                      "opacity-100": field.value?.id === composition.id,
+                                    })}
+                                  />
+                                  {composition.name}
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
+                <FormDescription>
+                  Leave this field blank if you do not wish to use a predefined composition in this raid.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex gap-2 flex-row-reverse">
+            <Button type="submit">Create</Button>
+            <Link href={`/dashboard/${guildId}/raids`} tabIndex={-1}>
+              <Button variant="secondary">Cancel</Button>
+            </Link>
+          </div>
+        </form>
+      </Form>
     </Card>
   );
 }

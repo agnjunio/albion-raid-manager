@@ -13,7 +13,7 @@ export default async function CreateRaidPage({ params }: RaidsPageProps) {
 
       <div className="flex justify-center">
         <div className="w-full max-w-xl">
-          <CreateRaid id={guildId} compositions={compositions} />
+          <CreateRaid guildId={guildId} compositions={compositions} />
         </div>
       </div>
     </Page>
