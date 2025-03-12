@@ -5,5 +5,5 @@ export function Page({ children }: PropsWithChildren) {
 }
 
 export function PageTitle({ children }: PropsWithChildren) {
-  return <h2 className="text-2xl font-semibold text-center py-4">{children}</h2>;
+  return <h2 className="text-2xl font-normal text-center font-title">{children}</h2>;
 }

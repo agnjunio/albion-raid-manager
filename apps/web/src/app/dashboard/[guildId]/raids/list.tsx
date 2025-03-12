@@ -1,21 +1,38 @@
-import RaidStatusBadge from "@/components/raids/RaidStatusBadge";
-import Loading from "@/components/ui/loading";
+"use client";
+
+import { Button } from "@/components/ui/button";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import { faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { compareAsc } from "date-fns";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
-
-interface RaidListProps {
-  raids: Raid[];
-  loading: boolean;
-  onRefresh: () => Promise<void>;
-}
+import { useRaidsContext } from "./context";
 
 const statusOrder = [RaidStatus.SCHEDULED, RaidStatus.OPEN, RaidStatus.CLOSED, RaidStatus.ONGOING, RaidStatus.FINISHED];
 
-export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
+export function RaidStatusBadge({ raid }: { raid: Raid }) {
+  const statusColors = {
+    [RaidStatus.SCHEDULED]: "bg-secondary-violet-800",
+    [RaidStatus.OPEN]: "bg-green-800",
+    [RaidStatus.CLOSED]: "bg-red-900",
+    [RaidStatus.ONGOING]: "bg-primary-yellow-800",
+    [RaidStatus.FINISHED]: "bg-primary-gray-500",
+  };
+
+  return (
+    <div
+      className={`select-none w-24 text-center p-1 text-xs uppercase rounded-lg font-semibold shadow-sm ${statusColors[raid.status]}`}
+    >
+      {raid.status}
+    </div>
+  );
+}
+
+export function RaidList() {
+  const { guildId } = useParams();
+  const { raids } = useRaidsContext();
   const [filter, setFilter] = useState("ALL");
 
   const filteredRaids = useMemo(
@@ -27,7 +44,6 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
     [raids, filter],
   );
 
-  if (loading) return <Loading />;
   return (
     <div className="h-full flex flex-col gap-3">
       <div className="flex justify-between items-center gap-2">
@@ -35,8 +51,8 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
           {["ALL", ...Object.keys(RaidStatus)].map((status) => {
             const colors =
               filter === status
-                ? "bg-primary-yellow/50 hover:bg-primary-yellow-700/90 active:bg-primary-yellow-600"
-                : "bg-secondary-violet-700 hover:bg-secondary-violet/50 active:bg-secondary-violet-600";
+                ? "bg-primary/50 hover:bg-primary/90 active:bg-primary"
+                : "bg-secondary/50 hover:bg-secondary/90 active:bg-secondary";
             return (
               <button
                 key={status}
@@ -49,14 +65,14 @@ export default function RaidList({ raids, loading, onRefresh }: RaidListProps) {
           })}
         </div>
 
-        <div className="flex gap-2 flex-row-reverse">
+        <div className="flex gap-2 items-center flex-row-reverse">
           <Link href="raids/create" tabIndex={-1}>
-            <button className="whitespace-nowrap">New Raid</button>
+            <Button className="whitespace-nowrap">New Raid</Button>
           </Link>
 
-          <button role="icon-button" onClick={onRefresh}>
+          <Link href={`/dashboard/${guildId}/raids`} replace>
             <FontAwesomeIcon icon={faRefresh} />
-          </button>
+          </Link>
         </div>
       </div>
 
