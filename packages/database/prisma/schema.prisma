@@ -17,7 +17,7 @@ model Guild {
   id                    Int           @id @default(autoincrement())
   name                  String
   icon                  String?
-  discordId             String
+  discordId             String        @unique
   announcementChannelId String?
   members               GuildMember[]
   raids                 Raid[]
