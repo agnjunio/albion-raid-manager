@@ -1,7 +1,7 @@
 import { Container } from "@/components/pages/container";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeButton } from "@/components/ui/theme";
-import { nextAuthOptions } from "@/lib/next-auth";
+import { nextAuthOptions } from "@/lib/auth";
 import { prisma } from "@albion-raid-manager/database";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";

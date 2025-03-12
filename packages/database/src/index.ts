@@ -1,13 +1,11 @@
 import logger from "@albion-raid-manager/logger";
 import { PrismaClient } from "@prisma/client";
 
-interface CustomNodeJsGlobal {
-  prisma: PrismaClient;
-}
+declare const global: Global & { prisma?: PrismaClient };
 
-declare const global: CustomNodeJsGlobal;
+export let prisma: PrismaClient;
 
-const getPrismaClient = () => {
+function getPrisma() {
   if (global.prisma) return global.prisma;
 
   const prisma = new PrismaClient({
@@ -47,9 +45,10 @@ const getPrismaClient = () => {
     logger.warn(`(Prisma) ${event.message}`, event);
   });
 
+  if (process.env.NODE_ENV !== "production") global.prisma = prisma;
   return prisma;
-};
+}
 
-export const prisma = getPrismaClient();
-
-if (process.env.NODE_ENV === "development") global.prisma = prisma;
+if (typeof window === "undefined") {
+  prisma = getPrisma();
+}

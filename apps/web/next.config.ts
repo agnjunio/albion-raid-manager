@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
   },
+  serverExternalPackages: ["winston"],
   images: {
     remotePatterns: [
       {
@@ -16,6 +17,11 @@ const nextConfig: NextConfig = {
   },
   output: "standalone",
   webpack: (config, { isServer }) => {
+    // Since winston depends on fs, we need to explicitly tell Webpack not to bundle winston on the client.
+    if (!isServer) {
+      config.resolve.fallback = { fs: false };
+    }
+
     // See more: https://www.prisma.io/docs/orm/more/help-and-troubleshooting/help-articles/nextjs-prisma-client-monorepo
     if (isServer && process.env.NODE_ENV === "production") {
       config.plugins.push(new PrismaPlugin());

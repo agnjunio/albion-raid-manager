@@ -28,7 +28,7 @@ discordApiClient.interceptors.response.use(null, async (error) => {
   return Promise.reject(error);
 });
 
-export async function fetchServers(token: string) {
+export async function getUserGuilds(token: string) {
   const res = await discordApiClient.get(`/users/@me/guilds`, {
     headers: {
       Authorization: `Bearer ${token}`,

@@ -77,6 +77,9 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@albion-raid-manager/discord':
+        specifier: workspace:^
+        version: link:../../packages/discord
       '@albion-raid-manager/logger':
         specifier: workspace:^
         version: link:../../packages/logger
@@ -241,6 +244,18 @@ importers:
       prisma:
         specifier: ^6.4.1
         version: 6.4.1(typescript@5.8.2)
+
+  packages/discord:
+    dependencies:
+      '@albion-raid-manager/common':
+        specifier: workspace:^
+        version: link:../common
+      '@albion-raid-manager/logger':
+        specifier: workspace:^
+        version: link:../logger
+      axios:
+        specifier: ^1.7.8
+        version: 1.7.8
 
   packages/logger:
     dependencies:

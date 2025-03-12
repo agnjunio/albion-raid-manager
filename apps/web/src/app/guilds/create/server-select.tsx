@@ -1,17 +1,17 @@
 "use client";
 
-import { createGuild } from "@/app/actions/guilds";
-import { Server } from "@/types/discord";
+import { createGuild } from "@/actions/guilds";
 import { getServerPictureUrl } from "@albion-raid-manager/common/helpers/discord";
+import type { Server } from "@albion-raid-manager/discord";
 import Image from "next/image";
 
 interface ServerCardProps {
   server: Server;
 }
 
-export default function ServerSelect({ server }: ServerCardProps) {
+export function ServerSelect({ server }: ServerCardProps) {
   const handleClick = async () => {
-    const guild = await createGuild(server.id);
+    const guild = await createGuild(server);
     console.log(guild);
   };
 

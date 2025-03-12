@@ -1,5 +1,5 @@
 import Alert from "@/components/ui/alert";
-import { nextAuthOptions } from "@/lib/next-auth";
+import { nextAuthOptions } from "@/lib/auth";
 import { prisma } from "@albion-raid-manager/database";
 import {
   faArrowRightFromBracket,

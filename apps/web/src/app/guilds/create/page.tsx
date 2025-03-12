@@ -1,17 +1,17 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { fetchServers } from "@/lib/discord";
-import { nextAuthOptions } from "@/lib/next-auth";
-import { Server } from "@/types/discord";
+import { nextAuthOptions } from "@/lib/auth";
 import { hasPermissions, PERMISSIONS, transformGuild } from "@albion-raid-manager/common/helpers/discord";
+import type { Server } from "@albion-raid-manager/discord";
+import { getUserGuilds } from "@albion-raid-manager/discord";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import ServerSelect from "./server-select";
+import { ServerSelect } from "./server-select";
 
 export default async function Page() {
   const session = await getServerSession(nextAuthOptions);
   if (!session?.accessToken) return redirect("/");
 
-  const servers: Server[] = (await fetchServers(session.accessToken))
+  const servers: Server[] = (await getUserGuilds(session.accessToken))
     .filter((server: any) => hasPermissions(server.permissions, [PERMISSIONS.ADMINISTRATOR]))
     .map(transformGuild);
 

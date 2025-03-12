@@ -1,4 +1,4 @@
-import { nextAuthOptions } from "@/lib/next-auth";
+import { nextAuthOptions } from "@/lib/auth";
 import { getErrorMessage } from "@albion-raid-manager/common/errors";
 import { prisma } from "@albion-raid-manager/database";
 import logger from "@albion-raid-manager/logger";
