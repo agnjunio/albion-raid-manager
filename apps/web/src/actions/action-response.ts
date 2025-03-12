@@ -1,6 +1,6 @@
 export interface SuccessResponse<T> {
   success: true;
-  data?: T;
+  data: T;
 }
 
 export interface FailureResponse {
@@ -9,7 +9,7 @@ export interface FailureResponse {
 }
 
 export class ActionResponse {
-  static Success<T>(data?: T): SuccessResponse<T> {
+  static Success<T>(data: T): SuccessResponse<T> {
     return { success: true, data };
   }
 

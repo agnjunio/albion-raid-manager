@@ -104,8 +104,8 @@ export function DashboardSidebar() {
                 </DropdownMenuItem>
               </Link>
             ))}
-            <DropdownMenuSeparator />
-            <Link href="/guilds/create">
+            {guilds.length > 0 && <DropdownMenuSeparator />}
+            <Link href="/create">
               <DropdownMenuItem>
                 <FontAwesomeIcon icon={faPlus} className="size-4" />
                 <div className="leading-normal">Create Guild</div>

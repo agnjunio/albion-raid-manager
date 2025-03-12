@@ -31,7 +31,7 @@ export default function Page() {
           </div>
           <CardTitle className="text-2xl">Welcome to Albion Raid Manager</CardTitle>
           <CardDescription className="text-lg">Please select a guild or create one</CardDescription>
-          <Link href="/guilds/create">
+          <Link href="/create">
             <Button>
               <FontAwesomeIcon icon={faPlus} />
               <div>Create Guild</div>

@@ -1,9 +1,16 @@
+"use server";
+
 import { ActionResponse } from "@/actions/action-response";
 import { prisma } from "@albion-raid-manager/database";
+import { Guild } from "@albion-raid-manager/database/models";
 import type { Server } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";
 
-export async function createGuild(server: Server) {
+type CreateGuildSuccessResponse = {
+  guild: Guild;
+};
+
+export async function createGuild(server: Server, userId: string) {
   try {
     const existingGuild = await prisma.guild.findUnique({
       where: {
@@ -12,14 +19,25 @@ export async function createGuild(server: Server) {
     });
 
     if (existingGuild) {
-      return ActionResponse.Failure("Guild already exists");
+      return ActionResponse.Failure("GUILD_ALREADY_EXISTS");
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const guild = await prisma.guild.create({
+      data: {
+        discordId: server.id,
+        name: server.name,
+        icon: server.icon,
+        members: {
+          create: {
+            userId: userId,
+            role: "LEADER",
+          },
+        },
+      },
+    });
 
-    // Create a new guild if it doesn't exist
-    return ActionResponse.Success({
-      serverId: server.id,
+    return ActionResponse.Success<CreateGuildSuccessResponse>({
+      guild,
     });
   } catch (error) {
     logger.error(`Failed to create guild for server ${server.id}`, error);

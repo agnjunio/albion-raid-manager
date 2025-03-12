@@ -1,11 +1,13 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { nextAuthOptions } from "@/lib/auth";
 import { hasPermissions, PERMISSIONS, transformGuild } from "@albion-raid-manager/common/helpers/discord";
 import type { Server } from "@albion-raid-manager/discord";
 import { getUserGuilds } from "@albion-raid-manager/discord";
+import { faChevronCircleLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ServerSelect } from "./server-select";
+import { CreateGuild } from "./create-guild";
 
 export default async function Page() {
   const session = await getServerSession(nextAuthOptions);
@@ -16,22 +18,12 @@ export default async function Page() {
     .map(transformGuild);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <Card className="w-full min-w-[30vw] max-w-lg max-h-[80vh]">
-        <CardHeader>
-          <CardTitle>Create guild</CardTitle>
-        </CardHeader>
-
-        <CardContent className="overflow-auto">
-          <div className="flex flex-col gap-2">
-            {servers.map((server) => (
-              <ServerSelect key={server.id} server={server} />
-            ))}
-          </div>
-        </CardContent>
-
-        <CardFooter>Please select a discord server to create a guild.</CardFooter>
-      </Card>
+    <div className="flex flex-col justify-center min-h-screen p-4 gap-3">
+      <Link href="/dashboard" className="text-accent flex gap-1 items-center text-sm leading-none">
+        <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
+        <span className="font-sans">Back to dashboard</span>
+      </Link>
+      <CreateGuild servers={servers} userId={session.user.id} />
     </div>
   );
 }
