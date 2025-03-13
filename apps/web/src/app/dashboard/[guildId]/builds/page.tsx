@@ -1,7 +1,7 @@
 import { Page, PageTitle } from "@/components/ui/page";
-import React from "react";
+import { DashboardPageProps } from "../../types";
 
-const BuildsPage: React.FC = () => {
+export default async function BuildPage({ params }: DashboardPageProps) {
   return (
     <Page>
       <PageTitle>Builds</PageTitle>
@@ -9,6 +9,4 @@ const BuildsPage: React.FC = () => {
       <p>Welcome to the builds page. Here you can manage and view all your builds.</p>
     </Page>
   );
-};
-
-export default BuildsPage;
+}

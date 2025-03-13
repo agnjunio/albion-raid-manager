@@ -1,12 +1,10 @@
 import { Page, PageTitle } from "@/components/ui/page";
-import React from "react";
+import { DashboardPageProps } from "../../types";
 
-const GuildSettingsPage: React.FC = () => {
+export default async function SettingsPage({ params }: DashboardPageProps) {
   return (
     <Page>
       <PageTitle>Guild Settings</PageTitle>
     </Page>
   );
-};
-
-export default GuildSettingsPage;
+}
