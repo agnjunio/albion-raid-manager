@@ -3,7 +3,7 @@
 import { createGuild } from "@/actions/guilds";
 import Alert from "@/components/ui/alert";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getErrorMessage } from "@/helpers/errors";
+import { translateErrorCode } from "@/lib/errors";
 import { getServerPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import { Server } from "@albion-raid-manager/discord";
 import Image from "next/image";
@@ -37,7 +37,7 @@ export function CreateGuild({ servers, userId }: CreateGuildProps) {
 
       <CardContent className="overflow-auto">
         <div className="flex flex-col gap-2">
-          {error && <Alert>{getErrorMessage(error)}</Alert>}
+          {error && <Alert>{translateErrorCode(error)}</Alert>}
           {servers.map((server) => (
             <div
               key={server.id}

@@ -1,6 +1,6 @@
 "use client";
 
-import { filterCompositions } from "@/helpers/compositions";
+import { filterCompositions } from "@/lib/compositions";
 import { Prisma } from "@albion-raid-manager/database/models";
 import Link from "next/link";
 import { useMemo, useState } from "react";

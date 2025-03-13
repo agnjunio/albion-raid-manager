@@ -42,6 +42,6 @@ export async function createGuild(server: Server, userId: string) {
     });
   } catch (error) {
     logger.error(`Failed to create guild for server ${server.id}`, error);
-    return ActionResponse.Failure("Failed to create guild. Please try again later.");
+    return ActionResponse.Failure("CREATE_GUILD_FAILED");
   }
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { createRaid } from "@/actions/raids";
+import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -7,12 +9,13 @@ import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { translateErrorCode } from "@/lib/errors";
+import { raidFormSchema } from "@/lib/schemas/raid";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { Composition } from "@albion-raid-manager/database/models";
 import { faCheck, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addMonths, startOfDay } from "date-fns";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -24,38 +27,30 @@ type CreateRaidProps = {
   compositions: Composition[];
 };
 
-const today = startOfDay(Date.now());
-const maxDate = addMonths(today, 2);
-
-const formSchema = z.object({
-  description: z
-    .string()
-    .min(6, { message: "Description should contain at least 6 characters" })
-    .max(50, { message: "Description should not exceed 50 characters." }),
-  date: z
-    .date()
-    .min(today, { message: "Start date must be today or later." })
-    .max(maxDate, { message: "Start date cannot be more than 2 months ahead." }),
-  composition: z.custom<Composition>().refine((val) => val !== undefined, { message: "Please select a composition " }),
-});
-
 export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof raidFormSchema>>({
+    resolver: zodResolver(raidFormSchema),
     defaultValues: {
       description: "",
-      date: today,
+      date: new Date(),
     },
   });
-  const [compositionsOpen, setCompositionsOpen] = useState(false);
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const handleSubmit = async (data: z.infer<typeof raidFormSchema>) => {
+    const response = await createRaid(guildId, data);
+
+    if (!response.success) {
+      return setError(response.error);
+    }
+
+    router.push(`/dashboard/${guildId}/raids`);
   };
 
   return (
     <Card className="p-8">
+      {error && <Alert>{translateErrorCode(error)}</Alert>}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 lg:space-y-8">
           <FormField
@@ -102,12 +97,11 @@ export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
               <FormItem>
                 <FormLabel>Composition</FormLabel>
                 <FormControl>
-                  <Popover open={compositionsOpen} onOpenChange={setCompositionsOpen}>
+                  <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         role="combobox"
                         variant="outline"
-                        aria-expanded={compositionsOpen}
                         className="w-full justify-start"
                         disabled={field.disabled}
                       >
@@ -127,7 +121,9 @@ export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
                               <CommandItem
                                 key={composition.id}
                                 value={composition.name}
-                                onSelect={() => field.onChange(composition)}
+                                onSelect={() =>
+                                  field.onChange(field.value?.id !== composition.id ? composition : undefined)
+                                }
                               >
                                 <div className="flex items-center gap-2">
                                   <FontAwesomeIcon

@@ -29,7 +29,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
     "class-variance-authority": "^0.7.1",
-    "cmdk": "1.0.0",
+    "cmdk": "1.0.4",
     "date-fns": "^4.1.0",
     "fastest-levenshtein": "^1.0.16",
     "next": "15.2.1",
