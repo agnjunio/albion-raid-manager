@@ -58,7 +58,7 @@
   --muted: #4a3f35; /* Muted brown remains constant */
   --muted-foreground: #d3c0b6; /* Muted foreground */
   --accent: #b8860b; /* Darker gold accent */
-  --border: #f5e6c1; /* Darker border color */
+  --border: #2a2a2a; /* Darker border color */
   --destructive: #e63946; /* Red for destructive actions */
   --destructive-foreground: #ff4d4d; /* White foreground for destructive actions */
 
@@ -113,7 +113,7 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar: var(--sidebar);
 
-  --font-mono: var(--font-roboto-mono);
+  --font-mono: var(--font-dm-mono);
   --font-sans: var(--font-dm-sans);
   --font-title: var(--font-pirata-one);
   --font-caption: var(--font-lora);

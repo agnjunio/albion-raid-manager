@@ -1,11 +1,10 @@
 "use client";
 
-import { Container } from "@/components/ui/container";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupLabel,
   SidebarInset,
   SidebarMenu,
@@ -21,6 +20,7 @@ import {
   faHourglassStart,
   faPlay,
   faPlus,
+  faRefresh,
   faStop,
   faTriangleExclamation,
   IconDefinition,
@@ -104,11 +104,6 @@ export function RaidList() {
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Status</SidebarGroupLabel>
-            <SidebarGroupAction asChild>
-              <Link href={`/dashboard/${guildId}/raids/create`}>
-                <FontAwesomeIcon icon={faPlus} />
-              </Link>
-            </SidebarGroupAction>
             <SidebarMenu>
               {statusOrder.map((status) => {
                 const statusData = statuses[status];
@@ -128,60 +123,49 @@ export function RaidList() {
         </SidebarContent>
       </Sidebar>
 
-      <SidebarInset className="p-4">
-        <Container className="flex flex-1 flex-col space-y-2 overflow-hidden rounded-lg">
-          <ul>
-            {filteredRaids.map((raid) => (
-              <li key={raid.id}>
-                <Link
-                  href={`raids/${raid.id}`}
-                  className="hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4 outline-offset-0 transition-colors"
-                >
-                  <div className="grow text-lg font-semibold">{raid.description}</div>
-                  <div>
-                    {new Date(raid.date).toLocaleString(navigator.language, {
-                      day: "numeric",
-                      month: "2-digit",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </div>
-                  <RaidStatusBadge raid={raid} />
-                </Link>
-              </li>
-            ))}
-            {filteredRaids.length === 0 && <p className="flex items-center justify-center">No raids.</p>}
-          </ul>
-        </Container>
+      <SidebarInset className="flex flex-col gap-2">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="text-lg font-semibold">Raids</div>
+
+          <div className="flex flex-row-reverse items-center gap-4">
+            <Link href="raids/create" tabIndex={-1}>
+              <Button className="whitespace-nowrap">
+                <FontAwesomeIcon icon={faPlus} />
+                <span>New Raid</span>
+              </Button>
+            </Link>
+
+            <Link href={`/dashboard/${guildId}/raids`} replace tabIndex={-1}>
+              <Button variant="outline" size="icon">
+                <FontAwesomeIcon icon={faRefresh} />
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="flex grow flex-col gap-2 px-2">
+          {filteredRaids.map((raid) => (
+            <div key={raid.id} className="border-border gap-2 rounded-lg border">
+              <Link
+                href={`raids/${raid.id}`}
+                className="hover:bg-secondary active:bg-primary flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4"
+              >
+                <div className="grow font-sans">{raid.description}</div>
+                <div className="font-caption text-sm">
+                  {new Date(raid.date).toLocaleString(navigator.language, {
+                    day: "numeric",
+                    month: "2-digit",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  })}
+                </div>
+                <RaidStatusBadge raid={raid} />
+              </Link>
+            </div>
+          ))}
+          {filteredRaids.length === 0 && <p className="flex grow items-center justify-center">No raids.</p>}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
 }
-
-//   const colors =
-//     filter === status
-//       ? "bg-primary/50 hover:bg-primary/90 active:bg-primary"
-//       : "bg-secondary/50 hover:bg-secondary/90 active:bg-secondary";
-//   return (
-//     <button
-//       key={status}
-//       className={`rounded-full px-4 py-1 text-sm font-semibold transition-colors cursor-pointer select-none uppercase shadow-sm ${colors}`}
-//       onClick={() => setFilter(status)}
-//     >
-//       {status}
-//     </button>
-//   );
-
-// <div className="flex justify-between items-center gap-2">
-//   <div className="flex gap-2 flex-wrap"></div>
-
-//   <div className="flex gap-2 items-center flex-row-reverse">
-//     <Link href="raids/create" tabIndex={-1}>
-//       <Button className="whitespace-nowrap">New Raid</Button>
-//     </Link>
-
-//     <Link href={`/dashboard/${guildId}/raids`} replace>
-//       <FontAwesomeIcon icon={faRefresh} />
-//     </Link>
-//   </div>
-// </div>
