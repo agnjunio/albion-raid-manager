@@ -1,22 +1,21 @@
 "use client";
 
-import RaidStatusBadge from "@/components/raids/RaidStatusBadge";
-import Card from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import { Prisma, RaidStatus, Role } from "@albion-raid-manager/database/models";
-import { faArrowLeft, faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { RaidParams } from "../types";
+import { RaidProps } from "../types";
 
 type RaidInfo = Prisma.RaidGetPayload<{
   include: { slots: { include: { build: true; user: true } } };
 }>;
 
 export default function RaidPage() {
-  const params = useParams<RaidParams>();
+  const params = useParams<RaidProps>();
   const [loading, setLoading] = useState(false);
   const [raid, setRaid] = useState<RaidInfo>();
 
@@ -85,9 +84,7 @@ export default function RaidPage() {
           <div>Description:</div>
           <div className="font-semibold">{raid.description}</div>
           <div>Status:</div>
-          <div className="block">
-            <RaidStatusBadge raid={raid} />
-          </div>
+          <div className="block">{raid.status}</div>
           <div>Start date:</div>
           <div>
             {new Date(raid.date).toLocaleString(navigator.language, {
@@ -123,14 +120,7 @@ export default function RaidPage() {
         </div>
       </Card>
 
-      <Card
-        title="Raid Slots"
-        actions={
-          <button role="icon-button" onClick={() => fetchRaid()}>
-            <FontAwesomeIcon icon={faRefresh} />
-          </button>
-        }
-      >
+      <Card title="Raid Slots">
         <div className="flex flex-col gap-2">
           {raid.slots
             .sort((a, b) => a.id - b.id)

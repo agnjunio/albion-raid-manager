@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export function Footer() {
   return (
-    <footer className="bg-background border-border/25 z-10 w-full border-0 border-t-4">
+    <footer className="bg-background border-border/50 z-10 w-full border-0 border-t">
       <div className="flex flex-wrap items-center justify-center gap-6 py-2">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"

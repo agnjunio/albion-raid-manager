@@ -1,17 +1,30 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupLabel,
+  SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
+import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
-import { faFilter } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFileContract,
+  faFilter,
+  faHourglassStart,
+  faPlay,
+  faPlus,
+  faStop,
+  faTriangleExclamation,
+  IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { compareAsc } from "date-fns";
 import Link from "next/link";
@@ -19,20 +32,52 @@ import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useRaidsContext } from "./context";
 
-const statusOrder = [RaidStatus.SCHEDULED, RaidStatus.OPEN, RaidStatus.CLOSED, RaidStatus.ONGOING, RaidStatus.FINISHED];
+const statuses: {
+  [status: string]: {
+    icon: IconDefinition;
+    color?: string;
+  };
+} = {
+  ALL: {
+    icon: faFilter,
+  },
+  [RaidStatus.SCHEDULED]: {
+    icon: faHourglassStart,
+    color: "bg-secondary",
+  },
+  [RaidStatus.OPEN]: {
+    icon: faFileContract,
+    color: "bg-green-800",
+  },
+  [RaidStatus.CLOSED]: {
+    icon: faTriangleExclamation,
+    color: "bg-red-900",
+  },
+  [RaidStatus.ONGOING]: {
+    icon: faPlay,
+    color: "bg-primary",
+  },
+  [RaidStatus.FINISHED]: {
+    icon: faStop,
+    color: "bg-gray-500",
+  },
+};
+const statusOrder: (keyof typeof statuses)[] = [
+  "ALL",
+  RaidStatus.SCHEDULED,
+  RaidStatus.OPEN,
+  RaidStatus.CLOSED,
+  RaidStatus.ONGOING,
+  RaidStatus.FINISHED,
+];
 
 export function RaidStatusBadge({ raid }: { raid: Raid }) {
-  const statusColors = {
-    [RaidStatus.SCHEDULED]: "bg-secondary-violet-800",
-    [RaidStatus.OPEN]: "bg-green-800",
-    [RaidStatus.CLOSED]: "bg-red-900",
-    [RaidStatus.ONGOING]: "bg-primary-yellow-800",
-    [RaidStatus.FINISHED]: "bg-primary-gray-500",
-  };
-
   return (
     <div
-      className={`w-24 select-none rounded-lg p-1 text-center text-xs font-semibold uppercase shadow-sm ${statusColors[raid.status]}`}
+      className={cn(
+        `w-24 select-none rounded-lg p-1 text-center text-xs font-semibold uppercase shadow-sm`,
+        statuses[raid.status]?.color,
+      )}
     >
       {raid.status}
     </div>
@@ -42,7 +87,7 @@ export function RaidStatusBadge({ raid }: { raid: Raid }) {
 export function RaidList() {
   const { guildId } = useParams();
   const { raids } = useRaidsContext();
-  const [filter, setFilter] = useState("ALL");
+  const [filter, setFilter] = useState<keyof typeof statuses>("ALL");
 
   const filteredRaids = useMemo(
     () =>
@@ -54,34 +99,43 @@ export function RaidList() {
   );
 
   return (
-    <Card>
-      <SidebarProvider>
-        <Sidebar collapsible="none">
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarMenu>
-                {["All", ...Object.keys(RaidStatus)].map((status) => (
+    <SidebarProvider className="min-h-full">
+      <Sidebar collapsible="none" variant="inset">
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>Status</SidebarGroupLabel>
+            <SidebarGroupAction asChild>
+              <Link href={`/dashboard/${guildId}/raids/create`}>
+                <FontAwesomeIcon icon={faPlus} />
+              </Link>
+            </SidebarGroupAction>
+            <SidebarMenu>
+              {statusOrder.map((status) => {
+                const statusData = statuses[status];
+                return (
                   <SidebarMenuItem key={status}>
-                    <SidebarMenuButton asChild isActive={filter === status}>
-                      <div className="flex items-center">
-                        <FontAwesomeIcon icon={faFilter} />
+                    <SidebarMenuButton asChild isActive={filter === status} onClick={() => setFilter(status)}>
+                      <div className={cn("flex cursor-pointer items-center capitalize")}>
+                        <FontAwesomeIcon icon={statusData.icon} />
                         <span>{status}</span>
                       </div>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
 
-        <main className="flex h-[480px] flex-1 flex-col overflow-hidden">
-          <ul className="space-y-2">
+      <SidebarInset className="p-4">
+        <Container className="flex flex-1 flex-col space-y-2 overflow-hidden rounded-lg">
+          <ul>
             {filteredRaids.map((raid) => (
               <li key={raid.id}>
                 <Link
                   href={`raids/${raid.id}`}
-                  className="bg-primary-gray-800/25 hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4 outline-offset-0 transition-colors"
+                  className="hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4 outline-offset-0 transition-colors"
                 >
                   <div className="grow text-lg font-semibold">{raid.description}</div>
                   <div>
@@ -98,9 +152,9 @@ export function RaidList() {
             ))}
             {filteredRaids.length === 0 && <p className="flex items-center justify-center">No raids.</p>}
           </ul>
-        </main>
-      </SidebarProvider>
-    </Card>
+        </Container>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
 

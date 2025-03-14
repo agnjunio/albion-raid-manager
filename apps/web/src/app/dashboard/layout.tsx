@@ -1,5 +1,4 @@
 import { Container } from "@/components/ui/container";
-import { Footer } from "@/components/ui/footer";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { nextAuthOptions } from "@/lib/auth";
 import { prisma } from "@albion-raid-manager/database";
@@ -35,7 +34,6 @@ export default async function Layout({ children }: Readonly<DashboardLayoutProps
         <Container className="flex grow flex-col">
           <DashboardTitle />
           <div className="grow">{children}</div>
-          <Footer />
         </Container>
       </SidebarProvider>
     </DashboardProvider>

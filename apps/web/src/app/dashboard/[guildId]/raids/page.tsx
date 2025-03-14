@@ -1,4 +1,3 @@
-import { Page, PageTitle } from "@/components/ui/page";
 import { prisma } from "@albion-raid-manager/database";
 import { RaidsProvider } from "./context";
 import { RaidList } from "./list";
@@ -14,10 +13,7 @@ export default async function RaidsPage({ params }: RaidsPageProps) {
 
   return (
     <RaidsProvider raids={raids}>
-      <Page>
-        <PageTitle>Raids</PageTitle>
-        <RaidList />
-      </Page>
+      <RaidList />
     </RaidsProvider>
   );
 }
