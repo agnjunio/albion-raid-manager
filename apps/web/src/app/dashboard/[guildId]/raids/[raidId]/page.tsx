@@ -73,7 +73,7 @@ export default function RaidPage() {
   };
 
   return (
-    <div className="grow h-full flex flex-col p-4 gap-4">
+    <div className="flex h-full grow flex-col gap-4 p-4">
       <div>
         <button role="icon-button" onClick={() => window.history.back()}>
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -81,7 +81,7 @@ export default function RaidPage() {
       </div>
 
       <Card title="Raid Details">
-        <div className="grid grid-cols-auto_1fr gap-x-4 gap-y-2">
+        <div className="grid-cols-auto_1fr grid gap-x-4 gap-y-2">
           <div>Description:</div>
           <div className="font-semibold">{raid.description}</div>
           <div>Status:</div>
@@ -137,7 +137,7 @@ export default function RaidPage() {
             .map((slot) => (
               <div
                 key={slot.id}
-                className={`min-h-12 rounded px-4 py-2 flex justify-between items-center ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
+                className={`flex min-h-12 items-center justify-between rounded px-4 py-2 ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
               >
                 <div className="font-semibold">{slot.build.name}</div>
                 <div>
@@ -147,7 +147,7 @@ export default function RaidPage() {
                       <picture>
                         <img
                           src={getUserPictureUrl(slot.user.id, slot.user.avatar)}
-                          className="size-8 rounded-full select-none"
+                          className="size-8 select-none rounded-full"
                           alt={slot.user.username}
                         />
                       </picture>

@@ -47,7 +47,7 @@ export default function CreateComposition({ guildId }: CreateCompositionProps) {
         />
       </div>
 
-      <div className="flex gap-2 flex-row-reverse">
+      <div className="flex flex-row-reverse gap-2">
         <button type="submit">Create</button>
         <Link href={`/guilds/${guildId}/compositions`}>
           <button className="btn-secondary-violet">Cancel</button>

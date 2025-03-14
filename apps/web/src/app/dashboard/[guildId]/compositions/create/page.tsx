@@ -9,7 +9,7 @@ export default async function CreateCompositionPage({ params }: CompositionPageP
   const { guildId } = await params;
 
   return (
-    <div className="p-4 space-y-2 flex flex-col items-center">
+    <div className="flex flex-col items-center space-y-2 p-4">
       <div className="self-start">
         <Link tabIndex={-1} href={`/guilds/${guildId}/compositions`}>
           <button role="icon-button">
@@ -18,7 +18,7 @@ export default async function CreateCompositionPage({ params }: CompositionPageP
         </Link>
       </div>
 
-      <h2 className="text-2xl font-semibold text-center py-4">Create Composition</h2>
+      <h2 className="py-4 text-center text-2xl font-semibold">Create Composition</h2>
 
       <Card className="w-full max-w-lg">
         <CreateComposition guildId={guildId} />

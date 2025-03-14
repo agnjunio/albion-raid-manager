@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export function Footer() {
   return (
-    <footer className="w-full bg-background border-0 border-t-4 border-border/25 z-10">
-      <div className="flex gap-6 flex-wrap items-center justify-center py-2 ">
+    <footer className="bg-background border-border/25 z-10 w-full border-0 border-t-4">
+      <div className="flex flex-wrap items-center justify-center gap-6 py-2">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://discord.gg/"

@@ -18,8 +18,8 @@ export default async function Page() {
     .map(transformGuild);
 
   return (
-    <div className="flex flex-col justify-center min-h-screen p-4 gap-3">
-      <Link href="/dashboard" className="text-accent flex gap-1 items-center text-sm leading-none">
+    <div className="flex min-h-screen flex-col justify-center gap-3 p-4">
+      <Link href="/dashboard" className="text-accent flex items-center gap-1 text-sm leading-none">
         <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
         <span className="font-sans">Back to dashboard</span>
       </Link>

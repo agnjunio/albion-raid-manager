@@ -150,7 +150,7 @@ export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
             )}
           />
 
-          <div className="flex gap-2 flex-row-reverse">
+          <div className="flex flex-row-reverse gap-2">
             <Button type="submit">Create</Button>
             <Link href={`/dashboard/${guildId}/raids`} tabIndex={-1}>
               <Button variant="secondary">Cancel</Button>

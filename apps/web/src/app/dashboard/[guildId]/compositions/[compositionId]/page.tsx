@@ -43,7 +43,7 @@ export default function RaidPage() {
   }, []);
 
   if (loading) return <Loading />;
-  if (!composition) return <div className="flex h-full justify-center items-center">Composition not found.</div>;
+  if (!composition) return <div className="flex h-full items-center justify-center">Composition not found.</div>;
 
   const roleBg: { [key in Role]: string } = {
     TANK: "bg-role-tank/25",
@@ -56,7 +56,7 @@ export default function RaidPage() {
   };
 
   return (
-    <div className="grow h-full flex flex-col p-4 gap-4">
+    <div className="flex h-full grow flex-col gap-4 p-4">
       <div>
         <button role="icon-button" onClick={() => window.history.back()}>
           <FontAwesomeIcon icon={faArrowLeft} />
@@ -64,7 +64,7 @@ export default function RaidPage() {
       </div>
 
       <Card title="Composition Details">
-        <div className="grid grid-cols-auto_1fr gap-x-4 gap-y-2">
+        <div className="grid-cols-auto_1fr grid gap-x-4 gap-y-2">
           <div>Name:</div>
           <div className="font-semibold">{composition.name}</div>
           <div>Last update:</div>
@@ -80,7 +80,7 @@ export default function RaidPage() {
       <Card
         title="Composition Slots"
         actions={
-          <div className="flex gap-2 flex-row-reverse">
+          <div className="flex flex-row-reverse gap-2">
             <button role="icon-button">
               <FontAwesomeIcon icon={faPlus} />
             </button>
@@ -96,7 +96,7 @@ export default function RaidPage() {
             .map((slot) => (
               <div
                 key={slot.id}
-                className={`min-h-12 rounded px-4 py-2 flex justify-between items-center ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
+                className={`flex min-h-12 items-center justify-between rounded px-4 py-2 ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
               >
                 <div className="font-semibold">{slot.build.name}</div>
               </div>

@@ -32,7 +32,7 @@ export default async function Layout({ params, children }: DashboardLayoutProps)
   const isMember = guild?.members.some((member) => member.userId === session.user.id);
   if (!isMember) {
     return (
-      <div className="flex flex-col gap-2 justify-center items-center size-full">
+      <div className="flex size-full flex-col items-center justify-center gap-2">
         <Alert>FORBIDDEN: You are not part of this guild.</Alert>
       </div>
     );

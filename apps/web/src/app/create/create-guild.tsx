@@ -30,7 +30,7 @@ export function CreateGuild({ servers, userId }: CreateGuildProps) {
   };
 
   return (
-    <Card className="w-full min-w-[30vw] max-w-lg max-h-[80vh]">
+    <Card className="max-h-[80vh] w-full min-w-[30vw] max-w-lg">
       <CardHeader>
         <CardTitle>Create guild</CardTitle>
       </CardHeader>
@@ -41,7 +41,7 @@ export function CreateGuild({ servers, userId }: CreateGuildProps) {
           {servers.map((server) => (
             <div
               key={server.id}
-              className="flex items-center p-4 border border-border/20 rounded-lg shadow-md hover:shadow-lg cursor-pointer hover:bg-accent transition-all duration-200"
+              className="border-border/20 hover:bg-accent flex cursor-pointer items-center rounded-lg border p-4 shadow-md transition-all duration-200 hover:shadow-lg"
               onClick={() => handleCreateGuild(server)}
             >
               <Image
@@ -52,7 +52,7 @@ export function CreateGuild({ servers, userId }: CreateGuildProps) {
                 className="rounded-full"
               />
               <div className="ml-4 flex-grow">
-                <h3 className="text-lg font-semibold whitespace-nowrap truncate">{server.name}</h3>
+                <h3 className="truncate whitespace-nowrap text-lg font-semibold">{server.name}</h3>
               </div>
             </div>
           ))}

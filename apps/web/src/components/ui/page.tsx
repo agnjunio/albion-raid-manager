@@ -1,9 +1,9 @@
 import { PropsWithChildren } from "react";
 
 export function Page({ children }: PropsWithChildren) {
-  return <div className="grow h-full flex flex-col px-4 py-2 gap-4">{children}</div>;
+  return <div className="flex h-full grow flex-col gap-4 px-4 py-2">{children}</div>;
 }
 
 export function PageTitle({ children }: PropsWithChildren) {
-  return <h2 className="text-2xl font-normal text-center font-title">{children}</h2>;
+  return <h2 className="font-title text-center text-2xl font-normal">{children}</h2>;
 }

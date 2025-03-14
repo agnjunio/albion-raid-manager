@@ -7,5 +7,5 @@ interface Props {
 }
 
 export function Container({ className, children }: Props) {
-  return <main className={cn("bg-gray-500/10 dark:bg-gray-200/5 overflow-auto", className)}>{children}</main>;
+  return <main className={cn("overflow-auto bg-gray-500/10 dark:bg-gray-200/5", className)}>{children}</main>;
 }

@@ -12,32 +12,34 @@ export default function Home() {
   const session = useSession();
 
   return (
-    <div className="size-full flex justify-center">
-      <div className="basis-1/2 lg:basis-1/3 dark:bg-secondary/50 bg-secondary/40 z-10 bg-[url(/wallpapper.jpg)] bg-blend-multiply bg-no-repeat bg-cover bg-[center_center]">
-        <div className="flex flex-col gap-2 items-center justify-center size-full">
-          <h1 className="text-5xl drop-shadow-lg text-secondary-foreground font-title">Albion Raid Manager</h1>
-          <p className="mt-4 text-lg max-w-md mx-auto text-secondary-foreground">
+    <div className="z-1 flex size-full justify-center">
+      <div className="dark:bg-secondary/50 bg-secondary/40 relative z-10 basis-1/2 overflow-hidden bg-[url(/wallpapper.jpg)] bg-cover bg-[center_center] bg-no-repeat bg-blend-multiply lg:basis-1/3">
+        <div className="bg-radial -translate-1/2 from-primary/25 to-bg-primary/0 absolute left-2 top-2 size-[100vh] animate-pulse rounded-full to-100% blur-2xl [animation-duration:5000ms]" />
+
+        <div className="flex size-full flex-col items-center justify-center gap-2">
+          <h1 className="text-secondary-foreground font-title text-5xl drop-shadow-lg">Albion Raid Manager</h1>
+          <p className="text-secondary-foreground mx-auto mt-4 max-w-md text-lg">
             Command every raid with precision. Plan, strategize, and lead your guild to victory.
           </p>
         </div>
       </div>
 
-      <Container className="basis-1/2 lg:basis-1/3 flex flex-col relative items-center justify-center gap-2">
-        <ThemeButton className="absolute top-2 right-2" />
+      <Container className="relative flex basis-1/2 flex-col items-center justify-center gap-2 lg:basis-1/3">
+        <ThemeButton className="absolute right-2 top-2" />
         {session.data ? (
           <>
             {session.data.user.image && (
-              <picture className="shadow-lg shadow-foreground/50 dark:shadow-background rounded-full">
+              <picture className="shadow-foreground/50 dark:shadow-background rounded-full shadow-lg">
                 <img
                   src={session.data.user.image}
-                  className="size-12 rounded-full select-none"
+                  className="size-12 select-none rounded-full"
                   alt={session.data.user.name || "Unknown user"}
                 />
               </picture>
             )}
-            <div className="flex gap-1 items-center">
+            <div className="flex items-center gap-1">
               <div>Authenticated as</div>
-              <div className="font-semibold text-secondary dark:text-primary">@{session.data.user.name}</div>
+              <div className="text-secondary dark:text-primary font-semibold">@{session.data.user.name}</div>
             </div>
 
             <Link href="/dashboard" tabIndex={-1} passHref>

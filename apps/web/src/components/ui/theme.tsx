@@ -25,7 +25,7 @@ export function ThemeButton({ className, variant = "outline" }: Props) {
       size="icon"
       variant={variant}
       onClick={toggleTheme}
-      className={cn("transition-all ease-in-out duration-300", className)}
+      className={cn("transition-all duration-300 ease-in-out", className)}
     >
       {resolvedTheme === "dark" && <FontAwesomeIcon icon={faMoon} />}
       {resolvedTheme === "light" && <FontAwesomeIcon icon={faSun} />}

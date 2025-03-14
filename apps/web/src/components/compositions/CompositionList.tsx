@@ -25,8 +25,8 @@ export default function CompositionList({ compositions }: CompositionListProps) 
   }, [compositions, filter]) as unknown as typeof compositions;
 
   return (
-    <div className="h-full flex flex-col gap-3">
-      <div className="flex justify-between items-center gap-2">
+    <div className="flex h-full flex-col gap-3">
+      <div className="flex items-center justify-between gap-2">
         <input
           type="text"
           placeholder="Search..."
@@ -35,7 +35,7 @@ export default function CompositionList({ compositions }: CompositionListProps) 
           className="rounded-lg p-2"
         />
 
-        <div className="flex gap-2 flex-row-reverse">
+        <div className="flex flex-row-reverse gap-2">
           <Link href="compositions/create" tabIndex={-1}>
             <button className="whitespace-nowrap">New Composition</button>
           </Link>
@@ -47,11 +47,11 @@ export default function CompositionList({ compositions }: CompositionListProps) 
           <li key={composition.id}>
             <Link
               href={`compositions/${composition.id}`}
-              className="flex justify-between gap-4 p-4 items-center rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors outline-offset-0"
+              className="bg-primary-gray-800/25 hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4 outline-offset-0 transition-colors"
             >
               <div>
                 <div className="grow text-lg/tight font-semibold">{composition.name}</div>
-                <div className="text-xs text-secondary-violet">Size: {composition._count.slots}</div>
+                <div className="text-secondary-violet text-xs">Size: {composition._count.slots}</div>
               </div>
               <div>
                 Last Update:{" "}

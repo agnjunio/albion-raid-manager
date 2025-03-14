@@ -23,10 +23,10 @@ export default function Page() {
 
   if (selectedGuild) return; // Wait for redirect
   return (
-    <div className="flex justify-center items-center size-full flex-col gap-2">
+    <div className="flex size-full flex-col items-center justify-center gap-2">
       <Card className="max-w-md text-center">
         <CardHeader>
-          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+          <div className="bg-primary/10 mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full">
             <Image src="/book.jpg" alt="Albion Raid Manager" className="rounded-full" width={80} height={80} />
           </div>
           <CardTitle className="text-2xl">Welcome to Albion Raid Manager</CardTitle>
@@ -39,7 +39,7 @@ export default function Page() {
           </Link>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             The Albion Raid Manager helps you organize and manage your guild activities, track member participation, and
             schedule raids.
           </p>

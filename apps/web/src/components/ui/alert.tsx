@@ -6,5 +6,5 @@ interface Props {
 }
 
 export default function Alert({ children }: Props) {
-  return <div className={cn("text-red-100 p-2 bg-red-500 rounded-md")}>{children}</div>;
+  return <div className={cn("rounded-md bg-red-500 p-2 text-red-100")}>{children}</div>;
 }

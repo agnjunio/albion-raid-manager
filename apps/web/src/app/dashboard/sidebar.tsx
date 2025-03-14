@@ -123,10 +123,10 @@ export function DashboardSidebar() {
 
 export function GuildSelection({ guild, icon }: GuildSelectionProps) {
   return (
-    <div className="flex items-center gap-2 w-full">
+    <div className="flex w-full items-center gap-2">
       <div
         className={cn(
-          "flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground relative",
+          "text-sidebar-primary-foreground relative flex aspect-square size-8 items-center justify-center",
           { "bg-sidebar-primary rounded-lg": !guild },
         )}
       >
@@ -140,9 +140,9 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
         )}
       </div>
 
-      <div className={cn("flex flex-col leading-right grow whitespace-nowrap min-w-0")}>
-        <span className="font-semibold truncate">{guild ? guild.name : "Select Guild"} </span>
-        <span className="text-xs text-muted-foreground">
+      <div className={cn("leading-right flex min-w-0 grow flex-col whitespace-nowrap")}>
+        <span className="truncate font-semibold">{guild ? guild.name : "Select Guild"} </span>
+        <span className="text-muted-foreground text-xs">
           {guild ? `${guild.members.length} member${guild.members.length !== 1 ? "s" : ""}` : "No Guild Selected"}
         </span>
       </div>
@@ -159,15 +159,15 @@ export function UserInfo() {
   const { user } = session.data;
   return (
     <>
-      <div className="flex items-center gap-2 min-w-0">
+      <div className="flex min-w-0 items-center gap-2">
         <Avatar>
           <AvatarImage src={user.image || getUserPictureUrl(user.id)} />
           <AvatarFallback>{user.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
         </Avatar>
 
-        <div className="flex flex-col text-sm min-w-0 group-data-[collapsible=icon]:hidden">
-          <span className="font-semibold truncate">@{user.name || "Unknown User"}</span>
-          <span className="text-xs leading-tight truncate">{user.email}</span>
+        <div className="flex min-w-0 flex-col text-sm group-data-[collapsible=icon]:hidden">
+          <span className="truncate font-semibold">@{user.name || "Unknown User"}</span>
+          <span className="truncate text-xs leading-tight">{user.email}</span>
         </div>
       </div>
 

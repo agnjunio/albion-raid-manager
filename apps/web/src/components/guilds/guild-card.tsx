@@ -11,10 +11,10 @@ export function GuildCard({ guild }: GuildCardProps) {
   return (
     <Link
       href={`/guilds/${guild.id}`}
-      className="w-100 min-h-28 rounded overflow-hidden bg-white dark:bg-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors"
+      className="w-100 hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 min-h-28 cursor-pointer overflow-hidden rounded bg-white transition-colors dark:bg-gray-800/25"
     >
-      <div className="px-6 py-4 h-full flex items-center justify-center">
-        <div className="font-bold text-xl text-gray-900 dark:text-gray-100">{guild.name}</div>
+      <div className="flex h-full items-center justify-center px-6 py-4">
+        <div className="text-xl font-bold text-gray-900 dark:text-gray-100">{guild.name}</div>
       </div>
     </Link>
   );

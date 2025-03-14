@@ -5,7 +5,7 @@ import { ThemeButton } from "@/components/ui/theme";
 
 export function DashboardTitle() {
   return (
-    <div className="flex justify-between p-2 py-1 sticky top-0 items-center">
+    <div className="sticky top-0 flex items-center justify-between p-2 py-1">
       <SidebarTrigger />
       <ThemeButton variant="ghost" />
     </div>

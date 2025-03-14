@@ -32,7 +32,7 @@ export default async function Layout({ children }: Readonly<DashboardLayoutProps
     <DashboardProvider guilds={guilds}>
       <SidebarProvider>
         <DashboardSidebar />
-        <Container className="grow flex flex-col">
+        <Container className="flex grow flex-col">
           <DashboardTitle />
           <div className="grow">{children}</div>
           <Footer />

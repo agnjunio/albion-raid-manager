@@ -1,8 +1,17 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
-import { faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { compareAsc } from "date-fns";
 import Link from "next/link";
@@ -23,7 +32,7 @@ export function RaidStatusBadge({ raid }: { raid: Raid }) {
 
   return (
     <div
-      className={`select-none w-24 text-center p-1 text-xs uppercase rounded-lg font-semibold shadow-sm ${statusColors[raid.status]}`}
+      className={`w-24 select-none rounded-lg p-1 text-center text-xs font-semibold uppercase shadow-sm ${statusColors[raid.status]}`}
     >
       {raid.status}
     </div>
@@ -45,59 +54,80 @@ export function RaidList() {
   );
 
   return (
-    <div className="h-full flex flex-col gap-3">
-      <div className="flex justify-between items-center gap-2">
-        <div className="flex gap-2 flex-wrap">
-          {["ALL", ...Object.keys(RaidStatus)].map((status) => {
-            const colors =
-              filter === status
-                ? "bg-primary/50 hover:bg-primary/90 active:bg-primary"
-                : "bg-secondary/50 hover:bg-secondary/90 active:bg-secondary";
-            return (
-              <button
-                key={status}
-                className={`rounded-full px-4 py-1 text-sm font-semibold transition-colors cursor-pointer select-none uppercase shadow-sm ${colors}`}
-                onClick={() => setFilter(status)}
-              >
-                {status}
-              </button>
-            );
-          })}
-        </div>
+    <Card>
+      <SidebarProvider>
+        <Sidebar collapsible="none">
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarMenu>
+                {["All", ...Object.keys(RaidStatus)].map((status) => (
+                  <SidebarMenuItem key={status}>
+                    <SidebarMenuButton asChild isActive={filter === status}>
+                      <div className="flex items-center">
+                        <FontAwesomeIcon icon={faFilter} />
+                        <span>{status}</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroup>
+          </SidebarContent>
+        </Sidebar>
 
-        <div className="flex gap-2 items-center flex-row-reverse">
-          <Link href="raids/create" tabIndex={-1}>
-            <Button className="whitespace-nowrap">New Raid</Button>
-          </Link>
-
-          <Link href={`/dashboard/${guildId}/raids`} replace>
-            <FontAwesomeIcon icon={faRefresh} />
-          </Link>
-        </div>
-      </div>
-
-      <ul className="space-y-2">
-        {filteredRaids.map((raid) => (
-          <li key={raid.id}>
-            <Link
-              href={`raids/${raid.id}`}
-              className="flex justify-between gap-4 p-4 items-center rounded-lg bg-primary-gray-800/25 cursor-pointer hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 transition-colors outline-offset-0"
-            >
-              <div className="grow text-lg font-semibold">{raid.description}</div>
-              <div>
-                {new Date(raid.date).toLocaleString(navigator.language, {
-                  day: "numeric",
-                  month: "2-digit",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </div>
-              <RaidStatusBadge raid={raid} />
-            </Link>
-          </li>
-        ))}
-        {filteredRaids.length === 0 && <p className="flex items-center justify-center">No raids.</p>}
-      </ul>
-    </div>
+        <main className="flex h-[480px] flex-1 flex-col overflow-hidden">
+          <ul className="space-y-2">
+            {filteredRaids.map((raid) => (
+              <li key={raid.id}>
+                <Link
+                  href={`raids/${raid.id}`}
+                  className="bg-primary-gray-800/25 hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4 outline-offset-0 transition-colors"
+                >
+                  <div className="grow text-lg font-semibold">{raid.description}</div>
+                  <div>
+                    {new Date(raid.date).toLocaleString(navigator.language, {
+                      day: "numeric",
+                      month: "2-digit",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <RaidStatusBadge raid={raid} />
+                </Link>
+              </li>
+            ))}
+            {filteredRaids.length === 0 && <p className="flex items-center justify-center">No raids.</p>}
+          </ul>
+        </main>
+      </SidebarProvider>
+    </Card>
   );
 }
+
+//   const colors =
+//     filter === status
+//       ? "bg-primary/50 hover:bg-primary/90 active:bg-primary"
+//       : "bg-secondary/50 hover:bg-secondary/90 active:bg-secondary";
+//   return (
+//     <button
+//       key={status}
+//       className={`rounded-full px-4 py-1 text-sm font-semibold transition-colors cursor-pointer select-none uppercase shadow-sm ${colors}`}
+//       onClick={() => setFilter(status)}
+//     >
+//       {status}
+//     </button>
+//   );
+
+// <div className="flex justify-between items-center gap-2">
+//   <div className="flex gap-2 flex-wrap"></div>
+
+//   <div className="flex gap-2 items-center flex-row-reverse">
+//     <Link href="raids/create" tabIndex={-1}>
+//       <Button className="whitespace-nowrap">New Raid</Button>
+//     </Link>
+
+//     <Link href={`/dashboard/${guildId}/raids`} replace>
+//       <FontAwesomeIcon icon={faRefresh} />
+//     </Link>
+//   </div>
+// </div>
