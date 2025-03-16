@@ -14,7 +14,7 @@ export default async function Page() {
   if (!session?.accessToken) return redirect("/");
 
   const servers: Server[] = (await getUserGuilds(session.accessToken))
-    .filter((server: any) => hasPermissions(server.permissions, [PERMISSIONS.ADMINISTRATOR]))
+    .filter((server) => hasPermissions(server.permissions, [PERMISSIONS.ADMINISTRATOR]))
     .map(transformGuild);
 
   return (

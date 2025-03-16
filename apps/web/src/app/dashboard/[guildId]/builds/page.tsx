@@ -1,7 +1,6 @@
 import { Page, PageTitle } from "@/components/ui/page";
-import { DashboardPageProps } from "../../types";
 
-export default async function BuildPage({ params }: DashboardPageProps) {
+export default async function BuildPage() {
   return (
     <Page>
       <PageTitle>Builds</PageTitle>

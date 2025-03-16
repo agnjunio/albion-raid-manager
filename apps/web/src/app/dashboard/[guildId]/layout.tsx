@@ -1,18 +1,9 @@
 import Alert from "@/components/ui/alert";
 import { nextAuthOptions } from "@/lib/auth";
 import { prisma } from "@albion-raid-manager/database";
-import { faFlag, faGear, faPeopleGroup, faShieldHalved, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { DashboardLayoutProps } from "../types";
-
-const links = [
-  { href: "raids", label: "Raids", icon: faFlag },
-  { href: "compositions", label: "Compositions", icon: faPeopleGroup },
-  { href: "builds", label: "Builds", icon: faShieldHalved },
-  { href: "members", label: "Members", icon: faUsers },
-  { href: "settings", label: "Settings", icon: faGear },
-];
 
 export default async function Layout({ params, children }: DashboardLayoutProps) {
   const session = await getServerSession(nextAuthOptions);

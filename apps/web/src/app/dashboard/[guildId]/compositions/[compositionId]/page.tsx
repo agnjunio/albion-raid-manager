@@ -1,6 +1,6 @@
 "use client";
 
-import Card from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { Prisma, Role } from "@albion-raid-manager/database/models";
 import { faArrowLeft, faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
@@ -77,19 +77,15 @@ export default function RaidPage() {
         </div>
       </Card>
 
-      <Card
-        title="Composition Slots"
-        actions={
-          <div className="flex flex-row-reverse gap-2">
-            <button role="icon-button">
-              <FontAwesomeIcon icon={faPlus} />
-            </button>
-            <button role="icon-button" onClick={() => fetchComposition()}>
-              <FontAwesomeIcon icon={faRefresh} />
-            </button>
-          </div>
-        }
-      >
+      <Card title="Composition Slots">
+        <div className="flex flex-row-reverse gap-2">
+          <button role="icon-button">
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+          <button role="icon-button" onClick={() => fetchComposition()}>
+            <FontAwesomeIcon icon={faRefresh} />
+          </button>
+        </div>
         <div className="flex flex-col gap-2">
           {composition.slots
             .sort((a, b) => a.id - b.id)

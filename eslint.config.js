@@ -1,3 +1,4 @@
+import nextPlugin from "@next/eslint-plugin-next";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import prettier from "eslint-config-prettier";
@@ -23,13 +24,21 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...prettier.rules,
       "@typescript-eslint/no-unused-vars": [
-        "error",
+        "warn",
         {
           argsIgnorePattern: "^_",
         },
       ],
       "no-console": "warn",
       "prefer-const": ["warn"],
+    },
+  },
+  // Next.js-specific config (applies only to apps/web)
+  {
+    files: ["apps/web/**/*.{ts,tsx,js,jsx}"],
+    plugins: { next: nextPlugin },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
     },
   },
 ];

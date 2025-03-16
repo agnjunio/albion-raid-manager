@@ -1,6 +1,7 @@
 import { sleep } from "@albion-raid-manager/common/scheduler";
 import logger from "@albion-raid-manager/logger";
 import axios from "axios";
+import { APIGuild } from "discord-api-types/v10";
 
 const discordApiClient = axios.create({
   baseURL: "https://discord.com/api/v10",
@@ -28,7 +29,7 @@ discordApiClient.interceptors.response.use(null, async (error) => {
   return Promise.reject(error);
 });
 
-export async function getUserGuilds(token: string) {
+export async function getUserGuilds(token: string): Promise<APIGuild[]> {
   const res = await discordApiClient.get(`/users/@me/guilds`, {
     headers: {
       Authorization: `Bearer ${token}`,

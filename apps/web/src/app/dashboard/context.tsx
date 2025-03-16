@@ -1,9 +1,9 @@
 "use client";
 
+import { GuildWithMembers } from "@/types/database";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
-import { GuildWithMembers } from "./types";
 
 type DashboardContextType = {
   guilds: GuildWithMembers[];

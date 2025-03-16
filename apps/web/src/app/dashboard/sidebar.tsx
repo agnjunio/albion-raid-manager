@@ -21,6 +21,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { GuildWithMembers } from "@/types/database";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import {
@@ -40,7 +41,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useDashboardContext } from "./context";
-import { GuildWithMembers } from "./types";
 
 const links = [
   { href: "raids", label: "Raids", icon: faFlag },

@@ -36,7 +36,7 @@ export const getServerInviteUrl = (clientId: string, serverId?: string) => {
 
 export const checkFlag = (bit: string, flag: bigint) => (BigInt(bit) & flag) === flag;
 
-export function hasPermissions(permissions: string | bigint, requiredPermissions: bigint[]): boolean {
+export function hasPermissions(permissions: string | bigint = 0n, requiredPermissions: bigint[]): boolean {
   const permissionBits = BigInt(permissions);
   return requiredPermissions.every((perm) => (permissionBits & perm) !== 0n);
 }

@@ -1,5 +1,6 @@
 {
   "name": "@albion-raid-manager/web",
+  "type": "module",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "@albion-raid-manager/config": "workspace:^",
+    "@eslint/eslintrc": "^3.3.0",
     "@prisma/nextjs-monorepo-workaround-plugin": "^6.4.1",
     "@tailwindcss/postcss": "^4.0.10",
     "@types/node": "^22.13.9",
