@@ -78,7 +78,6 @@ export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
                     hourCycle={24}
                     granularity="minute"
                     displayFormat={{ hour24: "dd/MM/yyyy HH:mm" }}
-                    yearRange={0}
                     {...field}
                   />
                 </FormControl>

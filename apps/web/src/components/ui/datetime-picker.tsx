@@ -350,7 +350,7 @@ function Calendar({
           );
         },
         Footer: () => (
-          <div className="flex w-full justify-center">
+          <div className="flex w-full justify-center pt-2">
             <Button
               variant="primary"
               size="sm"
