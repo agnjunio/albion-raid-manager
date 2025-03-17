@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeButton } from "@/components/ui/theme";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -33,36 +34,50 @@ export default function Home() {
 
       <Container className="relative flex basis-1/2 flex-col items-center justify-center gap-2 lg:basis-1/3">
         <ThemeButton className="absolute right-2 top-2" />
-        {session.data ? (
-          <>
-            {session.data.user.image && (
-              <picture className="shadow-foreground/50 dark:shadow-background rounded-full shadow-lg">
-                <img
-                  src={session.data.user.image}
-                  className="size-12 select-none rounded-full"
-                  alt={session.data.user.name || "Unknown user"}
-                />
-              </picture>
-            )}
-            <div className="flex items-center gap-1">
-              <div>Authenticated as</div>
-              <div className="text-secondary dark:text-primary font-semibold">@{session.data.user.name}</div>
-            </div>
+        {
+          {
+            loading: (
+              <>
+                <Skeleton className="size-12 rounded-full" />
+                <Skeleton className="h-5 w-64" />
+                <Skeleton className="h-10 w-24" />
+              </>
+            ),
+            authenticated: (
+              <>
+                {session.data?.user.image && (
+                  <picture className="shadow-foreground/50 dark:shadow-background rounded-full shadow-lg">
+                    <img
+                      src={session.data.user.image}
+                      className="size-12 select-none rounded-full"
+                      alt={session.data.user.name || "Unknown user"}
+                    />
+                  </picture>
+                )}
+                <div className="flex items-center gap-1">
+                  <div>Authenticated as</div>
+                  <div className="text-secondary dark:text-primary font-semibold">
+                    @{session.data?.user.name || "Usuário desconhecido"}
+                  </div>
+                </div>
 
-            <Link href="/dashboard" tabIndex={-1} passHref>
-              <Button variant="primary">Enter</Button>
-            </Link>
-          </>
-        ) : (
-          <>
-            <p>You are not logged in. Please sign in with Discord to continue.</p>
+                <Link href="/dashboard" tabIndex={-1} passHref>
+                  <Button variant="primary">Enter</Button>
+                </Link>
+              </>
+            ),
+            unauthenticated: (
+              <>
+                <p>You are not logged in. Please sign in with Discord to continue.</p>
 
-            <Button onClick={() => signIn("discord")}>
-              <FontAwesomeIcon icon={faDiscord} />
-              Login
-            </Button>
-          </>
-        )}
+                <Button onClick={() => signIn("discord")}>
+                  <FontAwesomeIcon icon={faDiscord} />
+                  Login
+                </Button>
+              </>
+            ),
+          }[session.status]
+        }
       </Container>
     </div>
   );
