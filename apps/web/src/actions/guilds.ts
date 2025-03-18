@@ -29,7 +29,7 @@ export async function createGuild(server: Server, userId: string) {
         icon: server.icon,
         members: {
           create: {
-            userId: userId,
+            userId,
             role: "LEADER",
             default: true,
           },

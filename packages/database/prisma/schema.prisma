@@ -13,8 +13,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Guilds and Players
 model Guild {
-  id                    Int           @id @default(autoincrement())
+  id                    String        @id @default(uuid())
   name                  String
   icon                  String?
   discordId             String        @unique
@@ -27,7 +28,7 @@ model Guild {
 model GuildMember {
   guild   Guild           @relation(fields: [guildId], references: [id])
   user    User            @relation(fields: [userId], references: [id])
-  guildId Int
+  guildId String
   userId  String
   default Boolean         @default(false)
   role    GuildMemberRole @default(PLAYER)
@@ -45,62 +46,56 @@ model User {
   id          String        @id
   username    String
   avatar      String?
-  RaidSlot    RaidSlot[]
   GuildMember GuildMember[]
+  RaidSlot    RaidSlot[]
 }
 
-model Build {
-  id               Int               @id @default(autoincrement())
-  name             String
-  role             Role
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  CompositionSlots CompositionSlot[]
-  RaidSlot         RaidSlot[]
-}
-
+// Raids and Compositions
 model Composition {
-  id        Int               @id @default(autoincrement())
+  id        String             @id @default(uuid())
   name      String
-  Guild     Guild             @relation(fields: [guildId], references: [id])
-  guildId   Int
-  slots     CompositionSlot[]
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  Guild     Guild              @relation(fields: [guildId], references: [id])
+  guildId   String
+  builds    CompositionBuild[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
 }
 
-model CompositionSlot {
-  id            Int         @id @default(autoincrement())
-  Composition   Composition @relation(fields: [compositionId], references: [id])
-  compositionId Int
-  build         Build       @relation(fields: [buildId], references: [id])
-  buildId       Int
+model CompositionBuild {
+  id            String      @id @default(uuid())
+  composition   Composition @relation(fields: [compositionId], references: [id])
+  compositionId String
+  name          String
+  role          Role
   comment       String?
-  assignedAt    DateTime    @default(now())
+  count         Int         @default(1)
 }
 
 model Raid {
-  id                    Int        @id @default(autoincrement())
+  id                    String     @id @default(uuid())
+  guild                 Guild      @relation(fields: [guildId], references: [id])
+  guildId               String
   description           String
+  date                  DateTime
+  allowLateJoin         Boolean    @default(false)
   status                RaidStatus @default(SCHEDULED)
   announcementMessageId String?
-  date                  DateTime
-  guild                 Guild      @relation(fields: [guildId], references: [id])
-  guildId               Int
   slots                 RaidSlot[]
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
 }
 
 model RaidSlot {
-  id         Int      @id @default(autoincrement())
-  raid       Raid     @relation(fields: [raidId], references: [id])
-  raidId     Int
-  build      Build    @relation(fields: [buildId], references: [id])
-  buildId    Int
-  user       User?    @relation(fields: [userId], references: [id])
-  userId     String?
-  assignedAt DateTime @default(now())
+  id        String    @id @default(uuid())
+  name      String
+  role      Role
+  comment   String?
+  Raid      Raid?     @relation(fields: [raidId], references: [id])
+  raidId    String?
+  user      User?     @relation(fields: [userId], references: [id])
+  userId    String?
+  createdAt DateTime  @default(now())
+  joinedAt  DateTime?
 }
 
 enum Role {

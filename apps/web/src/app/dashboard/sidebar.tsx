@@ -33,7 +33,6 @@ import {
   faPeopleGroup,
   faPlus,
   faShield,
-  faShieldHalved,
   faUsers,
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
@@ -45,7 +44,6 @@ import { useDashboardContext } from "./context";
 const links = [
   { href: "raids", label: "Raids", icon: faFlag },
   { href: "compositions", label: "Compositions", icon: faPeopleGroup },
-  { href: "builds", label: "Builds", icon: faShieldHalved },
   { href: "members", label: "Members", icon: faUsers },
   { href: "settings", label: "Settings", icon: faGear },
 ];

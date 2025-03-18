@@ -14,5 +14,5 @@ export const raidFormSchema = z.object({
     .date()
     .min(today, { message: "Start date must be today or later." })
     .max(maxDate, { message: "Start date cannot be more than 2 months ahead." }),
-  composition: z.custom<Composition>().refine((val) => val !== undefined, { message: "Please select a composition " }),
+  composition: z.custom<Composition>(),
 });

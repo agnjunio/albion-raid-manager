@@ -1,5 +1,5 @@
 import raidsController from "@/controllers/raids";
-import { Build, Raid, RaidSlot, Role } from "@albion-raid-manager/database/models";
+import { Raid, RaidSlot, Role } from "@albion-raid-manager/database/models";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -25,7 +25,7 @@ const emojis = {
 
 export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
   raid: Raid,
-  slots: (RaidSlot & { build: Build })[],
+  slots: RaidSlot[],
 ): T => {
   const embed = new EmbedBuilder()
     .setColor("#ffbd59")
@@ -45,9 +45,8 @@ export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | Mess
   embed.addFields({
     name: `Composition (${signups.length}/${slots.length})`,
     value: slots
-      .sort((a, b) => a.id - b.id)
       .map((slot) => {
-        let row = `${emojis[slot.build.role]} ${slot.build.name}`;
+        let row = `${emojis[slot.role]} ${slot.name}`;
         if (slot.userId) row += ` - <@${slot.userId}>`;
         return row;
       })
@@ -72,17 +71,13 @@ export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | Mess
   } as unknown as T;
 };
 
-export const createRaidSignupReply = (
-  raid: Raid,
-  slots: (RaidSlot & { build: Build })[],
-  users?: User[],
-): InteractionReplyOptions => {
+export const createRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User[]): InteractionReplyOptions => {
   const menu = new StringSelectMenuBuilder()
     .setCustomId(`${raidsController.id}:select:${raid.id}`)
     .setPlaceholder("Select a build");
 
-  for (const slot of slots.sort((a, b) => a.id - b.id)) {
-    const { name, role } = slot.build;
+  for (const slot of slots) {
+    const { name, role } = slot;
     let label = name;
     if (slot.userId) {
       label += ` - `;

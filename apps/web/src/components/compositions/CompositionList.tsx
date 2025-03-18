@@ -10,7 +10,7 @@ type CompositionListProps = {
     include: {
       _count: {
         select: {
-          slots: true;
+          builds: true;
         };
       };
     };

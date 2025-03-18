@@ -12,12 +12,13 @@ export default async function Layout({ params, children }: DashboardLayoutProps)
   const { guildId } = await params;
   const guild = await prisma.guild.findUnique({
     where: {
-      id: Number(guildId),
+      id: guildId,
     },
     include: { raids: true, members: true },
   });
+
   if (!guild) {
-    return redirect("/guilds");
+    return redirect("/dashboard");
   }
 
   const isMember = guild?.members.some((member) => member.userId === session.user.id);

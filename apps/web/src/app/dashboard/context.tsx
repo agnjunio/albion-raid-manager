@@ -17,7 +17,7 @@ export function DashboardProvider({ children, guilds }: DashboardContextType & P
   const session = useSession();
   const selectedGuild = useMemo(() => {
     return guildId
-      ? guilds.find((guild) => guild.id === Number(guildId))
+      ? guilds.find((guild) => guild.id === guildId)
       : guilds.find((guild) => guild.members.find((member) => member.userId === session.data?.user.id)?.default);
   }, [guildId, guilds, session.data?.user.id]);
 

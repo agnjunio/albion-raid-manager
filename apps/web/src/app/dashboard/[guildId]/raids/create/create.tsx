@@ -106,7 +106,7 @@ export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
                       >
                         <div className="flex items-center gap-2">
                           <FontAwesomeIcon icon={faPeopleGroup} className="size-4" />
-                          {field.value ? field.value.name : "Select a composition..."}
+                          {field.value ? field.value.name : "No composition"}
                         </div>
                       </Button>
                     </PopoverTrigger>

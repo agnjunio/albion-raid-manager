@@ -10,12 +10,12 @@ export default async function CompositionsPage({ params }: CompositionPageProps)
 
   const compositions = await prisma.composition.findMany({
     where: {
-      guildId: Number(guildId),
+      guildId: guildId,
     },
     include: {
       _count: {
         select: {
-          slots: true,
+          builds: true,
         },
       },
     },

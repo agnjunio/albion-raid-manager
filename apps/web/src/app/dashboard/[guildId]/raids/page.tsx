@@ -7,7 +7,7 @@ export default async function RaidsPage({ params }: RaidsPageProps) {
   const { guildId } = await params;
   const raids = await prisma.raid.findMany({
     where: {
-      guildId: Number(guildId),
+      guildId: guildId,
     },
   });
 

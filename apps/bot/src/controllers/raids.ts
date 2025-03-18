@@ -20,11 +20,7 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
     },
     include: {
       guild: true,
-      slots: {
-        include: {
-          build: true,
-        },
-      },
+      slots: true,
     },
   });
   if (!raids.length) return;
@@ -78,14 +74,10 @@ const handleSignup = async ({ discord, interaction }: { discord: Client; interac
     if (!raidId) throw new Error("Missing raid id");
 
     const raid = await prisma.raid.findUnique({
-      where: { id: Number(raidId) },
+      where: { id: raidId },
       include: {
         guild: true,
-        slots: {
-          include: {
-            build: true,
-          },
-        },
+        slots: true,
       },
     });
 
@@ -115,7 +107,7 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
     const raidId = interaction.customId.split(":")[2];
 
     const raid = await prisma.raid.findUnique({
-      where: { id: Number(raidId) },
+      where: { id: raidId },
       include: {
         slots: true,
       },
@@ -124,8 +116,7 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
     if (!raid) throw new Error("Raid not found");
     if (raid.status !== RaidStatus.OPEN) throw new Error("Raid is not open for signups");
 
-    const slot = Number(interaction.values[0]);
-    if (isNaN(slot)) throw new Error("Invalid slot selected");
+    const slot = interaction.values[0];
 
     if (
       raid.slots.some((raidSlot) => raidSlot.id === slot && raidSlot.userId && raidSlot.userId !== interaction.user.id)
@@ -199,7 +190,7 @@ const handleSignout = async ({ interaction }: { discord: Client; interaction: In
     if (!raidId) throw new Error("Missing raid id");
 
     const raid = await prisma.raid.findUnique({
-      where: { id: Number(raidId) },
+      where: { id: raidId },
       include: {
         slots: true,
       },
@@ -258,7 +249,6 @@ const updateRaidAnnouncement = async (discord: Client, raid: Raid) => {
 
   const slots = await prisma.raidSlot.findMany({
     where: { raidId: raid.id },
-    include: { build: true },
   });
   await message.edit(getRaidAnnouncementMessage<MessageEditOptions>(raid, slots));
 };

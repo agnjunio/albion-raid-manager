@@ -1,7 +1,7 @@
 "use server";
 
 import { raidFormSchema } from "@/lib/schemas/raid";
-import { CompositionWithSlots } from "@/types/database";
+import { CompositionWithBuilds } from "@/types/database";
 import { prisma } from "@albion-raid-manager/database";
 import { Raid } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
@@ -16,14 +16,14 @@ export async function createRaid(guildId: string, data: z.infer<typeof raidFormS
   try {
     const { description, date } = data;
 
-    let composition: CompositionWithSlots | null;
+    let composition: CompositionWithBuilds | null;
     if (data.composition) {
       composition = await prisma.composition.findUnique({
         where: {
           id: data.composition.id,
         },
         include: {
-          slots: true,
+          builds: true,
         },
       });
 
@@ -37,15 +37,16 @@ export async function createRaid(guildId: string, data: z.infer<typeof raidFormS
         data: {
           description,
           date,
-          guildId: Number(guildId),
+          guildId: guildId,
         },
       });
 
       if (composition) {
         await tx.raidSlot.createMany({
-          data: composition.slots.map((slot) => ({
+          data: composition.builds.map((build) => ({
             raidId: raid.id,
-            buildId: slot.buildId,
+            name: build.name,
+            role: build.role,
           })),
         });
       }

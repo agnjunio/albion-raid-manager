@@ -122,32 +122,30 @@ export default function RaidPage() {
 
       <Card title="Raid Slots">
         <div className="flex flex-col gap-2">
-          {raid.slots
-            .sort((a, b) => a.id - b.id)
-            .map((slot) => (
-              <div
-                key={slot.id}
-                className={`flex min-h-12 items-center justify-between rounded px-4 py-2 ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
-              >
-                <div className="font-semibold">{slot.build.name}</div>
-                <div>
-                  {slot.user ? (
-                    <div className="flex items-center gap-2">
-                      <div>{slot.user.username}</div>
-                      <picture>
-                        <img
-                          src={getUserPictureUrl(slot.user.id, slot.user.avatar)}
-                          className="size-8 select-none rounded-full"
-                          alt={slot.user.username}
-                        />
-                      </picture>
-                    </div>
-                  ) : (
-                    <div className="text-xs">Empty</div>
-                  )}
-                </div>
+          {raid.slots.map((slot) => (
+            <div
+              key={slot.id}
+              className={`flex min-h-12 items-center justify-between rounded px-4 py-2 ${roleBg[slot.role] || "bg-secondary-violet/25"}`}
+            >
+              <div className="font-semibold">{slot.name}</div>
+              <div>
+                {slot.user ? (
+                  <div className="flex items-center gap-2">
+                    <div>{slot.user.username}</div>
+                    <picture>
+                      <img
+                        src={getUserPictureUrl(slot.user.id, slot.user.avatar)}
+                        className="size-8 select-none rounded-full"
+                        alt={slot.user.username}
+                      />
+                    </picture>
+                  </div>
+                ) : (
+                  <div className="text-xs">Empty</div>
+                )}
               </div>
-            ))}
+            </div>
+          ))}
           {raid.slots.length === 0 && <div className="text-center">No slots available.</div>}
         </div>
       </Card>
