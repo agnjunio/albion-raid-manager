@@ -11,11 +11,7 @@ import { CompositionParams } from "../types";
 
 type CompositionInfo = Prisma.CompositionGetPayload<{
   include: {
-    slots: {
-      include: {
-        build: true;
-      };
-    };
+    builds: true;
   };
 }>;
 
@@ -87,17 +83,15 @@ export default function RaidPage() {
           </button>
         </div>
         <div className="flex flex-col gap-2">
-          {composition.slots
-            .sort((a, b) => a.id - b.id)
-            .map((slot) => (
-              <div
-                key={slot.id}
-                className={`flex min-h-12 items-center justify-between rounded px-4 py-2 ${roleBg[slot.build.role] || "bg-secondary-violet/25"}`}
-              >
-                <div className="font-semibold">{slot.build.name}</div>
-              </div>
-            ))}
-          {composition.slots.length === 0 && <div className="text-center">No slots available.</div>}
+          {composition.builds.map((build) => (
+            <div
+              key={build.id}
+              className={`flex min-h-12 items-center justify-between rounded px-4 py-2 ${roleBg[build.role] || "bg-secondary-violet/25"}`}
+            >
+              <div className="font-semibold">{build.name}</div>
+            </div>
+          ))}
+          {composition.builds.length === 0 && <div className="text-center">No builds available.</div>}
         </div>
       </Card>
     </div>

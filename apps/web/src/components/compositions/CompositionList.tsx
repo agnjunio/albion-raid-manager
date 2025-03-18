@@ -51,7 +51,7 @@ export default function CompositionList({ compositions }: CompositionListProps) 
             >
               <div>
                 <div className="grow text-lg/tight font-semibold">{composition.name}</div>
-                <div className="text-secondary-violet text-xs">Size: {composition._count.slots}</div>
+                <div className="text-secondary-violet text-xs">Size: {composition._count.builds}</div>
               </div>
               <div>
                 Last Update:{" "}
