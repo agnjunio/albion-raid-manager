@@ -1,3 +1,2 @@
-export * from "./api";
-export * from "./bot";
+export * from "./service";
 export * from "./types";

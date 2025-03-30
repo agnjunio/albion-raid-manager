@@ -1,4 +1,4 @@
-import { APIGuild, APIGuildChannel, APIUser, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
+import { APIGuild, APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
 
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;
 export const PERMISSIONS: {
@@ -34,8 +34,6 @@ export const getServerInviteUrl = (clientId: string, serverId?: string) => {
   return `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot&permissions=2147534848${serverParam}`;
 };
 
-export const checkFlag = (bit: string, flag: bigint) => (BigInt(bit) & flag) === flag;
-
 export function hasPermissions(permissions: string | bigint = 0n, requiredPermissions: bigint[]): boolean {
   const permissionBits = BigInt(permissions);
   return requiredPermissions.every((perm) => (permissionBits & perm) !== 0n);
@@ -64,7 +62,7 @@ export function transformGuild(guild: APIGuild) {
   }
 
   if (guild.permissions) {
-    transformedGuild.admin = checkFlag(guild.permissions, PermissionFlagsBits.Administrator);
+    transformedGuild.admin = hasPermissions(guild.permissions, [PERMISSIONS.ADMINISTRATOR]);
   }
 
   return transformedGuild;

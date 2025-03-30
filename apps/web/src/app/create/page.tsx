@@ -1,5 +1,4 @@
 import { nextAuthOptions } from "@/lib/auth";
-import { hasPermissions, PERMISSIONS, transformGuild } from "@albion-raid-manager/common/helpers/discord";
 import type { Server } from "@albion-raid-manager/discord";
 import { getUserGuilds } from "@albion-raid-manager/discord";
 import { faChevronCircleLeft } from "@fortawesome/free-solid-svg-icons";
@@ -13,9 +12,7 @@ export default async function Page() {
   const session = await getServerSession(nextAuthOptions);
   if (!session?.accessToken) return redirect("/");
 
-  const servers: Server[] = (await getUserGuilds(session.accessToken))
-    .filter((server) => hasPermissions(server.permissions, [PERMISSIONS.ADMINISTRATOR]))
-    .map(transformGuild);
+  const servers: Server[] = (await getUserGuilds(session.accessToken)).filter((server) => server.admin);
 
   return (
     <div className="flex min-h-screen flex-col justify-center gap-3 p-4">
