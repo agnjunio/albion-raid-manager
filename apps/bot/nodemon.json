@@ -1,6 +1,6 @@
 {
-  "exec": "ts-node -r dotenv/config .",
   "watch": ["config", "src"],
   "ext": "ts, json",
-  "ignore": ["node_modules", "__tests__"]
+  "ignore": ["node_modules", "__tests__"],
+  "exec": "ts-node -r dotenv/config ./src/index.ts"
 }

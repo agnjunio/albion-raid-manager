@@ -1,5 +1,6 @@
 {
   "name": "@albion-raid-manager/bot",
+  "type": "module",
   "version": "1.0.0",
   "description": "Discord bot for Albion Raid Manager.",
   "main": "src/index.ts",
@@ -20,7 +21,6 @@
     "@albion-raid-manager/config": "workspace:^",
     "@albion-raid-manager/database": "workspace:^",
     "@albion-raid-manager/logger": "workspace:*",
-    "date-fns": "^4.1.0",
     "discord.js": "^14.18.0"
   }
 }
