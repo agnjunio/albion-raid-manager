@@ -1,20 +1,10 @@
 {
   "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
-    "allowJs": false,
-    "declaration": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "lib": ["dom"],
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ESNext"
+    "lib": ["DOM", "ES2023"]
   },
   "ts-node": {
-    "require": ["tsconfig-paths/register"]
+    "require": ["tsconfig-paths/register", "dotenv/config"]
   }
 }

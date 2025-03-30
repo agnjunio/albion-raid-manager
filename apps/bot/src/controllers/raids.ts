@@ -4,10 +4,10 @@ import { getErrorMessage } from "@albion-raid-manager/common/errors";
 import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { prisma } from "@albion-raid-manager/database";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
-import logger from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/logger";
 import { Client, Events, Interaction, MessageCreateOptions, MessageEditOptions, User } from "discord.js";
 import { EventEmitter } from "stream";
-import { Controller } from ".";
+import { Controller } from "./index.js";
 
 const raidEvents = new EventEmitter();
 

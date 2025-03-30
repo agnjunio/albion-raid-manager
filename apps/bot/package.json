@@ -1,12 +1,11 @@
 {
   "name": "@albion-raid-manager/bot",
-  "type": "module",
   "version": "1.0.0",
   "description": "Discord bot for Albion Raid Manager.",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node .",
-    "dev": "nodemon --config nodemon.json",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register -r dotenv/config .",
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
     "prettier": "prettier -c src/",
