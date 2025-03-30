@@ -72,6 +72,9 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:^
         version: link:../../packages/database
+      '@albion-raid-manager/discord':
+        specifier: workspace:^
+        version: link:../../packages/discord
       '@albion-raid-manager/logger':
         specifier: workspace:*
         version: link:../../packages/logger
@@ -238,9 +241,6 @@ importers:
       cron:
         specifier: ^3.1.7
         version: 3.2.1
-      discord-api-types:
-        specifier: ^0.37.110
-        version: 0.37.110
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.0.2
@@ -1994,9 +1994,6 @@ packages:
   diff@4.0.2:
     resolution: {integrity: sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==}
     engines: {node: '>=0.3.1'}
-
-  discord-api-types@0.37.110:
-    resolution: {integrity: sha512-wVaAJkrSgNRo8nd523qKYPqkClTNHhjKOk/g6265rzHuc7TNS6Ivz06DPW4iZvnhFobbH95hKlgsRf6jcAbtlA==}
 
   discord-api-types@0.37.119:
     resolution: {integrity: sha512-WasbGFXEB+VQWXlo6IpW3oUv73Yuau1Ig4AZF/m13tXcTKnMpc/mHjpztIlz4+BM9FG9BHQkEXiPto3bKduQUg==}
@@ -5326,8 +5323,6 @@ snapshots:
   detect-node-es@1.1.0: {}
 
   diff@4.0.2: {}
-
-  discord-api-types@0.37.110: {}
 
   discord-api-types@0.37.119: {}
 

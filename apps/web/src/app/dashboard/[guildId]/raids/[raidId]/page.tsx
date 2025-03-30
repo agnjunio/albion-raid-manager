@@ -2,8 +2,8 @@
 
 import { Card } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
-import { getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
 import { Prisma, RaidStatus, Role } from "@albion-raid-manager/database/models";
+import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "next/navigation";

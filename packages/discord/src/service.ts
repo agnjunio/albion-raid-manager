@@ -1,10 +1,10 @@
 import { memoize } from "@albion-raid-manager/common/helpers/cache";
-import { transformChannel, transformGuild, transformUser } from "@albion-raid-manager/common/helpers/discord";
 import { sleep } from "@albion-raid-manager/common/scheduler";
 import { getMilliseconds } from "@albion-raid-manager/common/utils/time";
 import config from "@albion-raid-manager/config";
 import { APIGuild } from "discord-api-types/v10";
 import { discordApiClient } from "./client";
+import { transformChannel, transformGuild, transformUser } from "./helpers";
 import { Server } from "./types";
 
 const DISCORD_TOKEN = config.discord.token;

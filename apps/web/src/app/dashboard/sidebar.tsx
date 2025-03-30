@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 import { GuildWithMembers } from "@/types/database";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/common/helpers/discord";
+import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
 import {
   faArrowRightFromBracket,
   faCheck,
