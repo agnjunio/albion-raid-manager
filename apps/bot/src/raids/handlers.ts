@@ -1,17 +1,13 @@
 import { ClientError, ErrorCodes } from "@/errors";
-import { createRaidSignupReply, getRaidAnnouncementMessage } from "@/messages/raids";
 import { getErrorMessage } from "@albion-raid-manager/common/errors";
-import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { prisma } from "@albion-raid-manager/database";
 import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
-import { logger } from "@albion-raid-manager/logger";
-import { Client, Events, Interaction, MessageCreateOptions, MessageEditOptions, User } from "discord.js";
-import { EventEmitter } from "stream";
-import { Controller } from "./index.js";
+import logger from "@albion-raid-manager/logger";
+import { Client, Interaction, MessageCreateOptions, MessageEditOptions } from "discord.js";
+import { raidEvents } from "./events";
+import { createRaidAnnouncementMessage, createRaidSignupReply } from "./messages";
 
-const raidEvents = new EventEmitter();
-
-const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
+export const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
   logger.verbose("Checking for raid announcements");
 
   const raids = await prisma.raid.findMany({
@@ -49,7 +45,7 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
       if (!channel.isTextBased())
         throw new Error(`Announcement channel is not a text channel: ${raid.guild.announcementChannelId}`);
 
-      const message = await channel.send(getRaidAnnouncementMessage<MessageCreateOptions>(raid, raid.slots));
+      const message = await channel.send(createRaidAnnouncementMessage<MessageCreateOptions>(raid, raid.slots));
 
       await prisma.raid.update({
         where: { id: raid.id },
@@ -66,7 +62,7 @@ const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
   }
 };
 
-const handleSignup = async ({ discord, interaction }: { discord: Client; interaction: Interaction }) => {
+export const handleSignup = async ({ discord, interaction }: { discord: Client; interaction: Interaction }) => {
   try {
     if (!interaction.isButton()) throw new Error("Invalid interaction type");
 
@@ -100,7 +96,7 @@ const handleSignup = async ({ discord, interaction }: { discord: Client; interac
   }
 };
 
-const handleSelect = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
+export const handleSelect = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
   if (!interaction.isStringSelectMenu()) return;
 
   try {
@@ -182,7 +178,7 @@ const handleSelect = async ({ interaction }: { discord: Client; interaction: Int
   }
 };
 
-const handleSignout = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
+export const handleSignout = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
   if (!interaction.isButton()) return;
 
   try {
@@ -233,7 +229,7 @@ const handleSignout = async ({ interaction }: { discord: Client; interaction: In
   }
 };
 
-const updateRaidAnnouncement = async (discord: Client, raid: Raid) => {
+export const updateRaidAnnouncement = async (discord: Client, raid: Raid) => {
   if (!raid.announcementMessageId) return;
 
   const guild = await prisma.guild.findUnique({
@@ -250,52 +246,5 @@ const updateRaidAnnouncement = async (discord: Client, raid: Raid) => {
   const slots = await prisma.raidSlot.findMany({
     where: { raidId: raid.id },
   });
-  await message.edit(getRaidAnnouncementMessage<MessageEditOptions>(raid, slots));
+  await message.edit(createRaidAnnouncementMessage<MessageEditOptions>(raid, slots));
 };
-
-const raidsController: Controller = {
-  id: "raids",
-  init: async ({ discord }) => {
-    runCronjob({
-      name: "Announce Raids",
-      cron: "*/30 * * * *", // Every 30 minutes
-      callback: () => handleAnnounceRaids({ discord }),
-      runOnStart: true,
-    });
-
-    discord.on(Events.InteractionCreate, async (interaction) => {
-      if (!interaction.isMessageComponent()) return;
-
-      const [controllerId, action] = interaction.customId.split(":");
-
-      if (controllerId !== raidsController.id) return;
-      if (action === "signup") return handleSignup({ discord, interaction });
-      if (action === "select") return handleSelect({ discord, interaction });
-      if (action === "signout") return handleSignout({ discord, interaction });
-
-      logger.warn(`Unknown action: ${interaction.customId}`, { interaction: interaction.toJSON() });
-    });
-
-    raidEvents.on("raidAnnounced", (raid: Raid) => {
-      logger.info(`Raid announced: ${raid.id}`, { raid });
-    });
-
-    raidEvents.on("raidSignup", async (raid: Raid, user: User) => {
-      logger.info(`User ${user.displayName} signed up for raid: ${raid.id}`, {
-        raid,
-        user: user.toJSON(),
-      });
-      return updateRaidAnnouncement(discord, raid);
-    });
-
-    raidEvents.on("raidSignout", async (raid: Raid, user: User) => {
-      logger.info(`User ${user.displayName} left raid: ${raid.id}`, {
-        raid,
-        user: user.toJSON(),
-      });
-      return updateRaidAnnouncement(discord, raid);
-    });
-  },
-};
-
-export default raidsController;

@@ -1,4 +1,3 @@
-import raidsController from "@/controllers/raids";
 import { Raid, RaidSlot, Role } from "@albion-raid-manager/database/models";
 import {
   ActionRowBuilder,
@@ -12,6 +11,7 @@ import {
   StringSelectMenuOptionBuilder,
   User,
 } from "discord.js";
+import { raids } from ".";
 
 const emojis = {
   [Role.CALLER]: "🧠",
@@ -23,7 +23,7 @@ const emojis = {
   [Role.BATTLEMOUNT]: "🐎",
 };
 
-export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
+export const createRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
   raid: Raid,
   slots: RaidSlot[],
 ): T => {
@@ -54,12 +54,12 @@ export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | Mess
   });
 
   const signupButton = new ButtonBuilder()
-    .setCustomId(`${raidsController.id}:signup:${raid.id}`)
+    .setCustomId(`${raids.id}:signup:${raid.id}`)
     .setLabel("Sign Up")
     .setStyle(ButtonStyle.Success);
 
   const signoutButon = new ButtonBuilder()
-    .setCustomId(`${raidsController.id}:signout:${raid.id}`)
+    .setCustomId(`${raids.id}:signout:${raid.id}`)
     .setLabel("Leave")
     .setStyle(ButtonStyle.Danger);
 
@@ -73,7 +73,7 @@ export const getRaidAnnouncementMessage = <T extends MessageCreateOptions | Mess
 
 export const createRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User[]): InteractionReplyOptions => {
   const menu = new StringSelectMenuBuilder()
-    .setCustomId(`${raidsController.id}:select:${raid.id}`)
+    .setCustomId(`${raids.id}:select:${raid.id}`)
     .setPlaceholder("Select a build");
 
   for (const slot of slots) {
