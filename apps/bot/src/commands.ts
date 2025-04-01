@@ -1,7 +1,15 @@
 import { runIfChanged } from "@albion-raid-manager/common/helpers/fileCache";
 import config from "@albion-raid-manager/config";
 import logger from "@albion-raid-manager/logger";
-import { APIApplicationCommand, Collection, Interaction, REST, Routes, SlashCommandBuilder } from "discord.js";
+import {
+  APIApplicationCommand,
+  Collection,
+  Interaction,
+  MessageFlags,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+} from "discord.js";
 import { Module } from "./modules";
 
 if (!config.discord.token || !config.discord.clientId) {
@@ -52,4 +60,32 @@ export async function deployCommands() {
       ignoreCache: (result) => !result,
     },
   );
+}
+
+export async function handleCommand(interaction: Interaction) {
+  if (!interaction.isChatInputCommand() || !interaction.guild) return;
+
+  const command = commands.get(interaction.commandName);
+  if (!command) {
+    logger.error(`${interaction.commandName} ~ Command is not loaded.`);
+    await interaction.reply({ content: "Command not found.", flags: MessageFlags.Ephemeral });
+    return;
+  }
+
+  try {
+    await command.execute(interaction);
+  } catch (error) {
+    logger.error(`${command.data.name} ~ Error:`, error);
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({
+        content: "There was an error while executing this command!",
+        flags: MessageFlags.Ephemeral,
+      });
+    } else {
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+  }
 }

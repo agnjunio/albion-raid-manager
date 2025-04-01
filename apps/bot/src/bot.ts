@@ -1,6 +1,7 @@
 import config from "@albion-raid-manager/config";
 import logger from "@albion-raid-manager/logger";
 import { Client, Events, Partials } from "discord.js";
+import { deployCommands, handleCommand } from "./commands";
 import { initModules } from "./modules";
 
 export const discord = new Client({
@@ -23,6 +24,7 @@ async function run() {
 
   logger.info("Starting the Bot Client.");
   await initModules({ discord });
+  await deployCommands();
   await discord.login(config.discord.token);
 }
 
@@ -41,6 +43,8 @@ discord.on(Events.ShardReady, async (shardId) => {
   process.env.SHARD = shardId.toString();
   logger.info(`Shard online! Bot user: ${discord.user?.tag}. Guild count: ${discord.guilds.cache.size}`);
 });
+
+discord.on(Events.InteractionCreate, handleCommand);
 
 // discord.on(Events.Debug, (message) => logger.debug(message));
 
