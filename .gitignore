@@ -2,6 +2,7 @@
 .env
 .turbo
 .next
+.cache
 
 # Generic outputs
 dist/

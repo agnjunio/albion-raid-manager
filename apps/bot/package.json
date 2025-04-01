@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node .",
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register -r dotenv/config .",
+    "commands:deploy": "MODE=commands ts-node .",
     "lint": "eslint src/",
     "lint:fix": "eslint --fix src/",
     "prettier": "prettier -c src/",

@@ -1,5 +1,6 @@
 import logger from "@albion-raid-manager/logger";
-import { Client, Collection, Events, Interaction, SlashCommandBuilder } from "discord.js";
+import { Client, Collection, Events, MessageFlags } from "discord.js";
+import { Command, commands, deployCommands, loadCommands } from "./commands";
 import { raids } from "./raids";
 
 export interface ModuleParams {
@@ -13,46 +14,36 @@ export type Module = {
   onReady?: ({ discord }: ModuleParams) => Promise<void>;
 };
 
-export type Command = {
-  data: SlashCommandBuilder;
-  handle: (interaction: Interaction) => Promise<void>;
-};
+export const MODULES_LIST: Module[] = [raids];
+export const modules = new Collection<Module["id"], Module>();
 
-const modules: Module[] = [raids];
-const commands = new Collection();
-
-async function loadCommands(module: Module) {
-  for (const command of module.commands) {
-    if (!command.data) {
-      logger.warn(`${module.id} ~ Command load has missing data. Skipping.`);
-      continue;
-    }
-
-    commands.set(command.data.name, command);
-    logger.debug(`${module.id} ~ Command loaded ~ ${command.data.name}`);
-  }
-}
-
-export async function loadModules({ discord }: ModuleParams) {
-  for (const module of modules) {
+export async function initModules({ discord }: ModuleParams) {
+  // Load modules and commands
+  for (const module of MODULES_LIST) {
     try {
-      logger.info(`Module loaded: ${module.id}`);
-
       if (module.onLoad) {
         await module.onLoad({ discord });
       }
 
-      // Detect commands
-      await loadCommands(module);
+      modules.set(module.id, module);
+      logger.info(`Module loaded: ${module.id}`);
+
+      if (module.commands) {
+        await loadCommands(module);
+      }
     } catch (error) {
       logger.error(`${module.id} ~ Load error:`, error);
     }
   }
 
+  // Deploy commands in background
+  await deployCommands();
+
+  // Initialize callbacks
   discord.on(Events.ClientReady, async (discord: Client) => {
     logger.debug("ClientReady");
 
-    for (const module of modules) {
+    for (const module of modules.values()) {
       try {
         if (module.onReady) {
           module.onReady({ discord });
@@ -67,5 +58,29 @@ export async function loadModules({ discord }: ModuleParams) {
 
   discord.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand() || !interaction.guild) return;
+
+    const command = commands.get(interaction.commandName);
+    if (!command) {
+      logger.error(`${interaction.commandName} ~ Command is not loaded.`);
+      await interaction.reply({ content: "Command not found.", flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    try {
+      await command.execute(interaction);
+    } catch (error) {
+      logger.error(`${command.data.name} ~ Error:`, error);
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      } else {
+        await interaction.reply({
+          content: "There was an error while executing this command!",
+          flags: MessageFlags.Ephemeral,
+        });
+      }
+    }
   });
 }

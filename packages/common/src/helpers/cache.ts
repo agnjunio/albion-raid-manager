@@ -11,7 +11,7 @@ type CacheOptions = {
   timeout?: number;
   refresh?: number;
   debug?: boolean;
-  ignore?: boolean;
+  ignoreCache?: (value: unknown) => boolean;
   onTimeout?: (key: string, value: unknown) => void;
 };
 
@@ -44,9 +44,9 @@ export function get(key: string, { debug = false }: { debug?: boolean }) {
   return data.value;
 }
 
-export function set(key: string, value: unknown, { timeout, onTimeout, debug = false, ignore }: CacheOptions) {
-  // If the value is strict equal to ignore, ignore cache
-  if (value === ignore) return value;
+export function set(key: string, value: unknown, { timeout, onTimeout, debug = false, ignoreCache }: CacheOptions) {
+  // Don't cache if the callback is true
+  if (ignoreCache && ignoreCache(value)) return value;
 
   if (timeout && typeof timeout !== "number") throw new Error("Timeout for cache must be a valid number.");
   if (onTimeout && typeof onTimeout !== "function")
@@ -78,19 +78,21 @@ export function set(key: string, value: unknown, { timeout, onTimeout, debug = f
 export async function memoize(
   key: string,
   fn: () => void,
-  { timeout, onTimeout, debug, ignore, refresh }: CacheOptions,
+  { timeout, onTimeout, debug, ignoreCache, refresh }: CacheOptions,
 ) {
-  // If entry exists and has data, return it
-  let value = get(key, { debug });
-  if (value) return value;
-
   if (timeout && typeof timeout !== "number") throw new Error("Cache 'timeout' option must be a valid number.");
   if (refresh && typeof refresh !== "number") throw new Error("Cache 'refresh' option must be a valid number.");
   if (onTimeout && typeof onTimeout !== "function") throw new Error("Cache 'onTimeout' must be a valid function.");
 
-  value = await fn();
-  set(key, value, { timeout, onTimeout, debug, ignore });
+  // 1. In-memory check
+  let value = get(key, { debug });
+  if (value) return value;
 
+  // 2. Generate value
+  value = await fn();
+  set(key, value, { timeout, onTimeout, debug, ignoreCache });
+
+  // 3. Refresh logic
   if (refresh) {
     const data = cache.get(key);
 

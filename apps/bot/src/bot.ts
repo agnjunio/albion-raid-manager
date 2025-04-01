@@ -1,7 +1,7 @@
 import config from "@albion-raid-manager/config";
 import logger from "@albion-raid-manager/logger";
 import { Client, Events, Partials } from "discord.js";
-import { loadModules } from "./modules";
+import { initModules } from "./modules";
 
 export const discord = new Client({
   intents: [],
@@ -16,17 +16,17 @@ export const discord = new Client({
   ],
 });
 
-export async function run() {
+async function run() {
   if (!config.discord.token) {
     throw new Error("Please define the discord token.");
   }
 
   logger.info("Starting the Bot Client.");
-  await loadModules({ discord });
+  await initModules({ discord });
   await discord.login(config.discord.token);
 }
 
-export async function cleanup() {
+async function cleanup() {
   logger.info("Shutting down Bot Client.");
   discord.removeAllListeners();
   await discord.destroy();
@@ -41,6 +41,8 @@ discord.on(Events.ShardReady, async (shardId) => {
   process.env.SHARD = shardId.toString();
   logger.info(`Shard online! Bot user: ${discord.user?.tag}. Guild count: ${discord.guilds.cache.size}`);
 });
+
+// discord.on(Events.Debug, (message) => logger.debug(message));
 
 export default {
   run,
