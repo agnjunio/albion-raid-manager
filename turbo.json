@@ -4,7 +4,8 @@
     "db:generate": {
       "inputs": ["prisma/schema.prisma"],
       "outputs": ["node_modules/.prisma", "node_modules/@prisma/client"],
-      "cache": false
+      "cache": false,
+      "env": ["DATABASE_URL"]
     },
 
     "start": {},
@@ -14,8 +15,11 @@
       "persistent": true
     },
     "build": {
+      "dependsOn": ["^db:generate"]
+    },
+    "build#web": {
       "dependsOn": ["^db:generate"],
-      "env": ["DATABASE_URL"]
+      "outputs": [".next/***", "!.next/cache/**"]
     },
     "lint": {},
     "prettier": {}
