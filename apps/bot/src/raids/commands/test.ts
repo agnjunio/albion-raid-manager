@@ -3,7 +3,7 @@ import logger from "@albion-raid-manager/logger";
 import { Interaction, SlashCommandBuilder } from "discord.js";
 
 async function execute(interaction: Interaction) {
-  logger.debug("🚀 ~ test.ts:6 ~ handle ~ interaction:", interaction);
+  logger.debug(interaction);
 }
 
 export const testCommand: Command = {

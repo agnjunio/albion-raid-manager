@@ -21,6 +21,5 @@
   },
   "turboConsoleLog.includeFilename": true,
   "turboConsoleLog.includeLineNum": true,
-  "turboConsoleLog.logFunction": "logger.debug",
   "turboConsoleLog.addSemicolonInTheEnd": true
 }

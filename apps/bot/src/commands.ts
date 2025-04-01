@@ -67,7 +67,7 @@ export async function handleCommand(interaction: Interaction) {
 
   const command = commands.get(interaction.commandName);
   if (!command) {
-    logger.error(`${interaction.commandName} ~ Command is not loaded.`);
+    logger.error(`handleCommand ~ ${interaction.commandName} ~ Command is not loaded.`);
     await interaction.reply({ content: "Command not found.", flags: MessageFlags.Ephemeral });
     return;
   }
@@ -75,7 +75,8 @@ export async function handleCommand(interaction: Interaction) {
   try {
     await command.execute(interaction);
   } catch (error) {
-    logger.error(`${command.data.name} ~ Error:`, error);
+    console.log(error);
+    logger.error(`handleCommand ~ ${command.data.name} ~ Error:`, error);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: "There was an error while executing this command!",
