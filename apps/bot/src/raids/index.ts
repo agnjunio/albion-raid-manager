@@ -3,7 +3,7 @@ import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { logger } from "@albion-raid-manager/logger";
 import { Events } from "discord.js";
 import { testCommand } from "./commands/test";
-import { handleAnnounceRaids, handleSelect, handleSignout, handleSignup } from "./handlers";
+import { handleAnnounceRaids, handleSelectRole, handleSignout, handleSignup } from "./handlers";
 
 export const raids: Module = {
   id: "raids",
@@ -23,7 +23,7 @@ export const raids: Module = {
 
       if (controllerId !== raids.id) return;
       if (action === "signup") return handleSignup({ discord, interaction });
-      if (action === "select") return handleSelect({ discord, interaction });
+      if (action === "select") return handleSelectRole({ discord, interaction });
       if (action === "signout") return handleSignout({ discord, interaction });
 
       logger.warn(`Unknown action: ${interaction.customId}`, { interaction: interaction.toJSON() });

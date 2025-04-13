@@ -5,7 +5,7 @@ import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
 import { Client, Interaction, MessageCreateOptions, MessageEditOptions } from "discord.js";
 import { raidEvents } from "./events";
-import { createRaidAnnouncementMessage, createRaidSignupReply } from "./messages";
+import { buildRaidAnnouncementMessage, buildRaidSignupReply } from "./messages";
 
 export const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
   logger.verbose("Checking for raid announcements");
@@ -45,7 +45,7 @@ export const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
       if (!channel.isTextBased())
         throw new Error(`Announcement channel is not a text channel: ${raid.guild.announcementChannelId}`);
 
-      const message = await channel.send(createRaidAnnouncementMessage<MessageCreateOptions>(raid, raid.slots));
+      const message = await channel.send(buildRaidAnnouncementMessage<MessageCreateOptions>(raid, raid.slots));
 
       await prisma.raid.update({
         where: { id: raid.id },
@@ -83,7 +83,7 @@ export const handleSignup = async ({ discord, interaction }: { discord: Client; 
     const users = await Promise.all(
       raid.slots.filter((slot) => !!slot.userId).map(async (slot) => discord.users.fetch(slot.userId as string)),
     );
-    await interaction.reply(createRaidSignupReply(raid, raid.slots, users));
+    await interaction.reply(buildRaidSignupReply(raid, raid.slots, users));
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
@@ -96,7 +96,7 @@ export const handleSignup = async ({ discord, interaction }: { discord: Client; 
   }
 };
 
-export const handleSelect = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
+export const handleSelectRole = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
   if (!interaction.isStringSelectMenu()) return;
 
   try {
@@ -246,5 +246,5 @@ export const updateRaidAnnouncement = async (discord: Client, raid: Raid) => {
   const slots = await prisma.raidSlot.findMany({
     where: { raidId: raid.id },
   });
-  await message.edit(createRaidAnnouncementMessage<MessageEditOptions>(raid, slots));
+  await message.edit(buildRaidAnnouncementMessage<MessageEditOptions>(raid, slots));
 };

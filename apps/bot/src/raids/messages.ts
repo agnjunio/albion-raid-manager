@@ -23,7 +23,7 @@ const emojis = {
   [Role.BATTLEMOUNT]: "🐎",
 };
 
-export const createRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
+export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
   raid: Raid,
   slots: RaidSlot[],
 ): T => {
@@ -71,7 +71,7 @@ export const createRaidAnnouncementMessage = <T extends MessageCreateOptions | M
   } as unknown as T;
 };
 
-export const createRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User[]): InteractionReplyOptions => {
+export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User[]): InteractionReplyOptions => {
   const menu = new StringSelectMenuBuilder()
     .setCustomId(`${raids.id}:select:${raid.id}`)
     .setPlaceholder("Select a build");
