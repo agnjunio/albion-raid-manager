@@ -75,7 +75,6 @@ export async function handleCommand(interaction: Interaction) {
   try {
     await command.execute(interaction);
   } catch (error) {
-    console.log(error);
     logger.error(`handleCommand ~ ${command.data.name} ~ Error:`, error);
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({

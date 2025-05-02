@@ -1,6 +1,7 @@
 import { nextAuthOptions } from "@/lib/auth";
 import type { Server } from "@albion-raid-manager/discord";
-import { getUserGuilds } from "@albion-raid-manager/discord";
+import { getUserGuilds, isAxiosError } from "@albion-raid-manager/discord";
+import logger from "@albion-raid-manager/logger";
 import { faChevronCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getServerSession } from "next-auth";
@@ -12,7 +13,13 @@ export default async function Page() {
   const session = await getServerSession(nextAuthOptions);
   if (!session?.accessToken) return redirect("/");
 
-  const servers: Server[] = (await getUserGuilds(session.accessToken)).filter((server) => server.admin);
+  let servers: Server[] = [];
+  try {
+    servers = (await getUserGuilds(session.accessToken)).filter((server) => server.admin);
+  } catch (error) {
+    if (isAxiosError(error) && error.status === 401) return redirect("/");
+    logger.error(`Failed to fetch user guilds:`, error);
+  }
 
   return (
     <div className="flex min-h-screen flex-col justify-center gap-3 p-4">

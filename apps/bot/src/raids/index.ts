@@ -2,12 +2,12 @@ import { Module } from "@/modules";
 import { runCronjob } from "@albion-raid-manager/common/scheduler";
 import { logger } from "@albion-raid-manager/logger";
 import { Events } from "discord.js";
-import { testCommand } from "./commands/test";
+import { raidCommand } from "./commands/raid";
 import { handleAnnounceRaids, handleSelectRole, handleSignout, handleSignup } from "./handlers";
 
 export const raids: Module = {
   id: "raids",
-  commands: [testCommand],
+  commands: [raidCommand],
   onReady: async ({ discord }) => {
     runCronjob({
       name: "Announce Raids",
