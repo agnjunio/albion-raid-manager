@@ -45,10 +45,20 @@ function CommandDialog({
   );
 }
 
-function CommandInput({ className, ...props }: React.ComponentProps<typeof CommandPrimitive.Input>) {
+function CommandInput({
+  borderBottom = true,
+  searchIcon = true,
+  className,
+  ...props
+}: React.ComponentProps<typeof CommandPrimitive.Input> & { borderBottom?: boolean; searchIcon?: boolean }) {
   return (
-    <div data-slot="command-input-wrapper" className="flex h-9 items-center gap-2 border-b px-3">
-      <FontAwesomeIcon icon={faSearch} className="size-4 shrink-0 opacity-50" />
+    <div
+      data-slot="command-input-wrapper"
+      className={cn("flex h-9 items-center gap-2 px-3", {
+        "border-b": borderBottom,
+      })}
+    >
+      {searchIcon && <FontAwesomeIcon icon={faSearch} className="size-4 shrink-0 opacity-50" />}
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(

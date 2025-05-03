@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,8 @@ import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { GuildWithMembers } from "@/types/database";
@@ -45,7 +48,17 @@ const links = [
   { href: "raids", label: "Raids", icon: faFlag },
   { href: "compositions", label: "Compositions", icon: faPeopleGroup },
   { href: "members", label: "Members", icon: faUsers },
-  { href: "settings", label: "Settings", icon: faGear },
+  {
+    href: "settings",
+    label: "Settings",
+    icon: faGear,
+    submenu: [
+      {
+        href: "raids",
+        label: "Raids",
+      },
+    ],
+  },
 ];
 
 interface GuildSelectionProps {
@@ -94,14 +107,31 @@ export function DashboardSidebar() {
             <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarMenu>
               {links.map((link) => (
-                <SidebarMenuItem key={link.label}>
-                  <SidebarMenuButton asChild>
-                    <Link href={`/dashboard/${selectedGuild.id}/${link.href}`}>
-                      <FontAwesomeIcon icon={link.icon} />
-                      <span>{link.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <Collapsible defaultOpen key={link.label}>
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton asChild>
+                        <Link href={link.submenu ? "#" : `/dashboard/${selectedGuild.id}/${link.href}`}>
+                          <FontAwesomeIcon icon={link.icon} />
+                          <span>{link.label}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      {link.submenu && (
+                        <SidebarMenuSub>
+                          {link.submenu.map((sublink) => (
+                            <SidebarMenuSubButton asChild key={sublink.href}>
+                              <Link href={`/dashboard/${selectedGuild.id}/${link.href}/${sublink.href}`}>
+                                <span className="pl-1.5">{sublink.label}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          ))}
+                        </SidebarMenuSub>
+                      )}
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
               ))}
             </SidebarMenu>
           </SidebarGroup>

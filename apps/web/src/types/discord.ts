@@ -1,5 +1,3 @@
-export * from "discord-api-types/v10";
-
 export type Server = {
   id: string;
   name: string;
@@ -15,6 +13,6 @@ export enum ChannelType {
 export interface Channel {
   id: string;
   name: string;
-  type: ChannelType;
+  type?: ChannelType;
   parentId?: string;
 }
