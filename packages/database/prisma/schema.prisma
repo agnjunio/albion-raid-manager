@@ -26,8 +26,8 @@ model Guild {
 }
 
 model GuildMember {
-  guild   Guild           @relation(fields: [guildId], references: [id])
-  user    User            @relation(fields: [userId], references: [id])
+  guild   Guild           @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   guildId String
   userId  String
   default Boolean         @default(false)
@@ -50,34 +50,36 @@ model User {
   RaidSlot    RaidSlot[]
 }
 
-// Raids and Compositions
-model Composition {
-  id        String             @id @default(uuid())
-  name      String
-  Guild     Guild              @relation(fields: [guildId], references: [id])
-  guildId   String
-  builds    CompositionBuild[]
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
-}
-
-model CompositionBuild {
+// Compositions
+model Build {
   id            String      @id @default(uuid())
   composition   Composition @relation(fields: [compositionId], references: [id])
   compositionId String
+  raidSlots     RaidSlot[]
   name          String
   role          Role
   comment       String?
   count         Int         @default(1)
 }
 
+model Composition {
+  id        String   @id @default(uuid())
+  name      String
+  guild     Guild    @relation(fields: [guildId], references: [id])
+  guildId   String
+  builds    Build[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Raids
 model Raid {
   id                    String     @id @default(uuid())
   guild                 Guild      @relation(fields: [guildId], references: [id])
   guildId               String
   description           String
   date                  DateTime
-  allowLateJoin         Boolean    @default(false)
+  allowLateJoin         Boolean    @default(true)
   status                RaidStatus @default(SCHEDULED)
   announcementMessageId String?
   slots                 RaidSlot[]
@@ -88,14 +90,23 @@ model Raid {
 model RaidSlot {
   id        String    @id @default(uuid())
   name      String
-  role      Role
   comment   String?
-  Raid      Raid?     @relation(fields: [raidId], references: [id])
+  raid      Raid?     @relation(fields: [raidId], references: [id])
   raidId    String?
   user      User?     @relation(fields: [userId], references: [id])
   userId    String?
+  build     Build?    @relation(fields: [buildId], references: [id])
+  buildId   String?
   createdAt DateTime  @default(now())
   joinedAt  DateTime?
+}
+
+enum RaidStatus {
+  SCHEDULED
+  OPEN
+  CLOSED
+  ONGOING
+  FINISHED
 }
 
 enum Role {
@@ -106,12 +117,4 @@ enum Role {
   RANGED_DPS
   MELEE_DPS
   BATTLEMOUNT
-}
-
-enum RaidStatus {
-  SCHEDULED
-  OPEN
-  CLOSED
-  ONGOING
-  FINISHED
 }
