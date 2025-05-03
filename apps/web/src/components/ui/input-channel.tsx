@@ -72,14 +72,20 @@ export const InputChannel = ({ channels, value, onChannelChange, ...props }: Pro
   };
 
   return (
-    <div className={cn("space-y-2", props.className)}>
-      <Command className="rounded-md border">
+    <div className={cn(props.className)}>
+      <Command className="group">
         <div className="relative">
           <CommandInput
-            borderBottom={autoComplete}
+            borderBottom={false}
             searchIcon={false}
             value={inputText}
             onValueChange={handleInputChange}
+            className={cn(
+              "group-focus-within:border-ring group-focus-within:ring-ring/50 group-focus-within:ring-[3px]",
+              {
+                "rounded-b-none": autoComplete,
+              },
+            )}
             {...props}
           />
           <div className="absolute bottom-0 right-3 top-0 flex items-center gap-2">
@@ -90,9 +96,8 @@ export const InputChannel = ({ channels, value, onChannelChange, ...props }: Pro
         </div>
 
         <CommandList
-          className={cn({
+          className={cn("border-border group-focus-within:border-ring scroll-py-0 rounded-b-lg border border-t-0", {
             hidden: !autoComplete,
-            "scroll-py-0": !autoComplete,
           })}
         >
           <CommandEmpty>No results found</CommandEmpty>

@@ -13,7 +13,7 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
     <CommandPrimitive
       data-slot="command"
       className={cn(
-        "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
+        "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-visible rounded-md",
         className,
       )}
       {...props}
@@ -54,19 +54,23 @@ function CommandInput({
   return (
     <div
       data-slot="command-input-wrapper"
-      className={cn("flex h-9 items-center gap-2 px-3", {
+      className={cn("relative flex h-9 items-center gap-2", {
         "border-b": borderBottom,
       })}
     >
-      {searchIcon && <FontAwesomeIcon icon={faSearch} className="size-4 shrink-0 opacity-50" />}
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
-          "placeholder:text-muted-foreground outline-hidden flex h-10 w-full rounded-md bg-transparent py-3 text-sm disabled:cursor-not-allowed disabled:opacity-50",
+          "inset-0 disabled:cursor-not-allowed disabled:opacity-50",
+          "border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground shadow-xs flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base outline-none transition-[color,box-shadow] file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+          { "pl-7": searchIcon },
           className,
         )}
         {...props}
       />
+      {searchIcon && <FontAwesomeIcon icon={faSearch} className="absolute left-2 size-4 shrink-0 opacity-50" />}
     </div>
   );
 }

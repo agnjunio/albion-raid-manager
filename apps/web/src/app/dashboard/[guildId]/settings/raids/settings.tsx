@@ -67,7 +67,7 @@ export function RaidSettings() {
                 <FormLabel>Pings Channel</FormLabel>
                 <FormControl>
                   <InputChannel
-                    placeholder="Pings channel"
+                    placeholder="Enter pings channel..."
                     channels={channels}
                     onChannelChange={(channel) => {
                       form.setValue("pingChannel", channel);
