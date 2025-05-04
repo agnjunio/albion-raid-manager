@@ -24,6 +24,7 @@ import {
   SidebarMenuSubButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { links } from "@/lib/menu";
 import { GuildWithMembers } from "@/types/database";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
@@ -31,35 +32,14 @@ import {
   faArrowRightFromBracket,
   faCheck,
   faChevronDown,
-  faFlag,
-  faGear,
-  faPeopleGroup,
   faPlus,
   faShield,
-  faUsers,
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useDashboardContext } from "./context";
-
-const links = [
-  { href: "raids", label: "Raids", icon: faFlag },
-  { href: "compositions", label: "Compositions", icon: faPeopleGroup },
-  { href: "members", label: "Members", icon: faUsers },
-  {
-    href: "settings",
-    label: "Settings",
-    icon: faGear,
-    submenu: [
-      {
-        href: "raids",
-        label: "Raids",
-      },
-    ],
-  },
-];
 
 interface GuildSelectionProps {
   guild?: GuildWithMembers;
