@@ -3,7 +3,7 @@ import { discordService } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";
 import { ActionResponse } from ".";
 
-export async function upsertUser(userId: string) {
+export async function updateUser(userId: string) {
   try {
     const user = await discordService.users.getUser(userId);
 
@@ -11,12 +11,12 @@ export async function upsertUser(userId: string) {
       where: { id: user.id },
       create: {
         id: user.id,
-        username: user.name || "Usuário Desconhecido",
-        avatar: user.image,
+        username: user.username ?? "Usuário Desconhecido",
+        avatar: user.avatar,
       },
       update: {
-        username: user.name || "Usuário Desconhecido",
-        avatar: user.image,
+        username: user.username ?? "Usuário Desconhecido",
+        avatar: user.avatar,
       },
     });
   } catch (error) {
