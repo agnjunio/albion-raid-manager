@@ -27,12 +27,13 @@ model Guild {
 }
 
 model GuildMember {
-  guild   Guild           @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guildId String
-  userId  String
-  default Boolean         @default(false)
-  role    GuildMemberRole @default(PLAYER)
+  guild    Guild           @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guildId  String
+  userId   String
+  nickname String?
+  default  Boolean         @default(false)
+  role     GuildMemberRole @default(PLAYER)
 
   @@id([guildId, userId])
 }

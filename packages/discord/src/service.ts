@@ -91,7 +91,7 @@ export async function getBotGuilds() {
   );
 }
 
-export async function getServer(guildId: string) {
+export async function getGuild(guildId: string) {
   return memoize<Server>(
     `discord.guilds.${guildId}`,
     async () => {
@@ -220,11 +220,11 @@ export const discordService = {
   users: {
     getCurrentUser,
     getUser,
-    getServer,
   },
   guilds: {
     getUserGuilds,
     getBotGuilds,
+    getGuild,
     getMembers,
   },
 };

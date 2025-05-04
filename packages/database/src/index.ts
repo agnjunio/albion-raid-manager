@@ -1,5 +1,5 @@
 import logger from "@albion-raid-manager/logger";
-import { PrismaClient } from "../.prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 declare const global: Global & { prisma?: PrismaClient };
 
