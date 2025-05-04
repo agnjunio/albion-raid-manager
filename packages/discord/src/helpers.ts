@@ -1,4 +1,5 @@
 import { APIGuild, APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
+import { Server } from "./types";
 
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;
 export const PERMISSIONS: {
@@ -48,7 +49,7 @@ export function transformUser(user: APIUser) {
   };
 }
 
-export function transformGuild(guild: APIGuild) {
+export function transformGuild(guild: APIGuild): Server {
   const transformedGuild = {
     id: guild.id,
     name: guild.name,

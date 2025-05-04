@@ -1,6 +1,10 @@
-export default function Loading() {
+interface Props {
+  label?: string;
+}
+
+export default function Loading({ label }: Props) {
   return (
-    <div className="flex h-full items-center justify-center p-4">
+    <div className="flex h-full flex-col items-center justify-center gap-2 p-4">
       <div role="status">
         <svg
           aria-hidden="true"
@@ -20,6 +24,7 @@ export default function Loading() {
         </svg>
         <span className="sr-only">Loading...</span>
       </div>
+      {label && <p className="text-muted-foreground text-center text-sm">{label}</p>}
     </div>
   );
 }

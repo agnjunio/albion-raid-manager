@@ -6,7 +6,7 @@ import { prisma } from "@albion-raid-manager/database";
 import { Raid } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
 import { z } from "zod";
-import { ActionResponse } from "./action-response";
+import { ActionResponse } from ".";
 
 type CreateRaidSuccessResponse = {
   raid: Raid;

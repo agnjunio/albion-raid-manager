@@ -75,9 +75,9 @@ export function set(key: string, value: unknown, { timeout, onTimeout, debug = f
   return value;
 }
 
-export async function memoize(
+export async function memoize<T>(
   key: string,
-  fn: () => void,
+  fn: () => T | Promise<T>,
   { timeout, onTimeout, debug, ignoreCache, refresh }: CacheOptions,
 ) {
   if (timeout && typeof timeout !== "number") throw new Error("Cache 'timeout' option must be a valid number.");
@@ -85,7 +85,7 @@ export async function memoize(
   if (onTimeout && typeof onTimeout !== "function") throw new Error("Cache 'onTimeout' must be a valid function.");
 
   // 1. In-memory check
-  let value = get(key, { debug });
+  let value: T = get(key, { debug });
   if (value) return value;
 
   // 2. Generate value
