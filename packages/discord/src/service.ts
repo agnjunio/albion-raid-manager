@@ -91,11 +91,11 @@ export async function getBotGuilds() {
   );
 }
 
-export async function getGuild(guildId: string) {
-  return memoize(
+export async function getServer(guildId: string) {
+  return memoize<Server>(
     `discord.guilds.${guildId}`,
     async () => {
-      const res = await discordApiClient.get(`/guilds/${guildId}`, {
+      const res = await discordApiClient.get<APIGuild>(`/guilds/${guildId}`, {
         headers: {
           Authorization: `Bot ${DISCORD_TOKEN}`,
         },

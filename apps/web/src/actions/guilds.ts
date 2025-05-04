@@ -1,12 +1,12 @@
 "use server";
 
-import { ActionResponse } from "@/actions/action-response";
+import { ActionResponse } from "@/actions";
 import { prisma } from "@albion-raid-manager/database";
 import { Guild } from "@albion-raid-manager/database/models";
-import type { Server } from "@albion-raid-manager/discord";
+import { getServer, type Server } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";
 
-type CreateGuildSuccessResponse = {
+export type CreateGuildSuccessResponse = {
   guild: Guild;
 };
 
@@ -43,5 +43,16 @@ export async function createGuild(server: Server, userId: string) {
   } catch (error) {
     logger.error(`Failed to create guild for server ${server.id}`, error);
     return ActionResponse.Failure("CREATE_GUILD_FAILED");
+  }
+}
+
+export async function verifyServer(server: Server) {
+  try {
+    const verifiedServer = await getServer(server.id);
+    if (!verifiedServer) throw new Error("Failed to find server.");
+    return ActionResponse.Success(verifiedServer);
+  } catch (error) {
+    logger.error(`Failed to verify server ${server.name}`, { error, server });
+    return ActionResponse.Failure("SERVER_VERIFICATION_FAILED");
   }
 }
