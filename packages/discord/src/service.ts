@@ -2,7 +2,7 @@ import { memoize } from "@albion-raid-manager/common/helpers/cache";
 import { sleep } from "@albion-raid-manager/common/scheduler";
 import { getMilliseconds } from "@albion-raid-manager/common/utils/time";
 import config from "@albion-raid-manager/config";
-import { APIGuild } from "discord-api-types/v10";
+import { APIGuild, APIGuildMember } from "discord-api-types/v10";
 import { discordApiClient } from "./client";
 import { transformChannel, transformGuild, transformUser } from "./helpers";
 import { Server } from "./types";
@@ -197,4 +197,34 @@ export const sendMessage = async (channelId: string, payload: any) => {
     },
   });
   return res.data;
+};
+
+function getMembers(guildId: string) {
+  return memoize<APIGuildMember[]>(
+    `discord.guilds.${guildId}.members`,
+    async () => {
+      const res = await discordApiClient.get(`/guilds/${guildId}/members`, {
+        headers: {
+          Authorization: `Bot ${DISCORD_TOKEN}`,
+        },
+      });
+      return res.data;
+    },
+    {
+      timeout: getMilliseconds(30, "seconds"),
+    },
+  );
+}
+
+export const discordService = {
+  users: {
+    getCurrentUser,
+    getUser,
+    getServer,
+  },
+  guilds: {
+    getUserGuilds,
+    getBotGuilds,
+    getMembers,
+  },
 };
