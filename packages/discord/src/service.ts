@@ -207,6 +207,9 @@ function getMembers(guildId: string) {
         headers: {
           Authorization: `Bot ${DISCORD_TOKEN}`,
         },
+        params: {
+          limit: 1000, // TODO: Paginate
+        },
       });
       return res.data;
     },

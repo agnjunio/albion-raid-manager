@@ -1,6 +1,6 @@
 "use client";
 
-import { detectServerMembers } from "@/actions/guildMembers";
+import { syncServerMembers } from "@/actions/guildMembers";
 import { MemberBadge } from "@/components/guildMembers/member-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ export function MembersList() {
 
   const handleSyncMembers = async () => {
     setIsSyncing(true);
-    const response = await detectServerMembers(guildId);
+    const response = await syncServerMembers(guildId);
     if (response.success) {
       setGuildMembers(response.data.guildMembers);
     }
@@ -46,7 +46,7 @@ export function MembersList() {
             className="hover:bg-muted/50 flex cursor-pointer items-center rounded-md px-3 py-2 transition-colors duration-150"
           >
             <Avatar className="mr-3 h-8 w-8">
-              <AvatarImage src={getUserPictureUrl(member.user.id, member.user.avatar)} />
+              <AvatarImage src={getUserPictureUrl(member.user.id, member.user.avatar)} className="z-0" />
               <AvatarFallback>{member.user.username.substring(0, 1).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex gap-2">

@@ -3,8 +3,10 @@
 import { ActionResponse } from "@/actions";
 import { GuildMemberWithUser } from "@/types/database";
 import { prisma } from "@albion-raid-manager/database";
+import { GuildMemberRole } from "@albion-raid-manager/database/models";
 import { discordService } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";
+import { syncUsers } from "./users";
 
 export type GetGuildMembersSuccessResponse = {
   guildMembers: GuildMemberWithUser[];
@@ -30,7 +32,7 @@ export async function getGuildMembers(guildId: string) {
   }
 }
 
-export async function detectServerMembers(serverId: string) {
+export async function syncServerMembers(serverId: string) {
   try {
     const server = await prisma.guild.findUnique({
       where: {
@@ -43,47 +45,61 @@ export async function detectServerMembers(serverId: string) {
     }
 
     const serverMembers = await discordService.guilds.getMembers(server.discordId);
-
     if (!serverMembers) {
       return ActionResponse.Failure("SERVER_MEMBERS_NOT_FOUND");
     }
 
-    const guildMembers = await prisma.$transaction(async (tx) => {
-      for (const member of serverMembers) {
-        await tx.user.upsert({
-          where: {
-            id: member.user.id,
-          },
-          update: {
-            username: member.user.username,
-            avatar: member.user.avatar,
-          },
-          create: {
-            id: member.user.id,
-            username: member.user.username,
-            avatar: member.user.avatar,
-          },
-        });
+    const syncResponse = await syncUsers(serverMembers.map((member) => member.user));
+    if (!syncResponse.success) {
+      return syncResponse;
+    }
 
-        const role = "PLAYER"; // TODO: Add role detection
-        await tx.guildMember.upsert({
-          where: {
-            guildId_userId: {
-              guildId: server.id,
-              userId: member.user.id,
-            },
-          },
-          update: {
-            nickname: member.nick ?? member.user.global_name,
-          },
-          create: {
-            guildId: server.id,
-            userId: member.user.id,
-            nickname: member.nick ?? member.user.global_name,
-            role,
-          },
-        });
-      }
+    const guildMembers = await prisma.$transaction(async (tx) => {
+      const currentGuildMembers = await tx.guildMember.findMany({
+        where: {
+          guildId: server.id,
+        },
+      });
+
+      // Remove guild members that are not in the server members
+      await tx.guildMember.deleteMany({
+        where: {
+          guildId: server.id,
+          userId: { notIn: serverMembers.map((member) => member.user.id) },
+        },
+      });
+
+      // Create guild members that are not in the database
+      const guildMembersToCreate = serverMembers
+        .filter((member) => !currentGuildMembers.some((currentMember) => currentMember.userId === member.user.id))
+        .map((member) => ({
+          guildId: server.id,
+          userId: member.user.id,
+          nickname: member.nick ?? member.user.global_name,
+          role: GuildMemberRole.PLAYER, // TODO: Add role detection
+        }));
+
+      await tx.guildMember.createMany({
+        data: guildMembersToCreate,
+        skipDuplicates: true,
+      });
+
+      // Update guild members that are in the database
+      await Promise.all(
+        serverMembers
+          .filter((member) => currentGuildMembers.some((currentMember) => currentMember.userId === member.user.id))
+          .map((member) =>
+            tx.guildMember.update({
+              where: {
+                guildId_userId: {
+                  guildId: server.id,
+                  userId: member.user.id,
+                },
+              },
+              data: { nickname: member.nick ?? member.user.global_name },
+            }),
+          ),
+      );
 
       return tx.guildMember.findMany({
         where: {
