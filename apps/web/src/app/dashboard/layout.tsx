@@ -23,7 +23,11 @@ export default async function Layout({ children }: Readonly<DashboardLayoutProps
       },
     },
     include: {
-      members: true,
+      members: {
+        where: {
+          userId: session.user.id,
+        },
+      },
     },
   });
 

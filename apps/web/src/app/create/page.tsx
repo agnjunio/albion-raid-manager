@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { CreateGuild } from "./create-guild";
+import { AddServer } from "./add-server";
 
 export default async function Page() {
   const session = await getServerSession(nextAuthOptions);
@@ -27,7 +27,7 @@ export default async function Page() {
         <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
         <span className="font-sans">Back to dashboard</span>
       </Link>
-      <CreateGuild servers={servers} userId={session.user.id} />
+      <AddServer servers={servers} userId={session.user.id} />
     </div>
   );
 }

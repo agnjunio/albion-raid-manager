@@ -74,7 +74,7 @@ export function DashboardSidebar() {
             <Link href="/create">
               <DropdownMenuItem>
                 <FontAwesomeIcon icon={faPlus} className="size-4" />
-                <div className="leading-normal">Create Guild</div>
+                <div className="leading-normal">Add Server</div>
               </DropdownMenuItem>
             </Link>
           </DropdownMenuContent>
@@ -149,10 +149,8 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
       </div>
 
       <div className={cn("leading-right flex min-w-0 grow flex-col whitespace-nowrap")}>
-        <span className="truncate font-semibold">{guild ? guild.name : "Select Guild"} </span>
-        <span className="text-muted-foreground text-xs">
-          {guild ? `${guild.members.length} member${guild.members.length !== 1 ? "s" : ""}` : "No Guild Selected"}
-        </span>
+        <span className="truncate font-semibold">{guild ? guild.name : "Select server"} </span>
+        <span className="text-muted-foreground text-xs">{!guild && "No server selected"}</span>
       </div>
 
       {icon && <FontAwesomeIcon icon={icon} className="ml-auto size-4 data-[state=collapsed]:hidden" />}

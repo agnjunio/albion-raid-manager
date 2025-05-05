@@ -1,43 +1,22 @@
 "use client";
 
-import { syncServerMembers } from "@/actions/guildMembers";
 import { MemberBadge } from "@/components/guildMembers/member-badge";
+import Alert from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Card, CardTitle } from "@/components/ui/card";
 import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
-import { faSync } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useParams } from "next/navigation";
-import { useState } from "react";
 import { useMembersContext } from "./context";
-import { MembersPageProps } from "./types";
 
 export function MembersList() {
-  const params = useParams<MembersPageProps["params"]>();
-  const { guildMembers, setGuildMembers } = useMembersContext();
-  const [isSyncing, setIsSyncing] = useState(false);
-
-  const { guildId } = params;
-
-  const handleSyncMembers = async () => {
-    setIsSyncing(true);
-    const response = await syncServerMembers(guildId);
-    if (response.success) {
-      setGuildMembers(response.data.guildMembers);
-    }
-    setIsSyncing(false);
-  };
+  const { guildMembers } = useMembersContext();
 
   return (
     <Card variant="outline" className="p-4">
       <div className="flex items-center justify-between px-2">
         <CardTitle size="small">List of Members</CardTitle>
-        <Button disabled={isSyncing} onClick={handleSyncMembers}>
-          <FontAwesomeIcon icon={faSync} />
-          Sync Members
-        </Button>
       </div>
+
+      <Alert variant="info">This list contains only members that have participated in raids.</Alert>
 
       <ul className="space-y-2">
         {guildMembers.map((member) => (

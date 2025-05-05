@@ -10,9 +10,10 @@ import { getServerInviteUrl, getServerPictureUrl } from "@albion-raid-manager/di
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import Loading from "../loading";
+import Loading from "./loading";
 
 enum CreateStep {
   SERVER_SELECT,
@@ -21,12 +22,12 @@ enum CreateStep {
   COMPLETE,
 }
 
-interface CreateGuildProps {
+interface AddServerProps {
   servers: Server[];
   userId: string;
 }
 
-export function CreateGuild({ servers, userId }: CreateGuildProps) {
+export function AddServer({ servers, userId }: AddServerProps) {
   const [step, setStep] = useState(CreateStep.SERVER_SELECT);
   const [error, setError] = useState<string | null>(null);
   const [popup, setPopup] = useState<WindowProxy | null>(null);
@@ -36,7 +37,6 @@ export function CreateGuild({ servers, userId }: CreateGuildProps) {
   const handleServerSelect = useCallback(async (server: Server) => {
     setServer(server);
     setError(null);
-    setStep(CreateStep.SERVER_INVITATION);
 
     if (!popup || popup.closed) {
       setPopup(
@@ -45,27 +45,36 @@ export function CreateGuild({ servers, userId }: CreateGuildProps) {
     } else {
       popup.focus();
     }
+
+    setStep(CreateStep.SERVER_INVITATION);
   }, []);
 
-  const handlePopupClosed = useCallback(() => {
+  const handlePopupClosed = useCallback(async () => {
     setPopup(null);
     setStep(CreateStep.SERVER_VERIFICATION);
-  }, []);
 
-  const handleServerVerified = useCallback(async (verified: boolean) => {
-    if (!verified || !server) {
+    if (!server) {
       setError("SERVER_VERIFICATION_FAILED");
       setStep(CreateStep.SERVER_SELECT);
       return;
     }
 
-    const response = await createGuild(server, userId);
-    if (!response.success) {
-      return setError(response.error);
+    const verifyServerResponse = await verifyServer(server);
+    if (!verifyServerResponse.success) {
+      setError("SERVER_VERIFICATION_FAILED");
+      setStep(CreateStep.SERVER_SELECT);
+      return;
+    }
+
+    const createGuildResponse = await createGuild(server, userId);
+    if (!createGuildResponse.success) {
+      setError(createGuildResponse.error);
+      setStep(CreateStep.SERVER_SELECT);
+      return;
     }
 
     setError(null);
-    setCreateGuildSuccessResponse(response.data);
+    setCreateGuildSuccessResponse(createGuildResponse.data);
     setStep(CreateStep.COMPLETE);
   }, []);
 
@@ -73,14 +82,12 @@ export function CreateGuild({ servers, userId }: CreateGuildProps) {
     <Card className="max-h-[80vh] w-full min-w-[30vw] max-w-lg">
       <CardHeader className="space-y-3">
         {error && <Alert className="p-3">{translateErrorCode(error)}</Alert>}
-        <CardTitle>Create guild</CardTitle>
+        <CardTitle>Add server</CardTitle>
       </CardHeader>
 
       {step === CreateStep.SERVER_SELECT && <ServerSelect servers={servers} onServerSelect={handleServerSelect} />}
       {step === CreateStep.SERVER_INVITATION && <ServerInvitation popup={popup} onPopupClosed={handlePopupClosed} />}
-      {step === CreateStep.SERVER_VERIFICATION && (
-        <ServerVerification server={server} onServerVerified={handleServerVerified} />
-      )}
+      {step === CreateStep.SERVER_VERIFICATION && <ServerVerification server={server} />}
       {step === CreateStep.COMPLETE && <Complete createGuildSuccessResponse={createGuildSuccessResponse} />}
     </Card>
   );
@@ -94,7 +101,7 @@ interface ServerSelectProps {
 function ServerSelect({ servers, onServerSelect }: ServerSelectProps) {
   return (
     <CardContent className="flex flex-col gap-2 overflow-auto">
-      <p className="text-muted-foreground text-sm">Please select a discord server to create a guild.</p>
+      <p className="text-muted-foreground text-sm">Please select a discord server to add to your account.</p>
       <div className="flex flex-col gap-2">
         {servers.map((server) => (
           <div
@@ -143,25 +150,12 @@ function ServerInvitation({ popup, onPopupClosed }: ServerInviationProps) {
 
 interface ServerVerificationProps {
   server?: Server;
-  onServerVerified: (verified: boolean) => void;
 }
 
-function ServerVerification({ server, onServerVerified }: ServerVerificationProps) {
-  if (!server) {
-    onServerVerified(false);
-    return null;
-  }
-
-  useEffect(() => {
-    (async () => {
-      const response = await verifyServer(server);
-      onServerVerified(response?.success || false);
-    })();
-  }, []);
-
+function ServerVerification({ server }: ServerVerificationProps) {
   return (
     <CardContent>
-      <Loading label={`Verifiying server ${server.name}...`} />
+      <Loading label={`Verifiying server ${server?.name}...`} />
     </CardContent>
   );
 }
@@ -179,11 +173,13 @@ function Complete({ createGuildSuccessResponse }: CompleteProps) {
     }
   }, []);
 
+  const link = `/dashboard/${createGuildSuccessResponse?.guild.id}`;
   return (
     <CardContent className="flex flex-col items-center gap-3">
       <FontAwesomeIcon icon={faCheck} size="2xl" />
       <p className="text-muted-foreground text-base">
-        Verification complete. You will be redirected to the dashboard page. Please click here is that doesn't happen.
+        Verification complete. You will be redirected to the dashboard page. Please <Link href={link}>click here</Link>{" "}
+        if that doesn't happen.
       </p>
     </CardContent>
   );
