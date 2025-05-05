@@ -1,6 +1,7 @@
 "use client";
 
-import { createGuild, CreateGuildSuccessResponse, verifyServer } from "@/actions/guilds";
+import { createGuild, CreateGuildSuccessResponse } from "@/actions/guilds";
+import { verifyServer } from "@/actions/servers";
 import Alert from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { translateErrorCode } from "@/lib/errors";
