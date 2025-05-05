@@ -1,11 +1,23 @@
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import * as React from "react";
 
-function Card({ className, ...props }: React.ComponentProps<"div">) {
+interface CardProps extends React.ComponentProps<"div"> {
+  variant?: "default" | "outline";
+}
+function Card({ variant = "default", className, ...props }: CardProps) {
+  const variantClass = {
+    default: "bg-card text-card-foreground shadow-sm border border-foreground",
+    outline: "bg-card border-border text-card-foreground",
+  }[variant];
+
   return (
     <div
       data-slot="card"
-      className={cn("bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm", className)}
+      className={cn(
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        variantClass,
+        className,
+      )}
       {...props}
     />
   );
@@ -15,14 +27,17 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="card-header" className={cn("flex flex-col gap-1.5 px-6", className)} {...props} />;
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="card-title"
-      className={cn("font-title text-2xl font-semibold leading-none", className)}
-      {...props}
-    />
-  );
+interface CardTitleProps extends React.ComponentProps<"div"> {
+  size?: "default" | "small";
+}
+
+function CardTitle({ size = "default", className, ...props }: CardTitleProps) {
+  const sizeClass = {
+    default: "text-2xl font-semibold leading-none",
+    small: "text-xl font-semibold leading-tight",
+  }[size];
+
+  return <div data-slot="card-title" className={cn("font-title", sizeClass, className)} {...props} />;
 }
 
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {

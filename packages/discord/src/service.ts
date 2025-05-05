@@ -2,23 +2,23 @@ import { memoize } from "@albion-raid-manager/common/helpers/cache";
 import { sleep } from "@albion-raid-manager/common/scheduler";
 import { getMilliseconds } from "@albion-raid-manager/common/utils/time";
 import config from "@albion-raid-manager/config";
-import { APIGuild, APIGuildMember } from "discord-api-types/v10";
+import { APIGuild, APIGuildChannel, APIGuildMember, APIMessage, APIUser, ChannelType } from "discord-api-types/v10";
 import { discordApiClient } from "./client";
-import { transformChannel, transformGuild, transformUser } from "./helpers";
+import { transformChannel, transformGuild } from "./helpers";
 import { Server } from "./types";
 
 const DISCORD_TOKEN = config.discord.token;
 
 export async function getCurrentUser(Authorization: string) {
-  return memoize(
+  return memoize<APIUser>(
     `discord.users.${Authorization}`,
     async () => {
-      const res = await discordApiClient.get(`/users/@me`, {
+      const res = await discordApiClient.get<APIUser>(`/users/@me`, {
         headers: {
           Authorization,
         },
       });
-      return transformUser(res.data);
+      return res.data;
     },
     {
       timeout: getMilliseconds(1, "days"),
@@ -26,16 +26,16 @@ export async function getCurrentUser(Authorization: string) {
   );
 }
 
-export async function getUser(userId: string) {
-  return memoize(
+async function getUser(userId: string) {
+  return memoize<APIUser>(
     `discord.users.${userId}`,
     async () => {
-      const res = await discordApiClient.get(`/users/${userId}`, {
+      const res = await discordApiClient.get<APIUser>(`/users/${userId}`, {
         headers: {
           Authorization: `Bot ${DISCORD_TOKEN}`,
         },
       });
-      return transformUser(res.data);
+      return res.data;
     },
     {
       timeout: getMilliseconds(1, "days"),
@@ -47,7 +47,7 @@ export async function getUserGuilds(token: string): Promise<Server[]> {
   return memoize(
     `discord.users.${token}.guilds`,
     async () => {
-      const res = await discordApiClient.get(`/users/@me/guilds`, {
+      const res = await discordApiClient.get<APIGuild[]>(`/users/@me/guilds`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -112,7 +112,7 @@ export async function getGuildChannels(guildId: string) {
   return memoize(
     `discord.guilds.${guildId}.channels`,
     async () => {
-      const res = await discordApiClient.get(`/guilds/${guildId}/channels`, {
+      const res = await discordApiClient.get<APIGuildChannel<ChannelType.GuildText>[]>(`/guilds/${guildId}/channels`, {
         headers: {
           Authorization: `Bot ${DISCORD_TOKEN}`,
         },
@@ -191,7 +191,7 @@ export const sendMessage = async (channelId: string, payload: any) => {
     form.append(`files[${file.id}]`, new Blob([file.image]), file.name);
   });
 
-  const res = await discordApiClient.postForm(`/channels/${channelId}/messages`, form, {
+  const res = await discordApiClient.postForm<APIMessage>(`/channels/${channelId}/messages`, form, {
     headers: {
       Authorization: `Bot ${DISCORD_TOKEN}`,
     },
@@ -203,7 +203,7 @@ function getMembers(guildId: string) {
   return memoize<APIGuildMember[]>(
     `discord.guilds.${guildId}.members`,
     async () => {
-      const res = await discordApiClient.get(`/guilds/${guildId}/members`, {
+      const res = await discordApiClient.get<APIGuildMember[]>(`/guilds/${guildId}/members`, {
         headers: {
           Authorization: `Bot ${DISCORD_TOKEN}`,
         },

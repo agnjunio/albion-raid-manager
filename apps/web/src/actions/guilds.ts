@@ -3,7 +3,7 @@
 import { ActionResponse } from "@/actions";
 import { prisma } from "@albion-raid-manager/database";
 import { Guild } from "@albion-raid-manager/database/models";
-import { type Server } from "@albion-raid-manager/discord";
+import { discordService, type Server } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";
 
 export type CreateGuildSuccessResponse = {
@@ -22,6 +22,12 @@ export async function createGuild(server: Server, userId: string) {
       return ActionResponse.Failure("GUILD_ALREADY_EXISTS");
     }
 
+    const user = await discordService.users.getUser(userId);
+
+    if (!user) {
+      return ActionResponse.Failure("USER_NOT_FOUND");
+    }
+
     const guild = await prisma.guild.create({
       data: {
         discordId: server.id,
@@ -32,6 +38,7 @@ export async function createGuild(server: Server, userId: string) {
             userId,
             role: "LEADER",
             default: true,
+            nickname: user.global_name,
           },
         },
       },

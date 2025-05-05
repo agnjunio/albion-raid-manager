@@ -1,3 +1,5 @@
+"use server";
+
 import { prisma } from "@albion-raid-manager/database";
 import { discordService } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";

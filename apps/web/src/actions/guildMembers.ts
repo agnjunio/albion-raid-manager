@@ -1,3 +1,5 @@
+"use server";
+
 import { ActionResponse } from "@/actions";
 import { GuildMemberWithUser } from "@/types/database";
 import { prisma } from "@albion-raid-manager/database";
@@ -30,7 +32,21 @@ export async function getGuildMembers(guildId: string) {
 
 export async function detectServerMembers(serverId: string) {
   try {
-    const serverMembers = await discordService.guilds.getMembers(serverId);
+    const server = await prisma.guild.findUnique({
+      where: {
+        id: serverId,
+      },
+    });
+
+    if (!server) {
+      return ActionResponse.Failure("SERVER_NOT_FOUND");
+    }
+
+    const serverMembers = await discordService.guilds.getMembers(server.discordId);
+
+    if (!serverMembers) {
+      return ActionResponse.Failure("SERVER_MEMBERS_NOT_FOUND");
+    }
 
     const guildMembers = await prisma.$transaction(async (tx) => {
       for (const member of serverMembers) {
@@ -53,16 +69,17 @@ export async function detectServerMembers(serverId: string) {
         await tx.guildMember.upsert({
           where: {
             guildId_userId: {
-              guildId: serverId,
+              guildId: server.id,
               userId: member.user.id,
             },
           },
           update: {
-            role,
+            nickname: member.nick ?? member.user.global_name,
           },
           create: {
-            guildId: serverId,
+            guildId: server.id,
             userId: member.user.id,
+            nickname: member.nick ?? member.user.global_name,
             role,
           },
         });
@@ -70,7 +87,7 @@ export async function detectServerMembers(serverId: string) {
 
       return tx.guildMember.findMany({
         where: {
-          guildId: serverId,
+          guildId: server.id,
         },
         include: {
           user: true,
