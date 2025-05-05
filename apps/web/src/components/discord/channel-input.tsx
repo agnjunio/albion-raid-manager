@@ -1,18 +1,18 @@
 "use client";
 
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Channel, ChannelType } from "@/types/discord";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "./command";
 
 interface Props extends React.ComponentProps<"input"> {
   channels: Channel[];
   onChannelChange: (channel?: Channel) => void;
 }
 
-export const InputChannel = ({ channels, value, onChannelChange, ...props }: Props) => {
+export const ChannelInput = ({ channels, value, onChannelChange, ...props }: Props) => {
   const [matchedChannels, setMatchedChannels] = useState<Channel[]>(
     channels.filter((channel) => channel.type === ChannelType.TEXT),
   );
@@ -76,7 +76,6 @@ export const InputChannel = ({ channels, value, onChannelChange, ...props }: Pro
       <Command className="group">
         <div className="relative">
           <CommandInput
-            borderBottom={false}
             searchIcon={false}
             value={inputText}
             onValueChange={handleInputChange}

@@ -110,7 +110,7 @@ export default function CreateRaid({ guildId, compositions }: CreateRaidProps) {
                         </div>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="p-0">
+                    <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
                       <Command>
                         <CommandInput placeholder="Search composition" />
                         <CommandList>

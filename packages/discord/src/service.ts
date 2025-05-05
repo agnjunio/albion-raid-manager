@@ -5,7 +5,7 @@ import config from "@albion-raid-manager/config";
 import { APIGuild, APIGuildChannel, APIGuildMember, APIMessage, APIUser, ChannelType } from "discord-api-types/v10";
 import { discordApiClient } from "./client";
 import { transformChannel, transformGuild } from "./helpers";
-import { Server } from "./types";
+import { DiscordServiceOptions, Server } from "./types";
 
 const DISCORD_TOKEN = config.discord.token;
 
@@ -91,13 +91,13 @@ export async function getBotGuilds() {
   );
 }
 
-async function getGuild(guildId: string) {
+async function getGuild(guildId: string, { authorization = `Bot ${DISCORD_TOKEN}` }: DiscordServiceOptions = {}) {
   return memoize<APIGuild>(
     `discord.guilds.${guildId}`,
     async () => {
       const res = await discordApiClient.get<APIGuild>(`/guilds/${guildId}`, {
         headers: {
-          Authorization: `Bot ${DISCORD_TOKEN}`,
+          Authorization: authorization,
         },
         params: {
           with_counts: true,

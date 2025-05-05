@@ -1,10 +1,10 @@
 "use client";
 
+import { ChannelInput } from "@/components/discord/channel-input";
 import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { InputChannel } from "@/components/ui/input-channel";
 import { translateErrorCode } from "@/lib/errors";
 import { raidSettingsFormSchema } from "@/lib/schemas/settings";
 import { Channel, ChannelType } from "@/types/discord";
@@ -66,7 +66,7 @@ export function RaidSettings() {
               <FormItem>
                 <FormLabel>Pings Channel</FormLabel>
                 <FormControl>
-                  <InputChannel
+                  <ChannelInput
                     placeholder="Enter pings channel..."
                     channels={channels}
                     onChannelChange={(channel) => {

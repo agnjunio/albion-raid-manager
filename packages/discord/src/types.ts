@@ -1,5 +1,9 @@
 export * from "discord-api-types/v10";
 
+export type DiscordServiceOptions = {
+  authorization?: string;
+};
+
 export type Server = {
   id: string;
   name: string;
