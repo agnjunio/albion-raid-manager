@@ -12,14 +12,14 @@
     "./helpers": "./src/helpers.ts"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json",
     "dev": "tsc --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc --watch --preserveWatchOutput"
   },
   "packageManager": "pnpm@10.6.1",
   "dependencies": {
-    "@albion-raid-manager/common": "workspace:^",
+    "@albion-raid-manager/core": "workspace:^",
     "@albion-raid-manager/config": "workspace:^",
     "@albion-raid-manager/logger": "workspace:^",
     "axios": "^1.8.4",

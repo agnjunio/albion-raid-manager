@@ -1,0 +1,46 @@
+{
+  "name": "@albion-raid-manager/core",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    "./cache": {
+      "types": "./src/cache/index.ts",
+      "default": "./src/cache/index.ts"
+    },
+    "./types": {
+      "types": "./src/types/index.ts",
+      "default": "./src/types/index.ts"
+    },
+    "./scheduler": {
+      "types": "./src/scheduler.ts",
+      "default": "./src/scheduler.ts"
+    },
+    "./helpers": {
+      "types": "./src/helpers/index.ts",
+      "default": "./src/helpers/index.ts"
+    },
+    "./utils": {
+      "types": "./src/utils/index.ts",
+      "default": "./src/utils/index.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@albion-raid-manager/database": "workspace:*",
+    "@albion-raid-manager/config": "workspace:^",
+    "@albion-raid-manager/logger": "workspace:*",
+    "clsx": "^2.1.1",
+    "cron": "^3.1.7",
+    "tailwind-merge": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "eslint": "^8.57.0",
+    "typescript": "^5.3.3"
+  }
+}

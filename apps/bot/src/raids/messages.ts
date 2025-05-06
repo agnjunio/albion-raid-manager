@@ -14,6 +14,7 @@ import {
 import { raids } from ".";
 
 const emojis = {
+  default: "❔",
   [Role.CALLER]: "🧠",
   [Role.TANK]: "🛡️",
   [Role.HEALER]: "💚",
@@ -46,7 +47,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     name: `Composition (${signups.length}/${slots.length})`,
     value: slots
       .map((slot) => {
-        let row = `${emojis[slot.role]} ${slot.name}`;
+        let row = `${emojis.default} ${slot.name}`;
         if (slot.userId) row += ` - <@${slot.userId}>`;
         return row;
       })
@@ -77,17 +78,13 @@ export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User
     .setPlaceholder("Select a build");
 
   for (const slot of slots) {
-    const { name, role } = slot;
-    let label = name;
+    let label = slot.name;
     if (slot.userId) {
       label += ` - `;
       const user = users?.find((user) => user.id === slot.userId);
       label += user ? `[${user.displayName}]` : `[Taken]`;
     }
-    const option = new StringSelectMenuOptionBuilder()
-      .setValue(`${slot.id}`)
-      .setLabel(label)
-      .setEmoji(emojis[role] || "❔");
+    const option = new StringSelectMenuOptionBuilder().setValue(`${slot.id}`).setLabel(label).setEmoji(emojis.default);
     menu.addOptions(option);
   }
 

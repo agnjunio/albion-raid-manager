@@ -1,5 +1,5 @@
 import { Module } from "@/modules";
-import { runCronjob } from "@albion-raid-manager/common/scheduler";
+import { runCronjob } from "@albion-raid-manager/core/scheduler";
 import { logger } from "@albion-raid-manager/logger";
 import { Events } from "discord.js";
 import { raidCommand } from "./commands/raid";

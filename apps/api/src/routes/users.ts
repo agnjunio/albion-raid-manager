@@ -1,4 +1,4 @@
-import { CreateUserDto, UpdateUserDto, UserDetailsDto, UserDto } from "@albion-raid-manager/common";
+import { CreateUserDto, UpdateUserDto, UserDetailsDto, UserDto } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 

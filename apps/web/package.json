@@ -12,7 +12,7 @@
     "prettier:fix": "prettier -w ."
   },
   "dependencies": {
-    "@albion-raid-manager/common": "workspace:^",
+    "@albion-raid-manager/core": "workspace:^",
     "@albion-raid-manager/database": "workspace:*",
     "@albion-raid-manager/discord": "workspace:^",
     "@albion-raid-manager/logger": "workspace:^",

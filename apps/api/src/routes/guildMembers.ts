@@ -1,4 +1,4 @@
-import { GuildMemberDto, UpdateGuildMemberDto } from "@albion-raid-manager/common";
+import { GuildMemberDto, UpdateGuildMemberDto } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { GuildMemberRole } from "@albion-raid-manager/database/models";
 import { Request, Response, Router } from "express";

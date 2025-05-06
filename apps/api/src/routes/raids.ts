@@ -1,4 +1,4 @@
-import { CreateRaidDto, RaidDto, UpdateRaidDto } from "@albion-raid-manager/common";
+import { CreateRaidDto, RaidDto, UpdateRaidDto } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { RaidStatus } from "@albion-raid-manager/database/models";
 import { Request, Response, Router } from "express";
