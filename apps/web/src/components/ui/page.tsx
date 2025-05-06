@@ -1,5 +1,5 @@
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { faTriangleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { faTriangleExclamation, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PropsWithChildren } from "react";
 
@@ -11,11 +11,27 @@ export function PageTitle({ children, className }: { className?: string } & Prop
   return <h2 className={cn("font-title text-center text-2xl font-normal", className)}>{children}</h2>;
 }
 
-export function PageError({ error }: { error: string }) {
+interface PageErrorProps {
+  error: string;
+  variant?: "error" | "warning";
+  icon?: IconDefinition;
+}
+
+export function PageError({ error, icon = faTriangleExclamation, variant = "warning" }: PageErrorProps) {
   return (
-    <div className="flex h-full grow flex-col items-center justify-center gap-2">
-      <FontAwesomeIcon icon={faTriangleExclamation} size="2xl" />
-      {error}
+    <div className={cn("flex h-full grow items-center justify-center")}>
+      <div
+        className={cn(
+          "flex flex-col items-center justify-center gap-2 rounded-lg p-4",
+          {
+            error: "text-destructive-foreground bg-destructive/10",
+            warning: "text-muted-foreground bg-muted/10",
+          }[variant],
+        )}
+      >
+        <FontAwesomeIcon icon={icon} size="2xl" />
+        <p className={cn("text-center")}>{error}</p>
+      </div>
     </div>
   );
 }
