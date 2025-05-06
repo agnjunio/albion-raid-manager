@@ -11,3 +11,9 @@ export type GuildMemberWithUser = GuildMember & {
 export type CompositionWithBuilds = Composition & {
   builds: Build[];
 };
+
+export enum GuildPermissionType {
+  ADMIN = "adminRoles",
+  COMPOSITION = "compositionRoles",
+  RAID = "raidRoles",
+}

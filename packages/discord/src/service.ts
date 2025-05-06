@@ -5,9 +5,47 @@ import config from "@albion-raid-manager/config";
 import { APIGuild, APIGuildChannel, APIGuildMember, APIMessage, APIUser, ChannelType } from "discord-api-types/v10";
 import { discordApiClient } from "./client";
 import { transformChannel, transformGuild } from "./helpers";
-import { DiscordServiceOptions, Server } from "./types";
+import { DiscordAccessToken, DiscordServiceOptions, Server } from "./types";
 
 const DISCORD_TOKEN = config.discord.token;
+
+function getDiscordClientCredentials() {
+  if (!config.discord.clientId || !config.discord.clientSecret) {
+    throw new Error("Discord client ID and secret are required.");
+  }
+
+  return {
+    clientId: config.discord.clientId,
+    clientSecret: config.discord.clientSecret,
+  };
+}
+
+export async function exchangeCode(code: string, redirect: string) {
+  const { clientId, clientSecret } = getDiscordClientCredentials();
+
+  const params = new URLSearchParams();
+  params.append("client_id", clientId);
+  params.append("client_secret", clientSecret);
+  params.append("grant_type", "authorization_code");
+  params.append("code", code);
+  params.append("redirect_uri", redirect);
+
+  const res = await discordApiClient.post<DiscordAccessToken>("/oauth2/token", params);
+  return res.data;
+}
+
+export async function refreshToken(refreshToken: string) {
+  const { clientId, clientSecret } = getDiscordClientCredentials();
+
+  const params = new URLSearchParams();
+  params.append("client_id", clientId);
+  params.append("client_secret", clientSecret);
+  params.append("grant_type", "refresh_token");
+  params.append("refresh_token", refreshToken);
+
+  const res = await discordApiClient.post<DiscordAccessToken>("/oauth2/token", params);
+  return res.data;
+}
 
 export async function getCurrentUser(Authorization: string) {
   return memoize<APIUser>(
@@ -202,6 +240,27 @@ export const sendMessage = async (channelId: string, payload: any) => {
   return res.data;
 };
 
+function getMember(
+  guildId: string,
+  userId: string,
+  { authorization = `Bot ${DISCORD_TOKEN}` }: DiscordServiceOptions = {},
+) {
+  return memoize<APIGuildMember>(
+    `discord.guilds.${guildId}.members.${userId}`,
+    async () => {
+      const res = await discordApiClient.get<APIGuildMember>(`/guilds/${guildId}/members/${userId}`, {
+        headers: {
+          Authorization: authorization,
+        },
+      });
+      return res.data;
+    },
+    {
+      timeout: getMilliseconds(30, "seconds"),
+    },
+  );
+}
+
 function getMembers(guildId: string) {
   return memoize<APIGuildMember[]>(
     `discord.guilds.${guildId}.members`,
@@ -231,6 +290,7 @@ export const discordService = {
     getUserGuilds,
     getBotGuilds,
     getGuild,
+    getMember,
     getMembers,
   },
 };

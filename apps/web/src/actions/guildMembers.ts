@@ -4,7 +4,7 @@ import { ActionResponse } from "@/actions";
 import { GuildMemberWithUser } from "@/types/database";
 import { prisma } from "@albion-raid-manager/database";
 import { GuildMemberRole } from "@albion-raid-manager/database/models";
-import { discordService } from "@albion-raid-manager/discord";
+import { APIGuildMember, discordService } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";
 import { syncUsers } from "./users";
 
@@ -29,6 +29,44 @@ export async function getGuildMembers(guildId: string) {
   } catch (error) {
     logger.error(`Failed to get guild members for guild ${guildId}`, { error });
     return ActionResponse.Failure("GET_GUILD_MEMBERS_FAILED");
+  }
+}
+
+export type GetGuildMemberSuccessResponse = {
+  guildMember: GuildMemberWithUser;
+  discordMember: APIGuildMember;
+};
+
+export async function getGuildMember(guildId: string, userId: string) {
+  try {
+    const guildMember = await prisma.guildMember.findUnique({
+      where: {
+        guildId_userId: {
+          guildId,
+          userId,
+        },
+      },
+      include: {
+        guild: true,
+        user: true,
+      },
+    });
+    if (!guildMember) {
+      return ActionResponse.Failure("GUILD_MEMBER_NOT_FOUND");
+    }
+
+    const discordMember = await discordService.guilds.getMember(guildMember.guild.discordId, userId);
+    if (!discordMember) {
+      return ActionResponse.Failure("DISCORD_MEMBER_NOT_FOUND");
+    }
+
+    return ActionResponse.Success<GetGuildMemberSuccessResponse>({
+      guildMember,
+      discordMember,
+    });
+  } catch (error) {
+    logger.error(`Failed to get guild member ${guildId}/${userId}`, { error });
+    return ActionResponse.Failure("GET_GUILD_MEMBER_FAILED");
   }
 }
 

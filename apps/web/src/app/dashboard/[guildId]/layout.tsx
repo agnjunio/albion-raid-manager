@@ -1,13 +1,18 @@
-import Alert from "@/components/ui/alert";
-import { nextAuthOptions } from "@/lib/auth";
+import { PageError } from "@/components/ui/page";
+import { auth, nextAuthOptions } from "@/lib/auth";
 import { prisma } from "@albion-raid-manager/database";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { DashboardLayoutProps } from "../types";
+import { DashboardProvider } from "./context";
 
 export default async function Layout({ params, children }: DashboardLayoutProps) {
   const session = await getServerSession(nextAuthOptions);
   if (!session) return redirect("/");
+
+  if (session.error === "RefreshTokenExpired") {
+    await auth.signIn("discord");
+  }
 
   const { guildId } = await params;
   const guild = await prisma.guild.findUnique({
@@ -23,12 +28,12 @@ export default async function Layout({ params, children }: DashboardLayoutProps)
 
   const isMember = guild?.members.some((member) => member.userId === session.user.id);
   if (!isMember) {
-    return (
-      <div className="flex size-full flex-col items-center justify-center gap-2">
-        <Alert>FORBIDDEN: You are not part of this guild.</Alert>
-      </div>
-    );
+    return <PageError error={"FORBIDDEN: You are not part of this guild."} variant="error" />;
   }
 
-  return children;
+  return (
+    <DashboardProvider guildMember={guild.members.find((member) => member.userId === session.user.id)!}>
+      {children}
+    </DashboardProvider>
+  );
 }

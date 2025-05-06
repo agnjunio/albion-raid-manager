@@ -34,20 +34,23 @@ export function AddServer({ servers, userId }: AddServerProps) {
   const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<CreateGuildSuccessResponse>();
   const [server, setServer] = useState<Server>();
 
-  const handleServerSelect = useCallback(async (server: Server) => {
-    setServer(server);
-    setError(null);
+  const handleServerSelect = useCallback(
+    async (server: Server) => {
+      setServer(server);
+      setError(null);
 
-    if (!popup || popup.closed) {
-      setPopup(
-        window.open(getServerInviteUrl(process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID!, server.id), "_blank", "popup"),
-      );
-    } else {
-      popup.focus();
-    }
+      if (!popup || popup.closed) {
+        setPopup(
+          window.open(getServerInviteUrl(process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID!, server.id), "_blank", "popup"),
+        );
+      } else {
+        popup.focus();
+      }
 
-    setStep(CreateStep.SERVER_INVITATION);
-  }, []);
+      setStep(CreateStep.SERVER_INVITATION);
+    },
+    [popup],
+  );
 
   const handlePopupClosed = useCallback(async () => {
     setPopup(null);
@@ -76,7 +79,7 @@ export function AddServer({ servers, userId }: AddServerProps) {
     setError(null);
     setCreateGuildSuccessResponse(createGuildResponse.data);
     setStep(CreateStep.COMPLETE);
-  }, []);
+  }, [server, userId]);
 
   return (
     <Card className="max-h-[80vh] w-full min-w-[30vw] max-w-lg">
@@ -139,7 +142,7 @@ function ServerInvitation({ popup, onPopupClosed }: ServerInviationProps) {
         onPopupClosed();
       }
     }, 1000);
-  }, []);
+  }, [onPopupClosed, popup?.closed]);
 
   return (
     <CardContent>
@@ -171,7 +174,7 @@ function Complete({ createGuildSuccessResponse }: CompleteProps) {
     if (createGuildSuccessResponse) {
       router.push(`/dashboard/${createGuildSuccessResponse.guild.id}`);
     }
-  }, []);
+  }, [createGuildSuccessResponse, router]);
 
   const link = `/dashboard/${createGuildSuccessResponse?.guild.id}`;
   return (

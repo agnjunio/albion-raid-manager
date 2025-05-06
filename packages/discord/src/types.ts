@@ -4,6 +4,13 @@ export type DiscordServiceOptions = {
   authorization?: string;
 };
 
+export interface DiscordAccessToken {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  token_type: string;
+}
+
 export type Server = {
   id: string;
   name: string;

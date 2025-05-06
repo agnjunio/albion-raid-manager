@@ -5,18 +5,23 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import { APIRole } from "@albion-raid-manager/discord";
-import { faChevronDown, faClose, faPeopleCarryBox } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faChevronDown, faClose, faPeopleCarryBox } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   roles: APIRole[];
   onRolesChange: (roles: APIRole[]) => void;
   value?: APIRole[];
+  disabled?: boolean;
 }
 
-export const RoleSelect = ({ roles, value = [], onRolesChange }: Props) => {
+export const RoleSelect = ({ roles, value = [], disabled = false, onRolesChange }: Props) => {
   const handleRoleSelect = (role: APIRole) => {
-    if (!value.find((r) => r.id === role.id)) {
+    const exists = value.find((r) => r.id === role.id);
+    if (exists) {
+      const newRoles = value.filter((r) => r.id !== role.id);
+      onRolesChange(newRoles);
+    } else {
       const newRoles = [...value, role];
       onRolesChange(newRoles);
     }
@@ -30,7 +35,11 @@ export const RoleSelect = ({ roles, value = [], onRolesChange }: Props) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="hover:bg-accent/50 h-auto w-full items-center justify-start gap-2">
+        <Button
+          variant="outline"
+          className="hover:bg-accent/50 h-auto w-full items-center justify-start gap-2"
+          disabled={disabled}
+        >
           <FontAwesomeIcon icon={faPeopleCarryBox} className="size-4" />
 
           <div className="flex grow flex-wrap gap-2">
@@ -42,8 +51,13 @@ export const RoleSelect = ({ roles, value = [], onRolesChange }: Props) => {
                 style={{ color: role.color ? `#${role.color.toString(16)}` : "hsl(var(--foreground))" }}
               >
                 {role.name}
-                <button
-                  type="button"
+                <div
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleRoleRemove(role.id);
+                    }
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleRoleRemove(role.id);
@@ -51,7 +65,7 @@ export const RoleSelect = ({ roles, value = [], onRolesChange }: Props) => {
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <FontAwesomeIcon icon={faClose} className="h-3 w-3" />
-                </button>
+                </div>
               </div>
             ))}
           </div>
@@ -73,7 +87,7 @@ export const RoleSelect = ({ roles, value = [], onRolesChange }: Props) => {
                     key={role.id}
                     value={role.name}
                     onSelect={() => handleRoleSelect(role)}
-                    className="cursor-pointer"
+                    className="flex cursor-pointer justify-between gap-2"
                   >
                     <span
                       className={cn("mr-2", role.color ? "text-foreground" : "text-muted-foreground")}
@@ -81,6 +95,7 @@ export const RoleSelect = ({ roles, value = [], onRolesChange }: Props) => {
                     >
                       {role.name}
                     </span>
+                    {value.find((r) => r.id === role.id) && <FontAwesomeIcon icon={faCheck} className="size-4" />}
                   </CommandItem>
                 ))}
             </CommandGroup>
