@@ -16,14 +16,18 @@ datasource db {
 
 // Guilds and Players
 model Guild {
-  id                    String        @id @default(uuid())
-  name                  String
-  icon                  String?
-  discordId             String        @unique
-  announcementChannelId String?
-  members               GuildMember[]
-  raids                 Raid[]
-  compositions          Composition[]
+  id                        String        @id @default(uuid())
+  name                      String
+  icon                      String?
+  discordId                 String        @unique
+  members                   GuildMember[]
+  raids                     Raid[]
+  compositions              Composition[]
+  // Settings
+  adminRoles                String[]      @default([])
+  raidRoles                 String[]      @default([])
+  compositionRoles          String[]      @default([])
+  raidAnnouncementChannelId String?
 }
 
 model GuildMember {
