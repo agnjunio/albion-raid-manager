@@ -1,7 +1,8 @@
 import config from "@albion-raid-manager/config";
 import { prisma } from "@albion-raid-manager/database";
+import { refreshToken } from "@albion-raid-manager/discord";
 import logger from "@albion-raid-manager/logger";
-import { NextAuthOptions } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import Discord from "next-auth/providers/discord";
 
 if (!config.discord.clientId || !config.discord.clientSecret) {
@@ -17,7 +18,6 @@ export const nextAuthOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
     async signIn({ user }) {
@@ -45,16 +45,51 @@ export const nextAuthOptions: NextAuthOptions = {
       }
     },
     async jwt({ token, account }) {
+      const expiresIn = (token.expiresAt as number) * 1000 - Date.now();
       if (account) {
-        token.accessToken = account.access_token;
+        return {
+          ...token,
+          accessToken: account.access_token,
+          refreshToken: account.refresh_token,
+          expiresAt: account.expires_at,
+        };
+      } else if (expiresIn > 0) {
+        return token;
+      } else {
+        if (!token.refreshToken) {
+          throw new TypeError("Missing refresh_token");
+        }
+        try {
+          const discordAccessToken = await refreshToken(token.refreshToken);
+          if (!discordAccessToken) {
+            throw new TypeError("Failed to refresh token");
+          }
+
+          return {
+            ...token,
+            accessToken: discordAccessToken.access_token,
+            refreshToken: discordAccessToken.refresh_token,
+            expiresAt: discordAccessToken.expires_in,
+          };
+        } catch (error) {
+          if (!(error instanceof Error)) {
+            return token;
+          }
+
+          logger.verbose(`Failed to refresh token: ${error.message}`, {
+            token,
+            error,
+          });
+          return { ...token, error: "RefreshTokenExpired" };
+        }
       }
-      return token;
     },
     redirect({ baseUrl }) {
       return `${baseUrl}/dashboard`;
     },
     session({ session, token }) {
       session.accessToken = token.accessToken as string;
+      session.error = token.error;
       if (token?.sub) {
         session.user = {
           ...session.user,
@@ -79,3 +114,5 @@ export const nextAuthOptions: NextAuthOptions = {
     colorScheme: "dark",
   },
 };
+
+export const auth = NextAuth(nextAuthOptions);
