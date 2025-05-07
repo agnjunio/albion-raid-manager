@@ -1,9 +1,9 @@
-import nextPlugin from "@next/eslint-plugin-next";
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsParser from "@typescript-eslint/parser";
+import js from "@eslint/js";
 import prettier from "eslint-config-prettier";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
 
 export default [
   {
@@ -11,6 +11,7 @@ export default [
   },
   {
     files: ["**/*.ts", "**/*.tsx"],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -23,6 +24,7 @@ export default [
       react,
       prettier,
       "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
     },
     rules: {
       ...tseslint.configs.recommended.rules,
@@ -37,14 +39,6 @@ export default [
       ],
       "no-console": "warn",
       "prefer-const": ["warn"],
-    },
-  },
-  // Next.js-specific config (applies only to apps/web)
-  {
-    files: ["apps/web/**/*.{ts,tsx,js,jsx}"],
-    plugins: { next: nextPlugin },
-    rules: {
-      ...nextPlugin.configs.recommended.rules,
     },
   },
 ];
