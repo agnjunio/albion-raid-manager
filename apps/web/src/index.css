@@ -1,76 +1,125 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+@plugin "tailwindcss-animate";
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+:root {
+  /* Background and Foreground */
+  --background: #ffffff;
+  --foreground: #0f0f0f;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+  /* Colors */
+  --primary: #f4d03f; /* Gold accent color */
+  --primary-foreground: #ffffff; /* Darker text color */
+  --secondary: #1d3557; /* Navy Blue */
+  --secondary-foreground: #ffffff; /* Light color for secondary */
+  --muted: #4a3f35; /* Muted brown */
+  --muted-foreground: #d3c0b6; /* Muted foreground */
+  --accent: #d4af37; /* Accent golden color */
+  --border: #2a2a2a; /* Border color */
+  --destructive: #e63946; /* Red for destructive actions */
+  --destructive-foreground: #ff4d4d; /* White foreground for destructive actions */
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+  /* UI Elements */
+  --input: #2a2a2a;
+  --ring: #f39c12; /* Ring color */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+  /* Card */
+  --card: #f5e6c1;
+  --card-foreground: #1f1f1f;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+  /* Popover */
+  --popover: #f5e6c1;
+  --popover-foreground: #1f1f1f;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+  /* Sidebar */
+  --sidebar-accent: #1d3557; /* Navy Blue */
+  --sidebar-accent-foreground: #ffffff; /* White text on sidebar accent */
+  --sidebar-border: #2a2a2a;
+  --sidebar-foreground: #f5e6c1; /* Light color for sidebar text */
+  --sidebar-primary: #1d3557; /* Navy Blue for sidebar primary background */
+  --sidebar-primary-foreground: #ffffff; /* White text on primary sidebar */
+  --sidebar-ring: #f39c12; /* Gold ring color */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-  }
+  /* Border Radius */
+  --radius: 0.625rem; /* Border radius for elements */
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+[data-theme="dark"] {
+  /* Dark Mode Background and Foreground */
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+
+  /* Dark Mode Colors */
+  --primary: #b8860b; /* Darker gold accent */
+  --primary-foreground: #ffffff; /* Light foreground for primary */
+  --secondary: #1d3557; /* Navy Blue remains constant */
+  --secondary-foreground: #ffffff; /* Light foreground for secondary */
+  --muted: #4a3f35; /* Muted brown remains constant */
+  --muted-foreground: #d3c0b6; /* Muted foreground */
+  --accent: #b8860b; /* Darker gold accent */
+  --border: #2a2a2a; /* Darker border color */
+  --destructive: #e63946; /* Red for destructive actions */
+  --destructive-foreground: #ff4d4d; /* White foreground for destructive actions */
+
+  /* Dark Mode UI Elements */
+  --input: #2a2a2a;
+  --ring: #b8860b; /* Ring color in dark mode */
+
+  /* Card */
+  --card: #1f1f1f;
+  --card-foreground: #e5d7b2;
+
+  /* Popover */
+  --popover: #1f1f1f;
+  --popover-foreground: #e5d7b2;
+
+  /* Sidebar */
+  --sidebar-accent: #1d3557; /* Navy Blue */
+  --sidebar-accent-foreground: #ffffff; /* White text on sidebar accent */
+  --sidebar-border: #2a2a2a;
+  --sidebar-foreground: #e5d7b2; /* Light color for sidebar text */
+  --sidebar-primary: #1d3557; /* Navy Blue for sidebar primary background */
+  --sidebar-primary-foreground: #ffffff; /* White text on primary sidebar */
+  --sidebar-ring: #b8860b; /* Gold ring color */
+}
+
+@theme inline {
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-border: var(--border);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive: var(--destructive);
+  --color-foreground: var(--foreground);
+  --color-input: var(--input);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-ring: var(--ring);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar: var(--sidebar);
+
+  --font-mono: var(--font-dm-mono);
+  --font-sans: var(--font-dm-sans);
+  --font-title: var(--font-pirata-one);
+  --font-caption: var(--font-lora);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: calc(var(--radius) + 4px);
 }

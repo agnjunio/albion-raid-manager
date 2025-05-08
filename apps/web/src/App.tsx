@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
 import { Routes } from "react-router-dom";
 
 // Import your pages here
@@ -9,6 +8,7 @@ import { Routes } from "react-router-dom";
 export default function App() {
   return (
     <>
+      <div className="bg-primary text-foreground">a</div>
       <Routes>
         {/* Add your routes here */}
         {/* Example:
@@ -16,7 +16,6 @@ export default function App() {
         <Route path="/about" element={<About />} />
         */}
       </Routes>
-      <Toaster />
     </>
   );
 }
