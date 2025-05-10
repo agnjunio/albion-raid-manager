@@ -1,4 +1,5 @@
 import { GuildMemberRole, RaidStatus, Role } from "@albion-raid-manager/database/models";
+import { User } from "./user";
 
 // Guild Member DTOs
 export interface GuildMemberDto {
@@ -6,7 +7,7 @@ export interface GuildMemberDto {
   userId: string;
   nickname?: string;
   role: GuildMemberRole;
-  user: UserDto;
+  user: User;
 }
 
 export interface CreateGuildMemberDto {
@@ -81,39 +82,6 @@ export interface ServerDetailsDto extends ServerDto {
   members: GuildMemberDto[];
 }
 
-// User DTOs
-export interface UserDto {
-  id: string;
-  username: string;
-  avatar?: string;
-}
-
-export interface CreateUserDto {
-  id: string;
-  username: string;
-  avatar?: string;
-}
-
-export interface UpdateUserDto {
-  username?: string;
-  avatar?: string;
-}
-
-export interface UserDetailsDto extends UserDto {
-  guildMemberships: {
-    guild: GuildDto;
-    nickname?: string;
-    role: GuildMemberRole;
-  }[];
-  raidSlots: {
-    raid: RaidDto;
-    build?: BuildDto;
-    name: string;
-    comment?: string;
-    joinedAt?: Date;
-  }[];
-}
-
 // Raid DTOs
 export interface RaidDto {
   id: string;
@@ -158,7 +126,7 @@ export interface RaidSlotDto {
   comment?: string;
   userId?: string;
   buildId?: string;
-  user?: UserDto;
+  user?: User;
   build?: BuildDto;
   joinedAt?: Date;
 }

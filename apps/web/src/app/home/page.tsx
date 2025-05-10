@@ -3,12 +3,13 @@ import { Container } from "@/components/ui/container";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeButton } from "@/components/ui/theme";
 import { useAuth } from "@/lib/auth";
+import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
 export function Home() {
-  const { session, status, signIn } = useAuth();
+  const { user, status, signIn } = useAuth();
 
   return (
     <div className="flex size-full justify-center">
@@ -38,22 +39,20 @@ export function Home() {
             <Skeleton className="h-5 w-64" />
             <Skeleton className="h-10 w-24" />
           </>
-        ) : status === "authenticated" && session ? (
+        ) : status === "authenticated" && user ? (
           <>
-            {session.user.image && (
+            {user.avatar && (
               <picture className="shadow-foreground/50 dark:shadow-background rounded-full shadow-lg">
                 <img
-                  src={session.user.image}
+                  src={getUserPictureUrl(user.id, user.avatar)}
                   className="size-12 select-none rounded-full"
-                  alt={session.user.name || "Unknown user"}
+                  alt={user.username || "Unknown user"}
                 />
               </picture>
             )}
             <div className="flex items-center gap-1">
               <div>Authenticated as</div>
-              <div className="text-secondary dark:text-primary font-semibold">
-                @{session.user.name || "Unknown user"}
-              </div>
+              <div className="text-secondary dark:text-primary font-semibold">@{user.username}</div>
             </div>
 
             <Link to="/dashboard" tabIndex={-1}>

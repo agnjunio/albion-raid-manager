@@ -1,7 +1,7 @@
 import config from "@albion-raid-manager/config";
-import { memoize } from "@albion-raid-manager/core/helpers/cache";
+import { memoize } from "@albion-raid-manager/core/cache";
 import { sleep } from "@albion-raid-manager/core/scheduler";
-import { getMilliseconds } from "@albion-raid-manager/core/utils/time";
+import { getMilliseconds } from "@albion-raid-manager/core/utils";
 import { APIGuild, APIGuildChannel, APIGuildMember, APIMessage, APIUser, ChannelType } from "discord-api-types/v10";
 import { discordApiClient } from "./client";
 import { transformChannel, transformGuild } from "./helpers";
@@ -20,7 +20,7 @@ function getDiscordClientCredentials() {
   };
 }
 
-export async function exchangeCode(code: string, redirect: string) {
+async function exchangeCode(code: string, redirect: string) {
   const { clientId, clientSecret } = getDiscordClientCredentials();
 
   const params = new URLSearchParams();
@@ -34,7 +34,7 @@ export async function exchangeCode(code: string, redirect: string) {
   return res.data;
 }
 
-export async function refreshToken(refreshToken: string) {
+async function refreshToken(refreshToken: string) {
   const { clientId, clientSecret } = getDiscordClientCredentials();
 
   const params = new URLSearchParams();
@@ -282,6 +282,10 @@ function getMembers(guildId: string) {
 }
 
 export const discordService = {
+  auth: {
+    exchangeCode,
+    refreshToken,
+  },
   users: {
     getCurrentUser,
     getUser,

@@ -1,22 +1,12 @@
+import { apiClient } from "@/lib/api";
+import { type User } from "@albion-raid-manager/core/types";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface User {
-  id: string;
-  name: string | null;
-  email: string | null;
-  image: string | null;
-}
-
-interface Session {
-  user: User;
-  accessToken: string;
-  error?: string;
-}
-
 interface AuthContextType {
-  session: Session | null;
+  user?: User;
   status: "loading" | "authenticated" | "unauthenticated";
+  checkSession: () => Promise<void>;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -24,25 +14,30 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User>();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if we have a session in localStorage
-    const storedSession = localStorage.getItem("session");
-    if (storedSession) {
-      try {
-        const parsedSession = JSON.parse(storedSession);
-        setSession(parsedSession);
+  const checkSession = async () => {
+    try {
+      const response = await apiClient.get<User>("/auth/me");
+      if (response.status === 200) {
+        setUser(response.data);
         setStatus("authenticated");
-      } catch {
-        localStorage.removeItem("session");
+      } else {
+        setUser(undefined);
         setStatus("unauthenticated");
       }
-    } else {
+    } catch (error) {
+      console.error("Failed to check session:", error);
+      setUser(undefined);
       setStatus("unauthenticated");
     }
+  };
+
+  useEffect(() => {
+    if (window.location.pathname === "/auth/callback") return;
+    checkSession();
   }, []);
 
   const signIn = async () => {
@@ -58,13 +53,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    localStorage.removeItem("session");
-    setSession(null);
-    setStatus("unauthenticated");
-    navigate("/");
+    try {
+      await fetch("/api/auth/signout", { method: "POST" });
+      setUser(undefined);
+      setStatus("unauthenticated");
+      navigate("/");
+    } catch (error) {
+      console.error("Failed to sign out:", error);
+    }
   };
 
-  return <AuthContext.Provider value={{ session, status, signIn, signOut }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, status, checkSession, signIn, signOut }}>{children}</AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

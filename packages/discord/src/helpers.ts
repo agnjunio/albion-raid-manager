@@ -1,3 +1,4 @@
+import { User } from "@albion-raid-manager/core/types";
 import { APIGuild, APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
 import { Server } from "./types";
 
@@ -40,12 +41,11 @@ export function hasPermissions(permissions: string | bigint = 0n, requiredPermis
   return requiredPermissions.every((perm) => (permissionBits & perm) !== 0n);
 }
 
-export function transformUser(user: APIUser) {
+export function transformUser(user: APIUser): User {
   return {
-    id: user.id,
-    username: user.global_name,
-    avatar: user.avatar,
-    locale: user.locale,
+    discordId: user.id,
+    username: user.username,
+    avatar: user.avatar ?? undefined,
   };
 }
 

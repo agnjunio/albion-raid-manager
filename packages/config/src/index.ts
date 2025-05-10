@@ -20,6 +20,15 @@ const schema = z.object({
     pretty: z.any().optional().transform(parseBool),
     files: z.any().optional().transform(parseBool),
   }),
+
+  session: z.object({
+    secret: z.string(),
+    cookie: z.object({
+      secure: z.boolean().default(false),
+      maxAge: z.number().default(24 * 60 * 60 * 1000), // 24 hours
+      sameSite: z.enum(["lax", "strict", "none"]).default("lax"),
+    }),
+  }),
 });
 
 const isProd = process.env.NODE_ENV === "production";
@@ -41,6 +50,15 @@ const config = schema.safeParse({
     level: process.env.LOGGER_LEVEL ?? (isProd ? "info" : "debug"),
     pretty: process.env.LOGGER_PRETTY ?? !isProd,
     files: process.env.LOGGER_FILES ?? isProd,
+  },
+
+  session: {
+    secret: process.env.SESSION_SECRET ?? "your-secret-key",
+    cookie: {
+      secure: isProd,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: isProd ? "none" : "lax",
+    },
   },
 });
 
