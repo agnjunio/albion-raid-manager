@@ -1,7 +1,5 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
   /* Background and Foreground */
@@ -45,7 +43,7 @@
   --radius: 0.625rem; /* Border radius for elements */
 }
 
-[data-theme="dark"] {
+.dark {
   /* Dark Mode Background and Foreground */
   --background: #0a0a0a;
   --foreground: #ffffff;
