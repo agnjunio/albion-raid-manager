@@ -39,15 +39,9 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { useDashboard } from "./context";
-interface GuildSelectionProps {
-  guild?: Guild;
-  icon?: IconDefinition;
-}
-
 export function DashboardSidebar() {
   const { fetchGuilds, selectedGuild } = useDashboard();
   const guilds = fetchGuilds.data ?? [];
-  console.log("🚀 ~ sidebar.tsx:50 ~ DashboardSidebar ~ guilds:", guilds);
   const links = useMenu();
 
   return (
@@ -59,25 +53,19 @@ export function DashboardSidebar() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <GuildSelection guild={selectedGuild} icon={faChevronDown} />
+              <GuildSelection guild={selectedGuild} icon={faChevronDown} isLoading={fetchGuilds.isLoading} />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-60" align="start">
-            {fetchGuilds.isLoading && (
-              <DropdownMenuItem>
-                <Skeleton className="h-4 w-4" />
-                <Skeleton className="h-4 w-24" />
-              </DropdownMenuItem>
-            )}
-            {guilds?.map((guild) => (
+            {guilds.map((guild) => (
               <Link key={guild.id} to={`/dashboard/${guild.id}`}>
                 <DropdownMenuItem>
                   <GuildSelection guild={guild} icon={guild === selectedGuild ? faCheck : undefined} />
                 </DropdownMenuItem>
               </Link>
             ))}
-            {guilds?.length && <DropdownMenuSeparator />}
+            {guilds.length > 0 && <DropdownMenuSeparator />}
             <Link to="/create">
               <DropdownMenuItem>
                 <FontAwesomeIcon icon={faPlus} className="size-4" />
@@ -136,7 +124,13 @@ export function DashboardSidebar() {
   );
 }
 
-export function GuildSelection({ guild, icon }: GuildSelectionProps) {
+interface GuildSelectionProps {
+  guild?: Guild;
+  icon?: IconDefinition;
+  isLoading?: boolean;
+}
+
+export function GuildSelection({ guild, icon, isLoading }: GuildSelectionProps) {
   return (
     <div className="flex w-full items-center gap-2">
       <div
@@ -145,7 +139,9 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
           { "bg-sidebar-primary rounded-lg": !guild },
         )}
       >
-        {guild ? (
+        {isLoading ? (
+          <Skeleton className="size-8" />
+        ) : guild ? (
           <Avatar>
             <AvatarImage src={getServerPictureUrl(guild.discordId, guild.icon)} />
             <AvatarFallback>{guild.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
@@ -155,10 +151,17 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
         )}
       </div>
 
-      <div className={cn("leading-right flex min-w-0 grow flex-col whitespace-nowrap")}>
-        <span className="truncate font-semibold">{guild ? guild.name : "Select server"} </span>
-        <span className="text-muted-foreground text-xs">{!guild && "No server selected"}</span>
-      </div>
+      {isLoading ? (
+        <div className={cn("flex min-w-0 grow flex-col gap-1")}>
+          <Skeleton className="bg-muted h-3 w-24" />
+          <Skeleton className="bg-muted-foreground h-3 w-24" />
+        </div>
+      ) : (
+        <div className={cn("leading-right flex min-w-0 grow flex-col whitespace-nowrap")}>
+          <span className="truncate font-semibold">{guild ? guild.name : "Select server"} </span>
+          <span className="text-muted-foreground text-xs">{!guild && "No server selected"}</span>
+        </div>
+      )}
 
       {icon && <FontAwesomeIcon icon={icon} className="ml-auto size-4 data-[state=collapsed]:hidden" />}
     </div>
@@ -166,20 +169,27 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
 }
 
 export function UserInfo() {
-  const { user, signOut } = useAuth();
-  if (!user) return null;
+  const { user, signOut, status } = useAuth();
 
   return (
     <>
       <div className="flex min-w-0 items-center gap-2">
-        <Avatar>
-          <AvatarImage src={user.avatar || getUserPictureUrl(user.id)} />
-          <AvatarFallback>{user.username?.substring(0, 1).toUpperCase()}</AvatarFallback>
-        </Avatar>
+        {status === "loading" ? (
+          <Skeleton className="size-8" />
+        ) : (
+          <Avatar>
+            {user?.id && <AvatarImage src={user?.avatar || getUserPictureUrl(user.id)} />}
+            <AvatarFallback>{user?.username?.substring(0, 1).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        )}
 
-        <div className="flex min-w-0 flex-col text-sm group-data-[collapsible=icon]:hidden">
-          <span className="truncate font-semibold">@{user.username || "Unknown User"}</span>
-        </div>
+        {status === "loading" ? (
+          <Skeleton className="bg-muted h-3 w-24" />
+        ) : (
+          <div className="flex min-w-0 flex-col text-sm group-data-[collapsible=icon]:hidden">
+            <span className="truncate font-semibold">@{user?.username || "Unknown User"}</span>
+          </div>
+        )}
       </div>
 
       <SidebarMenuAction onClick={() => signOut()}>
