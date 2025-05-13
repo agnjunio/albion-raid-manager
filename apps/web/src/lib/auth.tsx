@@ -1,6 +1,6 @@
 import type { User } from "@albion-raid-manager/core/types";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -20,6 +20,8 @@ const AUTH_FLAG_KEY = "auth_authenticated";
 const AUTH_REDIRECT_KEY = "auth_redirect";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const isAuthenticated = useMemo(() => localStorage.getItem(AUTH_FLAG_KEY) === "true", []);
+
   const [user, setUser] = useState<User>();
   const [status, setStatus] = useState<"loading" | "authenticated" | "unauthenticated">("loading");
   const navigate = useNavigate();
@@ -33,23 +35,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   const checkSession = useCallback(async () => {
-    const isAuthenticated = localStorage.getItem(AUTH_FLAG_KEY) === "true";
     if (!isAuthenticated) {
       setUser(undefined);
       setStatus("unauthenticated");
       return;
     }
 
-    try {
-      const user = await fetchMe.execute();
-      setUser(user);
-      setStatus("authenticated");
-    } catch {
+    await fetchMe.execute();
+    if (fetchMe.error) {
+      console.log("checkSession failed");
       localStorage.removeItem(AUTH_FLAG_KEY);
       setUser(undefined);
       setStatus("unauthenticated");
+    } else if (fetchMe.data) {
+      setUser(fetchMe.data);
+      setStatus("authenticated");
     }
-  }, [fetchMe]);
+  }, [fetchMe, isAuthenticated]);
 
   useEffect(() => {
     if (window.location.pathname === "/auth/callback") return;

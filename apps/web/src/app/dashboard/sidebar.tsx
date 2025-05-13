@@ -41,7 +41,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { useMenu } from "@/lib/menu";
 
-
 import { useDashboard } from "./context";
 
 export function DashboardSidebar() {
@@ -176,7 +175,7 @@ export function GuildSelection({ guild, icon, isLoading }: GuildSelectionProps) 
 export function UserInfo() {
   const { user, signOut, status } = useAuth();
 
-  if (status === "loading")
+  if (status === "loading" || !user)
     return (
       <div className="flex min-w-0 items-center gap-2">
         <Skeleton className="size-8" />
@@ -184,7 +183,6 @@ export function UserInfo() {
       </div>
     );
 
-  if (!user) throw new Error("User not found");
   return (
     <>
       <div className="flex min-w-0 items-center gap-2">
