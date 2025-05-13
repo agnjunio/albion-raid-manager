@@ -1,4 +1,4 @@
-import { Raid, RaidSlot, Role } from "@albion-raid-manager/database/models";
+import { type Raid, type RaidSlot, Role } from "@albion-raid-manager/core/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,

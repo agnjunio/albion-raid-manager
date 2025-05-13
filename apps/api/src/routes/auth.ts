@@ -1,4 +1,5 @@
-import { APIErrorType } from "@/types/error";
+import { APIError, APIErrorType } from "@/types/error";
+import { User } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
@@ -47,7 +48,7 @@ router.post("/callback", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/me", async (req: Request, res: Response) => {
+router.get("/me", async (req: Request, res: Response<User | APIError>) => {
   if (!req.session.accessToken) {
     return res.status(401).json({ error: APIErrorType.NOT_AUTHORIZED });
   }
@@ -86,11 +87,11 @@ router.get("/me", async (req: Request, res: Response) => {
         await get();
       } catch (refreshError) {
         req.session.destroy(() => {
-          res.status(401).json({ error: "Session expired" });
+          res.status(401).json({ error: APIErrorType.SESSION_EXPIRED });
         });
       }
     } else {
-      res.status(401).json({ error: "Session expired" });
+      res.status(401).json({ error: APIErrorType.SESSION_EXPIRED });
     }
   }
 });
@@ -98,7 +99,7 @@ router.get("/me", async (req: Request, res: Response) => {
 router.post("/logout", (req: Request, res: Response) => {
   req.session.destroy((err: Error | null) => {
     if (err) {
-      return res.status(500).json({ error: "Failed to logout" });
+      return res.status(500).json({ error: APIErrorType.INTERNAL_SERVER_ERROR });
     }
     res.clearCookie("connect.sid");
     res.json({ success: true });

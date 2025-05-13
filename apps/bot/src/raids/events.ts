@@ -1,5 +1,5 @@
 import { discord } from "@/bot";
-import { Raid } from "@albion-raid-manager/database/models";
+import { type Raid } from "@albion-raid-manager/core/types";
 import logger from "@albion-raid-manager/logger";
 import { User } from "discord.js";
 import EventEmitter from "events";

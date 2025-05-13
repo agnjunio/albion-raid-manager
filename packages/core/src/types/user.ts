@@ -1,1 +1,3 @@
-export type { User } from "@albion-raid-manager/database/models";
+import { Prisma } from "@albion-raid-manager/database";
+
+export type User = Prisma.UserGetPayload<{}>;

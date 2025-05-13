@@ -1,6 +1,5 @@
-import { GuildMemberDto, UpdateGuildMemberDto } from "@albion-raid-manager/core/types";
+import { GuildMemberDto, GuildMemberRole, UpdateGuildMemberDto } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
-import { GuildMemberRole } from "@albion-raid-manager/database/models";
 import { Request, Response, Router } from "express";
 
 const router = Router();

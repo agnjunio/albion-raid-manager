@@ -1,6 +1,5 @@
-import { GuildMemberWithUser } from "@/types/database";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { GuildMemberRole } from "@albion-raid-manager/database/models";
+import { cn } from "@albion-raid-manager/core/helpers";
+import { GuildMemberRole, type GuildMemberWithUser } from "@albion-raid-manager/core/types";
 
 const roleClassName: Record<GuildMemberRole, string> = {
   LEADER: "bg-primary/20 text-primary",

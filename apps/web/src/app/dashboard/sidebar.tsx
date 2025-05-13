@@ -39,6 +39,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import { useDashboard } from "./context";
+
 export function DashboardSidebar() {
   const { fetchGuilds, selectedGuild } = useDashboard();
   const guilds = fetchGuilds.data ?? [];

@@ -1,4 +1,4 @@
-import { Guild, GuildMember } from "@albion-raid-manager/database/models";
+import { type Guild, type GuildMember } from "@albion-raid-manager/core/types";
 import Link from "next/link";
 
 interface GuildCardProps {

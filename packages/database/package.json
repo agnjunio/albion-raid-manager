@@ -2,10 +2,10 @@
   "name": "@albion-raid-manager/database",
   "version": "1.0.0",
   "main": "src/index.ts",
+  "types": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./errors": "./src/errors.ts",
-    "./models": "./src/models.ts"
+    "./errors": "./src/errors.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

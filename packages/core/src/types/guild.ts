@@ -1,6 +1,11 @@
-import { Guild, GuildMember } from "@albion-raid-manager/database/models";
-export type { Guild } from "@albion-raid-manager/database/models";
+import { Prisma } from "@albion-raid-manager/database";
 
-export interface GuildWithMembers extends Guild {
-  members: GuildMember[];
-}
+export type Guild = Prisma.GuildGetPayload<{}>;
+
+export type GuildWithMembers = Prisma.GuildGetPayload<{
+  include: {
+    members: {
+      include: { user: true };
+    };
+  };
+}>;

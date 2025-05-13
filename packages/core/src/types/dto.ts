@@ -1,4 +1,4 @@
-import { GuildMemberRole, RaidStatus, Role } from "@albion-raid-manager/database/models";
+import { GuildMemberRole, RaidStatus, Role } from "@albion-raid-manager/core/types";
 import { User } from "./user";
 
 // Guild Member DTOs
