@@ -2,7 +2,7 @@ import { CreateUserDto, UpdateUserDto, UserDetailsDto, UserDto } from "@albion-r
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
-const router = Router();
+const router: Router = Router();
 
 // Get all users
 router.get("/", async (req: Request, res: Response) => {

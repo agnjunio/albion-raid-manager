@@ -1,3 +1,5 @@
+import type React from "react";
+
 import { cn } from "@albion-raid-manager/core/helpers";
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {

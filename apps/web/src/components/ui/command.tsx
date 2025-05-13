@@ -1,9 +1,12 @@
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import * as React from "react";
+
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Command as CommandPrimitive } from "cmdk";
-import * as React from "react";
+
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (

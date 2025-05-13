@@ -1,9 +1,13 @@
-import { Theme, useTheme } from "@/lib/theme";
+import type { VariantProps } from "class-variance-authority";
+
+import { useCallback } from "react";
+
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faComputer, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { VariantProps } from "class-variance-authority";
-import { useCallback } from "react";
+
+import { Theme, useTheme } from "@/lib/theme";
+
 import { Button, buttonVariants } from "./button";
 
 interface Props extends VariantProps<typeof buttonVariants> {

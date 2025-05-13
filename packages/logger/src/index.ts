@@ -1,5 +1,6 @@
-import config from "@albion-raid-manager/config";
 import path from "path";
+
+import config from "@albion-raid-manager/config";
 import { createLogger, format, transports } from "winston";
 
 export const logger = createLogger({
@@ -7,10 +8,10 @@ export const logger = createLogger({
   format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
   defaultMeta: {
     get service() {
-      return process.env.SERVICE;
+      return config.service.name;
     },
     get shard() {
-      return process.env.SHARD;
+      return config.bot.shards.current;
     },
   },
   transports: [],
@@ -57,5 +58,3 @@ if (config.logger.files) {
     }),
   );
 }
-
-export default logger;

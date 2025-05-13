@@ -1,4 +1,4 @@
-import logger from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/logger";
 
 type CacheData = {
   value: unknown;
@@ -13,6 +13,8 @@ type CacheOptions = {
   debug?: boolean;
   ignoreCache?: (value: unknown) => boolean;
   onTimeout?: (key: string, value: unknown) => void;
+  onExpire?: (key: string, _value: unknown) => void;
+  onDelete?: (_key: string, _value: unknown) => void;
 };
 
 const cache = new Map(); // In-memory cache using Map

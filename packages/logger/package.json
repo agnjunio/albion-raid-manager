@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint:fix": "eslint . --fix",
     "prettier": "prettier -c .",
     "prettier:fix": "prettier --write .",
     "test": "echo \"Error: no test specified\" && exit 1"

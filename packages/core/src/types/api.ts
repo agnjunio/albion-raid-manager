@@ -18,9 +18,9 @@ export enum APIErrorType {
 }
 
 export namespace APIResponse {
-  export type Type<T = any> = APISuccess<T> | APIError;
+  export type Type<T = unknown> = APISuccess<T> | APIError;
 
-  export function Success<T = any>(data?: T): APISuccess<T> {
+  export function Success<T = unknown>(data?: T): APISuccess<T> {
     return { success: true, data };
   }
 

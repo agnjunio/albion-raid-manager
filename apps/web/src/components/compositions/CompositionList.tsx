@@ -1,8 +1,9 @@
+import { useMemo, useState } from "react";
+
 import { type Composition } from "@albion-raid-manager/core/types";
 import { compareAsc } from "date-fns";
 import { distance } from "fastest-levenshtein";
 import Link from "next/link";
-import { useMemo, useState } from "react";
 
 export function filterCompositions(compositions: Composition[], filter: string) {
   return compositions

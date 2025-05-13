@@ -1,11 +1,17 @@
 import z from "zod";
+
 import { parseBool, parseShardList, parseShardsTotal } from "./parsers";
 
 const schema = z.object({
+  service: z.object({
+    name: z.string(),
+  }),
+
   bot: z.object({
     shards: z.object({
       total: z.custom<number | "auto">(parseShardsTotal).optional(),
       list: z.custom<number[] | "auto">(parseShardList).optional(),
+      current: z.number().optional(),
     }),
   }),
 
@@ -33,10 +39,15 @@ const schema = z.object({
 
 const isProd = process.env.NODE_ENV === "production";
 const config = schema.safeParse({
+  service: {
+    name: process.env.SERVICE,
+  },
+
   bot: {
     shards: {
       total: process.env.SHARDS_TOTAL,
       list: process.env.SHARDS_SPAWN,
+      current: process.env.SHARD,
     },
   },
 
@@ -63,7 +74,6 @@ const config = schema.safeParse({
 });
 
 if (!config.success) {
-  // eslint-disable-next-line no-console
   console.error("❌ Invalid configuration:", config.error.issues);
   process.exit(1);
 }

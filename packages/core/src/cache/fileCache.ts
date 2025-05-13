@@ -1,7 +1,8 @@
-import logger from "@albion-raid-manager/logger";
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+
+import { logger } from "@albion-raid-manager/logger";
 
 type CacheOptions<T> = {
   cacheDir?: string;

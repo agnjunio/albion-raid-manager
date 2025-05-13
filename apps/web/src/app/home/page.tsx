@@ -1,12 +1,13 @@
+import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeButton } from "@/components/ui/theme";
 import { useAuth } from "@/lib/auth";
-import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
-import { faDiscord } from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
 
 export function Home() {
   const { user, status, signIn } = useAuth();

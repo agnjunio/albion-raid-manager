@@ -1,7 +1,8 @@
 import { cn } from "@albion-raid-manager/core/helpers";
 import { Route, Routes } from "react-router-dom";
+
 import { AuthCallback } from "./auth/callback";
-import { Dashboard } from "./dashboard/page";
+import { DashboardLayout } from "./dashboard/layout";
 import { Home } from "./home/page";
 
 export default function App() {
@@ -15,7 +16,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<div>Dashboard</div>} />
+        </Route>
       </Routes>
     </div>
   );

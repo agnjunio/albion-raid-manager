@@ -2,7 +2,7 @@ import { GuildMemberDto, GuildMemberRole, UpdateGuildMemberDto } from "@albion-r
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
-const router = Router();
+const router: Router = Router();
 
 // Get all guild members for a guild
 router.get("/", async (req: Request, res: Response) => {

@@ -1,7 +1,10 @@
-import { useApi } from "@/lib/api";
 import type { User } from "@albion-raid-manager/core/types";
+
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
+import { useApi } from "@/lib/api";
 
 interface AuthContextType {
   user?: User;
@@ -41,8 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const user = await fetchMe.execute();
       setUser(user);
       setStatus("authenticated");
-    } catch (error) {
-      console.log("Session check failed:", error);
+    } catch {
       localStorage.removeItem(AUTH_FLAG_KEY);
       setUser(undefined);
       setStatus("unauthenticated");
@@ -52,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (window.location.pathname === "/auth/callback") return;
     checkSession();
-  }, []);
+  }, [checkSession]);
 
   const signIn = async () => {
     const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID;

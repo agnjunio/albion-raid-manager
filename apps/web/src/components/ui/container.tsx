@@ -1,5 +1,6 @@
-import { cn } from "@albion-raid-manager/core/helpers";
 import type { ReactNode } from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
 
 interface Props {
   className?: string;

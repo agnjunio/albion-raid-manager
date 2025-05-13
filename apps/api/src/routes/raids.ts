@@ -2,7 +2,7 @@ import { CreateRaidDto, RaidDto, RaidStatus, UpdateRaidDto } from "@albion-raid-
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
-const router = Router();
+const router: Router = Router();
 
 // Get all raids for a guild
 router.get("/", async (req: Request, res: Response) => {

@@ -1,3 +1,4 @@
+import { type Raid, type RaidSlot, type Role } from "@albion-raid-manager/core/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -10,18 +11,18 @@ import {
   StringSelectMenuOptionBuilder,
   User,
 } from "discord.js";
-import { raids } from ".";
-import { type Raid, type RaidSlot, Role } from "../../../../packages/core/src/types.bkp";
 
-const emojis = {
-  default: "❔",
-  [Role.CALLER]: "🧠",
-  [Role.TANK]: "🛡️",
-  [Role.HEALER]: "💚",
-  [Role.MELEE_DPS]: "⚔️",
-  [Role.RANGED_DPS]: "🏹",
-  [Role.SUPPORT]: "💊",
-  [Role.BATTLEMOUNT]: "🐎",
+import { raids } from ".";
+
+const emojis: Record<Role | "DEFAULT", string> = {
+  DEFAULT: "❔",
+  CALLER: "🧠",
+  TANK: "🛡️",
+  HEALER: "💚",
+  MELEE_DPS: "⚔️",
+  RANGED_DPS: "🏹",
+  SUPPORT: "💊",
+  BATTLEMOUNT: "🐎",
 };
 
 export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
@@ -47,7 +48,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     name: `Composition (${signups.length}/${slots.length})`,
     value: slots
       .map((slot) => {
-        let row = `${emojis.default} ${slot.name}`;
+        let row = `${emojis.DEFAULT} ${slot.name}`;
         if (slot.userId) row += ` - <@${slot.userId}>`;
         return row;
       })
@@ -84,7 +85,7 @@ export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User
       const user = users?.find((user) => user.id === slot.userId);
       label += user ? `[${user.displayName}]` : `[Taken]`;
     }
-    const option = new StringSelectMenuOptionBuilder().setValue(`${slot.id}`).setLabel(label).setEmoji(emojis.default);
+    const option = new StringSelectMenuOptionBuilder().setValue(`${slot.id}`).setLabel(label).setEmoji(emojis.DEFAULT);
     menu.addOptions(option);
   }
 

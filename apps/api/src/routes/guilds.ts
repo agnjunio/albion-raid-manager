@@ -1,10 +1,11 @@
-import { requireAuth } from "@/middleware/auth";
 import { Guild } from "@albion-raid-manager/core/types";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
-const router = Router();
+import { requireAuth } from "@/middleware/auth";
+
+const router: Router = Router();
 
 router.use(requireAuth);
 

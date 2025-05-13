@@ -1,3 +1,18 @@
+import type { Guild } from "@albion-raid-manager/core/types";
+
+import { cn } from "@albion-raid-manager/core/helpers";
+import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import {
+  faArrowRightFromBracket,
+  faCheck,
+  faChevronDown,
+  faPlus,
+  faShield,
+  type IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -25,19 +40,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { useMenu } from "@/lib/menu";
-import { cn } from "@albion-raid-manager/core/helpers";
-import type { Guild } from "@albion-raid-manager/core/types";
-import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
-import {
-  faArrowRightFromBracket,
-  faCheck,
-  faChevronDown,
-  faPlus,
-  faShield,
-  type IconDefinition,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+
+
 import { useDashboard } from "./context";
 
 export function DashboardSidebar() {

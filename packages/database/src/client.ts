@@ -1,9 +1,8 @@
-import logger from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/logger";
+
 import { PrismaClient } from "../generated/prisma";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
-
-export let prisma: PrismaClient;
 
 function getPrisma() {
   if (globalForPrisma.prisma) return globalForPrisma.prisma;
@@ -49,4 +48,4 @@ function getPrisma() {
   return prisma;
 }
 
-prisma = getPrisma();
+export const prisma = getPrisma();

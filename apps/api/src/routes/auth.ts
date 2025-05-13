@@ -3,11 +3,11 @@ import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
-import logger from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
 import { z } from "zod";
 
-const router = Router();
+const router: Router = Router();
 
 const discordCallbackSchema = z.object({
   code: z.string(),
@@ -41,7 +41,7 @@ router.post("/callback", async (req: Request, res: Response<APIResponse.Type>) =
     });
   } catch (error) {
     if (isAxiosError(error)) {
-      console.log(error.response?.data);
+      logger.debug("Discord API error response:", error.response?.data);
     }
     logger.error("Failed to authenticate user:", error);
     res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
@@ -77,7 +77,7 @@ router.get("/me", async (req: Request, res: Response<APIResponse.Type<User>>) =>
 
   try {
     await get();
-  } catch (error) {
+  } catch {
     if (req.session.refreshToken) {
       try {
         const { access_token, refresh_token } = await discordService.auth.refreshToken(req.session.refreshToken);
@@ -85,7 +85,7 @@ router.get("/me", async (req: Request, res: Response<APIResponse.Type<User>>) =>
         req.session.refreshToken = refresh_token;
         req.session.save();
         await get();
-      } catch (refreshError) {
+      } catch {
         req.session.destroy(() => {
           res.status(401).json(APIResponse.Error(APIErrorType.SESSION_EXPIRED));
         });

@@ -1,5 +1,6 @@
-import { cn } from "@albion-raid-manager/core/helpers";
 import * as React from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (

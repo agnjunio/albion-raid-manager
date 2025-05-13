@@ -1,9 +1,11 @@
-import { buttonVariants } from "@/components/ui/button";
+import * as React from "react";
+
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as React from "react";
 import { DayPicker } from "react-day-picker";
+
+import { buttonVariants } from "@/components/ui/button";
 
 function Calendar({ className, classNames, showOutsideDays = true, ...props }: React.ComponentProps<typeof DayPicker>) {
   return (

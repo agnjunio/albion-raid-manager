@@ -1,7 +1,8 @@
 import type { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import axios from "axios";
+
 import { useCallback, useEffect, useRef, useState } from "react";
+
+import axios, { type AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
 
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -69,7 +70,7 @@ interface UseApiOptions extends AxiosRequestConfig {
  * };
  * ```
  */
-export function useApi<T = any>(options: UseApiOptions = {}): UseApiResult<T> {
+export function useApi<T = unknown>(options: UseApiOptions = {}): UseApiResult<T> {
   const { autoExecute, ...config } = options;
   const [state, setState] = useState<UseApiState<T>>({
     isLoading: false,
@@ -86,7 +87,7 @@ export function useApi<T = any>(options: UseApiOptions = {}): UseApiResult<T> {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
-        const response = await apiClient.request<APIResponse.Response<T>>({
+        const response = await apiClient.request<APIResponse.Type<T>>({
           ...config,
           ...requestConfig,
         });

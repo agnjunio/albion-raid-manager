@@ -1,7 +1,8 @@
+import { type PropsWithChildren } from "react";
+
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { type PropsWithChildren } from "react";
 
 export function Page({ children }: PropsWithChildren) {
   return <div className="flex h-full grow flex-col gap-4 p-4">{children}</div>;

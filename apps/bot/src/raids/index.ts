@@ -1,9 +1,12 @@
-import { Module } from "@/modules";
 import { runCronjob } from "@albion-raid-manager/core/scheduler";
 import { logger } from "@albion-raid-manager/logger";
 import { Events } from "discord.js";
+
+import { type Module } from "@/modules";
+
 import { raidCommand } from "./commands/raid";
 import { handleAnnounceRaids, handleSelectRole, handleSignout, handleSignup } from "./handlers";
+
 
 export const raids: Module = {
   id: "raids",

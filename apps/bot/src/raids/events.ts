@@ -1,8 +1,12 @@
-import { discord } from "@/bot";
+import EventEmitter from "events";
+
 import logger from "@albion-raid-manager/logger";
 import { User } from "discord.js";
-import EventEmitter from "events";
+
+import { discord } from "@/bot";
+
 import { type Raid } from "../../../../packages/core/src/types.bkp";
+
 import { updateRaidAnnouncement } from "./handlers";
 
 export const raidEvents = new EventEmitter();

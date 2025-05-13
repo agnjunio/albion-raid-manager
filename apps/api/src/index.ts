@@ -1,12 +1,13 @@
 import config from "@albion-raid-manager/config";
 import { prisma } from "@albion-raid-manager/database";
-import logger from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/logger";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
+
 import routes from "./routes";
 
 dotenv.config();

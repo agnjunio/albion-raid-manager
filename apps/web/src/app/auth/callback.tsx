@@ -1,7 +1,9 @@
+import { useEffect, useRef } from "react";
+
+import { useNavigate, useSearchParams } from "react-router-dom";
+
 import { useApi } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 
 const AUTH_FLAG_KEY = "auth_authenticated";
 

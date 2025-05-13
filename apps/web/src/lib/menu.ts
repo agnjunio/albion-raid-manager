@@ -1,4 +1,5 @@
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+
 import { faFlag, faGear, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
 
 export interface MenuLink {

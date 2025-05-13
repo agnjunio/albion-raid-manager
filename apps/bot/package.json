@@ -7,8 +7,8 @@
     "start": "ts-node .",
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register -r dotenv/config .",
     "commands:deploy": "MODE=commands ts-node .",
-    "lint": "eslint src/",
-    "lint:fix": "eslint --fix src/",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prettier": "prettier -c src/",
     "prettier:fix": "prettier --write src/",
     "test": "echo \"Error: no test specified\" && exit 1"
