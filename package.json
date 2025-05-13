@@ -24,12 +24,9 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "react-refresh": "^0.17.0",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.4",
     "turbo": "2.4.4",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.0"
-  },
-  "dependencies": {
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0"
   }
 }

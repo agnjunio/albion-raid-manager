@@ -4,9 +4,8 @@
   "description": "Discord bot for Albion Raid Manager.",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node .",
-    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register -r dotenv/config .",
-    "commands:deploy": "MODE=commands ts-node .",
+    "start": "tsx .",
+    "dev": "tsx watch .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier -c src/",

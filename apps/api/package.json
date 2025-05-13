@@ -1,11 +1,10 @@
 {
   "name": "@albion-raid-manager/api",
-  "type": "module",
   "version": "1.0.0",
   "private": true,
   "main": "src/index.ts",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register -r dotenv/config .",
+    "dev": "tsx watch .",
     "build": "tsc",
     "start": "node dist/index.js",
     "lint": "eslint .",

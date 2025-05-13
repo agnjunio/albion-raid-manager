@@ -40,7 +40,7 @@ const schema = z.object({
 const isProd = process.env.NODE_ENV === "production";
 const config = schema.safeParse({
   service: {
-    name: process.env.SERVICE,
+    name: process.env.SERVICE ?? "albion-raid-manager",
   },
 
   bot: {
