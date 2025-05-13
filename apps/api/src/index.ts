@@ -42,6 +42,7 @@ app.use(
     }),
   }),
 );
+
 app.use(routes);
 
 const server = app.listen(port, () => {

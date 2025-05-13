@@ -1,6 +1,4 @@
-"use client";
-
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/core/helpers";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 import * as React from "react";
 

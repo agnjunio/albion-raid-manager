@@ -1,4 +1,3 @@
-import { requireAuth } from "@/middleware/auth";
 import { APIErrorType } from "@/types/error";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
@@ -30,8 +29,13 @@ router.post("/callback", async (req: Request, res: Response) => {
 
     await req.session.save((err) => {
       if (err) {
+        logger.error("Failed to save session:", err);
         return res.status(500).json({ error: APIErrorType.INTERNAL_SERVER_ERROR });
       }
+      logger.info("Session saved successfully", {
+        cookie: req.session.cookie,
+        sessionId: req.session.id,
+      });
       res.json({ success: true });
     });
   } catch (error) {
@@ -43,7 +47,11 @@ router.post("/callback", async (req: Request, res: Response) => {
   }
 });
 
-router.get("/me", requireAuth, async (req: Request, res: Response) => {
+router.get("/me", async (req: Request, res: Response) => {
+  if (!req.session.accessToken) {
+    return res.status(401).json({ error: APIErrorType.NOT_AUTHORIZED });
+  }
+
   const get = async () => {
     const discordUser = await discordService.users.getCurrentUser(`Bearer ${req.session.accessToken}`);
     const user = await prisma.user.upsert({
