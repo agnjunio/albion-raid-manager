@@ -1,4 +1,4 @@
-import { User } from "../../../../packages/core/src/types.bkp";
+import { User } from "@albion-raid-manager/core/types";
 
 declare module "express-session" {
   interface SessionData {

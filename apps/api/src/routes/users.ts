@@ -1,6 +1,6 @@
+import { CreateUserDto, UpdateUserDto, UserDetailsDto, UserDto } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
-import { CreateUserDto, UpdateUserDto, UserDetailsDto, UserDto } from "../../../../packages/core/src/types.bkp";
 
 const router = Router();
 

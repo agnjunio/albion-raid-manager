@@ -1,3 +1,4 @@
+import type { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -26,13 +27,13 @@ apiClient.interceptors.response.use(
 );
 
 export interface UseApiState<T> {
-  data: T | null;
+  data?: T;
   isLoading: boolean;
-  error: AxiosError | null;
+  error: AxiosError | APIErrorType | null;
 }
 
 export interface UseApiResult<T> extends UseApiState<T> {
-  execute: (config?: AxiosRequestConfig) => Promise<T>;
+  execute: (config?: AxiosRequestConfig) => Promise<T | undefined>;
   reset: () => void;
 }
 
@@ -71,7 +72,6 @@ interface UseApiOptions extends AxiosRequestConfig {
 export function useApi<T = any>(options: UseApiOptions = {}): UseApiResult<T> {
   const { autoExecute, ...config } = options;
   const [state, setState] = useState<UseApiState<T>>({
-    data: null,
     isLoading: false,
     error: null,
   });
@@ -79,32 +79,38 @@ export function useApi<T = any>(options: UseApiOptions = {}): UseApiResult<T> {
   // Use a ref to track if we've executed in Strict Mode
   const hasExecutedRef = useRef(false);
   // Use a ref to store the mount execution promise
-  const mountPromiseRef = useRef<Promise<T> | null>(null);
+  const mountPromiseRef = useRef<Promise<T | undefined>>(undefined);
 
   const execute = useCallback(
     async (requestConfig?: AxiosRequestConfig) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       try {
-        const response = await apiClient.request<T>({
+        const response = await apiClient.request<APIResponse.Response<T>>({
           ...config,
           ...requestConfig,
         });
-        setState({ data: response.data, isLoading: false, error: null });
-        return response.data;
+
+        if (response.data.success) {
+          const data = response.data.data;
+          setState({ data, isLoading: false, error: null });
+          return data;
+        } else if (!response.data.success) {
+          const { error } = response.data;
+          setState((prev) => ({ ...prev, isLoading: false, error }));
+        }
       } catch (error) {
         const axiosError = error as AxiosError;
         setState((prev) => ({ ...prev, isLoading: false, error: axiosError }));
-        throw axiosError;
       }
     },
     [config],
   );
 
   const reset = useCallback(() => {
-    setState({ data: null, isLoading: false, error: null });
+    setState({ data: undefined, isLoading: false, error: null });
     hasExecutedRef.current = false;
-    mountPromiseRef.current = null;
+    mountPromiseRef.current = undefined;
   }, []);
 
   useEffect(() => {

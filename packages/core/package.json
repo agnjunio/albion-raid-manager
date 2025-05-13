@@ -24,6 +24,10 @@
     "./types": {
       "types": "./generated/types/index.ts",
       "default": "./generated/types/index.ts"
+    },
+    "./types/api": {
+      "types": "./src/types/api.ts",
+      "default": "./src/types/api.ts"
     }
   },
   "scripts": {

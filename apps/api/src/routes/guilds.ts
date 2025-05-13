@@ -1,14 +1,14 @@
 import { requireAuth } from "@/middleware/auth";
-import { APIError, APIErrorType } from "@/types/error";
+import { Guild } from "@albion-raid-manager/core/types";
+import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
-import { GuildWithMembers } from "../../../../packages/core/src/types.bkp";
 
 const router = Router();
 
 router.use(requireAuth);
 
-router.get("/", async (req: Request, res: Response<GuildWithMembers[] | APIError>) => {
+router.get("/", async (req: Request, res: Response<APIResponse.Type<Guild[]>>) => {
   try {
     const guilds = await prisma.guild.findMany({
       where: {
@@ -26,14 +26,14 @@ router.get("/", async (req: Request, res: Response<GuildWithMembers[] | APIError
         },
       },
     });
-    res.json(guilds);
+    res.json(APIResponse.Success(guilds));
   } catch (error) {
     console.error("Failed to get guilds:", error);
-    res.status(500).json({ error: "Failed to fetch guilds" });
+    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
 
-router.get("/:id", async (req: Request, res: Response<GuildWithMembers | APIError>) => {
+router.get("/:id", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
   try {
     const { id } = req.params;
 
@@ -49,18 +49,17 @@ router.get("/:id", async (req: Request, res: Response<GuildWithMembers | APIErro
     });
 
     if (!guild) {
-      return res.status(404).json({ error: APIErrorType.NOT_FOUND });
+      return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
     }
 
-    res.json(guild);
+    res.json(APIResponse.Success(guild));
   } catch (error) {
     console.error("Failed to get guild:", error);
-    res.status(500).json({ error: "Failed to fetch guild" });
+    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
 
-// Create a new guild
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
   try {
     const { name, icon, discordId, adminRoles, raidRoles, compositionRoles, raidAnnouncementChannelId } = req.body;
 
@@ -76,15 +75,14 @@ router.post("/", async (req: Request, res: Response) => {
       },
     });
 
-    res.status(201).json({ guild });
+    res.status(201).json(APIResponse.Success(guild));
   } catch (error) {
     console.error("Failed to create guild:", error);
-    res.status(500).json({ error: "Failed to create guild" });
+    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
 
-// Update a guild
-router.patch("/:id", async (req: Request, res: Response) => {
+router.patch("/:id", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
   try {
     const { id } = req.params;
     const { name, icon, adminRoles, raidRoles, compositionRoles, raidAnnouncementChannelId } = req.body;
@@ -101,15 +99,14 @@ router.patch("/:id", async (req: Request, res: Response) => {
       },
     });
 
-    res.json({ guild });
+    res.json(APIResponse.Success(guild));
   } catch (error) {
     console.error("Failed to update guild:", error);
-    res.status(500).json({ error: "Failed to update guild" });
+    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
 
-// Delete a guild
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", async (req: Request, res: Response<APIResponse.Type>) => {
   try {
     const { id } = req.params;
 
@@ -117,10 +114,10 @@ router.delete("/:id", async (req: Request, res: Response) => {
       where: { id },
     });
 
-    res.status(204).send();
+    res.json(APIResponse.Success());
   } catch (error) {
     console.error("Failed to delete guild:", error);
-    res.status(500).json({ error: "Failed to delete guild" });
+    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
 

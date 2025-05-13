@@ -1,11 +1,11 @@
-import { APIError, APIErrorType } from "@/types/error";
+import { User } from "@albion-raid-manager/core/types";
+import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
 import logger from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
 import { z } from "zod";
-import { User } from "../../../../packages/core/src/types.bkp";
 
 const router = Router();
 
@@ -14,14 +14,14 @@ const discordCallbackSchema = z.object({
   redirectUri: z.string(),
 });
 
-router.post("/callback", async (req: Request, res: Response) => {
+router.post("/callback", async (req: Request, res: Response<APIResponse.Type>) => {
   try {
     const { code, redirectUri } = discordCallbackSchema.parse(req.body);
     const { access_token, refresh_token } = await discordService.auth.exchangeCode(code, redirectUri);
 
     const discordUser = await discordService.users.getCurrentUser(`Bearer ${access_token}`);
     if (!discordUser) {
-      return res.status(401).json({ error: APIErrorType.AUTHENTICATION_FAILED });
+      return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
     }
 
     req.session.accessToken = access_token;
@@ -31,26 +31,26 @@ router.post("/callback", async (req: Request, res: Response) => {
     await req.session.save((err) => {
       if (err) {
         logger.error("Failed to save session:", err);
-        return res.status(500).json({ error: APIErrorType.INTERNAL_SERVER_ERROR });
+        return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
       }
       logger.info("Session saved successfully", {
         cookie: req.session.cookie,
         sessionId: req.session.id,
       });
-      res.json({ success: true });
+      res.json(APIResponse.Success());
     });
   } catch (error) {
     if (isAxiosError(error)) {
       console.log(error.response?.data);
     }
     logger.error("Failed to authenticate user:", error);
-    res.status(401).json({ error: APIErrorType.AUTHENTICATION_FAILED });
+    res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
   }
 });
 
-router.get("/me", async (req: Request, res: Response<User | APIError>) => {
+router.get("/me", async (req: Request, res: Response<APIResponse.Type<User>>) => {
   if (!req.session.accessToken) {
-    return res.status(401).json({ error: APIErrorType.NOT_AUTHORIZED });
+    return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
   }
 
   const get = async () => {
@@ -72,7 +72,7 @@ router.get("/me", async (req: Request, res: Response<User | APIError>) => {
       },
     });
 
-    res.json(user);
+    res.json(APIResponse.Success(user));
   };
 
   try {
@@ -87,22 +87,22 @@ router.get("/me", async (req: Request, res: Response<User | APIError>) => {
         await get();
       } catch (refreshError) {
         req.session.destroy(() => {
-          res.status(401).json({ error: APIErrorType.SESSION_EXPIRED });
+          res.status(401).json(APIResponse.Error(APIErrorType.SESSION_EXPIRED));
         });
       }
     } else {
-      res.status(401).json({ error: APIErrorType.SESSION_EXPIRED });
+      res.status(401).json(APIResponse.Error(APIErrorType.SESSION_EXPIRED));
     }
   }
 });
 
-router.post("/logout", (req: Request, res: Response) => {
+router.post("/logout", (req: Request, res: Response<APIResponse.Type>) => {
   req.session.destroy((err: Error | null) => {
     if (err) {
-      return res.status(500).json({ error: APIErrorType.INTERNAL_SERVER_ERROR });
+      return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
     }
     res.clearCookie("connect.sid");
-    res.json({ success: true });
+    res.json(APIResponse.Success());
   });
 });
 
