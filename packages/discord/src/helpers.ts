@@ -43,9 +43,10 @@ export function hasPermissions(permissions: string | bigint = 0n, requiredPermis
 
 export function transformUser(user: APIUser): User {
   return {
-    discordId: user.id,
+    id: user.id,
     username: user.username,
-    avatar: user.avatar ?? undefined,
+    nickname: user.global_name,
+    avatar: user.avatar ?? null,
   };
 }
 

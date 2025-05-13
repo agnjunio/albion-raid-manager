@@ -171,25 +171,27 @@ export function GuildSelection({ guild, icon, isLoading }: GuildSelectionProps) 
 export function UserInfo() {
   const { user, signOut, status } = useAuth();
 
+  if (status === "loading")
+    return (
+      <div className="flex min-w-0 items-center gap-2">
+        <Skeleton className="size-8" />
+        <Skeleton className="bg-muted h-3 w-24" />
+      </div>
+    );
+
+  if (!user) throw new Error("User not found");
   return (
     <>
       <div className="flex min-w-0 items-center gap-2">
-        {status === "loading" ? (
-          <Skeleton className="size-8" />
-        ) : (
-          <Avatar>
-            {user?.id && <AvatarImage src={user?.avatar || getUserPictureUrl(user.id)} />}
-            <AvatarFallback>{user?.username?.substring(0, 1).toUpperCase()}</AvatarFallback>
-          </Avatar>
-        )}
+        <Avatar>
+          <AvatarImage src={getUserPictureUrl(user.id, user.avatar)} />
+          <AvatarFallback>{user.username.substring(0, 1).toUpperCase()}</AvatarFallback>
+        </Avatar>
 
-        {status === "loading" ? (
-          <Skeleton className="bg-muted h-3 w-24" />
-        ) : (
-          <div className="flex min-w-0 flex-col text-sm group-data-[collapsible=icon]:hidden">
-            <span className="truncate font-semibold">@{user?.username || "Unknown User"}</span>
-          </div>
-        )}
+        <div className="flex min-w-0 flex-col text-sm leading-tight group-data-[collapsible=icon]:hidden">
+          <span className="truncate font-semibold">{user.nickname || "Unknown User"}</span>
+          <span className="text-muted-foreground text-xs">@{user.username}</span>
+        </div>
       </div>
 
       <SidebarMenuAction onClick={() => signOut()}>

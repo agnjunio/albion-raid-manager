@@ -52,6 +52,7 @@ model User {
   id          String        @id
   username    String
   avatar      String?
+  nickname    String?
   GuildMember GuildMember[]
   RaidSlot    RaidSlot[]
 }

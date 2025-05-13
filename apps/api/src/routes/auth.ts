@@ -60,11 +60,13 @@ router.get("/me", async (req: Request, res: Response) => {
       },
       update: {
         username: discordUser.username,
+        nickname: discordUser.global_name,
         avatar: discordUser.avatar ?? undefined,
       },
       create: {
         id: discordUser.id,
         username: discordUser.username,
+        nickname: discordUser.global_name,
         avatar: discordUser.avatar ?? undefined,
       },
     });
