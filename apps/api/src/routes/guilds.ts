@@ -1,21 +1,39 @@
+import { requireAuth } from "@/middleware/auth";
+import { APIError, APIErrorType } from "@/types/error";
+import { GuildWithMembers } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
 const router = Router();
 
-// Get all guilds
-router.get("/", async (_req: Request, res: Response) => {
+router.use(requireAuth);
+
+router.get("/", async (req: Request, res: Response<GuildWithMembers[] | APIError>) => {
   try {
-    const guilds = await prisma.guild.findMany();
-    res.json({ guilds });
+    const guilds = await prisma.guild.findMany({
+      where: {
+        members: {
+          some: {
+            userId: req.session.user?.id,
+          },
+        },
+      },
+      include: {
+        members: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+    res.json(guilds);
   } catch (error) {
     console.error("Failed to get guilds:", error);
     res.status(500).json({ error: "Failed to fetch guilds" });
   }
 });
 
-// Get a specific guild
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/:id", async (req: Request, res: Response<GuildWithMembers | APIError>) => {
   try {
     const { id } = req.params;
 
@@ -31,10 +49,10 @@ router.get("/:id", async (req: Request, res: Response) => {
     });
 
     if (!guild) {
-      return res.status(404).json({ error: "Guild not found" });
+      return res.status(404).json({ error: APIErrorType.NOT_FOUND });
     }
 
-    res.json({ guild });
+    res.json(guild);
   } catch (error) {
     console.error("Failed to get guild:", error);
     res.status(500).json({ error: "Failed to fetch guild" });

@@ -1,5 +1,8 @@
+import { requireAuth } from "@/middleware/auth";
+import { APIErrorType } from "@/types/error";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
+import { transformUser } from "@albion-raid-manager/discord/helpers";
 import logger from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
 import { z } from "zod";
@@ -16,12 +19,18 @@ router.post("/callback", async (req: Request, res: Response) => {
     const { code, redirectUri } = discordCallbackSchema.parse(req.body);
     const { access_token, refresh_token } = await discordService.auth.exchangeCode(code, redirectUri);
 
+    const discordUser = await discordService.users.getCurrentUser(`Bearer ${access_token}`);
+    if (!discordUser) {
+      return res.status(401).json({ error: APIErrorType.AUTHENTICATION_FAILED });
+    }
+
     req.session.accessToken = access_token;
     req.session.refreshToken = refresh_token;
+    req.session.user = transformUser(discordUser);
 
     await req.session.save((err) => {
       if (err) {
-        return res.status(500).json({ error: "Failed to save session" });
+        return res.status(500).json({ error: APIErrorType.INTERNAL_SERVER_ERROR });
       }
       res.json({ success: true });
     });
@@ -30,15 +39,11 @@ router.post("/callback", async (req: Request, res: Response) => {
       console.log(error.response?.data);
     }
     logger.error("Failed to authenticate user:", error);
-    res.status(401).json({ error: "Failed to authenticate" });
+    res.status(401).json({ error: APIErrorType.AUTHENTICATION_FAILED });
   }
 });
 
-router.get("/me", async (req: Request, res: Response) => {
-  if (!req.session.accessToken) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
-
+router.get("/me", requireAuth, async (req: Request, res: Response) => {
   const get = async () => {
     const discordUser = await discordService.users.getCurrentUser(`Bearer ${req.session.accessToken}`);
     const user = await prisma.user.upsert({
