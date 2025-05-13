@@ -1,6 +1,4 @@
-"use client";
-
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/core/helpers";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as React from "react";
 

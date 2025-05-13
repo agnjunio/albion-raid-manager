@@ -1,4 +1,4 @@
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/core/helpers";
 import * as React from "react";
 
 interface CardProps extends React.ComponentProps<"div"> {

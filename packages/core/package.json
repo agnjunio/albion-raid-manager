@@ -9,10 +9,6 @@
       "types": "./src/cache/index.ts",
       "default": "./src/cache/index.ts"
     },
-    "./types": {
-      "types": "./src/types/index.ts",
-      "default": "./src/types/index.ts"
-    },
     "./scheduler": {
       "types": "./src/scheduler.ts",
       "default": "./src/scheduler.ts"
@@ -24,6 +20,10 @@
     "./utils": {
       "types": "./src/utils/index.ts",
       "default": "./src/utils/index.ts"
+    },
+    "./types": {
+      "types": "./generated/types/index.ts",
+      "default": "./generated/types/index.ts"
     }
   },
   "scripts": {

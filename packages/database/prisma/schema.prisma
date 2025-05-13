@@ -6,7 +6,13 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  output   = "../generated/prisma"
+}
+
+generator typescriptInterfaces {
+  provider = "prisma-generator-typescript-interfaces"
+  output   = "../../core/generated/types/index.ts"
+  prettier = true
 }
 
 datasource db {

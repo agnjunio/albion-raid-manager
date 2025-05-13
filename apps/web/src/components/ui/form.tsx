@@ -1,7 +1,5 @@
-"use client";
-
 import { Label } from "@/components/ui/label";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/core/helpers";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";

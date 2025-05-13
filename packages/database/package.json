@@ -5,7 +5,7 @@
   "types": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./errors": "./src/errors.ts"
+    "./generated/prisma": "./generated/prisma/index.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",
@@ -19,6 +19,8 @@
     "@prisma/client": "6.5.0"
   },
   "devDependencies": {
-    "prisma": "^6.5.0"
+    "prisma": "^6.5.0",
+    "prisma-generator-typescript-interfaces": "^2.1.0",
+    "zod": "^3.24.4"
   }
 }

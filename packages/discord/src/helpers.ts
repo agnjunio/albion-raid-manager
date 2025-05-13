@@ -1,5 +1,5 @@
-import { User } from "@albion-raid-manager/core/types";
 import { APIGuild, APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
+import { User } from "../../core/src/types.bkp";
 import { Server } from "./types";
 
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;

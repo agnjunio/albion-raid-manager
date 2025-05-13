@@ -1,5 +1,3 @@
-export { Prisma } from ".prisma/client";
+export { Prisma } from "../generated/prisma";
+export type { GuildMemberRole, RaidStatus, Role } from "../generated/prisma";
 export { prisma } from "./client";
-
-// Export enums only
-export { GuildMemberRole, RaidStatus, Role } from ".prisma/client";

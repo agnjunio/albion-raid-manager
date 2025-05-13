@@ -1,4 +1,3 @@
-import { type Raid, type RaidSlot, Role } from "@albion-raid-manager/core/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -12,6 +11,7 @@ import {
   User,
 } from "discord.js";
 import { raids } from ".";
+import { type Raid, type RaidSlot, Role } from "../../../../packages/core/src/types.bkp";
 
 const emojis = {
   default: "❔",

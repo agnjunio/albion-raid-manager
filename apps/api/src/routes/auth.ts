@@ -1,11 +1,11 @@
 import { APIError, APIErrorType } from "@/types/error";
-import { User } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
 import logger from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
 import { z } from "zod";
+import { User } from "../../../../packages/core/src/types.bkp";
 
 const router = Router();
 

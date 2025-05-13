@@ -1,7 +1,5 @@
-"use client";
-
 import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/core/helpers";
 import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as React from "react";

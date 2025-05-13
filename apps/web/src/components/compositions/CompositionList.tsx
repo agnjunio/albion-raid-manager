@@ -1,4 +1,4 @@
-import { type Composition, type CompositionWithBuildsAndCount } from "@albion-raid-manager/core/types";
+import { type Composition } from "@albion-raid-manager/core/types";
 import { compareAsc } from "date-fns";
 import { distance } from "fastest-levenshtein";
 import Link from "next/link";
@@ -17,7 +17,7 @@ export function filterCompositions(compositions: Composition[], filter: string) 
 }
 
 type CompositionListProps = {
-  compositions: CompositionWithBuildsAndCount[];
+  compositions: Composition[];
 };
 
 export default function CompositionList({ compositions }: CompositionListProps) {
@@ -54,7 +54,7 @@ export default function CompositionList({ compositions }: CompositionListProps) 
             >
               <div>
                 <div className="grow text-lg/tight font-semibold">{composition.name}</div>
-                <div className="text-secondary-violet text-xs">Size: {composition._count.builds}</div>
+                <div className="text-secondary-violet text-xs">Size: {composition.builds?.length ?? 0}</div>
               </div>
               <div>
                 Last Update:{" "}

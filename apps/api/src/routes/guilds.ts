@@ -1,8 +1,8 @@
 import { requireAuth } from "@/middleware/auth";
 import { APIError, APIErrorType } from "@/types/error";
-import { GuildWithMembers } from "@albion-raid-manager/core/types";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
+import { GuildWithMembers } from "../../../../packages/core/src/types.bkp";
 
 const router = Router();
 

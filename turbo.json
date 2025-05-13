@@ -18,10 +18,6 @@
     "build": {
       "dependsOn": ["^db:generate"]
     },
-    "build#web": {
-      "dependsOn": ["^db:generate"],
-      "outputs": [".next/***", "!.next/cache/**"]
-    },
     "lint": {},
     "prettier": {}
   }

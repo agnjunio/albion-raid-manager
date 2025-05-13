@@ -1,5 +1,5 @@
 import { useApi } from "@/lib/api";
-import { type User } from "@albion-raid-manager/core/types";
+import type { User } from "@albion-raid-manager/core/types";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 

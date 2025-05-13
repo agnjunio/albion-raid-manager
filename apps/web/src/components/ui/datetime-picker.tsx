@@ -2,7 +2,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/core/helpers";
 import { faCalendar, faCalendarDay, faChevronLeft, faChevronRight, faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { add, format } from "date-fns";
