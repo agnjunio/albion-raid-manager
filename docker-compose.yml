@@ -1,35 +1,14 @@
 services:
-  bot:
-    build:
-      context: .
-      dockerfile: apps/bot/Dockerfile
-    image: albion-raid-manager-bot
-    command: turbo start:dev
-    env_file: apps/bot/.env
-    develop:
-      watch:
-        - action: rebuild
-          path: ./apps/bot/package.json
-        - action: sync
-          path: ./apps/bot/src
-          target: /app/apps/bot/src
-        - action: sync
-          path: ./packages/common/src
-          target: /app/packages/common/src
-        - action: sync
-          path: ./packages/logger/src
-          target: /app/packages/logger/src
-
   database:
     image: postgres
     user: postgres
+    ports:
+      - "5432:5432"
     volumes:
       - database-data:/var/lib/postgresql/data
-    secrets:
-      - database-password
     environment:
       - POSTGRES_DB=albion-raid-manager
-      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+      - POSTGRES_PASSWORD=postgres
     healthcheck:
       test: [ "CMD", "pg_isready" ]
       interval: 10s
@@ -38,8 +17,3 @@ services:
 
 volumes:
   database-data:
-
-
-secrets:
-  database-password:
-    external: true
