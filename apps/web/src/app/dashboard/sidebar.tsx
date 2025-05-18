@@ -40,13 +40,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { useMenu } from "@/lib/menu";
+import { useGetGuildsQuery } from "@/lib/store/guilds";
 
 import { useDashboard } from "./context";
 
 export function DashboardSidebar() {
-  const { fetchGuilds, selectedGuild } = useDashboard();
-  const guilds = fetchGuilds.data ?? [];
+  const { selectedGuild } = useDashboard();
+  const fetchGuilds = useGetGuildsQuery();
   const links = useMenu();
+
+  const guilds = fetchGuilds.data?.guilds ?? [];
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">

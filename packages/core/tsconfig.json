@@ -3,7 +3,10 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": ".",
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@types": ["./generated/types/index.ts"]
+    }
   },
   "include": ["src/**/*", "generated/**/*"],
   "exclude": ["node_modules", "dist"]

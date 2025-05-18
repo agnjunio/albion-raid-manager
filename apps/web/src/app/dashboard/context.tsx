@@ -1,14 +1,13 @@
-import type { Guild } from "@albion-raid-manager/core/types";
+import type { Guild, GuildMember } from "@albion-raid-manager/core/types";
 
 import { createContext, useContext, useMemo } from "react";
 
 import { useParams } from "react-router-dom";
 
-import { useApi, type UseApiResult } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { useGetGuildsQuery } from "@/lib/store/guilds";
 
 type DashboardContextType = {
-  fetchGuilds: UseApiResult<Guild[]>;
   selectedGuild?: Guild;
 };
 
@@ -17,21 +16,19 @@ const DashboardContext = createContext<DashboardContextType | undefined>(undefin
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const { guildId } = useParams();
-  const fetchGuilds = useApi<Guild[]>({
-    method: "GET",
-    url: "/guilds",
-    autoExecute: true,
-  });
+  const fetchGuilds = useGetGuildsQuery();
 
   const selectedGuild = useMemo(() => {
     if (!fetchGuilds.data) return;
 
-    const { data: guilds } = fetchGuilds;
+    const { guilds } = fetchGuilds.data;
     return guildId
-      ? guilds.find((guild) => guild.id === guildId)
-      : guilds.find((guild) => guild.members?.find((member) => member.userId === user?.id)?.default);
-  }, [fetchGuilds, guildId, user?.id]);
-  return <DashboardContext.Provider value={{ fetchGuilds, selectedGuild }}>{children}</DashboardContext.Provider>;
+      ? guilds.find((guild: Guild) => guild.id === guildId)
+      : guilds.find(
+          (guild: Guild) => guild.members?.find((member: GuildMember) => member.userId === user?.id)?.default,
+        );
+  }, [fetchGuilds.data, guildId, user?.id]);
+  return <DashboardContext.Provider value={{ selectedGuild }}>{children}</DashboardContext.Provider>;
 }
 
 export function useDashboard() {

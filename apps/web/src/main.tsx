@@ -2,27 +2,29 @@ import React from "react";
 
 import ReactDOM from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
+import { Provider as ReduxProvider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "./app";
 import "./index.css";
-import { AuthProvider } from "./lib/auth";
+import { store } from "./lib/store";
 import { Theme, ThemeProvider } from "./lib/theme";
-function GlobalError({ error }: { error: Error }) {
-  return <p>Something went wrong: {error.message}</p>;
-}
 
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Root element not found");
+
+function GlobalError({ error }: { error: Error }) {
+  return <p>Something went wrong: {error.message}</p>;
+}
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <ErrorBoundary fallbackRender={GlobalError}>
       <BrowserRouter>
         <ThemeProvider defaultTheme={Theme.SYSTEM} storageKey="theme">
-          <AuthProvider>
+          <ReduxProvider store={store}>
             <App />
-          </AuthProvider>
+          </ReduxProvider>
         </ThemeProvider>
       </BrowserRouter>
     </ErrorBoundary>

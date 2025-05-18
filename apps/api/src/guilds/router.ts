@@ -1,15 +1,16 @@
 import { Guild } from "@albion-raid-manager/core/types";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
+import { GetGuildsResponse } from "@albion-raid-manager/core/types/api/guilds";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
-import { requireAuth } from "@/middleware/auth";
+import { requireAuth } from "@/auth/middleware";
 
-const router: Router = Router();
+export const guildsRouter: Router = Router();
 
-router.use(requireAuth);
+guildsRouter.use(requireAuth);
 
-router.get("/", async (req: Request, res: Response<APIResponse.Type<Guild[]>>) => {
+guildsRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetGuildsResponse>>) => {
   try {
     const guilds = await prisma.guild.findMany({
       where: {
@@ -27,14 +28,14 @@ router.get("/", async (req: Request, res: Response<APIResponse.Type<Guild[]>>) =
         },
       },
     });
-    res.json(APIResponse.Success(guilds));
+    res.json(APIResponse.Success({ guilds }));
   } catch (error) {
     console.error("Failed to get guilds:", error);
     res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
 
-router.get("/:id", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
+guildsRouter.get("/:id", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
   try {
     const { id } = req.params;
 
@@ -60,7 +61,7 @@ router.get("/:id", async (req: Request, res: Response<APIResponse.Type<Guild>>) 
   }
 });
 
-router.post("/", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
+guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
   try {
     const { name, icon, discordId, adminRoles, raidRoles, compositionRoles, raidAnnouncementChannelId } = req.body;
 
@@ -82,44 +83,3 @@ router.post("/", async (req: Request, res: Response<APIResponse.Type<Guild>>) =>
     res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
-
-router.patch("/:id", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
-  try {
-    const { id } = req.params;
-    const { name, icon, adminRoles, raidRoles, compositionRoles, raidAnnouncementChannelId } = req.body;
-
-    const guild = await prisma.guild.update({
-      where: { id },
-      data: {
-        name,
-        icon,
-        adminRoles,
-        raidRoles,
-        compositionRoles,
-        raidAnnouncementChannelId,
-      },
-    });
-
-    res.json(APIResponse.Success(guild));
-  } catch (error) {
-    console.error("Failed to update guild:", error);
-    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
-  }
-});
-
-router.delete("/:id", async (req: Request, res: Response<APIResponse.Type>) => {
-  try {
-    const { id } = req.params;
-
-    await prisma.guild.delete({
-      where: { id },
-    });
-
-    res.json(APIResponse.Success());
-  } catch (error) {
-    console.error("Failed to delete guild:", error);
-    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
-  }
-});
-
-export default router;

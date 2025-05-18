@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 import { AuthCallback } from "./auth/callback";
 import { DashboardLayout } from "./dashboard/layout";
+import { DashboardPage } from "./dashboard/page";
 import { Home } from "./home/page";
 
 export default function App() {
@@ -17,7 +18,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<div>Dashboard</div>} />
+          <Route index element={<DashboardPage />} />
         </Route>
       </Routes>
     </div>

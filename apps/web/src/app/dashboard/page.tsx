@@ -2,16 +2,14 @@ import { useEffect } from "react";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Image from "next/image";
-import Link from "next/link";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { useDashboard } from "./context";
 
-export default function Page() {
+export function DashboardPage() {
   const location = useLocation();
   const { selectedGuild } = useDashboard();
   const navigate = useNavigate();
@@ -28,13 +26,13 @@ export default function Page() {
       <Card className="max-w-md text-center">
         <CardHeader>
           <div className="bg-primary/10 mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full">
-            <Image src="/book.jpg" alt="Albion Raid Manager" className="rounded-full" width={80} height={80} />
+            <img src="/book.jpg" alt="Albion Raid Manager" className="rounded-full" width={80} height={80} />
           </div>
           <CardTitle className="text-2xl">Welcome to Albion Raid Manager</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
           <p className="text-muted-foreground text-sm">Please select a guild or click Create Guild to start.</p>
-          <Link href="/create">
+          <Link to="/create">
             <Button>
               <FontAwesomeIcon icon={faPlus} />
               <div>Create Guild</div>

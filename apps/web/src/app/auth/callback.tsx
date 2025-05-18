@@ -1,21 +1,14 @@
 import { useEffect, useRef } from "react";
 
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
-import { useApi } from "@/lib/api";
-import { useAuth } from "@/lib/auth";
-
-const AUTH_FLAG_KEY = "auth_authenticated";
+import { AUTH_FLAG_KEY } from "@/lib/auth";
+import { useDiscordCallbackMutation } from "@/lib/store/auth";
 
 export function AuthCallback() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const processedRef = useRef(false);
-  const { checkSession } = useAuth();
-  const authCallback = useApi<{ success: boolean }>({
-    method: "POST",
-    url: "/auth/callback",
-  });
+  const [discordCallback] = useDiscordCallbackMutation();
 
   useEffect(() => {
     if (processedRef.current) return;
@@ -31,12 +24,9 @@ export function AuthCallback() {
 
       try {
         processedRef.current = true;
-        await authCallback.execute({ data: { code, redirectUri } });
+        await discordCallback({ code, redirectUri });
         localStorage.setItem(AUTH_FLAG_KEY, "true");
-        const redirectPath = localStorage.getItem("auth_redirect") || "/";
-        localStorage.removeItem("auth_redirect");
-        navigate(redirectPath);
-        checkSession();
+        window.location.href = "/dashboard";
       } catch (error) {
         console.error("Auth callback failed:", error);
         localStorage.removeItem(AUTH_FLAG_KEY);
@@ -45,7 +35,7 @@ export function AuthCallback() {
     };
 
     handleCallback();
-  }, [searchParams, navigate, authCallback, checkSession]);
+  }, [searchParams, discordCallback]);
 
   return (
     <div className="flex h-screen items-center justify-center">

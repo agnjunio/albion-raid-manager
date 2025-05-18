@@ -1,7 +1,7 @@
 {
   "name": "@black-river-gaming/albion-raid-manager",
-  "type": "module",
   "packageManager": "pnpm@10.10.0",
+  "type": "module",
   "scripts": {
     "dev": "turbo run dev",
     "api": "turbo run dev --filter=@albion-raid-manager/api",

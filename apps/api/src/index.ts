@@ -3,26 +3,26 @@ import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import cors from "cors";
-import dotenv from "dotenv";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
 
-import routes from "./routes";
-
-dotenv.config();
+import { routes } from "./routes";
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = config.api.port;
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: config.api.cors.origin,
     credentials: true,
   }),
 );
+
 app.use(express.urlencoded({ extended: true }));
+
 app.use(express.json());
+
 app.use(
   morgan("dev", {
     stream: {
@@ -32,6 +32,7 @@ app.use(
     },
   }),
 );
+
 app.use(
   session({
     secret: config.session.secret,
