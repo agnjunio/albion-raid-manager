@@ -1,4 +1,5 @@
-import axios, { type AxiosError, type AxiosResponse } from "axios";
+import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
+import axios, { isAxiosError, type AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
 
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -22,3 +23,25 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+// Request wrapper
+export const apiRequest = async (args: AxiosRequestConfig) => {
+  try {
+    const response = await apiClient.request(args);
+    const data = response.data as APIResponse.Type<unknown>;
+    if (APIResponse.isError(data)) {
+      throw new Error(data.type);
+    }
+
+    return { data: data.data };
+  } catch (error) {
+    if (isAxiosError(error)) {
+      if (error.response?.data) {
+        const data = error.response.data as APIResponse.Error;
+        return { error: data.type };
+      }
+    }
+
+    return { error: APIErrorType.UNKNOWN };
+  }
+};

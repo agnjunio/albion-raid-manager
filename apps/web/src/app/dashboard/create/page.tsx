@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import Loading from "@/components/ui/loading";
 import { PageError } from "@/components/ui/page";
-import { useGetServersQuery } from "@/lib/store/servers";
+import { useGetServersQuery } from "@/store/servers";
 
 import { AddServer } from "./add-server";
 

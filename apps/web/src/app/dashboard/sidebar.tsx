@@ -40,7 +40,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { useMenu } from "@/lib/menu";
-import { useGetGuildsQuery } from "@/lib/store/guilds";
+import { useGetGuildsQuery } from "@/store/guilds";
 
 import { useDashboard } from "./context";
 

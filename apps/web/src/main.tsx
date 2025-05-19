@@ -7,8 +7,8 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./app";
 import "./index.css";
-import { store } from "./lib/store";
 import { Theme, ThemeProvider } from "./lib/theme";
+import { store } from "./store";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Root element not found");

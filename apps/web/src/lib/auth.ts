@@ -1,6 +1,6 @@
 import type { User } from "@albion-raid-manager/core/types";
 
-import { useGetMeQuery, useLogoutMutation } from "@/lib/store/auth";
+import { useGetMeQuery, useLogoutMutation } from "@/store/auth";
 
 export const AUTH_FLAG_KEY = "auth_logged_in";
 export const AUTH_REDIRECT_KEY = "auth_redirect";

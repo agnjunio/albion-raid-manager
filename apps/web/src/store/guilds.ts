@@ -2,11 +2,11 @@ import type { GetGuildsResponse } from "@albion-raid-manager/core/types/api/guil
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { baseQuery } from "./baseQuery";
+import { apiRequest } from "@/lib/api";
 
 export const guildsApi = createApi({
-  reducerPath: "guildsApi",
-  baseQuery,
+  reducerPath: "guilds",
+  baseQuery: apiRequest,
   endpoints: (builder) => ({
     getGuilds: builder.query<GetGuildsResponse, void>({
       query: () => ({

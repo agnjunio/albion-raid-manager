@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { AUTH_FLAG_KEY } from "@/lib/auth";
-import { useDiscordCallbackMutation } from "@/lib/store/auth";
+import { useDiscordCallbackMutation } from "@/store/auth";
 
 export function AuthCallback() {
   const [searchParams] = useSearchParams();

@@ -5,7 +5,7 @@ import { createContext, useContext, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import { useAuth } from "@/lib/auth";
-import { useGetGuildsQuery } from "@/lib/store/guilds";
+import { useGetGuildsQuery } from "@/store/guilds";
 
 type DashboardContextType = {
   selectedGuild?: Guild;

@@ -2,11 +2,11 @@ import type { DiscordCallbackRequest, GetMeResponse } from "@albion-raid-manager
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { baseQuery } from "./baseQuery";
+import { apiRequest } from "@/lib/api";
 
 export const authApi = createApi({
-  reducerPath: "authApi",
-  baseQuery,
+  reducerPath: "auth",
+  baseQuery: apiRequest,
   endpoints: (builder) => ({
     getMe: builder.query<GetMeResponse, void>({
       query: () => ({ url: "/auth/me" }),
