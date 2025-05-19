@@ -1,3 +1,5 @@
+import type { SerializedError } from "@reduxjs/toolkit";
+
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import axios, { isAxiosError, type AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
 
@@ -24,8 +26,8 @@ apiClient.interceptors.response.use(
   },
 );
 
-// Request wrapper
-export const apiRequest = async (args: AxiosRequestConfig) => {
+// Request connector for RTK Query
+export const apiRTKRequest = async (args: AxiosRequestConfig): Promise<{ data: unknown; error?: SerializedError }> => {
   try {
     const response = await apiClient.request(args);
     const data = response.data as APIResponse.Type<unknown>;
@@ -38,10 +40,10 @@ export const apiRequest = async (args: AxiosRequestConfig) => {
     if (isAxiosError(error)) {
       if (error.response?.data) {
         const data = error.response.data as APIResponse.Error;
-        return { error: data.type };
+        return { data: error.response.data, error: { message: data.type } };
       }
     }
 
-    return { error: APIErrorType.UNKNOWN };
+    return { data: undefined, error: { message: APIErrorType.UNKNOWN } };
   }
 };

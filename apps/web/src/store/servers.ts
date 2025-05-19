@@ -2,11 +2,11 @@ import type { GetServersResponse } from "@albion-raid-manager/core/types/api/ser
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
-import { apiRequest } from "@/lib/api";
+import { apiRTKRequest } from "@/lib/api";
 
 export const serversApi = createApi({
   reducerPath: "servers",
-  baseQuery: apiRequest,
+  baseQuery: apiRTKRequest,
   endpoints: (builder) => ({
     getServers: builder.query<GetServersResponse, void>({
       query: () => ({ url: "/servers" }),

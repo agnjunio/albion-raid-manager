@@ -12,7 +12,14 @@ serverRouter.use(requireAuth);
 
 serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetServersResponse>>) => {
   try {
-    const servers = await discordService.guilds.getUserGuilds(req.session.accessToken ?? "");
+    const servers = await discordService.guilds.getUserGuilds(req.session.accessToken ?? "", {
+      admin: true,
+    });
+    if (!servers) {
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get servers"));
+      return;
+    }
+
     res.json(APIResponse.Success({ servers }));
   } catch (error) {
     if (isAxiosError(error) && error.response?.status === 401) {

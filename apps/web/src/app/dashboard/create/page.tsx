@@ -17,12 +17,14 @@ export function CreateGuildPage() {
   const { servers } = getServers.data;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-4">
-      <Link to="/dashboard" className="text-accent flex items-center gap-1 text-sm leading-none">
-        <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
-        <span className="font-sans">Back to dashboard</span>
-      </Link>
-      <AddServer servers={servers} />
+    <div className="flex grow items-center justify-center">
+      <div className="flex flex-col items-start gap-3">
+        <Link to="/dashboard" className="text-accent flex justify-center gap-1 text-sm leading-none">
+          <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
+          <span className="font-sans">Back to dashboard</span>
+        </Link>
+        <AddServer servers={servers} />
+      </div>
     </div>
   );
 }

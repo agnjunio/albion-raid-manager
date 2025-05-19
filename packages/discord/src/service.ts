@@ -1,12 +1,21 @@
 import config from "@albion-raid-manager/config";
 import { memoize } from "@albion-raid-manager/core/cache";
 import { sleep } from "@albion-raid-manager/core/scheduler";
+import { Server } from "@albion-raid-manager/core/types/discord";
 import { getMilliseconds } from "@albion-raid-manager/core/utils";
-import { APIGuild, APIGuildChannel, APIGuildMember, APIMessage, APIUser, ChannelType } from "discord-api-types/v10";
+import {
+  APIGuild,
+  APIGuildChannel,
+  APIGuildMember,
+  APIMessage,
+  APIUser,
+  ChannelType,
+  PermissionFlagsBits,
+} from "discord-api-types/v10";
 
 import { discordApiClient } from "./client";
-import { transformChannel, transformGuild } from "./helpers";
-import { DiscordAccessToken, DiscordServiceOptions, Server } from "./types";
+import { hasPermissions, transformChannel, transformGuild } from "./helpers";
+import { DiscordAccessToken, DiscordServiceOptions } from "./types";
 
 const DISCORD_TOKEN = config.discord.token;
 
@@ -82,7 +91,11 @@ async function getUser(userId: string) {
   );
 }
 
-export async function getUserGuilds(token: string): Promise<Server[]> {
+type GetUserGuildsOptions = {
+  admin?: boolean;
+};
+
+export async function getUserGuilds(token: string, { admin }: GetUserGuildsOptions = {}): Promise<Server[]> {
   return memoize(
     `discord.users.${token}.guilds`,
     async () => {
@@ -91,7 +104,13 @@ export async function getUserGuilds(token: string): Promise<Server[]> {
           Authorization: `Bearer ${token}`,
         },
       });
-      return res.data.map(transformGuild);
+
+      const servers = res.data.filter((server) => {
+        if (!admin) return true;
+        return hasPermissions(server.permissions, [PermissionFlagsBits.Administrator]);
+      });
+
+      return servers.map(transformGuild);
     },
     {
       timeout: getMilliseconds(1, "minutes"),
