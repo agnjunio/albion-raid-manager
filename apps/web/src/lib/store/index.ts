@@ -7,13 +7,16 @@ import { apiClient } from "@/lib/api";
 
 import { authApi } from "./auth";
 import { guildsApi } from "./guilds";
+import { serversApi } from "./servers";
 
 export const store = configureStore({
   reducer: {
     [authApi.reducerPath]: authApi.reducer,
     [guildsApi.reducerPath]: guildsApi.reducer,
+    [serversApi.reducerPath]: serversApi.reducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(authApi.middleware, guildsApi.middleware),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(authApi.middleware, guildsApi.middleware, serversApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

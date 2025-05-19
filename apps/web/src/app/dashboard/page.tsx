@@ -32,7 +32,7 @@ export function DashboardPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-2">
           <p className="text-muted-foreground text-sm">Please select a guild or click Create Guild to start.</p>
-          <Link to="/create">
+          <Link to="/dashboard/create">
             <Button>
               <FontAwesomeIcon icon={faPlus} />
               <div>Create Guild</div>

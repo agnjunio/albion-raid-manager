@@ -73,7 +73,7 @@ export function DashboardSidebar() {
               </Link>
             ))}
             {guilds.length > 0 && <DropdownMenuSeparator />}
-            <Link to="/create">
+            <Link to="/dashboard/create">
               <DropdownMenuItem>
                 <FontAwesomeIcon icon={faPlus} className="size-4" />
                 <div className="leading-normal">Add Server</div>

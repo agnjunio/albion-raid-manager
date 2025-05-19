@@ -9,9 +9,7 @@ export const authApi = createApi({
   baseQuery,
   endpoints: (builder) => ({
     getMe: builder.query<GetMeResponse, void>({
-      query: () => ({
-        url: "/auth/me",
-      }),
+      query: () => ({ url: "/auth/me" }),
     }),
     discordCallback: builder.mutation<void, DiscordCallbackRequest>({
       query: ({ code, redirectUri }) => ({

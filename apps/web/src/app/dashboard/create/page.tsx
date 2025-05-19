@@ -1,31 +1,28 @@
-import type { Server } from "@albion-raid-manager/discord";
-
-import { getUserGuilds, isAxiosError } from "@albion-raid-manager/discord";
-import logger from "@albion-raid-manager/logger";
 import { faChevronCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "next/link";
-import { redirect } from "next/navigation";
+import { Link } from "react-router-dom";
+
+import Loading from "@/components/ui/loading";
+import { PageError } from "@/components/ui/page";
+import { useGetServersQuery } from "@/lib/store/servers";
 
 import { AddServer } from "./add-server";
-async;
 
 export function CreateGuildPage() {
-  let servers: Server[] = [];
-  try {
-    servers = (await getUserGuilds(session.accessToken)).filter((server) => server.admin);
-  } catch (error) {
-    if (isAxiosError(error) && error.status === 401) return redirect("/");
-    logger.error(`Failed to fetch user guilds:`, error);
-  }
+  const getServers = useGetServersQuery();
+
+  if (getServers.isLoading) return <Loading />;
+  if (getServers.isError) return <PageError error={getServers.error} />;
+  if (!getServers.data) return <PageError error="No servers found" />;
+  const { servers } = getServers.data;
 
   return (
-    <div className="flex min-h-screen flex-col justify-center gap-3 p-4">
-      <Link href="/dashboard" className="text-accent flex items-center gap-1 text-sm leading-none">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-4">
+      <Link to="/dashboard" className="text-accent flex items-center gap-1 text-sm leading-none">
         <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
         <span className="font-sans">Back to dashboard</span>
       </Link>
-      <AddServer servers={servers} userId={session.user.id} />
+      <AddServer servers={servers} />
     </div>
   );
 }

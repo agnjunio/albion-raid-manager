@@ -1,8 +1,10 @@
-import { Guild } from "@albion-raid-manager/core/types";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import { GetGuildsResponse } from "@albion-raid-manager/core/types/api/guilds";
+import { CreateGuildResponse, GetGuildResponse, GetGuildsResponse } from "@albion-raid-manager/core/types/api/guilds";
 import { prisma } from "@albion-raid-manager/database";
+import { discordService, Server } from "@albion-raid-manager/discord";
+import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
+import { z } from "zod";
 
 import { requireAuth } from "@/auth/middleware";
 
@@ -35,7 +37,7 @@ guildsRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetGui
   }
 });
 
-guildsRouter.get("/:id", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
+guildsRouter.get("/:id", async (req: Request, res: Response<APIResponse.Type<GetGuildResponse>>) => {
   try {
     const { id } = req.params;
 
@@ -54,32 +56,53 @@ guildsRouter.get("/:id", async (req: Request, res: Response<APIResponse.Type<Gui
       return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
     }
 
-    res.json(APIResponse.Success(guild));
+    res.json(APIResponse.Success({ guild }));
   } catch (error) {
     console.error("Failed to get guild:", error);
     res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });
 
-guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<Guild>>) => {
+guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<CreateGuildResponse>>) => {
+  const createGuildSchema = z.object({
+    server: z.custom<Server>(),
+  });
+  const { server } = createGuildSchema.parse(req.body);
+
   try {
-    const { name, icon, discordId, adminRoles, raidRoles, compositionRoles, raidAnnouncementChannelId } = req.body;
+    const existingGuild = await prisma.guild.findUnique({
+      where: {
+        discordId: server.id,
+      },
+    });
+    if (existingGuild) {
+      return res.status(400).json(APIResponse.Error(APIErrorType.GUILD_ALREADY_EXISTS));
+    }
+
+    const user = await discordService.users.getCurrentUser(`Bearer ${req.session.accessToken}`);
+    if (!user) {
+      return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+    }
 
     const guild = await prisma.guild.create({
       data: {
-        name,
-        icon,
-        discordId,
-        adminRoles: adminRoles || [],
-        raidRoles: raidRoles || [],
-        compositionRoles: compositionRoles || [],
-        raidAnnouncementChannelId,
+        discordId: server.id,
+        name: server.name,
+        icon: server.icon,
+        members: {
+          create: {
+            userId: user.id,
+            role: "LEADER",
+            default: true,
+            nickname: user.username,
+          },
+        },
       },
     });
 
-    res.status(201).json(APIResponse.Success(guild));
+    res.status(201).json(APIResponse.Success({ guild }));
   } catch (error) {
-    console.error("Failed to create guild:", error);
+    logger.error(`Failed to create guild for server: ${server.id}`, error);
     res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
 });

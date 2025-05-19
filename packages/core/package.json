@@ -25,13 +25,9 @@
       "types": "./generated/types/index.ts",
       "default": "./generated/types/index.ts"
     },
-    "./types/api": {
-      "types": "./src/types/api/index.ts",
-      "default": "./src/types/api/index.ts"
-    },
-    "./types/api/*": {
-      "types": "./src/types/api/*.ts",
-      "default": "./src/types/api/*.ts"
+    "./types/*": {
+      "types": "./src/types/*.ts",
+      "default": "./src/types/*.ts"
     }
   },
   "scripts": {
