@@ -1,17 +1,19 @@
 import { useEffect, useRef } from "react";
 
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { AUTH_FLAG_KEY } from "@/lib/auth";
 import { useDiscordCallbackMutation } from "@/store/auth";
 
 export function AuthCallback() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const processedRef = useRef(false);
   const [discordCallback] = useDiscordCallbackMutation();
 
   useEffect(() => {
     if (processedRef.current) return;
+
     const handleCallback = async () => {
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
@@ -24,18 +26,19 @@ export function AuthCallback() {
 
       try {
         processedRef.current = true;
-        await discordCallback({ code, redirectUri });
+        const result = await discordCallback({ code, redirectUri });
+        if (result.error) throw result.error;
         localStorage.setItem(AUTH_FLAG_KEY, "true");
         window.location.href = "/dashboard";
       } catch (error) {
         console.error("Auth callback failed:", error);
         localStorage.removeItem(AUTH_FLAG_KEY);
-        window.location.href = "/";
+        navigate("/");
       }
     };
 
     handleCallback();
-  }, [searchParams, discordCallback]);
+  }, [searchParams, discordCallback, navigate]);
 
   return (
     <div className="flex h-screen items-center justify-center">

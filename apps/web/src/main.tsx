@@ -20,7 +20,7 @@ function GlobalError({ error }: { error: Error }) {
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <ErrorBoundary fallbackRender={GlobalError}>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <ThemeProvider defaultTheme={Theme.SYSTEM} storageKey="theme">
           <ReduxProvider store={store}>
             <App />

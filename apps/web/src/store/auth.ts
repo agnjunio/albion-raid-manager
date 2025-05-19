@@ -13,7 +13,7 @@ export const authApi = createApi({
     }),
     discordCallback: builder.mutation<void, DiscordCallbackRequest>({
       query: ({ code, redirectUri }) => ({
-        url: "/auth/discord/callback",
+        url: "/auth/callback",
         method: "POST",
         data: { code, redirectUri },
       }),
