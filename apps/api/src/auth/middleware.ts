@@ -9,7 +9,7 @@ export const requireAuth = async (req: Request, res: Response<APIResponse.Type>,
   }
 
   if (!req.session.user) {
-    const discordUser = await discordService.users.getCurrentUser(`Bearer ${req.session.accessToken}`);
+    const discordUser = await discordService.users.getCurrentUser({ type: "user", token: req.session.accessToken });
     if (!discordUser) {
       return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
     }

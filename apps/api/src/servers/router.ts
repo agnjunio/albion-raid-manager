@@ -4,7 +4,7 @@ import {
   AddServerResponse,
   GetServersResponse,
 } from "@albion-raid-manager/core/types/api/servers";
-import { prisma } from "@albion-raid-manager/database";
+import { GuildMemberRole, prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
@@ -20,7 +20,7 @@ serverRouter.use(requireAuth);
 
 serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetServersResponse>>) => {
   try {
-    const servers = await discordService.servers.getUserGuilds(req.session.accessToken ?? "", {
+    const servers = await discordService.servers.getServers({
       admin: true,
     });
     if (!servers) {
@@ -46,9 +46,14 @@ serverRouter.post(
     try {
       const { serverId } = req.body;
 
-      const server = await discordService.servers.getGuild(serverId, {
-        authorization: `Bearer ${req.session.accessToken}`,
+      const server = await discordService.servers.getServer(serverId, {
+        type: "user",
+        token: req.session.accessToken,
       });
+      if (!server) {
+        res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
+        return;
+      }
 
       const existingGuild = await prisma.guild.findUnique({
         where: {
@@ -69,11 +74,19 @@ serverRouter.post(
       const guild = await prisma.guild.create({
         data: {
           discordId: serverId,
-          name: existingGuild?.name,
-          icon: existingGuild?.icon,
-          ownerId: req.session.user.id,
+          name: server.name,
+          icon: server.icon,
+          members: {
+            create: {
+              userId: req.session.user.id,
+              role: GuildMemberRole.LEADER,
+              default: true,
+            },
+          },
         },
       });
+
+      res.json(APIResponse.Success({ guild }));
     } catch (error) {
       logger.warn("Failed to add server", error);
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to add server"));
