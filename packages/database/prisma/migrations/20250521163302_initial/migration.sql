@@ -1,7 +1,4 @@
 -- CreateEnum
-CREATE TYPE "GuildMemberRole" AS ENUM ('LEADER', 'OFFICER', 'PLAYER');
-
--- CreateEnum
 CREATE TYPE "Role" AS ENUM ('CALLER', 'TANK', 'SUPPORT', 'HEALER', 'RANGED_DPS', 'MELEE_DPS', 'BATTLEMOUNT');
 
 -- CreateEnum
@@ -13,7 +10,10 @@ CREATE TABLE "Guild" (
     "name" TEXT NOT NULL,
     "icon" TEXT,
     "discordId" TEXT NOT NULL,
-    "announcementChannelId" TEXT,
+    "adminRoles" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "raidRoles" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "compositionRoles" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "raidAnnouncementChannelId" TEXT,
 
     CONSTRAINT "Guild_pkey" PRIMARY KEY ("id")
 );
@@ -22,8 +22,10 @@ CREATE TABLE "Guild" (
 CREATE TABLE "GuildMember" (
     "guildId" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "default" BOOLEAN NOT NULL DEFAULT false,
-    "role" "GuildMemberRole" NOT NULL DEFAULT 'PLAYER',
+    "nickname" TEXT,
+    "adminPermission" BOOLEAN NOT NULL DEFAULT false,
+    "raidPermission" BOOLEAN NOT NULL DEFAULT false,
+    "compositionPermission" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "GuildMember_pkey" PRIMARY KEY ("guildId","userId")
 );
@@ -33,8 +35,22 @@ CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "avatar" TEXT,
+    "nickname" TEXT,
+    "defaultGuildId" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Build" (
+    "id" TEXT NOT NULL,
+    "compositionId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "role" "Role" NOT NULL,
+    "comment" TEXT,
+    "count" INTEGER NOT NULL DEFAULT 1,
+
+    CONSTRAINT "Build_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -49,24 +65,12 @@ CREATE TABLE "Composition" (
 );
 
 -- CreateTable
-CREATE TABLE "CompositionBuild" (
-    "id" TEXT NOT NULL,
-    "compositionId" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "role" "Role" NOT NULL,
-    "comment" TEXT,
-    "count" INTEGER NOT NULL DEFAULT 1,
-
-    CONSTRAINT "CompositionBuild_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Raid" (
     "id" TEXT NOT NULL,
     "guildId" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "allowLateJoin" BOOLEAN NOT NULL DEFAULT false,
+    "allowLateJoin" BOOLEAN NOT NULL DEFAULT true,
     "status" "RaidStatus" NOT NULL DEFAULT 'SCHEDULED',
     "announcementMessageId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -79,30 +83,43 @@ CREATE TABLE "Raid" (
 CREATE TABLE "RaidSlot" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "role" "Role" NOT NULL,
     "comment" TEXT,
     "raidId" TEXT,
     "userId" TEXT,
+    "buildId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "joinedAt" TIMESTAMP(3),
 
     CONSTRAINT "RaidSlot_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Session" (
+    "id" TEXT NOT NULL,
+    "sid" TEXT NOT NULL,
+    "data" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Guild_discordId_key" ON "Guild"("discordId");
 
--- AddForeignKey
-ALTER TABLE "GuildMember" ADD CONSTRAINT "GuildMember_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "Session_sid_key" ON "Session"("sid");
 
 -- AddForeignKey
-ALTER TABLE "GuildMember" ADD CONSTRAINT "GuildMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "GuildMember" ADD CONSTRAINT "GuildMember_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "GuildMember" ADD CONSTRAINT "GuildMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Build" ADD CONSTRAINT "Build_compositionId_fkey" FOREIGN KEY ("compositionId") REFERENCES "Composition"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Composition" ADD CONSTRAINT "Composition_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "CompositionBuild" ADD CONSTRAINT "CompositionBuild_compositionId_fkey" FOREIGN KEY ("compositionId") REFERENCES "Composition"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Raid" ADD CONSTRAINT "Raid_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -112,3 +129,6 @@ ALTER TABLE "RaidSlot" ADD CONSTRAINT "RaidSlot_raidId_fkey" FOREIGN KEY ("raidI
 
 -- AddForeignKey
 ALTER TABLE "RaidSlot" ADD CONSTRAINT "RaidSlot_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RaidSlot" ADD CONSTRAINT "RaidSlot_buildId_fkey" FOREIGN KEY ("buildId") REFERENCES "Build"("id") ON DELETE SET NULL ON UPDATE CASCADE;
