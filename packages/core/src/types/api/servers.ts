@@ -1,4 +1,14 @@
+import { Guild } from "@types";
+
 import { Server } from "../discord";
 
-// Response types
-export type GetServersResponse = { servers: Server[] };
+export type AddServerRequestBody = {
+  serverId: string;
+};
+export type AddServerResponse = {
+  guild: Guild;
+};
+
+export type GetServersResponse = {
+  servers: Server[];
+};

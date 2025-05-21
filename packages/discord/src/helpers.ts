@@ -78,3 +78,7 @@ export function transformChannel(channel: APIGuildChannel<ChannelType>) {
     parentId: channel.parent_id,
   };
 }
+
+export function getAuthorization(type: "user" | "bot", token: string) {
+  return type === "user" ? `Bearer ${token}` : `Bot ${token}`;
+}

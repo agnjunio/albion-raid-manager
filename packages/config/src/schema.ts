@@ -23,7 +23,7 @@ export const schema = z.object({
   }),
 
   discord: z.object({
-    token: z.string().optional(),
+    token: z.string(),
     clientId: z.string().optional(),
     clientSecret: z.string().optional(),
   }),

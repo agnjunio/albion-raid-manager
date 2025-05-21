@@ -1,7 +1,8 @@
 export * from "discord-api-types/v10";
 
 export type DiscordServiceOptions = {
-  authorization?: string;
+  type?: "user" | "bot";
+  token?: string;
 };
 
 export interface DiscordAccessToken {
