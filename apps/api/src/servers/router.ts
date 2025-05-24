@@ -48,10 +48,7 @@ serverRouter.post(
     try {
       const { serverId } = req.body;
 
-      const server = await discordService.servers.getServer(serverId, {
-        type: "user",
-        token: req.session.accessToken,
-      });
+      const server = await discordService.servers.getServer(serverId);
       if (!server) {
         res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
         return;
@@ -59,7 +56,7 @@ serverRouter.post(
 
       const existingGuild = await prisma.guild.findUnique({
         where: {
-          id: serverId,
+          discordId: serverId,
         },
       });
       if (existingGuild) {

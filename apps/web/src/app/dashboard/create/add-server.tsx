@@ -1,6 +1,7 @@
+import type { AddServerResponse } from "@albion-raid-manager/core/types/api/servers";
 import type { Server } from "@albion-raid-manager/core/types/discord";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { APIErrorType } from "@albion-raid-manager/core/types/api";
 import { getServerInviteUrl, getServerPictureUrl } from "@albion-raid-manager/discord/helpers";
@@ -11,7 +12,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Alert from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
-import { useVerifyServerMutation } from "@/store/servers";
+import { isAPIError } from "@/lib/api";
+import { useAddServerMutation } from "@/store/servers";
 
 enum CreateStep {
   SERVER_SELECT,
@@ -28,9 +30,9 @@ export function AddServer({ servers }: AddServerProps) {
   const [step, setStep] = useState(CreateStep.SERVER_SELECT);
   const [error, setError] = useState<string | null>(null);
   const [popup, setPopup] = useState<WindowProxy | null>(null);
-  const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<CreateGuildSuccessResponse>();
+  const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<AddServerResponse>();
   const [server, setServer] = useState<Server>();
-  const [verifyServer] = useVerifyServerMutation();
+  const [addServer] = useAddServerMutation();
 
   const handleServerSelect = useCallback(
     async (server: Server) => {
@@ -58,25 +60,19 @@ export function AddServer({ servers }: AddServerProps) {
       return;
     }
 
-    const verifyServerResponse = await verifyServer({ serverId: server.id });
-    if (verifyServerResponse.error) {
-      console.log(verifyServerResponse.error);
-      setError(APIErrorType.SERVER_VERIFICATION_FAILED);
-      setStep(CreateStep.SERVER_SELECT);
-      return;
-    }
-
-    const createGuildResponse = await createGuild(server);
-    if (!createGuildResponse.success) {
-      setError(createGuildResponse.error);
+    const addServerResponse = await addServer({ serverId: server.id });
+    if (addServerResponse.error) {
+      setError(
+        isAPIError(addServerResponse.error) ? addServerResponse.error.data : APIErrorType.SERVER_VERIFICATION_FAILED,
+      );
       setStep(CreateStep.SERVER_SELECT);
       return;
     }
 
     setError(null);
-    setCreateGuildSuccessResponse(createGuildResponse.data);
+    setCreateGuildSuccessResponse(addServerResponse.data);
     setStep(CreateStep.COMPLETE);
-  }, [server, verifyServer]);
+  }, [server, addServer]);
 
   return (
     <Card className="max-h-[80vh] w-full min-w-[30vw] max-w-lg">
@@ -88,7 +84,7 @@ export function AddServer({ servers }: AddServerProps) {
       {step === CreateStep.SERVER_SELECT && <ServerSelect servers={servers} onServerSelect={handleServerSelect} />}
       {step === CreateStep.SERVER_INVITATION && <ServerInvitation popup={popup} onPopupClosed={handlePopupClosed} />}
       {step === CreateStep.SERVER_VERIFICATION && <ServerVerification server={server} />}
-      {step === CreateStep.COMPLETE && <Complete createGuildSuccessResponse={createGuildSuccessResponse} />}
+      {step === CreateStep.COMPLETE && <Complete addServerResponse={createGuildSuccessResponse} />}
     </Card>
   );
 }
@@ -132,13 +128,21 @@ interface ServerInviationProps {
 }
 
 function ServerInvitation({ popup, onPopupClosed }: ServerInviationProps) {
+  const intervalRef = useRef<number>();
+
   useEffect(() => {
-    const invitePopupTick = setInterval(function () {
+    intervalRef.current = window.setInterval(function () {
       if (popup?.closed) {
-        clearInterval(invitePopupTick);
+        clearInterval(intervalRef.current);
         onPopupClosed();
       }
     }, 1000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [onPopupClosed, popup?.closed]);
 
   return (
@@ -161,25 +165,25 @@ function ServerVerification({ server }: ServerVerificationProps) {
 }
 
 interface CompleteProps {
-  createGuildSuccessResponse?: CreateGuildSuccessResponse;
+  addServerResponse?: AddServerResponse;
 }
 
-function Complete({ createGuildSuccessResponse }: CompleteProps) {
+function Complete({ addServerResponse }: CompleteProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (createGuildSuccessResponse) {
-      navigate(`/dashboard/${createGuildSuccessResponse.guild.id}`);
+    if (addServerResponse) {
+      navigate(`/dashboard/${addServerResponse.guild.id}`);
     }
-  }, [createGuildSuccessResponse, navigate]);
+  }, [addServerResponse, navigate]);
 
-  const link = `/dashboard/${createGuildSuccessResponse?.guild.id}`;
+  const link = `/dashboard/${addServerResponse?.guild.id}`;
   return (
     <CardContent className="flex flex-col items-center gap-3">
       <FontAwesomeIcon icon={faCheck} size="2xl" />
       <p className="text-muted-foreground text-base">
         Verification complete. You will be redirected to the dashboard page. Please <Link to={link}>click here</Link> if
-        that doesn't happen.
+        that doesn&apos;t happen.
       </p>
     </CardContent>
   );

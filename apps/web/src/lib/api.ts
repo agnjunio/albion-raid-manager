@@ -45,3 +45,7 @@ export const apiRTKRequest = async (args: AxiosRequestConfig) => {
     return { error: { status: 500, data: APIErrorType.UNKNOWN } };
   }
 };
+
+export const isAPIError = (error: unknown): error is { status: number; data: APIErrorType } => {
+  return typeof error === "object" && error !== null && "status" in error && "data" in error;
+};
