@@ -2,6 +2,7 @@ import type { Server } from "@albion-raid-manager/core/types/discord";
 
 import { useCallback, useEffect, useState } from "react";
 
+import { APIErrorType } from "@albion-raid-manager/core/types/api";
 import { getServerInviteUrl, getServerPictureUrl } from "@albion-raid-manager/discord/helpers";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +10,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import Alert from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Loading from "@/components/ui/loading";
+import { useVerifyServerMutation } from "@/store/servers";
 
 enum CreateStep {
   SERVER_SELECT,
@@ -27,6 +30,7 @@ export function AddServer({ servers }: AddServerProps) {
   const [popup, setPopup] = useState<WindowProxy | null>(null);
   const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<CreateGuildSuccessResponse>();
   const [server, setServer] = useState<Server>();
+  const [verifyServer] = useVerifyServerMutation();
 
   const handleServerSelect = useCallback(
     async (server: Server) => {
@@ -49,14 +53,15 @@ export function AddServer({ servers }: AddServerProps) {
     setStep(CreateStep.SERVER_VERIFICATION);
 
     if (!server) {
-      setError("SERVER_VERIFICATION_FAILED");
+      setError(APIErrorType.SERVER_VERIFICATION_FAILED);
       setStep(CreateStep.SERVER_SELECT);
       return;
     }
 
-    const verifyServerResponse = await verifyServer(server);
-    if (!verifyServerResponse.success) {
-      setError("SERVER_VERIFICATION_FAILED");
+    const verifyServerResponse = await verifyServer({ serverId: server.id });
+    if (verifyServerResponse.error) {
+      console.log(verifyServerResponse.error);
+      setError(APIErrorType.SERVER_VERIFICATION_FAILED);
       setStep(CreateStep.SERVER_SELECT);
       return;
     }
@@ -71,12 +76,12 @@ export function AddServer({ servers }: AddServerProps) {
     setError(null);
     setCreateGuildSuccessResponse(createGuildResponse.data);
     setStep(CreateStep.COMPLETE);
-  }, [server]);
+  }, [server, verifyServer]);
 
   return (
     <Card className="max-h-[80vh] w-full min-w-[30vw] max-w-lg">
       <CardHeader className="space-y-3">
-        {error && <Alert className="p-3">{translateErrorCode(error)}</Alert>}
+        {error && <Alert className="p-3">{error}</Alert>}
         <CardTitle>Add server</CardTitle>
       </CardHeader>
 

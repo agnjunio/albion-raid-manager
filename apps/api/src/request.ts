@@ -2,15 +2,35 @@ import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { Request, Response } from "express";
 import { z } from "zod";
 
-export const validateRequest = <T extends z.ZodType>(schema: T) => {
-  return async (req: Request<{}, {}, z.infer<T>>, res: Response, next: Function) => {
+type ValidationOptions = {
+  body?: z.ZodType;
+  params?: z.ZodType;
+  query?: z.ZodType;
+};
+
+export const validateRequest = (options: ValidationOptions) => {
+  return async (req: Request, res: Response, next: Function) => {
     try {
-      const validatedData = await schema.parseAsync(req.body);
-      req.body = validatedData;
+      if (options.body) {
+        const validatedBody = await options.body.parseAsync(req.body);
+        req.body = validatedBody;
+      }
+
+      if (options.params) {
+        const validatedPath = await options.params.parseAsync(req.params);
+        req.params = validatedPath;
+      }
+
+      if (options.query) {
+        const validatedQuery = await options.query.parseAsync(req.query);
+        req.query = validatedQuery;
+      }
+
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, error.errors[0].message));
+        const message = error.errors.map((error) => `${error.message}: ${error.path.join(".")}`).join(", ");
+        res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, message));
       } else {
         next(error);
       }

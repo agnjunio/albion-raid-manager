@@ -58,7 +58,7 @@ export async function getServer(
   serverId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
 ) {
-  return memoize<APIGuild>(
+  const server = await memoize<APIGuild>(
     `discord.${type}.${token}.guilds.${serverId}`,
     async () => {
       const res = await discordApiClient.get<APIGuild>(`/guilds/${serverId}`, {
@@ -75,6 +75,7 @@ export async function getServer(
       timeout: getMilliseconds(1, "days"),
     },
   );
+  return transformGuild(server);
 }
 
 export async function getServerChannels(

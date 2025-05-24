@@ -13,7 +13,10 @@ export const authRouter: Router = Router();
 
 authRouter.get("/me", requireAuth, async (req: Request, res: Response<APIResponse.Type<GetMeResponse>>) => {
   const get = async () => {
-    const discordUser = await discordService.users.getCurrentUser(`Bearer ${req.session.accessToken}`);
+    const discordUser = await discordService.users.getCurrentUser({
+      type: "user",
+      token: req.session.accessToken,
+    });
     const user = await prisma.user.upsert({
       where: {
         id: discordUser.id,
@@ -65,7 +68,10 @@ authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type
     const { code, redirectUri } = discordCallbackSchema.parse(req.body);
     const { access_token, refresh_token } = await discordService.auth.exchangeCode(code, redirectUri);
 
-    const discordUser = await discordService.users.getCurrentUser(`Bearer ${access_token}`);
+    const discordUser = await discordService.users.getCurrentUser({
+      type: "user",
+      token: access_token,
+    });
     if (!discordUser) {
       return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
     }

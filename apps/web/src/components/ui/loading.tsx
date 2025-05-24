@@ -4,7 +4,7 @@ interface Props {
 
 export default function Loading({ label }: Props) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-2 p-4">
+    <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
       <div role="status">
         <svg
           aria-hidden="true"

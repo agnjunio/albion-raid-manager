@@ -1,10 +1,12 @@
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import {
-  AddServerRequestBody,
+  AddServerRequest,
   AddServerResponse,
   GetServersResponse,
+  VerifyServerRequest,
+  VerifyServerResponse,
 } from "@albion-raid-manager/core/types/api/servers";
-import { GuildMemberRole, prisma } from "@albion-raid-manager/database";
+import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
@@ -12,7 +14,7 @@ import { Request, Response, Router } from "express";
 import { requireAuth } from "@/auth/middleware";
 import { validateRequest } from "@/request";
 
-import { addServerSchema } from "./schemas";
+import { addServerSchema, verifyServerSchema } from "./schemas";
 
 export const serverRouter: Router = Router();
 
@@ -41,8 +43,8 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
 
 serverRouter.post(
   "/",
-  validateRequest(addServerSchema),
-  async (req: Request<{}, {}, AddServerRequestBody>, res: Response<APIResponse.Type<AddServerResponse>>) => {
+  validateRequest({ body: addServerSchema }),
+  async (req: Request<{}, void, AddServerRequest.Body>, res: Response<APIResponse.Type<AddServerResponse>>) => {
     try {
       const { serverId } = req.body;
 
@@ -79,8 +81,7 @@ serverRouter.post(
           members: {
             create: {
               userId: req.session.user.id,
-              role: GuildMemberRole.LEADER,
-              default: true,
+              adminPermission: true,
             },
           },
         },
@@ -90,6 +91,30 @@ serverRouter.post(
     } catch (error) {
       logger.warn("Failed to add server", error);
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to add server"));
+    }
+  },
+);
+
+serverRouter.get(
+  "/:serverId/verify",
+  validateRequest({ params: verifyServerSchema }),
+  async (
+    req: Request<VerifyServerRequest.Params, void, void>,
+    res: Response<APIResponse.Type<VerifyServerResponse>>,
+  ) => {
+    try {
+      const { serverId } = req.params;
+
+      const server = await discordService.servers.getServer(serverId);
+      if (!server) {
+        res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
+        return;
+      }
+
+      res.json(APIResponse.Success({ server }));
+    } catch (error) {
+      logger.warn("Verify server error", error);
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to verify server"));
     }
   },
 );
