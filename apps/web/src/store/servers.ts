@@ -1,8 +1,4 @@
-import type {
-  AddServerRequest,
-  AddServerResponse,
-  GetServersResponse,
-} from "@albion-raid-manager/core/types/api/servers";
+import type { AddServer, GetServersResponse } from "@albion-raid-manager/core/types/api/servers";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -15,8 +11,8 @@ export const serversApi = createApi({
     getServers: builder.query<GetServersResponse, void>({
       query: () => ({ url: "/servers" }),
     }),
-    addServer: builder.mutation<AddServerResponse, AddServerRequest.Body>({
-      query: (data) => ({ url: `/servers`, method: "POST", data }),
+    addServer: builder.mutation<AddServer.Response, { body: AddServer.Body }>({
+      query: ({ body }) => ({ url: `/servers`, method: "POST", data: body }),
     }),
   }),
 });

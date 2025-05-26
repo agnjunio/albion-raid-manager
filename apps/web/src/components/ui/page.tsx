@@ -1,4 +1,6 @@
-import { type PropsWithChildren } from "react";
+import type { SizeProp } from "@fortawesome/fontawesome-svg-core";
+
+import { useMemo, type PropsWithChildren } from "react";
 
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -16,9 +18,17 @@ interface PageErrorProps {
   error: string;
   variant?: "error" | "warning";
   icon?: IconDefinition;
+  className?: string;
+  iconSize?: SizeProp;
 }
 
-export function PageError({ error, icon = faTriangleExclamation, variant = "warning" }: PageErrorProps) {
+export function PageError({ error, variant = "warning", iconSize = "2xl", className }: PageErrorProps) {
+  const icon = useMemo(() => {
+    if (variant === "error") return faTriangleExclamation;
+    if (variant === "warning") return faTriangleExclamation;
+    return faTriangleExclamation;
+  }, [variant]);
+
   return (
     <div className={cn("flex h-full grow items-center justify-center")}>
       <div
@@ -28,9 +38,10 @@ export function PageError({ error, icon = faTriangleExclamation, variant = "warn
             error: "text-destructive-foreground bg-destructive/10",
             warning: "text-muted-foreground bg-muted/10",
           }[variant],
+          className,
         )}
       >
-        <FontAwesomeIcon icon={icon} size="2xl" />
+        <FontAwesomeIcon icon={icon} size={iconSize} />
         <p className={cn("text-center")}>{error}</p>
       </div>
     </div>

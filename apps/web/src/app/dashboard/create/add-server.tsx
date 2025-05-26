@@ -1,4 +1,4 @@
-import type { AddServerResponse } from "@albion-raid-manager/core/types/api/servers";
+import type { AddServer } from "@albion-raid-manager/core/types/api/servers";
 import type { Server } from "@albion-raid-manager/core/types/discord";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -26,11 +26,11 @@ interface AddServerProps {
   servers: Server[];
 }
 
-export function AddServer({ servers }: AddServerProps) {
+export function AddServerPage({ servers }: AddServerProps) {
   const [step, setStep] = useState(CreateStep.SERVER_SELECT);
   const [error, setError] = useState<string | null>(null);
   const [popup, setPopup] = useState<WindowProxy | null>(null);
-  const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<AddServerResponse>();
+  const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<AddServer.Response>();
   const [server, setServer] = useState<Server>();
   const [addServer] = useAddServerMutation();
 
@@ -60,7 +60,10 @@ export function AddServer({ servers }: AddServerProps) {
       return;
     }
 
-    const addServerResponse = await addServer({ serverId: server.id });
+    const body: AddServer.Body = {
+      serverId: server.id,
+    };
+    const addServerResponse = await addServer({ body });
     if (addServerResponse.error) {
       setError(
         isAPIError(addServerResponse.error) ? addServerResponse.error.data : APIErrorType.SERVER_VERIFICATION_FAILED,
@@ -165,7 +168,7 @@ function ServerVerification({ server }: ServerVerificationProps) {
 }
 
 interface CompleteProps {
-  addServerResponse?: AddServerResponse;
+  addServerResponse?: AddServer.Response;
 }
 
 function Complete({ addServerResponse }: CompleteProps) {

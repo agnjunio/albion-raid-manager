@@ -2,26 +2,24 @@ import { Guild } from "@types";
 
 import { Server } from "../discord";
 
-export namespace AddServerRequest {
+export namespace AddServer {
   export type Body = {
     serverId: string;
   };
+  export type Response = {
+    guild: Guild;
+  };
 }
-
-export type AddServerResponse = {
-  guild: Guild;
-};
 
 export type GetServersResponse = {
   servers: Server[];
 };
 
-export namespace VerifyServerRequest {
+export namespace GetServerRequest {
   export type Params = {
     serverId: string;
   };
 }
-
-export type VerifyServerResponse = {
+export type GetServerResponse = {
   server: Server;
 };

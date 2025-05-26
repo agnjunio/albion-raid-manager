@@ -4,6 +4,6 @@ export const addServerSchema = z.object({
   serverId: z.string(),
 });
 
-export const verifyServerSchema = z.object({
+export const getServerSchema = z.object({
   serverId: z.string(),
 });

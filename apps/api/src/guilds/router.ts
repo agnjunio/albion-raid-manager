@@ -1,16 +1,19 @@
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { CreateGuildResponse, GetGuildResponse, GetGuildsResponse } from "@albion-raid-manager/core/types/api/guilds";
 import { prisma } from "@albion-raid-manager/database";
-import { discordService, Server } from "@albion-raid-manager/discord";
+import { discordService } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
-import { z } from "zod";
 
-import { requireAuth } from "@/auth/middleware";
+import { auth } from "@/auth/middleware";
+
+import { raidsRouter } from "./raids/router";
+import { createGuildSchema } from "./schemas";
 
 export const guildsRouter: Router = Router();
 
-guildsRouter.use(requireAuth);
+guildsRouter.use("/:guildId/raids", raidsRouter);
+guildsRouter.use(auth);
 
 guildsRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetGuildsResponse>>) => {
   try {
@@ -37,12 +40,16 @@ guildsRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetGui
   }
 });
 
-guildsRouter.get("/:id", async (req: Request, res: Response<APIResponse.Type<GetGuildResponse>>) => {
+guildsRouter.get("/:guildId", async (req: Request, res: Response<APIResponse.Type<GetGuildResponse>>) => {
   try {
-    const { id } = req.params;
+    const { guildId } = req.params;
+
+    if (!guildId) {
+      return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST));
+    }
 
     const guild = await prisma.guild.findUnique({
-      where: { id },
+      where: { id: guildId },
       include: {
         members: {
           include: {
@@ -64,9 +71,6 @@ guildsRouter.get("/:id", async (req: Request, res: Response<APIResponse.Type<Get
 });
 
 guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<CreateGuildResponse>>) => {
-  const createGuildSchema = z.object({
-    server: z.custom<Server>(),
-  });
   const { server } = createGuildSchema.parse(req.body);
 
   try {
@@ -79,7 +83,10 @@ guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<Creat
       return res.status(400).json(APIResponse.Error(APIErrorType.GUILD_ALREADY_EXISTS));
     }
 
-    const user = await discordService.users.getCurrentUser(`Bearer ${req.session.accessToken}`);
+    const user = await discordService.users.getCurrentUser({
+      type: "user",
+      token: req.session.accessToken,
+    });
     if (!user) {
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
@@ -92,8 +99,6 @@ guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<Creat
         members: {
           create: {
             userId: user.id,
-            role: "LEADER",
-            default: true,
             nickname: user.username,
           },
         },

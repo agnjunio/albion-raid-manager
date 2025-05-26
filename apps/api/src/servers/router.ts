@@ -1,24 +1,18 @@
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import {
-  AddServerRequest,
-  AddServerResponse,
-  GetServersResponse,
-  VerifyServerRequest,
-  VerifyServerResponse,
-} from "@albion-raid-manager/core/types/api/servers";
+import { AddServer, GetServerResponse, GetServersResponse } from "@albion-raid-manager/core/types/api/servers";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
 
-import { requireAuth } from "@/auth/middleware";
+import { auth } from "@/auth/middleware";
 import { validateRequest } from "@/request";
 
-import { addServerSchema, verifyServerSchema } from "./schemas";
+import { addServerSchema, getServerSchema } from "./schemas";
 
 export const serverRouter: Router = Router();
 
-serverRouter.use(requireAuth);
+serverRouter.use(auth);
 
 serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetServersResponse>>) => {
   try {
@@ -26,8 +20,7 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
       admin: true,
     });
     if (!servers) {
-      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get servers"));
-      return;
+      return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get servers"));
     }
 
     res.json(APIResponse.Success({ servers }));
@@ -44,14 +37,13 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
 serverRouter.post(
   "/",
   validateRequest({ body: addServerSchema }),
-  async (req: Request<{}, void, AddServerRequest.Body>, res: Response<APIResponse.Type<AddServerResponse>>) => {
+  async (req: Request<{}, void, AddServer.Body>, res: Response<APIResponse.Type<AddServer.Response>>) => {
     try {
       const { serverId } = req.body;
 
       const server = await discordService.servers.getServer(serverId);
       if (!server) {
-        res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-        return;
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
       const existingGuild = await prisma.guild.findUnique({
@@ -61,13 +53,11 @@ serverRouter.post(
       });
       if (existingGuild) {
         // TODO: If user is a server admin, join the guild automatically instead
-        res.status(400).json(APIResponse.Error(APIErrorType.GUILD_ALREADY_EXISTS, "Guild already exists"));
-        return;
+        return res.status(400).json(APIResponse.Error(APIErrorType.GUILD_ALREADY_EXISTS, "Guild already exists"));
       }
 
       if (!req.session.user) {
-        res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
-        return;
+        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
       }
 
       const guild = await prisma.guild.create({
@@ -93,25 +83,29 @@ serverRouter.post(
 );
 
 serverRouter.get(
-  "/:serverId/verify",
-  validateRequest({ params: verifyServerSchema }),
-  async (
-    req: Request<VerifyServerRequest.Params, void, void>,
-    res: Response<APIResponse.Type<VerifyServerResponse>>,
-  ) => {
+  "/:serverId",
+  validateRequest({ params: getServerSchema }),
+  async (req: Request, res: Response<APIResponse.Type<GetServerResponse>>) => {
     try {
       const { serverId } = req.params;
 
-      const server = await discordService.servers.getServer(serverId);
+      if (!serverId) {
+        return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST));
+      }
+
+      const server = await discordService.servers.getServer(serverId, {
+        type: "user",
+        token: req.session.accessToken,
+      });
+
       if (!server) {
-        res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-        return;
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
       res.json(APIResponse.Success({ server }));
     } catch (error) {
-      logger.warn("Verify server error", error);
-      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to verify server"));
+      logger.warn("Get server error", error);
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server"));
     }
   },
 );

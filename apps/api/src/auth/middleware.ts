@@ -3,7 +3,7 @@ import { discordService } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
 import { NextFunction, Request, Response } from "express";
 
-export const requireAuth = async (req: Request, res: Response<APIResponse.Type>, next: NextFunction) => {
+export const auth = async (req: Request, res: Response<APIResponse.Type>, next: NextFunction) => {
   if (!req.session.accessToken) {
     return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
   }

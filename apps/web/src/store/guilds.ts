@@ -1,4 +1,4 @@
-import type { GetGuildsResponse } from "@albion-raid-manager/core/types/api/guilds";
+import type { GetGuildRaids, GetGuildsResponse } from "@albion-raid-manager/core/types/api/guilds";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -13,7 +13,13 @@ export const guildsApi = createApi({
         url: "/guilds",
       }),
     }),
+
+    getGuildRaids: builder.query<GetGuildRaids.Response, { params: GetGuildRaids.Params }>({
+      query: ({ params }) => ({
+        url: `/guilds/${params.guildId}/raids`,
+      }),
+    }),
   }),
 });
 
-export const { useGetGuildsQuery } = guildsApi;
+export const { useGetGuildsQuery, useGetGuildRaidsQuery } = guildsApi;

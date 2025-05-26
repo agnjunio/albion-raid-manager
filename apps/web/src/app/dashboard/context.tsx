@@ -1,4 +1,4 @@
-import type { Guild, GuildMember } from "@albion-raid-manager/core/types";
+import type { Guild } from "@albion-raid-manager/core/types";
 
 import { createContext, useContext, useMemo } from "react";
 
@@ -22,12 +22,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     if (!fetchGuilds.data) return;
 
     const { guilds } = fetchGuilds.data;
-    return guildId
-      ? guilds.find((guild: Guild) => guild.id === guildId)
-      : guilds.find(
-          (guild: Guild) => guild.members?.find((member: GuildMember) => member.userId === user?.id)?.default,
-        );
-  }, [fetchGuilds.data, guildId, user?.id]);
+    return guilds.find((guild: Guild) => guild.id === (guildId || user?.defaultGuildId));
+  }, [fetchGuilds.data, guildId, user?.defaultGuildId]);
   return <DashboardContext.Provider value={{ selectedGuild }}>{children}</DashboardContext.Provider>;
 }
 

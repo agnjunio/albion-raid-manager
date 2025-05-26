@@ -1,8 +1,12 @@
 import { cn } from "@albion-raid-manager/core/helpers";
-import { Route, Routes } from "react-router-dom";
+import { faFileCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { Navigate, Route, Routes } from "react-router-dom";
+
+import { PageError } from "@/components/ui/page";
 
 import { AuthCallback } from "./auth/callback";
 import { CreateGuildPage } from "./dashboard/create/page";
+import { RaidsPage } from "./dashboard/guild/raids/page";
 import { DashboardLayout } from "./dashboard/layout";
 import { DashboardPage } from "./dashboard/page";
 import { Home } from "./home/page";
@@ -21,6 +25,14 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="create" element={<CreateGuildPage />} />
+          <Route path=":guildId">
+            <Route index element={<Navigate to="raids" replace />} />
+            <Route path="raids" element={<RaidsPage />} />
+            <Route
+              path="*"
+              element={<PageError icon={faFileCircleExclamation} error="Page not found" className="px-10 py-4" />}
+            />
+          </Route>
         </Route>
       </Routes>
     </div>

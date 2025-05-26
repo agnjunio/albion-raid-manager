@@ -7,7 +7,7 @@ import express from "express";
 import session from "express-session";
 import morgan from "morgan";
 
-import { routes } from "./routes";
+import { router } from "./router";
 
 const app = express();
 const port = config.api.port;
@@ -45,7 +45,7 @@ app.use(
   }),
 );
 
-app.use(routes);
+app.use(router);
 
 const server = app.listen(port, () => {
   logger.info(`Server is running on port ${port}`);

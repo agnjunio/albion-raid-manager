@@ -6,13 +6,13 @@ import Loading from "@/components/ui/loading";
 import { PageError } from "@/components/ui/page";
 import { useGetServersQuery } from "@/store/servers";
 
-import { AddServer } from "./add-server";
+import { AddServerPage } from "./add-server";
 
 export function CreateGuildPage() {
   const getServers = useGetServersQuery();
 
   if (getServers.isLoading) return <Loading />;
-  if (getServers.isError) return <PageError error={getServers.error} />;
+  if (getServers.isError) return <PageError error="Failed to load servers" variant="error" />;
   if (!getServers.data) return <PageError error="No servers found" />;
   const { servers } = getServers.data;
 
@@ -23,7 +23,7 @@ export function CreateGuildPage() {
           <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
           <span className="font-sans">Back to dashboard</span>
         </Link>
-        <AddServer servers={servers} />
+        <AddServerPage servers={servers} />
       </div>
     </div>
   );

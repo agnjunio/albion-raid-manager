@@ -5,13 +5,13 @@ import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
 import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
-import { z } from "zod";
 
-import { requireAuth } from "./middleware";
+import { auth } from "./middleware";
+import { discordCallbackSchema } from "./schemas";
 
 export const authRouter: Router = Router();
 
-authRouter.get("/me", requireAuth, async (req: Request, res: Response<APIResponse.Type<GetMeResponse>>) => {
+authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<GetMeResponse>>) => {
   const get = async () => {
     const discordUser = await discordService.users.getCurrentUser({
       type: "user",
@@ -59,11 +59,6 @@ authRouter.get("/me", requireAuth, async (req: Request, res: Response<APIRespons
 });
 
 authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type>) => {
-  const discordCallbackSchema = z.object({
-    code: z.string(),
-    redirectUri: z.string(),
-  });
-
   try {
     const { code, redirectUri } = discordCallbackSchema.parse(req.body);
     const { access_token, refresh_token } = await discordService.auth.exchangeCode(code, redirectUri);
