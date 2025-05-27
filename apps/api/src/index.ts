@@ -7,6 +7,8 @@ import express from "express";
 import session from "express-session";
 import morgan from "morgan";
 
+import { context } from "./context";
+import { errors } from "./errors";
 import { router } from "./router";
 
 const app = express();
@@ -45,7 +47,9 @@ app.use(
   }),
 );
 
+app.use(context);
 app.use(router);
+app.use(errors);
 
 const server = app.listen(port, () => {
   logger.info(`Server is running on port ${port}`);

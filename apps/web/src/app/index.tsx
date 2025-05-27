@@ -6,6 +6,7 @@ import { PageError } from "@/components/ui/page";
 
 import { AuthCallback } from "./auth/callback";
 import { CreateGuildPage } from "./dashboard/create/page";
+import { CreateRaidPage } from "./dashboard/guild/raids/create/page";
 import { RaidsPage } from "./dashboard/guild/raids/page";
 import { DashboardLayout } from "./dashboard/layout";
 import { DashboardPage } from "./dashboard/page";
@@ -28,6 +29,7 @@ export default function App() {
           <Route path=":guildId">
             <Route index element={<Navigate to="raids" replace />} />
             <Route path="raids" element={<RaidsPage />} />
+            <Route path="raids/create" element={<CreateRaidPage />} />
             <Route
               path="*"
               element={<PageError icon={faFileCircleExclamation} error="Page not found" className="px-10 py-4" />}

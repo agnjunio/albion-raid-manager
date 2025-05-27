@@ -46,6 +46,22 @@ export const apiRTKRequest = async (args: AxiosRequestConfig) => {
   }
 };
 
+// Utils
 export const isAPIError = (error: unknown): error is { status: number; data: APIErrorType } => {
   return typeof error === "object" && error !== null && "status" in error && "data" in error;
 };
+
+type TagDescription<T extends string> = { type: T; id: string };
+
+export const provideEntityTag = <T extends { id: string }, E extends string>(
+  entityType: E,
+): {
+  single: (_result: unknown, _error: unknown, id: string) => TagDescription<E>[];
+  list: (result: { [key: string]: T[] } | undefined) => TagDescription<E>[];
+} => ({
+  single: (_result: unknown, _error: unknown, id: string) => [{ type: entityType, id }],
+  list: (result: { [key: string]: T[] } | undefined) => {
+    const items = result?.[Object.keys(result)[0]] ?? [];
+    return [...items.map(({ id }) => ({ type: entityType, id })), { type: entityType, id: "LIST" }];
+  },
+});

@@ -124,7 +124,7 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
           <div className="text-lg font-semibold">Raids</div>
 
           <div className="flex flex-row-reverse items-center gap-4">
-            <Link to="raids/create" tabIndex={-1}>
+            <Link to="create" tabIndex={-1}>
               <Button className="whitespace-nowrap">
                 <FontAwesomeIcon icon={faPlus} />
                 <span>New Raid</span>

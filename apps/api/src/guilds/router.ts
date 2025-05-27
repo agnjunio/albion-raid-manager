@@ -7,12 +7,14 @@ import { Request, Response, Router } from "express";
 
 import { auth } from "@/auth/middleware";
 
+import { compositionsRouter } from "./compositions/router";
 import { raidsRouter } from "./raids/router";
 import { createGuildSchema } from "./schemas";
 
 export const guildsRouter: Router = Router();
 
 guildsRouter.use("/:guildId/raids", raidsRouter);
+guildsRouter.use("/:guildId/compositions", compositionsRouter);
 guildsRouter.use(auth);
 
 guildsRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetGuildsResponse>>) => {

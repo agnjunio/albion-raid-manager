@@ -3,9 +3,13 @@ import * as React from "react";
 import { cn } from "@albion-raid-manager/core/helpers";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
-function Popover({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
+const Popover = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>
+>((props, _ref) => {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
-}
+});
+Popover.displayName = "Popover";
 
 function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;

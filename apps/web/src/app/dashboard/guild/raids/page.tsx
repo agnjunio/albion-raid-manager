@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 
 import Loading from "@/components/ui/loading";
-import { useGetGuildRaidsQuery } from "@/store/guilds";
+import { useGetGuildRaidsQuery } from "@/store/raids";
 
 import { RaidList } from "./raid-list";
 
