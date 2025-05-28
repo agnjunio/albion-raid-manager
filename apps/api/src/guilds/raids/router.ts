@@ -1,6 +1,6 @@
 import { Composition } from "@albion-raid-manager/core/types";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import { CreateGuildRaid, GetGuildRaids } from "@albion-raid-manager/core/types/api/raids";
+import { CreateGuildRaid, GetGuildRaid, GetGuildRaids } from "@albion-raid-manager/core/types/api/raids";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
@@ -13,25 +13,6 @@ import { createGuildRaidSchema } from "./schemas";
 export const raidsRouter: Router = Router({ mergeParams: true });
 
 raidsRouter.use(auth, raidPermission);
-
-raidsRouter.get(
-  "/",
-  async (req: Request<GetGuildRaids.Params>, res: Response<APIResponse.Type<GetGuildRaids.Response>>) => {
-    const { guildId } = req.params;
-
-    if (!guildId) {
-      throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Guild ID is required");
-    }
-
-    const raids = await prisma.raid.findMany({
-      where: {
-        guildId,
-      },
-    });
-
-    res.json(APIResponse.Success({ raids }));
-  },
-);
 
 raidsRouter.post(
   "/",
@@ -80,6 +61,48 @@ raidsRouter.post(
         },
       });
     });
+
+    res.json(APIResponse.Success({ raid }));
+  },
+);
+
+raidsRouter.get(
+  "/",
+  async (req: Request<GetGuildRaids.Params>, res: Response<APIResponse.Type<GetGuildRaids.Response>>) => {
+    const { guildId } = req.params;
+
+    if (!guildId) {
+      throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Guild ID is required");
+    }
+
+    const raids = await prisma.raid.findMany({
+      where: {
+        guildId,
+      },
+    });
+
+    res.json(APIResponse.Success({ raids }));
+  },
+);
+
+raidsRouter.get(
+  "/:raidId",
+  async (req: Request<GetGuildRaid.Params>, res: Response<APIResponse.Type<GetGuildRaid.Response>>) => {
+    const { guildId, raidId } = req.params;
+
+    if (!guildId || !raidId) {
+      throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Guild ID and Raid ID are required");
+    }
+
+    const raid = await prisma.raid.findUnique({
+      where: {
+        id: raidId,
+      },
+    });
+
+    if (!raid) {
+      return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Raid not found"));
+    }
 
     res.json(APIResponse.Success({ raid }));
   },

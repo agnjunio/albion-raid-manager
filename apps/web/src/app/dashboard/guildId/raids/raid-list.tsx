@@ -1,23 +1,14 @@
-import type { Raid, RaidStatus } from "@albion-raid-manager/core/types";
+import type { Raid } from "@albion-raid-manager/core/types";
 
 import { useMemo, useState } from "react";
 
 import { cn } from "@albion-raid-manager/core/helpers";
-import {
-  faFileContract,
-  faFilter,
-  faHourglassStart,
-  faPlay,
-  faPlus,
-  faRefresh,
-  faStop,
-  faTriangleExclamation,
-  type IconDefinition,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { compareAsc } from "date-fns";
 import { Link } from "react-router-dom";
 
+import { RaidStatusBadge } from "@/app/dashboard/guildId/raids/raid-status";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -31,50 +22,9 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar";
 
-const statuses: {
-  [key in RaidStatus | "ALL"]: {
-    icon: IconDefinition;
-    color?: string;
-  };
-} = {
-  ALL: {
-    icon: faFilter,
-  },
-  SCHEDULED: {
-    icon: faHourglassStart,
-    color: "bg-secondary",
-  },
-  OPEN: {
-    icon: faFileContract,
-    color: "bg-green-800",
-  },
-  CLOSED: {
-    icon: faTriangleExclamation,
-    color: "bg-red-900",
-  },
-  ONGOING: {
-    icon: faPlay,
-    color: "bg-primary",
-  },
-  FINISHED: {
-    icon: faStop,
-    color: "bg-gray-500",
-  },
-};
-const statusOrder: (keyof typeof statuses)[] = ["ALL", "SCHEDULED", "OPEN", "CLOSED", "ONGOING", "FINISHED"];
+import { raidStatuses } from "./constants";
 
-export function RaidStatusBadge({ raid }: { raid: Raid }) {
-  return (
-    <div
-      className={cn(
-        `w-24 select-none rounded-lg p-1 text-center text-xs font-semibold uppercase shadow-sm`,
-        statuses[raid.status]?.color,
-      )}
-    >
-      {raid.status}
-    </div>
-  );
-}
+const statusOrder: (keyof typeof raidStatuses)[] = ["ALL", "SCHEDULED", "OPEN", "CLOSED", "ONGOING", "FINISHED"];
 
 interface RaidListProps {
   raids?: Raid[];
@@ -83,7 +33,7 @@ interface RaidListProps {
 }
 
 export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
-  const [filter, setFilter] = useState<keyof typeof statuses>("ALL");
+  const [filter, setFilter] = useState<keyof typeof raidStatuses>("ALL");
 
   const filteredRaids = useMemo(
     () =>
@@ -102,7 +52,7 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
             <SidebarGroupLabel>Status</SidebarGroupLabel>
             <SidebarMenu>
               {statusOrder.map((status) => {
-                const statusData = statuses[status];
+                const statusData = raidStatuses[status];
                 return (
                   <SidebarMenuItem key={status}>
                     <SidebarMenuButton asChild isActive={filter === status} onClick={() => setFilter(status)}>
@@ -141,7 +91,7 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
           {filteredRaids.map((raid) => (
             <div key={raid.id} className="border-border gap-2 rounded-lg border">
               <Link
-                to={`raids/${raid.id}`}
+                to={raid.id}
                 className="hover:bg-secondary active:bg-primary flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4"
               >
                 <div className="grow font-sans">{raid.description}</div>
@@ -153,7 +103,7 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
                     minute: "2-digit",
                   })}
                 </div>
-                <RaidStatusBadge raid={raid} />
+                <RaidStatusBadge status={raid.status} />
               </Link>
             </div>
           ))}

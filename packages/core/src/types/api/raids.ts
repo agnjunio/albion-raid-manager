@@ -1,10 +1,5 @@
 import { Raid } from "@types";
 
-export namespace GetGuildRaids {
-  export type Params = { guildId: string };
-  export type Response = { raids: Raid[] };
-}
-
 export namespace CreateGuildRaid {
   export type Params = { guildId: string };
   export type Body = {
@@ -12,5 +7,15 @@ export namespace CreateGuildRaid {
     date: string;
     compositionId?: string;
   };
+  export type Response = { raid: Raid };
+}
+
+export namespace GetGuildRaids {
+  export type Params = { guildId: string };
+  export type Response = { raids: Raid[] };
+}
+
+export namespace GetGuildRaid {
+  export type Params = { guildId: string; raidId: string };
   export type Response = { raid: Raid };
 }

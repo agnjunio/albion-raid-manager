@@ -3,11 +3,21 @@ import type { SizeProp } from "@fortawesome/fontawesome-svg-core";
 import { useMemo, type PropsWithChildren } from "react";
 
 import { cn } from "@albion-raid-manager/core/helpers";
-import { faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export function Page({ children }: PropsWithChildren) {
-  return <div className="flex h-full grow flex-col gap-4 p-4">{children}</div>;
+import { Button } from "./button";
+
+export function Page({ children, className }: PropsWithChildren<{ className?: string }>) {
+  return <div className={cn("flex h-full grow flex-col gap-4 p-4", className)}>{children}</div>;
+}
+
+export function PageBackButton() {
+  return (
+    <Button variant="ghost" size="icon" className="rounded-full" onClick={() => window.history.back()}>
+      <FontAwesomeIcon icon={faArrowLeft} />
+    </Button>
+  );
 }
 
 export function PageTitle({ children, className }: { className?: string } & PropsWithChildren) {
