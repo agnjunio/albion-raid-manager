@@ -92,7 +92,7 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
             <div key={raid.id} className="border-border gap-2 rounded-lg border">
               <Link
                 to={raid.id}
-                className="hover:bg-secondary active:bg-primary flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4"
+                className="hover:bg-secondary/20 active:bg-primary flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4"
               >
                 <div className="grow font-sans">{raid.description}</div>
                 <div className="font-caption text-sm">

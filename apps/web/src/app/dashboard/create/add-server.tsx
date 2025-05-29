@@ -105,7 +105,7 @@ function ServerSelect({ servers, onServerSelect }: ServerSelectProps) {
         {servers.map((server) => (
           <div
             key={server.id}
-            className="border-input hover:bg-accent/50 flex cursor-pointer select-none items-center rounded-lg border p-4 shadow-md transition-all duration-200 hover:shadow-lg"
+            className="border-input hover:bg-accent/50 flex cursor-pointer select-none items-center rounded-lg border p-4 transition-all duration-200 hover:shadow-lg"
             onClick={() => onServerSelect(server)}
           >
             <img
