@@ -64,7 +64,7 @@ export function CreateRaidPage() {
     }
 
     if (createRaidResponse.data) {
-      navigate(`../raids/${createRaidResponse.data.raid.id}`, { replace: true });
+      navigate(`../${createRaidResponse.data.raid.id}`, { replace: true });
     }
   };
 

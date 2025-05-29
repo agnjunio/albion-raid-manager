@@ -1,6 +1,11 @@
 import { Composition } from "@albion-raid-manager/core/types";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import { CreateGuildRaid, GetGuildRaid, GetGuildRaids } from "@albion-raid-manager/core/types/api/raids";
+import {
+  CreateGuildRaid,
+  GetGuildRaid,
+  GetGuildRaids,
+  UpdateGuildRaid,
+} from "@albion-raid-manager/core/types/api/raids";
 import { prisma } from "@albion-raid-manager/database";
 import { Request, Response, Router } from "express";
 
@@ -103,6 +108,29 @@ raidsRouter.get(
     if (!raid) {
       return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Raid not found"));
     }
+
+    res.json(APIResponse.Success({ raid }));
+  },
+);
+
+raidsRouter.put(
+  "/:raidId",
+  async (
+    req: Request<UpdateGuildRaid.Params, {}, UpdateGuildRaid.Body>,
+    res: Response<APIResponse.Type<UpdateGuildRaid.Response>>,
+  ) => {
+    const { guildId, raidId } = req.params;
+
+    if (!guildId || !raidId) {
+      throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Guild ID and Raid ID are required");
+    }
+
+    const { status } = req.body;
+
+    const raid = await prisma.raid.update({
+      where: { id: raidId },
+      data: { status },
+    });
 
     res.json(APIResponse.Success({ raid }));
   },

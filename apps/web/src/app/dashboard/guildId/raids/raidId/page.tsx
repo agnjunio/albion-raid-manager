@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { Page, PageBackButton, PageError } from "@/components/ui/page";
 import { isAPIError } from "@/lib/api";
-import { useGetGuildRaidQuery } from "@/store/raids";
+import { useGetGuildRaidQuery, useUpdateGuildRaidMutation } from "@/store/raids";
 
 import { RaidStatusBadge } from "../raid-status";
 
@@ -22,8 +22,9 @@ export function RaidPage() {
       raidId: raidId as string,
     },
   });
+  const [updateRaidStatus, updateRaidStatusResult] = useUpdateGuildRaidMutation();
 
-  if (isLoading) {
+  if (isLoading || updateRaidStatusResult.isLoading) {
     return <Loading />;
   }
 
@@ -32,8 +33,14 @@ export function RaidPage() {
   }
 
   const hasStatus = (...statuses: RaidStatus[]) => statuses.includes(raid.status);
-  const updateRaidStatus = (status: RaidStatus) => {
-    console.log(status);
+  const handleUpdateRaidStatus = async (status: RaidStatus) => {
+    updateRaidStatus({
+      params: {
+        guildId: guildId as string,
+        raidId: raidId as string,
+      },
+      body: { status },
+    });
   };
 
   const { raid } = data;
@@ -71,22 +78,22 @@ export function RaidPage() {
         <CardContent>
           <div className="flex gap-2">
             {hasStatus("SCHEDULED", "CLOSED") && (
-              <Button className="btn-primary-yellow" onClick={() => updateRaidStatus("OPEN")}>
+              <Button className="btn-primary-yellow" onClick={() => handleUpdateRaidStatus("OPEN")}>
                 Open Registration
               </Button>
             )}
             {hasStatus("OPEN") && (
-              <Button className="btn-primary-yellow" onClick={() => updateRaidStatus("CLOSED")}>
+              <Button className="btn-primary-yellow" onClick={() => handleUpdateRaidStatus("CLOSED")}>
                 Close Registration
               </Button>
             )}
             {hasStatus("OPEN", "CLOSED", "FINISHED") && (
-              <Button className="btn-primary-yellow" onClick={() => updateRaidStatus("ONGOING")}>
+              <Button className="btn-primary-yellow" onClick={() => handleUpdateRaidStatus("ONGOING")}>
                 Start Raid
               </Button>
             )}
             {hasStatus("ONGOING") && (
-              <Button className="btn-primary-yellow" onClick={() => updateRaidStatus("FINISHED")}>
+              <Button className="btn-primary-yellow" onClick={() => handleUpdateRaidStatus("FINISHED")}>
                 Finish Raid
               </Button>
             )}

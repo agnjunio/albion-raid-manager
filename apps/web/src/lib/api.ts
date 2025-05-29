@@ -51,17 +51,21 @@ export const isAPIError = (error: unknown): error is { status: number; data: API
   return typeof error === "object" && error !== null && "status" in error && "data" in error;
 };
 
-type TagDescription<T extends string> = { type: T; id: string };
-
-export const provideEntityTag = <T extends { id: string }, E extends string>(
-  entityType: E,
-): {
-  single: (_result: unknown, _error: unknown, id: string) => TagDescription<E>[];
-  list: (result: { [key: string]: T[] } | undefined) => TagDescription<E>[];
-} => ({
-  single: (_result: unknown, _error: unknown, id: string) => [{ type: entityType, id }],
-  list: (result: { [key: string]: T[] } | undefined) => {
-    const items = result?.[Object.keys(result)[0]] ?? [];
-    return [...items.map(({ id }) => ({ type: entityType, id })), { type: entityType, id: "LIST" }];
-  },
+export const createTagHelper = <T extends "Raid" | "Guild" | "Composition">(tag: T) => ({
+  list:
+    (key: string) =>
+    (response: unknown): { type: T; id: string }[] => {
+      if (!response || typeof response !== "object" || !(key in response)) return [{ type: tag, id: "LIST" }];
+      const items = (response as Record<string, Array<{ id: string | number }>>)[key];
+      if (!Array.isArray(items)) return [{ type: tag, id: "LIST" }];
+      return [...items.map(({ id }) => ({ type: tag, id: String(id) })), { type: tag, id: "LIST" }];
+    },
+  single:
+    (key: string) =>
+    (response: unknown): { type: T; id: string }[] => {
+      if (!response || typeof response !== "object" || !(key in response)) return [];
+      const item = (response as Record<string, { id: string | number }>)[key];
+      if (!item || typeof item !== "object" || !("id" in item)) return [];
+      return [{ type: tag, id: String(item.id) }];
+    },
 });

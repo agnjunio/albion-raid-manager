@@ -1,4 +1,4 @@
-import { Raid } from "@types";
+import { Raid, RaidStatus } from "@types";
 
 export namespace CreateGuildRaid {
   export type Params = { guildId: string };
@@ -17,5 +17,11 @@ export namespace GetGuildRaids {
 
 export namespace GetGuildRaid {
   export type Params = { guildId: string; raidId: string };
+  export type Response = { raid: Raid };
+}
+
+export namespace UpdateGuildRaid {
+  export type Params = { guildId: string; raidId: string };
+  export type Body = { status: RaidStatus };
   export type Response = { raid: Raid };
 }
