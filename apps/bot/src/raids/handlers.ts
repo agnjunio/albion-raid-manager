@@ -1,9 +1,12 @@
-import { ClientError, ErrorCodes } from "@/errors";
-import { getErrorMessage } from "@albion-raid-manager/common/errors";
+import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { prisma } from "@albion-raid-manager/database";
-import { Raid, RaidStatus } from "@albion-raid-manager/database/models";
 import logger from "@albion-raid-manager/logger";
 import { Client, Interaction, MessageCreateOptions, MessageEditOptions } from "discord.js";
+
+import { ClientError, ErrorCodes } from "@/errors";
+
+import { Raid, RaidStatus } from "../../../../packages/core/src/types.bkp";
+
 import { raidEvents } from "./events";
 import { buildRaidAnnouncementMessage, buildRaidSignupReply } from "./messages";
 
@@ -34,16 +37,16 @@ export const handleAnnounceRaids = async ({ discord }: { discord: Client }) => {
         data: { status: RaidStatus.OPEN },
       });
 
-      if (!raid.guild.announcementChannelId)
+      if (!raid.guild.raidAnnouncementChannelId)
         throw new Error(`Announcement channel not set for guild: ${raid.guild.name}`);
 
       const guild = discord.guilds.cache.get(raid.guild.discordId);
       if (!guild) throw new Error(`Discord guild not found: ${raid.guild.discordId}`);
 
-      const channel = await guild.channels.fetch(raid.guild.announcementChannelId);
-      if (!channel) throw new Error(`Announcement channel not found: ${raid.guild.announcementChannelId}`);
+      const channel = await guild.channels.fetch(raid.guild.raidAnnouncementChannelId);
+      if (!channel) throw new Error(`Announcement channel not found: ${raid.guild.raidAnnouncementChannelId}`);
       if (!channel.isTextBased())
-        throw new Error(`Announcement channel is not a text channel: ${raid.guild.announcementChannelId}`);
+        throw new Error(`Announcement channel is not a text channel: ${raid.guild.raidAnnouncementChannelId}`);
 
       const message = await channel.send(buildRaidAnnouncementMessage<MessageCreateOptions>(raid, raid.slots));
 
@@ -235,9 +238,9 @@ export const updateRaidAnnouncement = async (discord: Client, raid: Raid) => {
   const guild = await prisma.guild.findUnique({
     where: { id: raid.guildId },
   });
-  if (!guild || !guild.announcementChannelId) return;
+  if (!guild || !guild.raidAnnouncementChannelId) return;
 
-  const channel = discord.channels.cache.get(guild.announcementChannelId);
+  const channel = discord.channels.cache.get(guild.raidAnnouncementChannelId);
   if (!channel?.isTextBased()) return;
 
   const message = await channel.messages.fetch(raid.announcementMessageId);

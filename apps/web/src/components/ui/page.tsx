@@ -1,10 +1,23 @@
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { faTriangleExclamation, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { PropsWithChildren } from "react";
+import type { SizeProp } from "@fortawesome/fontawesome-svg-core";
 
-export function Page({ children }: PropsWithChildren) {
-  return <div className="flex h-full grow flex-col gap-4 p-4">{children}</div>;
+import { useMemo, type PropsWithChildren } from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
+import { faArrowLeft, faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { Button } from "./button";
+
+export function Page({ children, className }: PropsWithChildren<{ className?: string }>) {
+  return <div className={cn("flex h-full grow flex-col gap-4 p-4", className)}>{children}</div>;
+}
+
+export function PageBackButton() {
+  return (
+    <Button variant="ghost" size="icon" className="rounded-full" onClick={() => window.history.back()}>
+      <FontAwesomeIcon icon={faArrowLeft} />
+    </Button>
+  );
 }
 
 export function PageTitle({ children, className }: { className?: string } & PropsWithChildren) {
@@ -15,9 +28,17 @@ interface PageErrorProps {
   error: string;
   variant?: "error" | "warning";
   icon?: IconDefinition;
+  className?: string;
+  iconSize?: SizeProp;
 }
 
-export function PageError({ error, icon = faTriangleExclamation, variant = "warning" }: PageErrorProps) {
+export function PageError({ error, variant = "warning", iconSize = "2xl", className }: PageErrorProps) {
+  const icon = useMemo(() => {
+    if (variant === "error") return faTriangleExclamation;
+    if (variant === "warning") return faTriangleExclamation;
+    return faTriangleExclamation;
+  }, [variant]);
+
   return (
     <div className={cn("flex h-full grow items-center justify-center")}>
       <div
@@ -27,9 +48,10 @@ export function PageError({ error, icon = faTriangleExclamation, variant = "warn
             error: "text-destructive-foreground bg-destructive/10",
             warning: "text-muted-foreground bg-muted/10",
           }[variant],
+          className,
         )}
       >
-        <FontAwesomeIcon icon={icon} size="2xl" />
+        <FontAwesomeIcon icon={icon} size={iconSize} />
         <p className={cn("text-center")}>{error}</p>
       </div>
     </div>

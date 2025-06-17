@@ -1,29 +1,36 @@
-"use client";
+import type { Guild } from "@albion-raid-manager/core/types";
 
-import { GuildWithMembers } from "@/types/database";
-import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
-import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
+
+import { useParams } from "react-router-dom";
+
+import { useAuth } from "@/lib/auth";
+import { useGetGuildsQuery } from "@/store/guilds";
 
 type DashboardContextType = {
-  guilds: GuildWithMembers[];
-  selectedGuild?: GuildWithMembers;
+  selectedGuild?: Guild;
 };
 
-const DashboardContext = createContext<DashboardContextType>({ guilds: [] });
+const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
-export function DashboardProvider({ children, guilds }: DashboardContextType & PropsWithChildren) {
+export function DashboardProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   const { guildId } = useParams();
-  const session = useSession();
-  const selectedGuild = useMemo(() => {
-    return guildId
-      ? guilds.find((guild) => guild.id === guildId)
-      : guilds.find((guild) => guild.members.find((member) => member.userId === session.data?.user.id)?.default);
-  }, [guildId, guilds, session.data?.user.id]);
+  const fetchGuilds = useGetGuildsQuery();
 
-  return <DashboardContext.Provider value={{ guilds, selectedGuild }}>{children}</DashboardContext.Provider>;
+  const selectedGuild = useMemo(() => {
+    if (!fetchGuilds.data) return;
+
+    const { guilds } = fetchGuilds.data;
+    return guilds.find((guild: Guild) => guild.id === (guildId || user?.defaultGuildId));
+  }, [fetchGuilds.data, guildId, user?.defaultGuildId]);
+  return <DashboardContext.Provider value={{ selectedGuild }}>{children}</DashboardContext.Provider>;
 }
 
-export function useDashboardContext() {
-  return useContext(DashboardContext);
+export function useDashboard() {
+  const context = useContext(DashboardContext);
+  if (!context) {
+    throw new Error("useDashboard must be used within a DashboardProvider");
+  }
+  return context;
 }

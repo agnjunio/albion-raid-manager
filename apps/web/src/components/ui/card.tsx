@@ -1,23 +1,20 @@
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import * as React from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
 
 interface CardProps extends React.ComponentProps<"div"> {
   variant?: "default" | "outline";
 }
 function Card({ variant = "default", className, ...props }: CardProps) {
   const variantClass = {
-    default: "bg-card text-card-foreground shadow-sm border border-foreground",
-    outline: "bg-card border-border text-card-foreground",
+    default: "bg-card text-card-foreground border-[var(--card-border)] shadow-[var(--card-shadow)]",
+    outline: "bg-card border-[var(--card-border)] text-card-foreground",
   }[variant];
 
   return (
     <div
       data-slot="card"
-      className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
-        variantClass,
-        className,
-      )}
+      className={cn("bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6", variantClass, className)}
       {...props}
     />
   );

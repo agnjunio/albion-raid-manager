@@ -1,11 +1,13 @@
-"use client";
+import type { VariantProps } from "class-variance-authority";
 
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { useCallback } from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
 import { faComputer, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VariantProps } from "class-variance-authority";
-import { useTheme } from "next-themes";
-import { useCallback } from "react";
+
+import { Theme, useTheme } from "@/lib/theme";
+
 import { Button, buttonVariants } from "./button";
 
 interface Props extends VariantProps<typeof buttonVariants> {
@@ -13,12 +15,11 @@ interface Props extends VariantProps<typeof buttonVariants> {
 }
 
 export function ThemeButton({ className, variant = "outline" }: Props) {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { theme, themes, setTheme } = useTheme();
 
   const toggleTheme = useCallback(() => {
-    const themes = ["dark", "light"];
-    setTheme(themes[(themes.indexOf(resolvedTheme || themes[0]) + 1) % themes.length]);
-  }, [resolvedTheme, setTheme]);
+    setTheme(themes[(themes.indexOf(theme) + 1) % themes.length]);
+  }, [theme, themes, setTheme]);
 
   return (
     <Button
@@ -27,9 +28,9 @@ export function ThemeButton({ className, variant = "outline" }: Props) {
       onClick={toggleTheme}
       className={cn("transition-all duration-300 ease-in-out", className)}
     >
-      {resolvedTheme === "dark" && <FontAwesomeIcon icon={faMoon} />}
-      {resolvedTheme === "light" && <FontAwesomeIcon icon={faSun} />}
-      {resolvedTheme === "system" && <FontAwesomeIcon icon={faComputer} />}
+      {theme === Theme.DARK && <FontAwesomeIcon icon={faMoon} />}
+      {theme === Theme.LIGHT && <FontAwesomeIcon icon={faSun} />}
+      {theme === Theme.SYSTEM && <FontAwesomeIcon icon={faComputer} />}
     </Button>
   );
 }

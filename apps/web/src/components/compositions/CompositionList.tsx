@@ -1,20 +1,24 @@
-"use client";
-
-import { filterCompositions } from "@/lib/compositions";
-import { Prisma } from "@albion-raid-manager/database/models";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { type Composition } from "@albion-raid-manager/core/types";
+import { compareAsc } from "date-fns";
+import { distance } from "fastest-levenshtein";
+import Link from "next/link";
+
+export function filterCompositions(compositions: Composition[], filter: string) {
+  return compositions
+    .map((composition) => ({
+      ...composition,
+      distance: composition.name.length - distance(composition.name.toLowerCase(), filter.toLowerCase()),
+    }))
+    .filter((composition) => composition.distance >= 0)
+    .sort((a, b) => compareAsc(new Date(a.updatedAt), new Date(b.updatedAt)))
+    .sort((a, b) => b.distance - a.distance)
+    .map((composition) => ({ ...composition, distance: undefined }));
+}
+
 type CompositionListProps = {
-  compositions: Prisma.CompositionGetPayload<{
-    include: {
-      _count: {
-        select: {
-          builds: true;
-        };
-      };
-    };
-  }>[];
+  compositions: Composition[];
 };
 
 export default function CompositionList({ compositions }: CompositionListProps) {
@@ -51,7 +55,7 @@ export default function CompositionList({ compositions }: CompositionListProps) 
             >
               <div>
                 <div className="grow text-lg/tight font-semibold">{composition.name}</div>
-                <div className="text-secondary-violet text-xs">Size: {composition._count.builds}</div>
+                <div className="text-secondary-violet text-xs">Size: {composition.builds?.length ?? 0}</div>
               </div>
               <div>
                 Last Update:{" "}

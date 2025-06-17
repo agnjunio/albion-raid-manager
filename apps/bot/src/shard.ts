@@ -1,7 +1,8 @@
-import config from "@albion-raid-manager/config";
-import logger from "@albion-raid-manager/logger";
-import { ShardingManager } from "discord.js";
 import path from "path";
+
+import config from "@albion-raid-manager/config";
+import { logger } from "@albion-raid-manager/logger";
+import { ShardingManager } from "discord.js";
 
 let manager: ShardingManager;
 

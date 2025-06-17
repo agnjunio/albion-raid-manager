@@ -1,8 +1,7 @@
-"use client";
-
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import * as SeparatorPrimitive from "@radix-ui/react-separator";
 import * as React from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
+import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
 function Separator({
   className,

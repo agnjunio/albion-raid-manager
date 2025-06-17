@@ -13,3 +13,9 @@ apps/*/config/local*.*
 
 # Logs
 apps/*/logs/
+
+# Backup files
+*.bkp
+
+# Generated files
+generated/

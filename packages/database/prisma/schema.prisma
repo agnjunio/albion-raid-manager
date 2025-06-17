@@ -6,7 +6,13 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
+  output   = "../generated/prisma"
+}
+
+generator typescriptInterfaces {
+  provider = "prisma-generator-typescript-interfaces"
+  output   = "../../core/generated/types/index.ts"
+  prettier = true
 }
 
 datasource db {
@@ -31,29 +37,26 @@ model Guild {
 }
 
 model GuildMember {
-  guild    Guild           @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guildId  String
-  userId   String
-  nickname String?
-  default  Boolean         @default(false)
-  role     GuildMemberRole @default(PLAYER)
+  guild                 Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guildId               String
+  userId                String
+  nickname              String?
+  adminPermission       Boolean @default(false)
+  raidPermission        Boolean @default(false)
+  compositionPermission Boolean @default(false)
 
   @@id([guildId, userId])
 }
 
-enum GuildMemberRole {
-  LEADER
-  OFFICER
-  PLAYER
-}
-
 model User {
-  id          String        @id
-  username    String
-  avatar      String?
-  GuildMember GuildMember[]
-  RaidSlot    RaidSlot[]
+  id             String        @id
+  username       String
+  avatar         String?
+  nickname       String?
+  defaultGuildId String?
+  GuildMember    GuildMember[]
+  RaidSlot       RaidSlot[]
 }
 
 // Compositions
@@ -63,9 +66,21 @@ model Build {
   compositionId String
   raidSlots     RaidSlot[]
   name          String
-  role          Role
+  role          BuildRole
   comment       String?
   count         Int         @default(1)
+}
+
+enum BuildRole {
+  CALLER
+  TANK
+  SUPPORT
+  HEALER
+  RANGED_DPS
+  MELEE_DPS
+  BATTLEMOUNT
+
+  @@map("Role")
 }
 
 model Composition {
@@ -115,12 +130,10 @@ enum RaidStatus {
   FINISHED
 }
 
-enum Role {
-  CALLER
-  TANK
-  SUPPORT
-  HEALER
-  RANGED_DPS
-  MELEE_DPS
-  BATTLEMOUNT
+// Sessions
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
 }

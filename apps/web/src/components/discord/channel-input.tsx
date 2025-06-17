@@ -1,11 +1,12 @@
-"use client";
+import React, { useEffect, useState } from "react";
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Channel, ChannelType } from "@/types/discord";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import { cn } from "@albion-raid-manager/core/helpers";
+import { type Channel, ChannelType } from "@albion-raid-manager/discord";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+
 
 interface Props extends React.ComponentProps<"input"> {
   channels: Channel[];

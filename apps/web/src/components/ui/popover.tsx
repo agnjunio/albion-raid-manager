@@ -1,12 +1,15 @@
-"use client";
-
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as React from "react";
 
-function Popover({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
+import { cn } from "@albion-raid-manager/core/helpers";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
+
+const Popover = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root>
+>((props, _ref) => {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
-}
+});
+Popover.displayName = "Popover";
 
 function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
@@ -25,7 +28,7 @@ function PopoverContent({
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-hidden z-50 w-72 rounded-md border p-4 shadow-md",
+          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 outline-hidden z-50 w-72 rounded-md border border-[var(--card-border)] p-4 shadow-[var(--card-shadow)]",
           className,
         )}
         {...props}

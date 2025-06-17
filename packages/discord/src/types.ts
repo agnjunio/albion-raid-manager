@@ -1,7 +1,8 @@
 export * from "discord-api-types/v10";
 
 export type DiscordServiceOptions = {
-  authorization?: string;
+  type?: "user" | "bot";
+  token?: string;
 };
 
 export interface DiscordAccessToken {
@@ -10,14 +11,6 @@ export interface DiscordAccessToken {
   expires_in: number;
   token_type: string;
 }
-
-export type Server = {
-  id: string;
-  name: string;
-  icon: string | null;
-  owner?: boolean;
-  admin: boolean;
-};
 
 export enum ChannelType {
   TEXT = 0,

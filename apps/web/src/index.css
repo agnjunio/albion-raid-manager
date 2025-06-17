@@ -1,0 +1,171 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Base Colors */
+  --background: #fafafa;
+  --foreground: #1a1a1a;
+  --border: #e0e0e0;
+  --radius: 0.625rem;
+  --font-size-base: 16px;
+
+  /* Primary & Secondary */
+  --primary: #b8860b;
+  --primary-foreground: #ffffff;
+  --secondary: #1d3557;
+  --secondary-foreground: #ffffff;
+  --accent: #b8860b;
+  --muted: #5a4f45;
+  --muted-foreground: #666666;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --ring: #d4af37;
+
+  /* Card */
+  --card: #fafafa;
+  --card-foreground: #1a1a1a;
+  --card-border: #d1d5db;
+  --card-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+  /* Popover */
+  --popover: #fafafa;
+  --popover-foreground: #1a1a1a;
+
+  /* Sidebar */
+  --sidebar-background: #d1d5db;
+  --sidebar-accent: #1d3557;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #e0e0e0;
+  --sidebar-foreground: #1a1a1a;
+  --sidebar-primary: #1d3557;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-ring: #d4af37;
+
+  /* Button */
+  --button-primary: #b8860b;
+  --button-shadow: 0 2px 8px rgba(184, 134, 11, 0.08);
+
+  /* Input */
+  --input: #e5e7eb;
+}
+
+.dark {
+  /* Base Colors */
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --border: #2a2a2a;
+  --radius: 0.625rem;
+  --font-size-base: 16px;
+
+  /* Primary & Secondary */
+  --primary: #b8860b;
+  --primary-foreground: #ffffff;
+  --secondary: #1d3557;
+  --secondary-foreground: #ffffff;
+  --accent: #b8860b;
+  --muted: #4a3f35;
+  --muted-foreground: #d3c0b6;
+  --destructive: #e63946;
+  --destructive-foreground: #ff4d4d;
+  --ring: #b8860b;
+
+  /* Card */
+  --card: #1f1f1f;
+  --card-foreground: #e5d7b2;
+  --card-border: #33343a;
+  --card-shadow: 0 1px 4px rgba(0, 0, 0, 0.32);
+
+  /* Popover */
+  --popover: #1f1f1f;
+  --popover-foreground: #e5d7b2;
+
+  /* Sidebar */
+  --sidebar-background: #181a20;
+  --sidebar-accent: #1d3557;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #2a2a2a;
+  --sidebar-foreground: #e5d7b2;
+  --sidebar-primary: #1d3557;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-ring: #b8860b;
+
+  /* Button */
+  --button-primary: #b8860b;
+  --button-shadow: 0 2px 8px rgba(184, 134, 11, 0.16);
+
+  /* Input */
+  --input: #2a2a2a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-border: var(--border);
+  --color-radius: var(--radius);
+  --color-font-size-base: var(--font-size-base);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-ring: var(--ring);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
+  --color-card-shadow: var(--card-shadow);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-sidebar-background: var(--sidebar-background);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-button-primary: var(--button-primary);
+  --color-button-shadow: var(--button-shadow);
+
+  --color-input: var(--input);
+
+  --font-mono: var(--font-dm-mono);
+  --font-sans: var(--font-dm-sans);
+  --font-title: var(--font-pirata-one);
+  --font-caption: var(--font-lora);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 9999px;
+  border: none;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}

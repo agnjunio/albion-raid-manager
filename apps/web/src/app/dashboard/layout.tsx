@@ -1,43 +1,27 @@
+import { Navigate, Outlet } from "react-router-dom";
+
 import { Container } from "@/components/ui/container";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { nextAuthOptions } from "@/lib/auth";
-import { prisma } from "@albion-raid-manager/database";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
+import { useAuth } from "@/lib/auth";
+
 import { DashboardProvider } from "./context";
+import { DashboardHeader } from "./header";
 import { DashboardSidebar } from "./sidebar";
-import { DashboardTitle } from "./title";
-import { DashboardLayoutProps } from "./types";
 
-export default async function Layout({ children }: Readonly<DashboardLayoutProps>) {
-  const session = await getServerSession(nextAuthOptions);
+export function DashboardLayout() {
+  const { status } = useAuth();
 
-  if (!session) return redirect("/");
-
-  const guilds = await prisma.guild.findMany({
-    where: {
-      members: {
-        some: {
-          userId: session.user.id,
-        },
-      },
-    },
-    include: {
-      members: {
-        where: {
-          userId: session.user.id,
-        },
-      },
-    },
-  });
+  if (status === "unauthenticated") {
+    return <Navigate to="/" />;
+  }
 
   return (
-    <DashboardProvider guilds={guilds}>
+    <DashboardProvider>
       <SidebarProvider>
         <DashboardSidebar />
-        <Container className="flex grow flex-col">
-          <DashboardTitle />
-          <div className="grow">{children}</div>
+        <Container className="flex flex-1 flex-col">
+          <DashboardHeader />
+          <Outlet />
         </Container>
       </SidebarProvider>
     </DashboardProvider>

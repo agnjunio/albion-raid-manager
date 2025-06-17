@@ -1,5 +1,6 @@
 import logger from "@albion-raid-manager/logger";
 import { Client, Collection, Events } from "discord.js";
+
 import { Command, loadCommands } from "./commands";
 import { raids } from "./raids";
 

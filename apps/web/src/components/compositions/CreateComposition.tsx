@@ -1,9 +1,10 @@
-"use client";
+import { type FormEventHandler, useState } from "react";
 
-import Loading from "@/components/ui/loading";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEventHandler, useState } from "react";
+
+import Loading from "@/components/ui/loading";
+
 
 type CreateCompositionProps = {
   guildId: string;

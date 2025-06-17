@@ -1,15 +1,17 @@
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import * as React from "react";
+import { useImperativeHandle, useRef } from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
 import { faCalendar, faCalendarDay, faChevronLeft, faChevronRight, faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { add, format } from "date-fns";
 import { type Locale, enUS } from "date-fns/locale";
-import * as React from "react";
-import { useImperativeHandle, useRef } from "react";
 import { DayPicker } from "react-day-picker";
+
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // ---------- utils start ----------
 /**
@@ -237,9 +239,9 @@ function Calendar({
       };
     }
     return genMonths(locale);
-  }, []);
+  }, [props.locale]);
 
-  const YEARS = React.useMemo(() => genYears(yearRange), []);
+  const YEARS = React.useMemo(() => genYears(yearRange), [yearRange]);
   const disableLeftNavigation = () => {
     const today = new Date();
     const startDate = new Date(today.getFullYear() - yearRange, 0, 1);
@@ -514,7 +516,7 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
         id={id || picker}
         name={name || picker}
         className={cn(
-          "focus:bg-accent focus:text-accent-foreground w-[48px] text-center font-mono text-base tabular-nums caret-transparent [&::-webkit-inner-spin-button]:appearance-none",
+          "focus:bg-accent focus:text-accent-foreground text-accent-foreground w-[48px] text-center font-mono text-base tabular-nums caret-transparent [&::-webkit-inner-spin-button]:appearance-none",
           className,
         )}
         value={value || calculatedValue}
@@ -775,7 +777,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
+        <PopoverContent className="bg-popover border-card-border w-auto border p-0">
           <Calendar
             mode="single"
             selected={displayDate}
@@ -789,6 +791,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
             onMonthChange={handleMonthChange}
             yearRange={yearRange}
             locale={locale}
+            className="bg-popover border-card-border rounded-md border"
             {...props}
           />
           {granularity !== "day" && (

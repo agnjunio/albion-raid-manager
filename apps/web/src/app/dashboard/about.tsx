@@ -1,11 +1,13 @@
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
+import type { VariantProps } from "class-variance-authority";
+
+import { cn } from "@albion-raid-manager/core/helpers";
 import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { VariantProps } from "class-variance-authority";
-import Link from "next/link";
+import { Link } from "react-router-dom";
+
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 interface Props extends VariantProps<typeof buttonVariants> {
   className?: string;
@@ -38,7 +40,7 @@ export function AboutButton({ variant, className }: Props) {
           <div className="flex grow flex-col items-stretch justify-end gap-4 p-4">
             <Link
               className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-              href="https://discord.gg/"
+              to="https://discord.gg/"
               target="_blank"
               rel="noopener noreferrer"
               tabIndex={-1}
@@ -50,7 +52,7 @@ export function AboutButton({ variant, className }: Props) {
             </Link>
             <Link
               className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-              href="https://github.com/agnjunio/albion-raid-manager"
+              to="https://github.com/agnjunio/albion-raid-manager"
               target="_blank"
               rel="noopener noreferrer"
               tabIndex={-1}

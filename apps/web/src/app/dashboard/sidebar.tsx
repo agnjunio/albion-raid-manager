@@ -1,4 +1,17 @@
-"use client";
+import type { Guild } from "@albion-raid-manager/core/types";
+
+import { cn } from "@albion-raid-manager/core/helpers";
+import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import {
+  faArrowRightFromBracket,
+  faCheck,
+  faChevronDown,
+  faPlus,
+  faShield,
+  type IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -24,30 +37,19 @@ import {
   SidebarMenuSubButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { links } from "@/lib/menu";
-import { GuildWithMembers } from "@/types/database";
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
-import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
-import {
-  faArrowRightFromBracket,
-  faCheck,
-  faChevronDown,
-  faPlus,
-  faShield,
-  IconDefinition,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { signOut, useSession } from "next-auth/react";
-import Link from "next/link";
-import { useDashboardContext } from "./context";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/lib/auth";
+import { useMenu } from "@/lib/menu";
+import { useGetGuildsQuery } from "@/store/guilds";
 
-interface GuildSelectionProps {
-  guild?: GuildWithMembers;
-  icon?: IconDefinition;
-}
+import { useDashboard } from "./context";
 
 export function DashboardSidebar() {
-  const { guilds, selectedGuild } = useDashboardContext();
+  const { selectedGuild } = useDashboard();
+  const fetchGuilds = useGetGuildsQuery();
+  const links = useMenu();
+
+  const guilds = fetchGuilds.data?.guilds ?? [];
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">
@@ -58,20 +60,20 @@ export function DashboardSidebar() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <GuildSelection guild={selectedGuild} icon={faChevronDown} />
+              <GuildSelection guild={selectedGuild} icon={faChevronDown} isLoading={fetchGuilds.isLoading} />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-60" align="start">
             {guilds.map((guild) => (
-              <Link key={guild.id} href={`/dashboard/${guild.id}`}>
+              <Link key={guild.id} to={`/dashboard/${guild.id}`}>
                 <DropdownMenuItem>
                   <GuildSelection guild={guild} icon={guild === selectedGuild ? faCheck : undefined} />
                 </DropdownMenuItem>
               </Link>
             ))}
             {guilds.length > 0 && <DropdownMenuSeparator />}
-            <Link href="/create">
+            <Link to="/dashboard/create">
               <DropdownMenuItem>
                 <FontAwesomeIcon icon={faPlus} className="size-4" />
                 <div className="leading-normal">Add Server</div>
@@ -91,8 +93,8 @@ export function DashboardSidebar() {
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton asChild>
-                        <Link href={link.submenu ? "#" : `/dashboard/${selectedGuild.id}/${link.href}`}>
-                          <FontAwesomeIcon icon={link.icon} />
+                        <Link to={link.submenu ? "#" : `/dashboard/${selectedGuild.id}/${link.href}`}>
+                          {link.icon && <FontAwesomeIcon icon={link.icon} />}
                           <span>{link.label}</span>
                         </Link>
                       </SidebarMenuButton>
@@ -102,7 +104,7 @@ export function DashboardSidebar() {
                         <SidebarMenuSub>
                           {link.submenu.map((sublink) => (
                             <SidebarMenuSubButton asChild key={sublink.href}>
-                              <Link href={`/dashboard/${selectedGuild.id}/${link.href}/${sublink.href}`}>
+                              <Link to={`/dashboard/${selectedGuild.id}/${link.href}/${sublink.href}`}>
                                 <span className="pl-1.5">{sublink.label}</span>
                               </Link>
                             </SidebarMenuSubButton>
@@ -129,7 +131,13 @@ export function DashboardSidebar() {
   );
 }
 
-export function GuildSelection({ guild, icon }: GuildSelectionProps) {
+interface GuildSelectionProps {
+  guild?: Guild;
+  icon?: IconDefinition;
+  isLoading?: boolean;
+}
+
+export function GuildSelection({ guild, icon, isLoading }: GuildSelectionProps) {
   return (
     <div className="flex w-full items-center gap-2">
       <div
@@ -138,7 +146,9 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
           { "bg-sidebar-primary rounded-lg": !guild },
         )}
       >
-        {guild ? (
+        {isLoading ? (
+          <Skeleton className="size-8" />
+        ) : guild ? (
           <Avatar>
             <AvatarImage src={getServerPictureUrl(guild.discordId, guild.icon)} />
             <AvatarFallback>{guild.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
@@ -148,10 +158,17 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
         )}
       </div>
 
-      <div className={cn("leading-right flex min-w-0 grow flex-col whitespace-nowrap")}>
-        <span className="truncate font-semibold">{guild ? guild.name : "Select server"} </span>
-        <span className="text-muted-foreground text-xs">{!guild && "No server selected"}</span>
-      </div>
+      {isLoading ? (
+        <div className={cn("flex min-w-0 grow flex-col gap-1")}>
+          <Skeleton className="bg-muted h-3 w-24" />
+          <Skeleton className="bg-muted-foreground h-3 w-24" />
+        </div>
+      ) : (
+        <div className={cn("leading-right flex min-w-0 grow flex-col whitespace-nowrap")}>
+          <span className="truncate font-semibold">{guild ? guild.name : "Select server"} </span>
+          <span className="text-muted-foreground text-xs">{!guild && "No server selected"}</span>
+        </div>
+      )}
 
       {icon && <FontAwesomeIcon icon={icon} className="ml-auto size-4 data-[state=collapsed]:hidden" />}
     </div>
@@ -159,31 +176,31 @@ export function GuildSelection({ guild, icon }: GuildSelectionProps) {
 }
 
 export function UserInfo() {
-  const session = useSession();
-  if (!session?.data?.user) return null;
+  const { user, signOut, status } = useAuth();
 
-  const { user } = session.data;
+  if (status === "loading" || !user)
+    return (
+      <div className="flex min-w-0 items-center gap-2">
+        <Skeleton className="size-8" />
+        <Skeleton className="bg-muted h-3 w-24" />
+      </div>
+    );
+
   return (
     <>
       <div className="flex min-w-0 items-center gap-2">
         <Avatar>
-          <AvatarImage src={user.image || getUserPictureUrl(user.id)} />
-          <AvatarFallback>{user.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
+          <AvatarImage src={getUserPictureUrl(user.id, user.avatar)} />
+          <AvatarFallback>{user.username.substring(0, 1).toUpperCase()}</AvatarFallback>
         </Avatar>
 
-        <div className="flex min-w-0 flex-col text-sm group-data-[collapsible=icon]:hidden">
-          <span className="truncate font-semibold">@{user.name || "Unknown User"}</span>
-          <span className="truncate text-xs leading-tight">{user.email}</span>
+        <div className="flex min-w-0 flex-col text-sm leading-tight group-data-[collapsible=icon]:hidden">
+          <span className="truncate font-semibold">{user.nickname || "Unknown User"}</span>
+          <span className="text-muted-foreground text-xs">@{user.username}</span>
         </div>
       </div>
 
-      <SidebarMenuAction
-        onClick={() =>
-          signOut({
-            callbackUrl: "/",
-          })
-        }
-      >
+      <SidebarMenuAction onClick={() => signOut()}>
         <FontAwesomeIcon icon={faArrowRightFromBracket} />
       </SidebarMenuAction>
     </>

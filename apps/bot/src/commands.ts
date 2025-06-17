@@ -1,5 +1,5 @@
-import { runIfChanged } from "@albion-raid-manager/common/helpers/fileCache";
 import config from "@albion-raid-manager/config";
+import { runIfChanged } from "@albion-raid-manager/core/cache";
 import logger from "@albion-raid-manager/logger";
 import {
   APIApplicationCommand,
@@ -10,6 +10,7 @@ import {
   Routes,
   SlashCommandBuilder,
 } from "discord.js";
+
 import { Module } from "./modules";
 
 if (!config.discord.token || !config.discord.clientId) {
@@ -45,7 +46,7 @@ export async function deployCommands() {
     async () => {
       try {
         logger.info(`Started refreshing ${body.length} application (/) commands.`);
-        const data = (await rest.put(Routes.applicationCommands(config.discord.clientId!), {
+        const data = (await rest.put(Routes.applicationCommands(config.discord.clientId as string), {
           body,
         })) as APIApplicationCommand[];
         logger.info(`Successfully reloaded ${data.length} application (/) commands.`);

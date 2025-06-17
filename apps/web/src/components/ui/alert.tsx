@@ -1,5 +1,6 @@
-import { cn } from "@albion-raid-manager/common/helpers/classNames";
 import React from "react";
+
+import { cn } from "@albion-raid-manager/core/helpers";
 
 interface Props {
   children: React.ReactNode;
