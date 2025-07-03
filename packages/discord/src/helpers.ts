@@ -47,6 +47,7 @@ export function transformUser(user: APIUser): User {
     username: user.username,
     nickname: user.global_name,
     avatar: user.avatar ?? null,
+    defaultGuildId: null,
   };
 }
 

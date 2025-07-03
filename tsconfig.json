@@ -7,15 +7,27 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["DOM", "ES2023"],
-    "module": "ESNext",
     "moduleResolution": "bundler",
     "noEmit": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
-    "types": ["node"]
+    "types": ["node"],
+    "verbatimModuleSyntax": false,
+
+    /* Opinion */
+    "incremental": true,
+    "module": "preserve",
+    "outDir": "${configDir}/dist",
+    "baseUrl": "${configDir}",
+    "rootDir": "${configDir}/src",
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   },
+  "include": ["${configDir}/src", "${configDir}/src/**/*.json"],
+  "exclude": ["${configDir}/node_modules", "${configDir}/dist"],
   "ts-node": {
     "require": ["tsconfig-paths/register", "dotenv/config"]
   }

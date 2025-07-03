@@ -1,10 +1,8 @@
 import { type FormEventHandler, useState } from "react";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useNavigate } from "react-router-dom";
 
 import Loading from "@/components/ui/loading";
-
 
 type CreateCompositionProps = {
   guildId: string;
@@ -13,7 +11,7 @@ type CreateCompositionProps = {
 export default function CreateComposition({ guildId }: CreateCompositionProps) {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const navigate = useNavigate();
 
   const createComposition: FormEventHandler = async (event) => {
     event.preventDefault();
@@ -25,7 +23,7 @@ export default function CreateComposition({ guildId }: CreateCompositionProps) {
         body: JSON.stringify({ guildId, name }),
       });
       if (!response.ok) throw new Error("Failed to create composition");
-      router.push(`/guilds/${guildId}/compositions`);
+      navigate(`/guilds/${guildId}/compositions`);
     } finally {
       setLoading(false);
     }
@@ -50,7 +48,7 @@ export default function CreateComposition({ guildId }: CreateCompositionProps) {
 
       <div className="flex flex-row-reverse gap-2">
         <button type="submit">Create</button>
-        <Link href={`/guilds/${guildId}/compositions`}>
+        <Link to={`/guilds/${guildId}/compositions`}>
           <button className="btn-secondary-violet">Cancel</button>
         </Link>
       </div>

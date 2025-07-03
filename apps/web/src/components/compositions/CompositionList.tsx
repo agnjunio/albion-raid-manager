@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { type Composition } from "@albion-raid-manager/core/types";
 import { compareAsc } from "date-fns";
 import { distance } from "fastest-levenshtein";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 
 export function filterCompositions(compositions: Composition[], filter: string) {
   return compositions
@@ -40,7 +40,7 @@ export default function CompositionList({ compositions }: CompositionListProps) 
         />
 
         <div className="flex flex-row-reverse gap-2">
-          <Link href="compositions/create" tabIndex={-1}>
+          <Link to="compositions/create" tabIndex={-1}>
             <button className="whitespace-nowrap">New Composition</button>
           </Link>
         </div>
@@ -50,7 +50,7 @@ export default function CompositionList({ compositions }: CompositionListProps) 
         {filteredCompositions.map((composition) => (
           <li key={composition.id}>
             <Link
-              href={`compositions/${composition.id}`}
+              to={`compositions/${composition.id}`}
               className="bg-primary-gray-800/25 hover:bg-primary-gray-500/25 active:bg-primary-gray-500/50 flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4 outline-offset-0 transition-colors"
             >
               <div>
