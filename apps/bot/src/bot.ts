@@ -1,21 +1,13 @@
 import config from "@albion-raid-manager/config";
 import { logger } from "@albion-raid-manager/logger";
-import { Client, Events, Partials } from "discord.js";
+import { Client, Events, IntentsBitField, Partials } from "discord.js";
 
 import { deployCommands, handleCommand } from "./commands";
 import { initModules } from "./modules";
 
 export const discord = new Client({
-  intents: [],
-  partials: [
-    Partials.Channel,
-    Partials.GuildMember,
-    Partials.GuildScheduledEvent,
-    Partials.Message,
-    Partials.Reaction,
-    Partials.ThreadMember,
-    Partials.User,
-  ],
+  intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent],
+  partials: [Partials.Channel, Partials.Message, Partials.Reaction, Partials.User, Partials.GuildMember],
 });
 
 async function run() {
@@ -47,7 +39,7 @@ discord.on(Events.ShardReady, async (shardId) => {
 
 discord.on(Events.InteractionCreate, handleCommand);
 
-// discord.on(Events.Debug, (message) => logger.debug(message));
+discord.on(Events.Debug, (message) => logger.debug(message));
 
 export default {
   run,

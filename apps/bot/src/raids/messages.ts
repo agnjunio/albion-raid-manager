@@ -1,4 +1,4 @@
-import { type Raid, type RaidSlot, type Role } from "@albion-raid-manager/core/types";
+import { RaidRole, type Raid, type RaidSlot } from "@albion-raid-manager/core/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -14,7 +14,7 @@ import {
 
 import { raids } from ".";
 
-const emojis: Record<Role | "DEFAULT", string> = {
+const emojis: Record<RaidRole | "DEFAULT", string> = {
   DEFAULT: "❔",
   CALLER: "🧠",
   TANK: "🛡️",

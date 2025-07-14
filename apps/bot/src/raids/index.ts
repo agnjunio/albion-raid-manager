@@ -1,22 +1,19 @@
-import { runCronjob } from "@albion-raid-manager/core/scheduler";
 import { logger } from "@albion-raid-manager/logger";
 import { Events } from "discord.js";
 
 import { type Module } from "@/modules";
 
 import { raidCommand } from "./commands/raid";
-import { handleAnnounceRaids, handleSelectRole, handleSignout, handleSignup } from "./handlers";
-
+import { handleSelectRole, handleSignout, handleSignup } from "./handlers";
 
 export const raids: Module = {
   id: "raids",
   commands: [raidCommand],
   onReady: async ({ discord }) => {
-    runCronjob({
-      name: "Announce Raids",
-      cron: "*/30 * * * *", // Every 30 minutes
-      callback: () => handleAnnounceRaids({ discord }),
-      runOnStart: true,
+    discord.on(Events.MessageCreate, async (message) => {
+      if (message.author.bot) return;
+
+      logger.info(`Message received: ${message.content}`, { message: message.toJSON() });
     });
 
     discord.on(Events.InteractionCreate, async (interaction) => {
