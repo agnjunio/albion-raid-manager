@@ -16,6 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@albion-raid-manager/ai": "workspace:*",
     "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/config": "workspace:^",
     "@albion-raid-manager/database": "workspace:^",

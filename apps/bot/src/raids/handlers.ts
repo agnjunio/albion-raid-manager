@@ -1,12 +1,9 @@
+import { ClientError, ErrorCodes } from "@/errors";
+import { Raid } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { prisma } from "@albion-raid-manager/database";
-import logger from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/logger";
 import { Client, Interaction, MessageCreateOptions, MessageEditOptions } from "discord.js";
-
-import { ClientError, ErrorCodes } from "@/errors";
-
-import { Raid, RaidStatus } from "../../../../packages/core/src/types.bkp";
-
 import { raidEvents } from "./events";
 import { buildRaidAnnouncementMessage, buildRaidSignupReply } from "./messages";
 

@@ -43,6 +43,15 @@ const config = schema.safeParse({
       httpOnly: true,
     },
   },
+
+  ai: {
+    provider: process.env.AI_PROVIDER || "openai",
+    apiKey: process.env.AI_API_KEY,
+    model: process.env.AI_MODEL || "gpt-4",
+    baseUrl: process.env.AI_BASE_URL,
+    maxTokens: process.env.AI_MAX_TOKENS ? parseInt(process.env.AI_MAX_TOKENS) : undefined,
+    temperature: process.env.AI_TEMPERATURE ? parseFloat(process.env.AI_TEMPERATURE) : undefined,
+  },
 });
 
 if (!config.success) {

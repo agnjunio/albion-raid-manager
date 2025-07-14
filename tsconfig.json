@@ -17,7 +17,7 @@
     "verbatimModuleSyntax": false,
 
     /* Opinion */
-    "incremental": true,
+    "incremental": false,
     "module": "preserve",
     "outDir": "${configDir}/dist",
     "baseUrl": "${configDir}",

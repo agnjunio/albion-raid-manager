@@ -43,4 +43,13 @@ export const schema = z.object({
       httpOnly: z.boolean().default(true),
     }),
   }),
+
+  ai: z.object({
+    provider: z.enum(["openai", "anthropic", "google", "azure"]).optional(),
+    apiKey: z.string().optional(),
+    model: z.string().optional(),
+    baseUrl: z.string().url().optional(),
+    maxTokens: z.number().positive().optional(),
+    temperature: z.number().min(0).max(2).optional(),
+  }),
 });

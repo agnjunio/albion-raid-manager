@@ -1,0 +1,127 @@
+import { z } from "zod";
+
+// AI Provider Types
+export enum AIProvider {
+  OPENAI = "openai",
+  ANTHROPIC = "anthropic",
+  GOOGLE = "google",
+  AZURE = "azure",
+}
+
+// Base AI Service Interface
+export interface AIService {
+  provider: AIProvider;
+  parseDiscordPing(message: string): Promise<ParsedRaidData>;
+  validateMessage(message: string): Promise<boolean>;
+}
+
+// AI Service Configuration
+export interface AIServiceConfig {
+  provider: AIProvider;
+  apiKey: string;
+  model?: string;
+  baseUrl?: string;
+  maxTokens?: number;
+  temperature?: number;
+}
+
+// Parsed Raid Data Structure
+export interface ParsedRaidData {
+  title: string;
+  description?: string;
+  date: Date;
+  time?: string;
+  location?: string;
+  requirements?: string[];
+  roles?: RaidRole[];
+  maxParticipants?: number;
+  notes?: string;
+  confidence: number;
+}
+
+// Raid Role Structure
+export interface RaidRole {
+  name: string;
+  count: number;
+  preAssignedUsers?: string[]; // Discord user IDs or usernames
+  requirements?: string[]; // Role-specific requirements (optional)
+}
+
+// AI Response Structure
+export interface AIResponse<T = any> {
+  data: T;
+  usage?: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+  };
+  model: string;
+  provider: AIProvider;
+}
+
+// Discord Message Context
+export interface DiscordMessageContext {
+  guildId: string;
+  channelId: string;
+  authorId: string;
+  messageId: string;
+  timestamp: Date;
+  mentions: string[];
+  attachments: string[];
+}
+
+// Validation Schemas
+export const ParsedRaidDataSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  date: z.date(),
+  time: z.string().optional(),
+  location: z.string().optional(),
+  requirements: z.array(z.string()).optional(),
+  roles: z
+    .array(
+      z.object({
+        name: z.string(),
+        count: z.number().positive(),
+        preAssignedUsers: z.array(z.string()).optional(),
+        requirements: z.array(z.string()).optional(),
+      }),
+    )
+    .optional(),
+  maxParticipants: z.number().positive().optional(),
+  notes: z.string().optional(),
+  confidence: z.number().min(0).max(1),
+});
+
+export const AIServiceConfigSchema = z.object({
+  provider: z.nativeEnum(AIProvider),
+  apiKey: z.string().min(1),
+  model: z.string().optional(),
+  baseUrl: z.string().url().optional(),
+  maxTokens: z.number().positive().optional(),
+  temperature: z.number().min(0).max(2).optional(),
+});
+
+// Error Types
+export class AIServiceError extends Error {
+  constructor(
+    message: string,
+    public provider: AIProvider,
+    public code?: string,
+    public statusCode?: number,
+  ) {
+    super(message);
+    this.name = "AIServiceError";
+  }
+}
+
+export class AIParsingError extends Error {
+  constructor(
+    message: string,
+    public originalMessage: string,
+    public confidence: number,
+  ) {
+    super(message);
+    this.name = "AIParsingError";
+  }
+}
