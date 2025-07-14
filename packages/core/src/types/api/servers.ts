@@ -1,4 +1,4 @@
-import { Guild } from "@types";
+import { Guild } from "@albion-raid-manager/core/types";
 
 import { Server } from "../discord";
 

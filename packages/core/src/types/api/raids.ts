@@ -1,4 +1,4 @@
-import { Raid, RaidStatus } from "@types";
+import { Raid, RaidStatus } from "@albion-raid-manager/core/types";
 
 export namespace CreateGuildRaid {
   export type Params = { guildId: string };

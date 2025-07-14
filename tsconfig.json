@@ -19,9 +19,9 @@
     /* Opinion */
     "incremental": false,
     "module": "preserve",
-    "outDir": "${configDir}/dist",
-    "baseUrl": "${configDir}",
-    "rootDir": "${configDir}/src",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "rootDir": "./src",
     "paths": {
       "~/*": ["./src/*"]
     }
