@@ -28,7 +28,6 @@ model Guild {
   discordId                 String        @unique
   members                   GuildMember[]
   raids                     Raid[]
-  compositions              Composition[]
   // Settings
   adminRoles                String[]      @default([])
   raidRoles                 String[]      @default([])
@@ -59,53 +58,26 @@ model User {
   RaidSlot       RaidSlot[]
 }
 
-// Compositions
-model Build {
-  id            String      @id @default(uuid())
-  composition   Composition @relation(fields: [compositionId], references: [id])
-  compositionId String
-  raidSlots     RaidSlot[]
-  name          String
-  role          BuildRole
-  comment       String?
-  count         Int         @default(1)
-}
-
-enum BuildRole {
-  CALLER
-  TANK
-  SUPPORT
-  HEALER
-  RANGED_DPS
-  MELEE_DPS
-  BATTLEMOUNT
-
-  @@map("Role")
-}
-
-model Composition {
-  id        String   @id @default(uuid())
-  name      String
-  guild     Guild    @relation(fields: [guildId], references: [id])
-  guildId   String
-  builds    Build[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 // Raids
 model Raid {
   id                    String     @id @default(uuid())
-  guild                 Guild      @relation(fields: [guildId], references: [id])
+  type                  RaidType   @default(FIXED)
   guildId               String
-  description           String
-  date                  DateTime
-  allowLateJoin         Boolean    @default(true)
-  status                RaidStatus @default(SCHEDULED)
+  guild                 Guild      @relation(fields: [guildId], references: [id])
   announcementMessageId String?
+  status                RaidStatus @default(SCHEDULED)
+  title                 String     @default("Raid")
+  description           String?
+  note                  String?
+  date                  DateTime
   slots                 RaidSlot[]
   createdAt             DateTime   @default(now())
   updatedAt             DateTime   @updatedAt
+}
+
+enum RaidType {
+  FIXED
+  FLEX
 }
 
 model RaidSlot {
@@ -114,10 +86,9 @@ model RaidSlot {
   comment   String?
   raid      Raid?     @relation(fields: [raidId], references: [id])
   raidId    String?
+  role      RaidRole
   user      User?     @relation(fields: [userId], references: [id])
   userId    String?
-  build     Build?    @relation(fields: [buildId], references: [id])
-  buildId   String?
   createdAt DateTime  @default(now())
   joinedAt  DateTime?
 }
@@ -128,6 +99,16 @@ enum RaidStatus {
   CLOSED
   ONGOING
   FINISHED
+}
+
+enum RaidRole {
+  CALLER
+  TANK
+  SUPPORT
+  HEALER
+  RANGED_DPS
+  MELEE_DPS
+  BATTLEMOUNT
 }
 
 // Sessions

@@ -110,9 +110,7 @@ export function RaidPage() {
             {raid.slots ? (
               raid.slots.map((slot: RaidSlot) => <RaidSlotCard key={slot.id} slot={slot} />)
             ) : (
-              <div className="py-4 text-center">
-                {raid.composition ? "No slots available." : "No players registered for this raid."}
-              </div>
+              <div className="py-4 text-center">No players registered.</div>
             )}
           </div>
         </CardContent>
