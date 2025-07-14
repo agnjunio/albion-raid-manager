@@ -1,5 +1,5 @@
 import config from "@albion-raid-manager/config";
-import logger from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/logger";
 import { Client, Events, Partials } from "discord.js";
 
 import { deployCommands, handleCommand } from "./commands";

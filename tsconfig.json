@@ -19,9 +19,6 @@
     /* Opinion */
     "incremental": false,
     "module": "preserve",
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "rootDir": "./src",
     "paths": {
       "~/*": ["./src/*"]
     }
