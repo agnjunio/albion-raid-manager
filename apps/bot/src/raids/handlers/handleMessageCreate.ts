@@ -1,5 +1,6 @@
 import { DiscordMessageContext, mapRoleNameToEnum, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
+import { Guild } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
@@ -59,7 +60,7 @@ export const handleMessageCreate = async ({ discord: _discord, message }: { disc
     }
 
     // Create the raid
-    await createRaidFromParsedData(parsedData, context);
+    await createRaidFromParsedData(guild, parsedData);
 
     // Send confirmation message
     await message.reply({
@@ -76,17 +77,8 @@ export const handleMessageCreate = async ({ discord: _discord, message }: { disc
 };
 
 // Function to create raid from parsed data
-async function createRaidFromParsedData(parsedData: ParsedRaidData, context: DiscordMessageContext): Promise<void> {
+async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData): Promise<void> {
   try {
-    // Get or create guild
-    const guild = await prisma.guild.findUnique({
-      where: { discordId: context.guildId },
-    });
-
-    if (!guild) {
-      throw new Error(`Guild not found: ${context.guildId}`);
-    }
-
     // Create the raid
     const raid = await prisma.raid.create({
       data: {
@@ -136,7 +128,6 @@ async function createRaidFromParsedData(parsedData: ParsedRaidData, context: Dis
   } catch (error) {
     logger.error("Failed to create raid from parsed data", {
       parsedData,
-      context,
       error: getErrorMessage(error),
     });
     throw error;
