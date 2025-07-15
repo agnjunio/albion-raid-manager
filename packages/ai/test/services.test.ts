@@ -4,20 +4,6 @@ import { AnthropicService, OpenAIService } from "../src/service";
 import { getAIService } from "../src/service/factory";
 import { AIProvider } from "../src/types";
 
-// Mock axios
-vi.mock("axios", () => ({
-  default: {
-    create: vi.fn(() => ({
-      post: vi.fn(),
-      interceptors: {
-        request: { use: vi.fn() },
-        response: { use: vi.fn() },
-      },
-    })),
-    isAxiosError: vi.fn(() => false),
-  },
-}));
-
 describe("AI Service Factory", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -46,28 +32,42 @@ describe("AI Service Factory", () => {
     });
 
     it("should throw error when AI_PROVIDER is missing", () => {
+      const originalProvider = process.env.AI_PROVIDER;
       delete process.env.AI_PROVIDER;
       process.env.AI_API_KEY = "test-key";
 
-      expect(() => {
-        getAIService();
-      }).toThrow("AI_PROVIDER environment variable is required");
+      try {
+        expect(() => {
+          getAIService();
+        }).toThrow("AI_PROVIDER environment variable is required");
+      } finally {
+        if (originalProvider) {
+          process.env.AI_PROVIDER = originalProvider;
+        }
+      }
     });
 
     it("should throw error when AI_API_KEY is missing", () => {
+      const originalApiKey = process.env.AI_API_KEY;
       process.env.AI_PROVIDER = "openai";
       delete process.env.AI_API_KEY;
 
-      expect(() => {
-        getAIService();
-      }).toThrow("AI_API_KEY environment variable is required");
+      try {
+        expect(() => {
+          getAIService();
+        }).toThrow("AI_API_KEY environment variable is required");
+      } finally {
+        if (originalApiKey) {
+          process.env.AI_API_KEY = originalApiKey;
+        }
+      }
     });
   });
 });
 
 describe("OpenAI Service", () => {
   let service: OpenAIService;
-  let mockPost: any;
+  let mockCreate: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -77,7 +77,7 @@ describe("OpenAI Service", () => {
       model: "gpt-4",
     });
 
-    mockPost = vi.mocked(service["client"].post);
+    mockCreate = vi.mocked(service["client"].chat.completions.create);
   });
 
   it("should have correct default configuration", () => {
@@ -100,10 +100,9 @@ describe("OpenAI Service", () => {
   });
 
   it("should validate message correctly", async () => {
-    mockPost.mockResolvedValueOnce({
-      data: {
-        choices: [{ message: { content: "true" } }],
-      },
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: "true" } }],
+      usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
     });
 
     const result = await service.validateMessage("test raid message");
@@ -123,9 +122,10 @@ describe("OpenAI Service", () => {
           },
         },
       ],
+      usage: { prompt_tokens: 50, completion_tokens: 100, total_tokens: 150 },
     };
 
-    mockPost.mockResolvedValueOnce({ data: mockResponse });
+    mockCreate.mockResolvedValueOnce(mockResponse);
 
     const result = await service.parseDiscordPing("test message");
 
@@ -134,20 +134,18 @@ describe("OpenAI Service", () => {
   });
 
   it("should handle malformed JSON response", async () => {
-    mockPost.mockResolvedValueOnce({
-      data: {
-        choices: [{ message: { content: "invalid json" } }],
-      },
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: { content: "invalid json" } }],
+      usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
     });
 
     await expect(service.parseDiscordPing("test message")).rejects.toThrow("No valid JSON found in response");
   });
 
   it("should handle empty response content", async () => {
-    mockPost.mockResolvedValueOnce({
-      data: {
-        choices: [{ message: {} }],
-      },
+    mockCreate.mockResolvedValueOnce({
+      choices: [{ message: {} }],
+      usage: { prompt_tokens: 10, completion_tokens: 0, total_tokens: 10 },
     });
 
     await expect(service.parseDiscordPing("test message")).rejects.toThrow("No response content from OpenAI");
@@ -155,7 +153,7 @@ describe("OpenAI Service", () => {
 
   it("should handle API errors", async () => {
     const error = new Error("API Error");
-    mockPost.mockRejectedValueOnce(error);
+    mockCreate.mockRejectedValueOnce(error);
 
     await expect(service.parseDiscordPing("test message")).rejects.toThrow("Failed to parse Discord ping: API Error");
   });
@@ -163,7 +161,7 @@ describe("OpenAI Service", () => {
 
 describe("Anthropic Service", () => {
   let service: AnthropicService;
-  let mockPost: any;
+  let mockCreate: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -173,7 +171,7 @@ describe("Anthropic Service", () => {
       model: "claude-3-sonnet-20240229",
     });
 
-    mockPost = vi.mocked(service["client"].post);
+    mockCreate = vi.mocked(service["client"].messages.create);
   });
 
   it("should have correct default configuration", () => {
@@ -183,10 +181,9 @@ describe("Anthropic Service", () => {
   });
 
   it("should validate message correctly", async () => {
-    mockPost.mockResolvedValueOnce({
-      data: {
-        content: [{ text: "true" }],
-      },
+    mockCreate.mockResolvedValueOnce({
+      content: [{ type: "text", text: "true" }],
+      usage: { input_tokens: 10, output_tokens: 2 },
     });
 
     const result = await service.validateMessage("test raid message");
@@ -197,6 +194,7 @@ describe("Anthropic Service", () => {
     const mockResponse = {
       content: [
         {
+          type: "text",
           text: JSON.stringify({
             title: "Test Raid",
             date: new Date().toISOString(),
@@ -204,45 +202,40 @@ describe("Anthropic Service", () => {
           }),
         },
       ],
+      usage: { input_tokens: 50, output_tokens: 100 },
     };
 
-    mockPost.mockResolvedValueOnce({ data: mockResponse });
+    mockCreate.mockResolvedValueOnce(mockResponse);
 
     const result = await service.parseDiscordPing("test message");
 
     expect(result.title).toBe("Test Raid");
     expect(result.confidence).toBe(0.9);
   });
-});
 
-describe("Base AI Service", () => {
-  it("should handle axios errors correctly", async () => {
-    const { default: axios } = await import("axios");
-    vi.mocked(axios.isAxiosError).mockReturnValueOnce(true);
-
-    const service = new OpenAIService({
-      apiKey: "test-key",
+  it("should handle non-text content", async () => {
+    mockCreate.mockResolvedValueOnce({
+      content: [{ type: "thinking" }],
+      usage: { input_tokens: 10, output_tokens: 0 },
     });
 
-    const mockPost = vi.mocked(service["client"].post);
-    mockPost.mockRejectedValueOnce({
-      response: {
-        status: 429,
-        data: { error: { message: "Rate limit exceeded", code: "rate_limit_exceeded" } },
-      },
-    });
-
-    await expect(service["makeRequest"]("/test", {})).rejects.toThrow("Rate limit exceeded");
+    await expect(service.parseDiscordPing("test message")).rejects.toThrow("No valid text content from Anthropic");
   });
 
-  it("should handle non-axios errors correctly", async () => {
-    const service = new OpenAIService({
-      apiKey: "test-key",
+  it("should handle validation with non-text content", async () => {
+    mockCreate.mockResolvedValueOnce({
+      content: [{ type: "thinking" }],
+      usage: { input_tokens: 10, output_tokens: 0 },
     });
 
-    const mockPost = vi.mocked(service["client"].post);
-    mockPost.mockRejectedValueOnce(new Error("Network error"));
+    const result = await service.validateMessage("test message");
+    expect(result).toBe(false);
+  });
 
-    await expect(service["makeRequest"]("/test", {})).rejects.toThrow("Network error");
+  it("should handle API errors", async () => {
+    const error = new Error("API Error");
+    mockCreate.mockRejectedValueOnce(error);
+
+    await expect(service.parseDiscordPing("test message")).rejects.toThrow("Failed to parse Discord ping: API Error");
   });
 });

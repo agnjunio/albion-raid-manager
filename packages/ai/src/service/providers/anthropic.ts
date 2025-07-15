@@ -1,29 +1,12 @@
+import { logger } from "@albion-raid-manager/logger";
+import Anthropic from "@anthropic-ai/sdk";
+
 import { AIProvider, ParsedRaidData } from "../../types";
 import { BaseAIService } from "../base";
 
-interface AnthropicRequest {
-  model: string;
-  max_tokens: number;
-  temperature?: number;
-  messages: Array<{
-    role: "user" | "assistant";
-    content: string;
-  }>;
-}
-
-interface AnthropicResponse {
-  content: Array<{
-    type: "text";
-    text: string;
-  }>;
-  usage: {
-    input_tokens: number;
-    output_tokens: number;
-  };
-  model: string;
-}
-
 export class AnthropicService extends BaseAIService {
+  private client: Anthropic;
+
   constructor(config: { apiKey: string; model?: string; baseUrl?: string }) {
     super({
       provider: AIProvider.ANTHROPIC,
@@ -33,30 +16,46 @@ export class AnthropicService extends BaseAIService {
       maxTokens: 1000,
       temperature: 0.1,
     });
+
+    this.client = new Anthropic({
+      apiKey: config.apiKey,
+      baseURL: config.baseUrl,
+    });
   }
 
   async parseDiscordPing(message: string): Promise<ParsedRaidData> {
     const prompt = this.createRaidParsingPrompt(message);
 
-    const request: AnthropicRequest = {
-      model: this.config.model!,
-      max_tokens: this.config.maxTokens!,
-      temperature: this.config.temperature,
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    };
-
     try {
-      const response = await this.makeRequest<AnthropicResponse>("/messages", request);
+      logger.debug("Making Anthropic API request for Discord message parsing", {
+        provider: this.provider,
+        model: this.config.model,
+        messageLength: message.length,
+      });
 
-      const content = response.content[0]?.text;
-      if (!content) {
-        throw new Error("No response content from Anthropic");
+      const response = await this.client.messages.create({
+        model: this.config.model || "claude-3-sonnet-20240229",
+        max_tokens: this.config.maxTokens || 1000,
+        temperature: this.config.temperature,
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      });
+
+      const contentBlock = response.content[0];
+      if (!contentBlock || contentBlock.type !== "text") {
+        throw new Error("No valid text content from Anthropic");
       }
+      const content = contentBlock.text;
+
+      logger.debug("Received Anthropic response", {
+        provider: this.provider,
+        model: this.config.model,
+        usage: response.usage,
+      });
 
       // Try to extract JSON from the response
       const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -67,6 +66,19 @@ export class AnthropicService extends BaseAIService {
       const parsedData = JSON.parse(jsonMatch[0]);
       return this.validateParsedData(parsedData);
     } catch (error) {
+      logger.error("Anthropic API request failed", {
+        provider: this.provider,
+        model: this.config.model,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+
+      if (error && typeof error === "object" && "status" in error) {
+        const apiError = error as { status?: number };
+        throw new Error(
+          `Anthropic API Error: ${error instanceof Error ? error.message : "Unknown error"} (Status: ${apiError.status})`,
+        );
+      }
+
       throw new Error(`Failed to parse Discord ping: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
@@ -78,23 +90,46 @@ Message: "${message}"
 
 Respond with only "true" if it's raid-related, or "false" if it's not.`;
 
-    const request: AnthropicRequest = {
-      model: this.config.model!,
-      max_tokens: 10,
-      temperature: 0,
-      messages: [
-        {
-          role: "user",
-          content: validationPrompt,
-        },
-      ],
-    };
-
     try {
-      const response = await this.makeRequest<AnthropicResponse>("/messages", request);
-      const content = response.content[0]?.text?.toLowerCase().trim();
+      logger.debug("Making Anthropic API request for message validation", {
+        provider: this.provider,
+        model: this.config.model,
+        messageLength: message.length,
+      });
+
+      const response = await this.client.messages.create({
+        model: this.config.model || "claude-3-sonnet-20240229",
+        max_tokens: 10,
+        temperature: 0,
+        messages: [
+          {
+            role: "user",
+            content: validationPrompt,
+          },
+        ],
+      });
+
+      const contentBlock = response.content[0];
+      if (!contentBlock || contentBlock.type !== "text") {
+        return false;
+      }
+      const content = contentBlock.text.toLowerCase().trim();
+
+      logger.debug("Received Anthropic validation response", {
+        provider: this.provider,
+        model: this.config.model,
+        response: content,
+        usage: response.usage,
+      });
+
       return content === "true";
     } catch (error) {
+      logger.error("Anthropic validation request failed", {
+        provider: this.provider,
+        model: this.config.model,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+
       // If validation fails, assume it's not a raid message
       return false;
     }

@@ -1,59 +1,10 @@
-import { logger } from "@albion-raid-manager/logger";
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-
-import { AIProvider, AIService, AIServiceConfig, AIServiceError, ParsedRaidData } from "../types";
+import { AIProvider, AIService, AIServiceConfig, ParsedRaidData, RaidRole } from "../types";
 
 export abstract class BaseAIService implements AIService {
-  protected client: AxiosInstance;
   protected config: AIServiceConfig;
 
   constructor(config: AIServiceConfig) {
     this.config = config;
-    this.client = axios.create({
-      baseURL: config.baseUrl,
-      timeout: 30000,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${config.apiKey}`,
-      },
-    });
-
-    // Add request/response interceptors for logging
-    this.client.interceptors.request.use(
-      (config) => {
-        logger.debug(`AI Service Request: ${config.method?.toUpperCase()} ${config.url}`, {
-          provider: this.provider,
-          model: this.config.model,
-        });
-        return config;
-      },
-      (error) => {
-        logger.error(`AI Service Request Error: ${error.message}`, {
-          provider: this.provider,
-          error,
-        });
-        return Promise.reject(error);
-      },
-    );
-
-    this.client.interceptors.response.use(
-      (response) => {
-        logger.debug(`AI Service Response: ${response.status}`, {
-          provider: this.provider,
-          model: this.config.model,
-          status: response.status,
-        });
-        return response;
-      },
-      (error) => {
-        logger.error(`AI Service Response Error: ${error.message}`, {
-          provider: this.provider,
-          status: error.response?.status,
-          data: error.response?.data,
-        });
-        return Promise.reject(error);
-      },
-    );
   }
 
   get provider(): AIProvider {
@@ -62,23 +13,6 @@ export abstract class BaseAIService implements AIService {
 
   abstract parseDiscordPing(message: string): Promise<ParsedRaidData>;
   abstract validateMessage(message: string): Promise<boolean>;
-
-  protected async makeRequest<T = any>(endpoint: string, data: any, config?: AxiosRequestConfig): Promise<T> {
-    try {
-      const response = await this.client.post<T>(endpoint, data, config);
-      return response.data;
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        throw new AIServiceError(
-          error.response?.data?.error?.message || error.message,
-          this.provider,
-          error.response?.data?.error?.code,
-          error.response?.status,
-        );
-      }
-      throw new AIServiceError(error.message || "Unknown AI service error", this.provider);
-    }
-  }
 
   protected createRaidParsingPrompt(message: string): string {
     return `You are an AI assistant that parses Discord messages to extract raid information for Albion Online.
@@ -121,19 +55,20 @@ Important Albion Online context:
 Return only valid JSON without any additional text or formatting.`;
   }
 
-  protected validateParsedData(data: any): ParsedRaidData {
+  protected validateParsedData(data: unknown): ParsedRaidData {
     // Basic validation and transformation
+    const parsedData = data as Record<string, unknown>;
     const parsed: ParsedRaidData = {
-      title: data.title || "Raid",
-      description: data.description,
-      date: new Date(data.date || Date.now()),
-      time: data.time,
-      location: data.location,
-      requirements: data.requirements || [],
-      roles: data.roles || [],
-      maxParticipants: data.maxParticipants,
-      notes: data.notes,
-      confidence: Math.max(0, Math.min(1, data.confidence || 0.5)),
+      title: (parsedData.title as string) || "Raid",
+      description: parsedData.description as string | undefined,
+      date: new Date((parsedData.date as string | number) || Date.now()),
+      time: parsedData.time as string | undefined,
+      location: parsedData.location as string | undefined,
+      requirements: (parsedData.requirements as string[] | undefined) || [],
+      roles: (parsedData.roles as RaidRole[] | undefined) || [],
+      maxParticipants: parsedData.maxParticipants as number | undefined,
+      notes: parsedData.notes as string | undefined,
+      confidence: Math.max(0, Math.min(1, (parsedData.confidence as number) || 0.5)),
     };
 
     return parsed;

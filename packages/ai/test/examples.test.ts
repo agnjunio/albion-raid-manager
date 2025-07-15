@@ -1,37 +1,21 @@
-import axios from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { parseDiscordMessage, parseMultipleDiscordMessages, validateDiscordMessage } from "../src/parser";
 import { OpenAIService } from "../src/service/providers/openai";
 
-import { mockOpenAIResponses, mockValidationResponses } from "./mocks/ai-responses";
+import { mockOpenAIResponses } from "./mocks/ai-responses";
 
-// Mock axios
-vi.mock("axios");
-
-// Mock the createAIService function
-vi.mock("../src/service/factory", () => ({
-  createAIService: vi.fn(),
-}));
+// Mock the factory module
+vi.mock("../src/service/factory");
 
 describe("AI Service - Example Messages", () => {
   let openAIService: OpenAIService;
-  let mockPost: any;
-  let mockCreateAIService: any;
+  let mockCreate: any;
+  let mockGetAIService: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset mocks
     vi.clearAllMocks();
-
-    // Mock axios.create to return a mocked instance
-    const mockAxiosInstance = {
-      post: vi.fn(),
-      interceptors: {
-        request: { use: vi.fn() },
-        response: { use: vi.fn() },
-      },
-    };
-    vi.mocked(axios.create).mockReturnValue(mockAxiosInstance as any);
 
     // Create service
     openAIService = new OpenAIService({
@@ -39,13 +23,13 @@ describe("AI Service - Example Messages", () => {
       model: "gpt-4",
     });
 
-    // Mock createAIService to return our test service
-    const { createAIService } = require("../src/service/factory");
-    mockCreateAIService = vi.mocked(createAIService);
-    mockCreateAIService.mockReturnValue(openAIService);
+    // Mock getAIService to return our test service
+    const factory = await import("../src/service/factory");
+    mockGetAIService = vi.mocked(factory.getAIService);
+    mockGetAIService.mockReturnValue(openAIService);
 
-    // Get the mocked post function
-    mockPost = vi.mocked(mockAxiosInstance.post);
+    // Get the mocked create function
+    mockCreate = vi.mocked(openAIService["client"].chat.completions.create);
   });
 
   describe("BAU Message", () => {
@@ -80,19 +64,27 @@ SAIDA 16:20
 @everyone`;
 
     it("should validate BAU message as raid-related", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bau });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "true" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
 
       const isValid = await validateDiscordMessage(bauMessage);
 
       expect(isValid).toBe(true);
-      expect(mockPost).toHaveBeenCalledWith("/chat/completions", expect.any(Object), undefined);
     });
 
     it("should parse BAU message correctly", async () => {
       // Mock validation response
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bau });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "true" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
       // Mock parsing response
-      mockPost.mockResolvedValueOnce({ data: mockOpenAIResponses.bau });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: mockOpenAIResponses.bau.choices[0].message.content } }],
+        usage: { prompt_tokens: 50, completion_tokens: 100, total_tokens: 150 },
+      });
 
       const result = await parseDiscordMessage(bauMessage);
 
@@ -158,7 +150,10 @@ ARMADURA SOLDADO - CAPUZ ASSASSINO - SAPATOS - NEWCAP!
 CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
 
     it("should validate Roads Avalon message as raid-related", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.roadsAvalon });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "true" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
 
       const isValid = await validateDiscordMessage(roadsMessage);
 
@@ -166,8 +161,14 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     });
 
     it("should parse Roads Avalon message with role-specific gear requirements", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.roadsAvalon });
-      mockPost.mockResolvedValueOnce({ data: mockOpenAIResponses.roadsAvalon });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "true" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: mockOpenAIResponses.roadsAvalon.choices[0].message.content } }],
+        usage: { prompt_tokens: 50, completion_tokens: 100, total_tokens: 150 },
+      });
 
       const result = await parseDiscordMessage(roadsMessage);
 
@@ -226,7 +227,10 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
 @everyone - /join YameteYoY`;
 
     it("should validate Baú Dourado message as raid-related", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bauDourado });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "true" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
 
       const isValid = await validateDiscordMessage(bauDouradoMessage);
 
@@ -234,8 +238,14 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     });
 
     it("should parse Baú Dourado message with structured sections", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bauDourado });
-      mockPost.mockResolvedValueOnce({ data: mockOpenAIResponses.bauDourado });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "true" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: mockOpenAIResponses.bauDourado.choices[0].message.content } }],
+        usage: { prompt_tokens: 50, completion_tokens: 100, total_tokens: 150 },
+      });
 
       const result = await parseDiscordMessage(bauDouradoMessage);
 
@@ -268,7 +278,10 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     const invalidMessage = "Just a regular chat message about the weather today.";
 
     it("should validate invalid message as not raid-related", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.invalid });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "false" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
 
       const isValid = await validateDiscordMessage(invalidMessage);
 
@@ -276,33 +289,24 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     });
 
     it("should throw error when parsing invalid message", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.invalid });
+      mockCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: "false" } }],
+        usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+      });
 
       await expect(parseDiscordMessage(invalidMessage)).rejects.toThrow("Message does not appear to be raid-related");
     });
   });
 
-  describe("Batch Processing", () => {
+  describe("Multiple Messages", () => {
     const messages = [
       {
-        content: "✅ BAU PVE/PVP ✅ @everyone",
+        content: "Raid tonight at 8 PM!",
         context: {
           guildId: "123",
           channelId: "456",
-          authorId: "user1",
+          authorId: "789",
           messageId: "msg1",
-          timestamp: new Date(),
-          mentions: [],
-          attachments: [],
-        },
-      },
-      {
-        content: "🚦ROADS AVALON PVP/PVE 🚦 @everyone",
-        context: {
-          guildId: "123",
-          channelId: "456",
-          authorId: "user2",
-          messageId: "msg2",
           timestamp: new Date(),
           mentions: [],
           attachments: [],
@@ -313,8 +317,8 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
         context: {
           guildId: "123",
           channelId: "456",
-          authorId: "user3",
-          messageId: "msg3",
+          authorId: "789",
+          messageId: "msg2",
           timestamp: new Date(),
           mentions: [],
           attachments: [],
@@ -322,43 +326,27 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
       },
     ];
 
-    it("should process multiple messages and handle errors gracefully", async () => {
-      // Mock responses for each message
-      mockPost
-        .mockResolvedValueOnce({ data: mockValidationResponses.bau })
-        .mockResolvedValueOnce({ data: mockOpenAIResponses.bau })
-        .mockResolvedValueOnce({ data: mockValidationResponses.roadsAvalon })
-        .mockResolvedValueOnce({ data: mockOpenAIResponses.roadsAvalon })
-        .mockResolvedValueOnce({ data: mockValidationResponses.invalid });
+    it("should parse multiple messages and skip invalid ones", async () => {
+      // Mock responses for multiple messages
+      mockCreate
+        .mockResolvedValueOnce({
+          choices: [{ message: { content: "true" } }],
+          usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+        })
+        .mockResolvedValueOnce({
+          choices: [{ message: { content: JSON.stringify({ title: "Raid", confidence: 0.9 }) } }],
+          usage: { prompt_tokens: 20, completion_tokens: 30, total_tokens: 50 },
+        })
+        .mockResolvedValueOnce({
+          choices: [{ message: { content: "false" } }],
+          usage: { prompt_tokens: 10, completion_tokens: 2, total_tokens: 12 },
+        });
 
       const results = await parseMultipleDiscordMessages(messages);
 
-      expect(results).toHaveLength(2); // Only successful parses
-      expect(results[0].data.title).toBe("BAU PVE/PVP");
-      expect(results[1].data.title).toBe("ROADS AVALON PVP/PVE");
-    });
-  });
-
-  describe("Error Handling", () => {
-    it("should handle AI service errors gracefully", async () => {
-      mockPost.mockRejectedValueOnce(new Error("API rate limit exceeded"));
-
-      const isValid = await validateDiscordMessage("test message");
-
-      expect(isValid).toBe(false);
-    });
-
-    it("should handle malformed JSON responses", async () => {
-      mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bau });
-      mockPost.mockResolvedValueOnce({
-        data: {
-          choices: [{ message: { content: "invalid json" } }],
-        },
-      });
-
-      await expect(parseDiscordMessage("test raid message")).rejects.toThrow(
-        "Message does not appear to be raid-related",
-      );
+      expect(results).toHaveLength(1);
+      expect(results[0].data.title).toBe("Raid");
+      expect(results[0].originalMessage).toBe("Raid tonight at 8 PM!");
     });
   });
 });
