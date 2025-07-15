@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@albion-raid-manager/config": "workspace:*",
+    "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/logger": "workspace:*",
     "axios": "^1.6.0",
     "zod": "^3.22.4"

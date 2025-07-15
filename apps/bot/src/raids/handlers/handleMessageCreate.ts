@@ -1,11 +1,9 @@
-import { DiscordMessageContext, parseDiscordMessage } from "@albion-raid-manager/ai";
+import { DiscordMessageContext, mapRoleNameToEnum, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
-import { prisma } from "@albion-raid-manager/database";
+import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, Message } from "discord.js";
-
-import { createRaidFromParsedData } from "../helpers/aiRaidHandler";
 
 export const handleMessageCreate = async ({ discord: _discord, message }: { discord: Client; message: Message }) => {
   try {
@@ -76,3 +74,71 @@ export const handleMessageCreate = async ({ discord: _discord, message }: { disc
     });
   }
 };
+
+// Function to create raid from parsed data
+async function createRaidFromParsedData(parsedData: ParsedRaidData, context: DiscordMessageContext): Promise<void> {
+  try {
+    // Get or create guild
+    const guild = await prisma.guild.findUnique({
+      where: { discordId: context.guildId },
+    });
+
+    if (!guild) {
+      throw new Error(`Guild not found: ${context.guildId}`);
+    }
+
+    // Create the raid
+    const raid = await prisma.raid.create({
+      data: {
+        guildId: guild.id,
+        title: parsedData.title,
+        description: parsedData.description || `Raid created from Discord message`,
+        date: parsedData.date,
+        status: "SCHEDULED" as RaidStatus,
+        note: parsedData.notes,
+      },
+    });
+
+    // Create raid slots if roles are specified
+    if (parsedData.roles && parsedData.roles.length > 0) {
+      const slots = [];
+      for (const role of parsedData.roles) {
+        for (let i = 0; i < role.count; i++) {
+          const _preAssignedUser = role.preAssignedUsers?.[i]; // Prefixed with _ to indicate unused
+          const slotName = role.count === 1 ? role.name : `${role.name} ${i + 1}`;
+
+          slots.push({
+            raidId: raid.id,
+            name: slotName,
+            comment: role.requirements?.join(", "),
+            role: mapRoleNameToEnum(role.name), // Map to enum value
+            // If there's a pre-assigned user, we'll need to look them up and assign them
+            // This would require additional logic to resolve Discord usernames to user IDs
+          });
+        }
+      }
+
+      await prisma.raidSlot.createMany({
+        data: slots,
+      });
+
+      // TODO: Handle pre-assigned users by resolving Discord usernames to user IDs
+      // and updating the raid slots accordingly
+    }
+
+    logger.info("Successfully created raid from AI parsing", {
+      raidId: raid.id,
+      title: raid.title,
+      date: raid.date,
+      guildId: guild.id,
+      slotsCount: parsedData.roles?.reduce((sum, role) => sum + role.count, 0) || 0,
+    });
+  } catch (error) {
+    logger.error("Failed to create raid from parsed data", {
+      parsedData,
+      context,
+      error: getErrorMessage(error),
+    });
+    throw error;
+  }
+}
