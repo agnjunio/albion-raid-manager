@@ -1,12 +1,11 @@
 import { logger } from "@albion-raid-manager/logger";
 
-import { AIParsingError, AIService, DiscordMessageContext, ParsedRaidData } from "./types";
+import { getAIService } from "./service/factory";
+import { AIParsingError, DiscordMessageContext, ParsedRaidData } from "./types";
 
-export async function parseDiscordMessage(
-  aiService: AIService,
-  message: string,
-  context?: DiscordMessageContext,
-): Promise<ParsedRaidData> {
+const aiService = getAIService();
+
+export async function parseDiscordMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData> {
   try {
     logger.debug("Parsing Discord message with AI", {
       message: message.substring(0, 100) + "...",
@@ -57,14 +56,13 @@ export async function parseDiscordMessage(
 }
 
 export async function parseMultipleDiscordMessages(
-  aiService: AIService,
   messages: Array<{ content: string; context?: DiscordMessageContext }>,
 ): Promise<Array<{ data: ParsedRaidData; originalMessage: string }>> {
   const results = [];
 
   for (const { content, context } of messages) {
     try {
-      const data = await parseDiscordMessage(aiService, content, context);
+      const data = await parseDiscordMessage(content, context);
       results.push({ data, originalMessage: content });
     } catch (error) {
       logger.warn("Failed to parse message in batch", {
@@ -78,7 +76,7 @@ export async function parseMultipleDiscordMessages(
   return results;
 }
 
-export async function validateDiscordMessage(aiService: AIService, message: string): Promise<boolean> {
+export async function validateDiscordMessage(message: string): Promise<boolean> {
   try {
     return await aiService.validateMessage(message);
   } catch (error) {
@@ -87,28 +85,5 @@ export async function validateDiscordMessage(aiService: AIService, message: stri
       error: error instanceof Error ? error.message : "Unknown error",
     });
     return false;
-  }
-}
-
-// Legacy class for backward compatibility
-export class DiscordPingParser {
-  private aiService: AIService;
-
-  constructor(aiService: AIService) {
-    this.aiService = aiService;
-  }
-
-  async parseMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData> {
-    return parseDiscordMessage(this.aiService, message, context);
-  }
-
-  async parseMultipleMessages(
-    messages: Array<{ content: string; context?: DiscordMessageContext }>,
-  ): Promise<Array<{ data: ParsedRaidData; originalMessage: string }>> {
-    return parseMultipleDiscordMessages(this.aiService, messages);
-  }
-
-  async validateMessage(message: string): Promise<boolean> {
-    return validateDiscordMessage(this.aiService, message);
   }
 }

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { AnthropicService, OpenAIService } from "../src/service";
-import { AIServiceFactory } from "../src/service/factory";
+import { getAIService } from "../src/service/factory";
 import { AIProvider } from "../src/types";
 
 // Mock axios
@@ -22,47 +23,7 @@ describe("AI Service Factory", () => {
     vi.clearAllMocks();
   });
 
-  describe("create", () => {
-    it("should create OpenAI service", () => {
-      const service = AIServiceFactory.create({
-        provider: AIProvider.OPENAI,
-        apiKey: "test-key",
-        model: "gpt-4",
-      });
-
-      expect(service).toBeInstanceOf(OpenAIService);
-      expect(service.provider).toBe(AIProvider.OPENAI);
-    });
-
-    it("should create Anthropic service", () => {
-      const service = AIServiceFactory.create({
-        provider: AIProvider.ANTHROPIC,
-        apiKey: "test-key",
-        model: "claude-3-sonnet-20240229",
-      });
-
-      expect(service).toBeInstanceOf(AnthropicService);
-      expect(service.provider).toBe(AIProvider.ANTHROPIC);
-    });
-
-    it("should throw error for unsupported providers", () => {
-      expect(() => {
-        AIServiceFactory.create({
-          provider: AIProvider.GOOGLE,
-          apiKey: "test-key",
-        });
-      }).toThrow("Google AI service not yet implemented");
-
-      expect(() => {
-        AIServiceFactory.create({
-          provider: AIProvider.AZURE,
-          apiKey: "test-key",
-        });
-      }).toThrow("Azure AI service not yet implemented");
-    });
-  });
-
-  describe("createFromEnv", () => {
+  describe("createAIService", () => {
     const originalEnv = process.env;
 
     beforeEach(() => {
@@ -78,7 +39,7 @@ describe("AI Service Factory", () => {
       process.env.AI_API_KEY = "test-key";
       process.env.AI_MODEL = "gpt-4";
 
-      const service = AIServiceFactory.createFromEnv();
+      const service = getAIService();
 
       expect(service).toBeInstanceOf(OpenAIService);
       expect(service.provider).toBe(AIProvider.OPENAI);
@@ -89,7 +50,7 @@ describe("AI Service Factory", () => {
       process.env.AI_API_KEY = "test-key";
 
       expect(() => {
-        AIServiceFactory.createFromEnv();
+        getAIService();
       }).toThrow("AI_PROVIDER environment variable is required");
     });
 
@@ -98,7 +59,7 @@ describe("AI Service Factory", () => {
       delete process.env.AI_API_KEY;
 
       expect(() => {
-        AIServiceFactory.createFromEnv();
+        getAIService();
       }).toThrow("AI_API_KEY environment variable is required");
     });
   });

@@ -1,23 +1,8 @@
-import {
-  createAIServiceFromEnv,
-  DiscordMessageContext,
-  ParsedRaidData,
-  validateDiscordMessage,
-} from "@albion-raid-manager/ai";
+import { type DiscordMessageContext, type ParsedRaidData, validateDiscordMessage } from "@albion-raid-manager/ai";
 import { RaidRole, RaidStatus } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
-
-// Create AI service instance (singleton pattern)
-let aiServiceInstance: ReturnType<typeof createAIServiceFromEnv> | null = null;
-
-export function getAIService() {
-  if (!aiServiceInstance) {
-    aiServiceInstance = createAIServiceFromEnv();
-  }
-  return aiServiceInstance;
-}
 
 // Helper function to map role names to RaidRole enum values
 function mapRoleNameToEnum(roleName: string): RaidRole {
@@ -115,8 +100,7 @@ export async function createRaidFromParsedData(
 // Function to validate if a message is raid-related
 export async function validateRaidMessage(message: string): Promise<boolean> {
   try {
-    const aiService = getAIService();
-    return await validateDiscordMessage(aiService, message);
+    return await validateDiscordMessage(message);
   } catch (error) {
     logger.error("Failed to validate message", {
       message: message.substring(0, 100) + "...",

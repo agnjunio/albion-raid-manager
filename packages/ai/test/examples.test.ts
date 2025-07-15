@@ -1,16 +1,23 @@
 import axios from "axios";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DiscordPingParser } from "../src/parser";
-import { OpenAIService } from "../src/service/openai";
+
+import { parseDiscordMessage, parseMultipleDiscordMessages, validateDiscordMessage } from "../src/parser";
+import { OpenAIService } from "../src/service/providers/openai";
+
 import { mockOpenAIResponses, mockValidationResponses } from "./mocks/ai-responses";
 
 // Mock axios
 vi.mock("axios");
 
+// Mock the createAIService function
+vi.mock("../src/service/factory", () => ({
+  createAIService: vi.fn(),
+}));
+
 describe("AI Service - Example Messages", () => {
   let openAIService: OpenAIService;
-  let parser: DiscordPingParser;
   let mockPost: any;
+  let mockCreateAIService: any;
 
   beforeEach(() => {
     // Reset mocks
@@ -32,7 +39,10 @@ describe("AI Service - Example Messages", () => {
       model: "gpt-4",
     });
 
-    parser = new DiscordPingParser(openAIService);
+    // Mock createAIService to return our test service
+    const { createAIService } = require("../src/service/factory");
+    mockCreateAIService = vi.mocked(createAIService);
+    mockCreateAIService.mockReturnValue(openAIService);
 
     // Get the mocked post function
     mockPost = vi.mocked(mockAxiosInstance.post);
@@ -72,7 +82,7 @@ SAIDA 16:20
     it("should validate BAU message as raid-related", async () => {
       mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bau });
 
-      const isValid = await parser.validateMessage(bauMessage);
+      const isValid = await validateDiscordMessage(bauMessage);
 
       expect(isValid).toBe(true);
       expect(mockPost).toHaveBeenCalledWith("/chat/completions", expect.any(Object), undefined);
@@ -84,7 +94,7 @@ SAIDA 16:20
       // Mock parsing response
       mockPost.mockResolvedValueOnce({ data: mockOpenAIResponses.bau });
 
-      const result = await parser.parseMessage(bauMessage);
+      const result = await parseDiscordMessage(bauMessage);
 
       expect(result).toEqual(
         expect.objectContaining({
@@ -150,7 +160,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     it("should validate Roads Avalon message as raid-related", async () => {
       mockPost.mockResolvedValueOnce({ data: mockValidationResponses.roadsAvalon });
 
-      const isValid = await parser.validateMessage(roadsMessage);
+      const isValid = await validateDiscordMessage(roadsMessage);
 
       expect(isValid).toBe(true);
     });
@@ -159,7 +169,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
       mockPost.mockResolvedValueOnce({ data: mockValidationResponses.roadsAvalon });
       mockPost.mockResolvedValueOnce({ data: mockOpenAIResponses.roadsAvalon });
 
-      const result = await parser.parseMessage(roadsMessage);
+      const result = await parseDiscordMessage(roadsMessage);
 
       expect(result).toEqual(
         expect.objectContaining({
@@ -218,7 +228,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     it("should validate Baú Dourado message as raid-related", async () => {
       mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bauDourado });
 
-      const isValid = await parser.validateMessage(bauDouradoMessage);
+      const isValid = await validateDiscordMessage(bauDouradoMessage);
 
       expect(isValid).toBe(true);
     });
@@ -227,7 +237,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
       mockPost.mockResolvedValueOnce({ data: mockValidationResponses.bauDourado });
       mockPost.mockResolvedValueOnce({ data: mockOpenAIResponses.bauDourado });
 
-      const result = await parser.parseMessage(bauDouradoMessage);
+      const result = await parseDiscordMessage(bauDouradoMessage);
 
       expect(result).toEqual(
         expect.objectContaining({
@@ -260,7 +270,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     it("should validate invalid message as not raid-related", async () => {
       mockPost.mockResolvedValueOnce({ data: mockValidationResponses.invalid });
 
-      const isValid = await parser.validateMessage(invalidMessage);
+      const isValid = await validateDiscordMessage(invalidMessage);
 
       expect(isValid).toBe(false);
     });
@@ -268,7 +278,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     it("should throw error when parsing invalid message", async () => {
       mockPost.mockResolvedValueOnce({ data: mockValidationResponses.invalid });
 
-      await expect(parser.parseMessage(invalidMessage)).rejects.toThrow("Message does not appear to be raid-related");
+      await expect(parseDiscordMessage(invalidMessage)).rejects.toThrow("Message does not appear to be raid-related");
     });
   });
 
@@ -321,7 +331,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
         .mockResolvedValueOnce({ data: mockOpenAIResponses.roadsAvalon })
         .mockResolvedValueOnce({ data: mockValidationResponses.invalid });
 
-      const results = await parser.parseMultipleMessages(messages);
+      const results = await parseMultipleDiscordMessages(messages);
 
       expect(results).toHaveLength(2); // Only successful parses
       expect(results[0].data.title).toBe("BAU PVE/PVP");
@@ -333,7 +343,7 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
     it("should handle AI service errors gracefully", async () => {
       mockPost.mockRejectedValueOnce(new Error("API rate limit exceeded"));
 
-      const isValid = await parser.validateMessage("test message");
+      const isValid = await validateDiscordMessage("test message");
 
       expect(isValid).toBe(false);
     });
@@ -346,7 +356,9 @@ CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
         },
       });
 
-      await expect(parser.parseMessage("test raid message")).rejects.toThrow("No valid JSON found in response");
+      await expect(parseDiscordMessage("test raid message")).rejects.toThrow(
+        "Message does not appear to be raid-related",
+      );
     });
   });
 });

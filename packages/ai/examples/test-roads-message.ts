@@ -1,4 +1,6 @@
-import { AIServiceFactory, DiscordPingParser } from "../src";
+import { logger } from "@albion-raid-manager/logger";
+
+import { parseDiscordMessage } from "../src";
 
 async function testRoadsMessage() {
   const roadsMessage = `🚦ROADS AVALON PVP/PVE 🚦
@@ -30,56 +32,33 @@ ARMADURA SOLDADO - CAPUZ ASSASSINO - SAPATOS - NEWCAP!
 😎(PUTRIDO) @BIgodaoPutasso 
 CASACO REAL - BRUMARIO - CAPUZ ASSASSINO - SAPATOS REAIS - NEWCAPP!`;
 
-  console.log("🎯 Testing Roads Avalon Message Parsing\n");
-  console.log("📝 Original Message:");
-  console.log(roadsMessage);
-  console.log("\n" + "=".repeat(80) + "\n");
+  logger.info("🎯 Testing Roads Avalon Message Parsing");
+  logger.info("📝 Original Message:");
+  logger.info(roadsMessage);
+  logger.info("=".repeat(80));
 
   try {
-    // Create AI service
-    const aiService = AIServiceFactory.createFromEnv();
-    const parser = new DiscordPingParser(aiService);
-
-    console.log("🤖 Parsing with AI...\n");
+    logger.info("🤖 Parsing with AI...");
 
     // Parse the message
-    const result = await parser.parseMessage(roadsMessage);
+    const result = await parseDiscordMessage(roadsMessage);
 
-    console.log("✅ Parsed Results:");
-    console.log(`   Title: ${result.title}`);
-    console.log(`   Date: ${result.date.toLocaleDateString()}`);
-    console.log(`   Time: ${result.time || "Not specified"}`);
-    console.log(`   Location: ${result.location || "Not specified"}`);
-    console.log(`   Confidence: ${(result.confidence * 100).toFixed(1)}%`);
-    console.log(`   Max Participants: ${result.maxParticipants || "Not specified"}`);
+    logger.info("✅ Parsed Results:", {
+      title: result.title,
+      date: result.date.toLocaleDateString(),
+      time: result.time || "Not specified",
+      location: result.location || "Not specified",
+      confidence: `${(result.confidence * 100).toFixed(1)}%`,
+      maxParticipants: result.maxParticipants || "Not specified",
+      description: result.description,
+      requirements: result.requirements,
+      roles: result.roles,
+      notes: result.notes,
+    });
 
-    if (result.description) {
-      console.log(`   Description: ${result.description}`);
-    }
-
-    if (result.requirements && result.requirements.length > 0) {
-      console.log(`   General Requirements:`);
-      result.requirements.forEach((req, index) => {
-        console.log(`     ${index + 1}. ${req}`);
-      });
-    }
-
-    if (result.roles && result.roles.length > 0) {
-      console.log(`   Roles:`);
-      result.roles.forEach((role, index) => {
-        const preAssigned = role.preAssignedUsers?.length ? ` (Pre-assigned: ${role.preAssignedUsers.join(", ")})` : "";
-        const requirements = role.requirements?.length ? ` (Gear: ${role.requirements.join(", ")})` : "";
-        console.log(`     ${index + 1}. ${role.name} x${role.count}${preAssigned}${requirements}`);
-      });
-    }
-
-    if (result.notes) {
-      console.log(`   Notes: ${result.notes}`);
-    }
-
-    console.log("\n🎉 Raid would be automatically created with this data!");
+    logger.info("🎉 Raid would be automatically created with this data!");
   } catch (error) {
-    console.error("❌ Error parsing message:", error);
+    logger.error("❌ Error parsing message:", error);
   }
 }
 

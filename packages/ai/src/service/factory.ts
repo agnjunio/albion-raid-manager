@@ -1,23 +1,33 @@
-import { AIProvider, AIService, AIServiceConfig } from "../types";
+import config from "@albion-raid-manager/config";
 
-import { AnthropicService } from "./anthropic";
-import { OpenAIService } from "./openai";
+import { AIProvider, AIService } from "../types";
 
-export function createAIService(config: AIServiceConfig): AIService {
-  switch (config.provider) {
+import { AnthropicService } from "./providers/anthropic";
+import { OpenAIService } from "./providers/openai";
+
+let aiService: AIService | null = null;
+
+export function getAIService(): AIService {
+  if (aiService) {
+    return aiService;
+  }
+
+  switch (config.ai.provider) {
     case AIProvider.OPENAI:
-      return new OpenAIService({
-        apiKey: config.apiKey,
-        model: config.model,
-        baseUrl: config.baseUrl,
+      aiService = new OpenAIService({
+        apiKey: config.ai.apiKey,
+        model: config.ai.model,
+        baseUrl: config.ai.baseUrl,
       });
+      break;
 
     case AIProvider.ANTHROPIC:
-      return new AnthropicService({
-        apiKey: config.apiKey,
-        model: config.model,
-        baseUrl: config.baseUrl,
+      aiService = new AnthropicService({
+        apiKey: config.ai.apiKey,
+        model: config.ai.model,
+        baseUrl: config.ai.baseUrl,
       });
+      break;
 
     case AIProvider.GOOGLE:
       throw new Error("Google AI service not yet implemented");
@@ -26,36 +36,8 @@ export function createAIService(config: AIServiceConfig): AIService {
       throw new Error("Azure AI service not yet implemented");
 
     default:
-      throw new Error(`Unsupported AI provider: ${config.provider}`);
-  }
-}
-
-export function createAIServiceFromEnv(): AIService {
-  const provider = process.env.AI_PROVIDER as AIProvider;
-  const apiKey = process.env.AI_API_KEY;
-  const model = process.env.AI_MODEL;
-  const baseUrl = process.env.AI_BASE_URL;
-
-  if (!provider) {
-    throw new Error("AI_PROVIDER environment variable is required");
+      throw new Error(`Unsupported AI provider: ${config.ai.provider}`);
   }
 
-  if (!apiKey) {
-    throw new Error("AI_API_KEY environment variable is required");
-  }
-
-  const config: AIServiceConfig = {
-    provider,
-    apiKey,
-    model,
-    baseUrl,
-  };
-
-  return createAIService(config);
-}
-
-// Legacy class for backward compatibility
-export class AIServiceFactory {
-  static create = createAIService;
-  static createFromEnv = createAIServiceFromEnv;
+  return aiService;
 }

@@ -1,7 +1,9 @@
-import { AIServiceFactory, DiscordPingParser } from "../src";
+import { logger } from "@albion-raid-manager/logger";
+
+import { parseDiscordMessage, validateDiscordMessage } from "../src";
 
 async function main() {
-  console.log("🤖 AI Service Example - Discord Ping Parser\n");
+  logger.info("🤖 AI Service Example - Discord Ping Parser");
 
   // Example messages to test
   const testMessages = [
@@ -13,50 +15,40 @@ async function main() {
   ];
 
   try {
-    // Create AI service from environment variables
-    console.log("📡 Creating AI service...");
-    const aiService = AIServiceFactory.createFromEnv();
-    console.log(`✅ Using provider: ${aiService.provider}\n`);
-
-    // Create parser
-    const parser = new DiscordPingParser(aiService);
+    logger.info("📡 Parser ready to use");
 
     // Test each message
     for (const [index, message] of testMessages.entries()) {
-      console.log(`📝 Testing message ${index + 1}:`);
-      console.log(`   "${message}"`);
+      logger.info(`📝 Testing message ${index + 1}: "${message}"`);
 
       try {
         // First validate if it's raid-related
-        const isValid = await parser.validateMessage(message);
-        console.log(`   Validation: ${isValid ? "✅ Raid-related" : "❌ Not raid-related"}`);
+        const isValid = await validateDiscordMessage(message);
+        logger.info(`   Validation: ${isValid ? "✅ Raid-related" : "❌ Not raid-related"}`);
 
         if (isValid) {
           // Parse the message
-          const result = await parser.parseMessage(message);
-          console.log(`   ✅ Parsed successfully:`);
-          console.log(`      Title: ${result.title}`);
-          console.log(`      Date: ${result.date.toLocaleDateString()}`);
-          console.log(`      Confidence: ${(result.confidence * 100).toFixed(1)}%`);
-          if (result.roles && result.roles.length > 0) {
-            console.log(`      Roles: ${result.roles.map((r) => `${r.name} (${r.count})`).join(", ")}`);
-          }
-          if (result.location) {
-            console.log(`      Location: ${result.location}`);
-          }
+          const result = await parseDiscordMessage(message);
+          logger.info("   ✅ Parsed successfully:", {
+            title: result.title,
+            date: result.date.toLocaleDateString(),
+            confidence: `${(result.confidence * 100).toFixed(1)}%`,
+            roles: result.roles?.map((r) => `${r.name} (${r.count})`).join(", "),
+            location: result.location,
+          });
         }
       } catch (error) {
-        console.log(`   ❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`);
+        logger.error(`   ❌ Error: ${error instanceof Error ? error.message : "Unknown error"}`);
       }
 
-      console.log(""); // Empty line for readability
+      logger.info(""); // Empty line for readability
     }
   } catch (error) {
-    console.error("❌ Failed to initialize AI service:", error);
-    console.log("\n💡 Make sure you have set the required environment variables:");
-    console.log("   AI_PROVIDER=openai|anthropic");
-    console.log("   AI_API_KEY=your_api_key");
-    console.log("   AI_MODEL=your_model (optional)");
+    logger.error("❌ Failed to use parser:", error);
+    logger.info("💡 Make sure you have set the required environment variables:");
+    logger.info("   AI_PROVIDER=openai|anthropic");
+    logger.info("   AI_API_KEY=your_api_key");
+    logger.info("   AI_MODEL=your_model (optional)");
   }
 }
 

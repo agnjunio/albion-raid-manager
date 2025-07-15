@@ -1,6 +1,5 @@
-import { AIProvider, ParsedRaidData } from "../types";
-
-import { BaseAIService } from "./base";
+import { AIProvider, ParsedRaidData } from "../../types";
+import { BaseAIService } from "../base";
 
 interface OpenAIRequest {
   model: string;

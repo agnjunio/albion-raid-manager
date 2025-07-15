@@ -49,8 +49,7 @@ export const handleMessageCreate = async ({ discord: _discord, message }: { disc
     };
 
     // Parse the message
-    const aiService = getAIService();
-    const parsedData = await parseDiscordMessage(aiService, message.content, context);
+    const parsedData = await parseDiscordMessage(message.content, context);
 
     // Check if we should create a raid (confidence threshold)
     if (parsedData.confidence < 0.7) {

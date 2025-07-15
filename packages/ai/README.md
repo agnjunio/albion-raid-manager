@@ -57,93 +57,47 @@ AI_TEMPERATURE=0.1  # optional, defaults to 0.1
 ### Basic Usage
 
 ```typescript
-import { AIServiceFactory, DiscordPingParser } from "@albion-raid-manager/ai";
+import { parseDiscordMessage, validateDiscordMessage } from "@albion-raid-manager/ai";
 
-// Create AI service from environment variables
-const aiService = AIServiceFactory.createFromEnv();
-
-// Create parser
-const parser = new DiscordPingParser(aiService);
-
-// Parse a Discord message
-const message = "@everyone Raid tonight at 8 PM! Need 2 tanks, 3 healers, and 5 DPS for corrupted dungeon!";
-const parsedData = await parser.parseMessage(message);
-
-console.log(parsedData);
-// Output:
-// {
-//   title: "Corrupted Dungeon Raid",
-//   date: 2024-01-15T20:00:00.000Z,
-//   roles: [
-//     { name: "Tank", count: 2, preAssignedUsers: ["@Player1", "@Player2"] },
-//     { name: "Healer", count: 3, preAssignedUsers: ["@Healer1", "@Healer2", "@Healer3"] },
-//     { name: "DPS", count: 5, preAssignedUsers: ["@DPS1", "@DPS2", "@DPS3", "@DPS4", "@DPS5"] }
-//   ],
-//   confidence: 0.95
-// }
+const isValid = await validateDiscordMessage("Anyone up for a raid?");
+if (isValid) {
+  const parsedData = await parseDiscordMessage(message);
+  console.log(parsedData);
+}
 ```
 
-### Custom Configuration
+### Complete Usage
 
 ```typescript
-import { AIServiceFactory, AIProvider } from "@albion-raid-manager/ai";
+import { parseDiscordMessage, validateDiscordMessage } from "@albion-raid-manager/ai";
 
-// Create service with custom configuration
-const aiService = AIServiceFactory.create({
-  provider: AIProvider.OPENAI,
-  apiKey: "your-api-key",
-  model: "gpt-4-turbo",
-  maxTokens: 1500,
-  temperature: 0.2,
-});
-
-const parser = new DiscordPingParser(aiService);
-```
-
-### Discord Bot Integration
-
-```typescript
-import { AIRaidIntegration } from "./raids/ai-integration";
-
-// In your Discord bot initialization
-const aiIntegration = new AIRaidIntegration();
-aiIntegration.initialize(discord);
-
-// The bot will now automatically parse messages and create raids
+// Use functions directly - AI service is automatically created from config
+const isValid = await validateDiscordMessage("Anyone up for a raid?");
+if (isValid) {
+  const parsedData = await parseDiscordMessage(message);
+  console.log(parsedData);
+}
 ```
 
 ### Manual Message Validation
 
 ```typescript
-import { AIServiceFactory } from "@albion-raid-manager/ai";
+import { validateDiscordMessage } from "@albion-raid-manager/ai";
 
-const aiService = AIServiceFactory.createFromEnv();
-
-// Check if a message is raid-related
-const isRaidMessage = await aiService.validateMessage("Anyone up for a quick dungeon run?");
+// Check if a message is raid-related (no setup required!)
+const isRaidMessage = await validateDiscordMessage("Anyone up for a quick dungeon run?");
 // Returns: true/false
 ```
 
 ## API Reference
 
-### AIServiceFactory
+### Direct Functions
 
-Factory class for creating AI service instances.
+You can also use these functions directly without any initialization:
 
-#### Methods
-
-- `create(config: AIServiceConfig): AIService` - Create service with custom config
-- `createFromEnv(): AIService` - Create service from environment variables
-
-### DiscordPingParser
-
-High-level parser for Discord messages.
-
-#### Methods
-
-- `parseMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData>`
-- `parseMultipleMessages(messages: Array<{content: string, context?: DiscordMessageContext}>): Promise<Array<{data: ParsedRaidData, originalMessage: string}>>`
-- `validateMessage(message: string): Promise<boolean>`
+- `parseDiscordMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData>`
+- `parseMultipleDiscordMessages(messages: Array<{content: string, context?: DiscordMessageContext}>): Promise<Array<{data: ParsedRaidData, originalMessage: string}>>`
+- `validateDiscordMessage(message: string): Promise<boolean>`
 
 ### ParsedRaidData
 
