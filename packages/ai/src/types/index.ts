@@ -48,7 +48,7 @@ export interface RaidRole {
 }
 
 // AI Response Structure
-export interface AIResponse<T = any> {
+export interface AIResponse<T = unknown> {
   data: T;
   usage?: {
     promptTokens: number;

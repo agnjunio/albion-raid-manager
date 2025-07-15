@@ -4,21 +4,72 @@
   "tasks": {
     "db:generate": {
       "inputs": ["prisma/schema.prisma"],
-      "outputs": ["node_modules/.prisma", "node_modules/@prisma/client"],
+      "outputs": ["node_modules/.prisma", "node_modules/@prisma/client", "generated/**"],
       "cache": false,
       "env": ["DATABASE_URL"]
     },
 
-    "start": {},
+    "build": {
+      "dependsOn": ["^build", "^db:generate"],
+      "inputs": ["src/**/*", "package.json", "tsconfig.json", "tsup.config.ts", "vite.config.ts"],
+      "outputs": ["dist/**", "build/**"],
+      "env": ["NODE_ENV"]
+    },
+
     "dev": {
-      "dependsOn": ["^db:generate"],
+      "dependsOn": ["^build", "^db:generate"],
       "inputs": ["src/**/*", "package.json"],
+      "persistent": true,
+      "env": ["NODE_ENV", "DATABASE_URL"]
+    },
+
+    "start": {
+      "dependsOn": ["^build", "^db:generate"],
+      "env": ["NODE_ENV", "DATABASE_URL"]
+    },
+
+    "lint": {
+      "inputs": ["src/**/*", "package.json", "eslint.config.js", ".eslintrc.*"],
+      "outputs": []
+    },
+
+    "lint:fix": {
+      "inputs": ["src/**/*", "package.json", "eslint.config.js", ".eslintrc.*"],
+      "outputs": []
+    },
+
+    "prettier": {
+      "inputs": ["src/**/*", "package.json", ".prettierrc", ".prettierignore"],
+      "outputs": []
+    },
+
+    "prettier:fix": {
+      "inputs": ["src/**/*", "package.json", ".prettierrc", ".prettierignore"],
+      "outputs": []
+    },
+
+    "type-check": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*", "package.json", "tsconfig.json"],
+      "outputs": []
+    },
+
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*", "test/**/*", "package.json"],
+      "outputs": ["coverage/**"]
+    },
+
+    "test:watch": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*", "test/**/*", "package.json"],
       "persistent": true
     },
-    "build": {
-      "dependsOn": ["^db:generate"]
-    },
-    "lint": {},
-    "prettier": {}
+
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**/*", "test/**/*", "package.json"],
+      "outputs": ["coverage/**"]
+    }
   }
 }

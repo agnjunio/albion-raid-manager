@@ -1,10 +1,11 @@
-// Main exports
-export * from "./service";
+// Types and interfaces
 export * from "./types";
 
-// Parser
-export { DiscordPingParser } from "./parser";
+// Service layer
+export * from "./service";
+
+// Parser layer
+export { DiscordPingParser, parseDiscordMessage, parseMultipleDiscordMessages, validateDiscordMessage } from "./parser";
 
 // Convenience exports
-export { AIServiceFactory } from "./service/factory";
-export type { AIService, AIServiceConfig, ParsedRaidData } from "./types";
+export { AIServiceFactory, createAIService, createAIServiceFromEnv } from "./service/factory";
