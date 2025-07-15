@@ -2,10 +2,19 @@
   "name": "@albion-raid-manager/database",
   "version": "1.0.0",
   "main": "src/index.ts",
+  "module": "src/index.ts",
   "types": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./generated/prisma": "./generated/prisma/index.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
+    },
+    "./generated/prisma": {
+      "types": "./generated/prisma/index.ts",
+      "import": "./generated/prisma/index.ts",
+      "require": "./generated/prisma/index.ts"
+    }
   },
   "scripts": {
     "db:generate": "prisma generate",
@@ -13,6 +22,8 @@
     "db:push": "prisma db push --skip-generate",
     "db:reset": "prisma migrate reset",
     "db:studio": "prisma studio",
+    "dev": "echo 'JIT compilation - no build needed'",
+    "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

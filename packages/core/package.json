@@ -3,42 +3,50 @@
   "version": "0.0.0",
   "private": true,
   "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     "./*": {
       "types": "./src/*.ts",
-      "default": "./src/*.ts"
+      "import": "./src/*.ts",
+      "require": "./src/*.ts"
     },
     "./cache": {
       "types": "./src/cache/index.ts",
-      "default": "./src/cache/index.ts"
+      "import": "./src/cache/index.ts",
+      "require": "./src/cache/index.ts"
     },
     "./scheduler": {
       "types": "./src/scheduler.ts",
-      "default": "./src/scheduler.ts"
+      "import": "./src/scheduler.ts",
+      "require": "./src/scheduler.ts"
     },
     "./helpers": {
       "types": "./src/helpers/index.ts",
-      "default": "./src/helpers/index.ts"
+      "import": "./src/helpers/index.ts",
+      "require": "./src/helpers/index.ts"
     },
     "./utils": {
       "types": "./src/utils/index.ts",
-      "default": "./src/utils/index.ts"
+      "import": "./src/utils/index.ts",
+      "require": "./src/utils/index.ts"
     },
     "./types": {
       "types": "./generated/types/index.ts",
-      "default": "./generated/types/index.ts"
+      "import": "./generated/types/index.ts",
+      "require": "./generated/types/index.ts"
     },
     "./types/*": {
       "types": "./src/types/*.ts",
-      "default": "./src/types/*.ts"
+      "import": "./src/types/*.ts",
+      "require": "./src/types/*.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
+    "dev": "echo 'JIT compilation - no build needed'",
+    "type-check": "tsc --noEmit",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit"
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@albion-raid-manager/config": "workspace:^",

@@ -10,21 +10,21 @@
     },
 
     "build": {
-      "dependsOn": ["^build", "^db:generate"],
-      "inputs": ["src/**/*", "package.json", "tsconfig.json", "tsup.config.ts", "vite.config.ts"],
+      "dependsOn": ["^db:generate"],
+      "inputs": ["src/**/*", "package.json", "tsconfig.json", "vite.config.ts"],
       "outputs": ["dist/**", "build/**"],
       "env": ["NODE_ENV"]
     },
 
     "dev": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^db:generate"],
       "inputs": ["src/**/*", "package.json"],
       "persistent": true,
       "env": ["NODE_ENV", "DATABASE_URL"]
     },
 
     "start": {
-      "dependsOn": ["^build", "^db:generate"],
+      "dependsOn": ["^db:generate"],
       "env": ["NODE_ENV", "DATABASE_URL"]
     },
 
@@ -49,25 +49,21 @@
     },
 
     "type-check": {
-      "dependsOn": ["^build"],
       "inputs": ["src/**/*", "package.json", "tsconfig.json"],
       "outputs": []
     },
 
     "test": {
-      "dependsOn": ["^build"],
       "inputs": ["src/**/*", "test/**/*", "package.json"],
       "outputs": ["coverage/**"]
     },
 
     "test:watch": {
-      "dependsOn": ["^build"],
       "inputs": ["src/**/*", "test/**/*", "package.json"],
       "persistent": true
     },
 
     "test:coverage": {
-      "dependsOn": ["^build"],
       "inputs": ["src/**/*", "test/**/*", "package.json"],
       "outputs": ["coverage/**"]
     }

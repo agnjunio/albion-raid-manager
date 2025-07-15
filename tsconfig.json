@@ -16,16 +16,25 @@
     "types": ["node"],
     "verbatimModuleSyntax": false,
 
-    /* Opinion */
+    /* JIT Configuration */
     "incremental": false,
-    "module": "preserve",
+    "module": "ESNext",
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@albion-raid-manager/ai": ["./packages/ai/src/index.ts"],
+      "@albion-raid-manager/core": ["./packages/core/src/index.ts"],
+      "@albion-raid-manager/config": ["./packages/config/src/index.ts"],
+      "@albion-raid-manager/database": ["./packages/database/src/index.ts"],
+      "@albion-raid-manager/discord": ["./packages/discord/src/index.ts"],
+      "@albion-raid-manager/logger": ["./packages/logger/src/index.ts"]
     }
   },
-  "include": ["${configDir}/src", "${configDir}/src/**/*.json"],
-  "exclude": ["${configDir}/node_modules", "${configDir}/dist"],
+  "include": ["packages/**/*", "apps/**/*"],
+  "exclude": ["node_modules", "dist"],
   "ts-node": {
-    "require": ["tsconfig-paths/register", "dotenv/config"]
+    "require": ["tsconfig-paths/register", "dotenv/config"],
+    "esm": true
   }
 }
