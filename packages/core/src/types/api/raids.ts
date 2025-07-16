@@ -5,7 +5,6 @@ export namespace CreateGuildRaid {
   export type Body = {
     description: string;
     date: string;
-    compositionId?: string;
   };
   export type Response = { raid: Raid };
 }
@@ -17,6 +16,7 @@ export namespace GetGuildRaids {
 
 export namespace GetGuildRaid {
   export type Params = { guildId: string; raidId: string };
+  export type Query = { slots?: boolean };
   export type Response = { raid: Raid };
 }
 

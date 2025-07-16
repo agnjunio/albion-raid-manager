@@ -33,9 +33,12 @@ export const raidsApi = createApi({
         }),
         providesTags: tagHelper.list("raids"),
       }),
-      getGuildRaid: builder.query<GetGuildRaid.Response, { params: GetGuildRaid.Params }>({
-        query: ({ params }) => ({
+      getGuildRaid: builder.query<GetGuildRaid.Response, { params: GetGuildRaid.Params; query?: GetGuildRaid.Query }>({
+        query: ({ params, query }) => ({
           url: `/guilds/${params.guildId}/raids/${params.raidId}`,
+          params: {
+            ...query,
+          },
         }),
         providesTags: tagHelper.single("raid"),
       }),

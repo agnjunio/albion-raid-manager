@@ -1,0 +1,31 @@
+# Complex Raid with Multiple Slots
+🛡️ TANK: @Player1
+💚 HEALER: @Player2
+⚔️ DPS: @Player3 @Player4
+🎯 CALLER: @Player5
+🐎 BATTLEMOUNT: @Player6
+---
+# Empty Slots Test
+TANK: 
+HEALER: @Player1
+DPS: 
+SUPPORT: @Player2
+---
+# Mixed Languages and Builds
+GARRA-  <@525483737438486539> 
+HEALER  (swap paratempo)- <@343088519943815168> 
+PATAS OU GARRA-  
+PATAS OU MORTIFICOS-  
+STOPER y FROST-  <@1235259264856232057> 
+STOPER-  
+cursed,bestona ou susurrante-   
+---
+# Time and Location Test
+Raid at 16:30 - SAIDA DE BRECILIA
+TANK: @Player1
+HEALER: @Player2
+---
+# No Time Specified
+Raid tomorrow - SAIDA DE CAERLEON
+TANK: @Player1
+HEALER: @Player2 

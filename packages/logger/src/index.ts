@@ -45,6 +45,7 @@ if (config.logger.files) {
       maxsize: 10 * Math.pow(1024, 2), // 10 MB
       maxFiles: 1,
       tailable: true,
+      options: { flags: "w" }, // Truncate file on startup
     }),
   );
 

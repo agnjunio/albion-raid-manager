@@ -2,6 +2,7 @@ import { logger } from "@albion-raid-manager/logger";
 import OpenAI from "openai";
 
 import { AIProvider, ParsedRaidData } from "../../types";
+import { preprocessMessage } from "../../utils/message-preprocessor";
 import { BaseAIService } from "../base";
 
 export class OpenAIService extends BaseAIService {
@@ -88,11 +89,14 @@ export class OpenAIService extends BaseAIService {
   }
 
   async validateMessage(message: string): Promise<boolean> {
-    const validationPrompt = `Analyze the following Discord message and determine if it contains raid-related information for Albion Online. Look for keywords like "raid", "dungeon", "group", "party", "guild", "boss", "chest", "dungeon", "corrupted", "roads", "outlands", etc.
+    // Pre-process message to reduce tokens
+    const preprocessed = preprocessMessage(message);
 
-Message: "${message}"
+    const validationPrompt = `Is this message related to an Albion Online raid, group activity, dungeon, party, or composition? Raid messages can be in any language and use free-form text. Look for any signs of raid, dungeon, group, party, guild, boss, chest, corrupted, roads, outlands, pve, pvp, tank, healer, dps, support, composition, or similar concepts, even if the keywords are not exact or are in another language. If the message could possibly be raid-related, respond 'true'. Err on the side of inclusivity.
 
-Respond with only "true" if it's raid-related, or "false" if it's not.`;
+Msg: "${preprocessed.content}"
+
+Respond: true/false`;
 
     try {
       logger.debug("Making OpenAI API request for message validation", {
@@ -129,7 +133,7 @@ Respond with only "true" if it's raid-related, or "false" if it's not.`;
 
       return content === "true";
     } catch (error) {
-      logger.error("OpenAI validation request failed", {
+      logger.error(`OpenAI validation request failed: ${error instanceof Error ? error.message : "Unknown error"}`, {
         provider: this.provider,
         model: this.config.model,
         error: error instanceof Error ? error.message : "Unknown error",

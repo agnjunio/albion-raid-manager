@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { compareAsc } from "date-fns";
 import { Link } from "react-router-dom";
 
 import { RaidStatusBadge } from "@/app/dashboard/guildId/raids/raid-status";
@@ -39,8 +38,12 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
     () =>
       raids
         .filter((raid) => filter === "ALL" || raid.status === filter)
-        .sort((a, b) => compareAsc(new Date(a.date), new Date(b.date)))
-        .sort((a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)),
+        .sort((a, b) => {
+          const statusDiff = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
+          if (statusDiff !== 0) return statusDiff;
+          // Sort by date ascending if status is the same
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        }),
     [raids, filter],
   );
 
@@ -94,7 +97,7 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
                 to={raid.id}
                 className="hover:bg-secondary/20 active:bg-primary flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4"
               >
-                <div className="grow font-sans">{raid.description}</div>
+                <div className="grow font-sans">{raid.title}</div>
                 <div className="font-caption text-sm">
                   {new Date(raid.date).toLocaleString(navigator.language, {
                     day: "numeric",

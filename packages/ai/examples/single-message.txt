@@ -1,0 +1,5 @@
+🛡️ TANK: @Player1
+💚 HEALER: @Player2
+⚔️ DPS: @Player3 @Player4 @Player5
+🎯 CALLER: @Player6
+🐎 BATTLEMOUNT: @Player7 

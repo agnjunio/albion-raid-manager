@@ -2,6 +2,7 @@ import { logger } from "@albion-raid-manager/logger";
 import Anthropic from "@anthropic-ai/sdk";
 
 import { AIProvider, ParsedRaidData } from "../../types";
+import { preprocessMessage } from "../../utils/message-preprocessor";
 import { BaseAIService } from "../base";
 
 export class AnthropicService extends BaseAIService {
@@ -84,11 +85,14 @@ export class AnthropicService extends BaseAIService {
   }
 
   async validateMessage(message: string): Promise<boolean> {
-    const validationPrompt = `Analyze the following Discord message and determine if it contains raid-related information for Albion Online. Look for keywords like "raid", "dungeon", "group", "party", "guild", "boss", "chest", "dungeon", "corrupted", "roads", "outlands", etc.
+    // Pre-process message to reduce tokens
+    const preprocessed = preprocessMessage(message);
 
-Message: "${message}"
+    const validationPrompt = `Is this Albion Online raid msg? Look for: raid,dungeon,group,party,guild,boss,chest,corrupted,roads,outlands,pve,pvp,tank,healer,dps,support,bau,saida,montaria,energias,spec,call,swap,food,full,t8,8.1,7.3,gear,weapon,armor,departure,start,time,requirements,spec,build,mazmorra,grupo,gremio,jefe,cofre,corrupto,caminos,tierras exteriores,salida,inicio,hora,requisitos,рейд,подземелье,группа,гильдия,босс,сундук,испорченный,дороги,внешние земли,выход,начало,время,требования,специализация,билд,副本,团队,公会,boss,宝箱,腐化,道路,外域,出发,开始,时间,要求,坦克,治疗,输出,辅助,坐骑,食物,能量,装备,武器,护甲
 
-Respond with only "true" if it's raid-related, or "false" if it's not.`;
+Msg: "${preprocessed.content}"
+
+Respond: true/false`;
 
     try {
       logger.debug("Making Anthropic API request for message validation", {

@@ -3,13 +3,27 @@ import { logger } from "@albion-raid-manager/logger";
 import { getAIService } from "./service/factory";
 import { AIParsingError, DiscordMessageContext, ParsedRaidData } from "./types";
 
-const aiService = getAIService();
+// Lazy initialization to allow test mocks to work properly
+let aiService: ReturnType<typeof getAIService> | null = null;
+
+function getAIServiceInstance() {
+  if (!aiService) {
+    aiService = getAIService();
+  }
+  return aiService;
+}
+
+// Export for testing purposes
+export function resetAIService() {
+  aiService = null;
+}
 
 export async function parseDiscordMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData> {
   try {
+    const service = getAIServiceInstance();
     logger.debug("Parsing Discord message with AI.", {
       content: message.substring(0, 100) + "...",
-      provider: aiService.provider,
+      provider: service.provider,
       context: context
         ? {
             guildId: context.guildId,
@@ -20,29 +34,23 @@ export async function parseDiscordMessage(message: string, context?: DiscordMess
     });
 
     // First validate if the message is raid-related
-    const isValid = await aiService.validateMessage(message);
+    const isValid = await service.validateMessage(message);
     if (!isValid) {
       throw new AIParsingError("Message does not appear to be raid-related", message, 0.0);
     }
 
     // Parse the message to extract raid information
-    const parsedData = await aiService.parseDiscordPing(message);
+    const parsedData = await service.parseDiscordPing(message);
 
     logger.info("Successfully parsed Discord message", {
       title: parsedData.title,
       date: parsedData.date,
       confidence: parsedData.confidence,
-      provider: aiService.provider,
+      provider: service.provider,
     });
 
     return parsedData;
   } catch (error) {
-    logger.error("Failed to parse Discord message", {
-      message: message.substring(0, 100) + "...",
-      provider: aiService.provider,
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-
     if (error instanceof AIParsingError) {
       throw error;
     }
@@ -78,7 +86,8 @@ export async function parseMultipleDiscordMessages(
 
 export async function validateDiscordMessage(message: string): Promise<boolean> {
   try {
-    return await aiService.validateMessage(message);
+    const service = getAIServiceInstance();
+    return await service.validateMessage(message);
   } catch (error) {
     logger.error("Failed to validate message", {
       message: message.substring(0, 100) + "...",

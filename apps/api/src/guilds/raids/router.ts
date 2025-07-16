@@ -1,4 +1,3 @@
-import { Composition } from "@albion-raid-manager/core/types";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import {
   CreateGuildRaid,
@@ -27,44 +26,10 @@ raidsRouter.post(
     res: Response<APIResponse.Type<CreateGuildRaid.Response>>,
   ) => {
     const { guildId } = req.params;
-    const { description, date, compositionId } = req.body;
+    const { description, date } = req.body;
 
-    let composition: Composition | null = null;
-    if (compositionId) {
-      composition = await prisma.composition.findUnique({
-        where: {
-          id: compositionId,
-        },
-      });
-
-      if (!composition) {
-        throw APIResponse.Error(APIErrorType.NOT_FOUND, "Composition not found");
-      }
-    }
-
-    const raid = await prisma.$transaction(async (tx) => {
-      const raid = await tx.raid.create({
-        data: { guildId, description, date },
-      });
-
-      if (composition && composition.builds) {
-        await tx.raidSlot.createMany({
-          data: composition.builds.map((build) => ({
-            raidId: raid.id,
-            name: build.name,
-            buildId: build.id,
-          })),
-        });
-      }
-
-      return tx.raid.findUnique({
-        where: {
-          id: raid.id,
-        },
-        include: {
-          slots: true,
-        },
-      });
+    const raid = await prisma.raid.create({
+      data: { guildId, description, date },
     });
 
     res.json(APIResponse.Success({ raid }));
@@ -92,8 +57,12 @@ raidsRouter.get(
 
 raidsRouter.get(
   "/:raidId",
-  async (req: Request<GetGuildRaid.Params>, res: Response<APIResponse.Type<GetGuildRaid.Response>>) => {
+  async (
+    req: Request<GetGuildRaid.Params, {}, GetGuildRaid.Query>,
+    res: Response<APIResponse.Type<GetGuildRaid.Response>>,
+  ) => {
     const { guildId, raidId } = req.params;
+    const { slots } = req.query;
 
     if (!guildId || !raidId) {
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Guild ID and Raid ID are required");
@@ -102,6 +71,9 @@ raidsRouter.get(
     const raid = await prisma.raid.findUnique({
       where: {
         id: raidId,
+      },
+      include: {
+        slots: Boolean(slots),
       },
     });
 

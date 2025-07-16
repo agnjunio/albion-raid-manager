@@ -21,6 +21,9 @@ export function RaidPage() {
       guildId: guildId as string,
       raidId: raidId as string,
     },
+    query: {
+      slots: true,
+    },
   });
   const [updateRaidStatus, updateRaidStatusResult] = useUpdateGuildRaidMutation();
 
@@ -52,7 +55,7 @@ export function RaidPage() {
 
       <Card variant="outline">
         <CardHeader>
-          <CardTitle size="small">Raid Details</CardTitle>
+          <CardTitle size="small">{raid.title}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">

@@ -1,12 +1,12 @@
-import { DiscordMessageContext, mapRoleNameToEnum, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
+import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
-import { Guild } from "@albion-raid-manager/core/types";
+import { Guild, RaidRole } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, Message } from "discord.js";
 
-export const handleMessageCreate = async ({ discord: _discord, message }: { discord: Client; message: Message }) => {
+export const handleMessageCreate = async ({ message }: { discord: Client; message: Message }) => {
   try {
     // Skip bot messages and messages without guild
     if (message.author.bot || !message.guild) return;
@@ -78,6 +78,10 @@ export const handleMessageCreate = async ({ discord: _discord, message }: { disc
 
 // Function to create raid from parsed data
 async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData): Promise<void> {
+  logger.info("Creating raid from parsed data", {
+    parsedData,
+  });
+
   try {
     // Create the raid
     const raid = await prisma.raid.create({
@@ -103,7 +107,7 @@ async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData
             raidId: raid.id,
             name: slotName,
             comment: role.requirements?.join(", "),
-            role: mapRoleNameToEnum(role.name), // Map to enum value
+            role: role.role as RaidRole,
             // If there's a pre-assigned user, we'll need to look them up and assign them
             // This would require additional logic to resolve Discord usernames to user IDs
           });

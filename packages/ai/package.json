@@ -24,11 +24,12 @@
   },
   "scripts": {
     "dev": "echo 'JIT compilation - no build needed'",
-    "lint": "eslint src/",
+    "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "test:file": "tsx --env-file=.env examples/test-messages.ts"
   },
   "dependencies": {
     "@albion-raid-manager/config": "workspace:*",
@@ -43,6 +44,6 @@
     "@vitest/coverage-v8": "^1.0.0",
     "eslint": "^8.55.0",
     "typescript": "^5.3.0",
-    "vitest": "^1.0.0"
+    "vitest": "^3.2.4"
   }
 }

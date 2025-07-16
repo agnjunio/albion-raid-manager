@@ -1,0 +1,12 @@
+# BAU Raid
+🛡️ TANK: @Player1
+💚 HEALER: @Player2
+⚔️ DPS: @Player3 @Player4
+🎯 CALLER: @Player5
+---
+# Roads Raid
+🛡️ TANK: @TankPlayer
+💚 HEALER: @HealerPlayer
+⚔️ DPS: @DPS1 @DPS2 @DPS3
+🎯 CALLER: @CallerPlayer
+🐎 BATTLEMOUNT: @MountPlayer 

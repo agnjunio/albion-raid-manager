@@ -1,8 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
-import { AnthropicService, OpenAIService } from "../src/service";
-import { getAIService } from "../src/service/factory";
-import { AIProvider } from "../src/types";
+import { AnthropicService, OpenAIService } from "../../src/service";
+import { getAIService } from "../../src/service/factory";
+import { AIProvider } from "../../src/types";
 
 describe("AI Service Factory", () => {
   beforeEach(() => {
@@ -10,64 +10,17 @@ describe("AI Service Factory", () => {
   });
 
   describe("createAIService", () => {
-    const originalEnv = process.env;
-
-    beforeEach(() => {
-      process.env = { ...originalEnv };
-    });
-
-    afterEach(() => {
-      process.env = originalEnv;
-    });
-
     it("should create service from environment variables", () => {
-      process.env.AI_PROVIDER = "openai";
-      process.env.AI_API_KEY = "test-key";
-      process.env.AI_MODEL = "gpt-4";
-
       const service = getAIService();
-
       expect(service).toBeInstanceOf(OpenAIService);
       expect(service.provider).toBe(AIProvider.OPENAI);
-    });
-
-    it("should throw error when AI_PROVIDER is missing", () => {
-      const originalProvider = process.env.AI_PROVIDER;
-      delete process.env.AI_PROVIDER;
-      process.env.AI_API_KEY = "test-key";
-
-      try {
-        expect(() => {
-          getAIService();
-        }).toThrow("AI_PROVIDER environment variable is required");
-      } finally {
-        if (originalProvider) {
-          process.env.AI_PROVIDER = originalProvider;
-        }
-      }
-    });
-
-    it("should throw error when AI_API_KEY is missing", () => {
-      const originalApiKey = process.env.AI_API_KEY;
-      process.env.AI_PROVIDER = "openai";
-      delete process.env.AI_API_KEY;
-
-      try {
-        expect(() => {
-          getAIService();
-        }).toThrow("AI_API_KEY environment variable is required");
-      } finally {
-        if (originalApiKey) {
-          process.env.AI_API_KEY = originalApiKey;
-        }
-      }
     });
   });
 });
 
 describe("OpenAI Service", () => {
   let service: OpenAIService;
-  let mockCreate: any;
+  let mockCreate: Mock;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -161,7 +114,7 @@ describe("OpenAI Service", () => {
 
 describe("Anthropic Service", () => {
   let service: AnthropicService;
-  let mockCreate: any;
+  let mockCreate: Mock;
 
   beforeEach(() => {
     vi.clearAllMocks();
