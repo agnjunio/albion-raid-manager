@@ -3,6 +3,7 @@ import OpenAI from "openai";
 
 import { AIProvider, ParsedRaidData } from "../../types";
 import { preprocessMessage } from "../../utils/message-preprocessor";
+import { extractSlotLines } from "../../utils/slot-preprocessor";
 import { BaseAIService } from "../base";
 
 export class OpenAIService extends BaseAIService {
@@ -25,13 +26,24 @@ export class OpenAIService extends BaseAIService {
   }
 
   async parseDiscordPing(message: string): Promise<ParsedRaidData> {
-    const prompt = this.createRaidParsingPrompt(message);
+    // Extract slots using the preprocessor (guarantees 100% slot extraction)
+    const extractedSlots = extractSlotLines(message);
+    const slotStrings = extractedSlots.map(
+      (slot) => `${slot.buildName}${slot.userMention ? ` <@${slot.userMention}>` : ""}`,
+    );
+
+    logger.info(`Extracted ${extractedSlots.length} slots for AI mapping`, {
+      slots: slotStrings,
+    });
+
+    const prompt = this.createRaidParsingPrompt(message, slotStrings);
 
     try {
       logger.debug("Making OpenAI API request for Discord message parsing", {
         provider: this.provider,
         model: this.config.model,
         messageLength: message.length,
+        extractedSlotsCount: extractedSlots.length,
       });
 
       const response = await this.client.chat.completions.create({
@@ -92,7 +104,7 @@ export class OpenAIService extends BaseAIService {
     // Pre-process message to reduce tokens
     const preprocessed = preprocessMessage(message);
 
-    const validationPrompt = `Is this message related to an Albion Online raid, group activity, dungeon, party, or composition? Raid messages can be in any language and use free-form text. Look for any signs of raid, dungeon, group, party, guild, boss, chest, corrupted, roads, outlands, pve, pvp, tank, healer, dps, support, composition, or similar concepts, even if the keywords are not exact or are in another language. If the message could possibly be raid-related, respond 'true'. Err on the side of inclusivity.
+    const validationPrompt = `Is this an Albion Online raid/group activity? Look for raid, dungeon, party, tank, healer, dps, pve, pvp, or similar concepts in any language. If possibly raid-related, respond 'true'.
 
 Msg: "${preprocessed.content}"
 

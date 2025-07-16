@@ -83,6 +83,29 @@ async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData
   });
 
   try {
+    const slots = [];
+    if (parsedData.roles && parsedData.roles.length > 0) {
+      for (const role of parsedData.roles) {
+        // Validate and map the role to a valid RaidRole enum value
+        const validRole = mapToValidRaidRole(role.role);
+        if (!validRole) {
+          logger.warn(`Skipping role with invalid value: ${role.role}`, {
+            roleName: role.name,
+            roleValue: role.role,
+          });
+          continue;
+        }
+        // Create one slot per role entry
+        const slotName = role.name;
+        slots.push({
+          name: slotName,
+          comment: role.requirements?.join(", "),
+          role: validRole,
+        });
+        logger.debug("Created slot", { slotName, validRole });
+      }
+    }
+
     // Create the raid
     const raid = await prisma.raid.create({
       data: {
@@ -92,42 +115,18 @@ async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData
         date: parsedData.date,
         status: "SCHEDULED" as RaidStatus,
         note: parsedData.notes,
+        slots: {
+          create: slots,
+        },
       },
     });
-
-    // Create raid slots if roles are specified
-    if (parsedData.roles && parsedData.roles.length > 0) {
-      const slots = [];
-      for (const role of parsedData.roles) {
-        for (let i = 0; i < role.count; i++) {
-          const _preAssignedUser = role.preAssignedUsers?.[i]; // Prefixed with _ to indicate unused
-          const slotName = role.count === 1 ? role.name : `${role.name} ${i + 1}`;
-
-          slots.push({
-            raidId: raid.id,
-            name: slotName,
-            comment: role.requirements?.join(", "),
-            role: role.role as RaidRole,
-            // If there's a pre-assigned user, we'll need to look them up and assign them
-            // This would require additional logic to resolve Discord usernames to user IDs
-          });
-        }
-      }
-
-      await prisma.raidSlot.createMany({
-        data: slots,
-      });
-
-      // TODO: Handle pre-assigned users by resolving Discord usernames to user IDs
-      // and updating the raid slots accordingly
-    }
 
     logger.info("Successfully created raid from AI parsing", {
       raidId: raid.id,
       title: raid.title,
       date: raid.date,
       guildId: guild.id,
-      slotsCount: parsedData.roles?.reduce((sum, role) => sum + role.count, 0) || 0,
+      slotsCount: slots.length,
     });
   } catch (error) {
     logger.error("Failed to create raid from parsed data", {
@@ -135,5 +134,70 @@ async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData
       error: getErrorMessage(error),
     });
     throw error;
+  }
+}
+
+// Helper function to map AI role values to valid RaidRole enum values
+function mapToValidRaidRole(roleValue: string): RaidRole | null {
+  const upperRole = roleValue.toUpperCase().trim();
+
+  // Direct matches
+  if (
+    upperRole === "CALLER" ||
+    upperRole === "TANK" ||
+    upperRole === "SUPPORT" ||
+    upperRole === "HEALER" ||
+    upperRole === "RANGED_DPS" ||
+    upperRole === "MELEE_DPS" ||
+    upperRole === "BATTLEMOUNT"
+  ) {
+    return upperRole as RaidRole;
+  }
+
+  // Handle common variations and mappings
+  switch (upperRole) {
+    case "NOT SPECIFIED":
+    case "UNSPECIFIED":
+    case "UNKNOWN":
+      // Default to RANGED_DPS for unspecified roles
+      return "RANGED_DPS";
+    case "DPS":
+    case "DAMAGE":
+      // Default to RANGED_DPS for generic DPS
+      return "RANGED_DPS";
+    case "MELEE":
+      return "MELEE_DPS";
+    case "RANGED":
+      return "RANGED_DPS";
+    case "MOUNT":
+    case "BATTLE MOUNT":
+      return "BATTLEMOUNT";
+    default:
+      // Try to infer from role name patterns
+      if (upperRole.includes("TANK") || upperRole.includes("GUARDIAN") || upperRole.includes("PROTECTOR")) {
+        return "TANK";
+      }
+      if (upperRole.includes("HEAL") || upperRole.includes("SANADOR") || upperRole.includes("CURADOR")) {
+        return "HEALER";
+      }
+      if (upperRole.includes("SUPPORT") || upperRole.includes("SUPORTE") || upperRole.includes("CURSED")) {
+        return "SUPPORT";
+      }
+      if (upperRole.includes("CALLER") || upperRole.includes("CHAMADOR") || upperRole.includes("LEADER")) {
+        return "CALLER";
+      }
+      if (upperRole.includes("MOUNT") || upperRole.includes("MONTARIA") || upperRole.includes("CAVALO")) {
+        return "BATTLEMOUNT";
+      }
+      if (
+        upperRole.includes("MELEE") ||
+        upperRole.includes("MELE") ||
+        upperRole.includes("LANÇA") ||
+        upperRole.includes("LANCA")
+      ) {
+        return "MELEE_DPS";
+      }
+      // Default to RANGED_DPS for anything else
+      return "RANGED_DPS";
   }
 }

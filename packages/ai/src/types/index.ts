@@ -44,7 +44,7 @@ export interface RaidRole {
   name: string;
   role: string; // The mapped role enum value (TANK, HEALER, SUPPORT, etc.)
   count: number;
-  preAssignedUsers?: string[]; // Discord user IDs or usernames
+  preAssignedUser?: string; // Discord user ID or username
   requirements?: string[]; // Role-specific requirements (optional)
 }
 
@@ -85,7 +85,7 @@ export const ParsedRaidDataSchema = z.object({
         name: z.string(),
         role: z.string(),
         count: z.number().positive(),
-        preAssignedUsers: z.array(z.string()).optional(),
+        preAssignedUser: z.string().optional(),
         requirements: z.array(z.string()).optional(),
       }),
     )

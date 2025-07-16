@@ -1,0 +1,13 @@
+@everyone ROAMING RAID - Shapeshifter Test
+
+T8
+Food.2
+Stone Golem: <@123456789> 
+Phoenix: <@987654321>  
+Wolf: <@555666777> 
+Imp: <@111222333> 
+Ent: <@444555666> 
+Panther: <@777888999> 
+Crystal Cobra: <@000111222>
+
+Saída: Quando fechar 

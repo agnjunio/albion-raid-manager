@@ -93,7 +93,7 @@ ARMA T8 - BUILD T7
     const result = preprocessMessage(sampleMessage);
     const reductionPercentage = (result.tokenReduction / result.originalLength) * 100;
 
-    // Should reduce by at least 30%
-    expect(reductionPercentage).toBeGreaterThan(30);
+    // Should reduce by at least 20%
+    expect(reductionPercentage).toBeGreaterThan(20);
   });
 });

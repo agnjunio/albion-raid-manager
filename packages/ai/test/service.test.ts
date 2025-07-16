@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
-import { AnthropicService, OpenAIService } from "../../src/service";
-import { getAIService } from "../../src/service/factory";
-import { AIProvider } from "../../src/types";
+import { AnthropicService, OpenAIService } from "../src/service";
+import { getAIService } from "../src/service/factory";
+import { AIProvider } from "../src/types";
 
 describe("AI Service Factory", () => {
   beforeEach(() => {
@@ -130,7 +130,7 @@ describe("Anthropic Service", () => {
   it("should have correct default configuration", () => {
     expect(service.provider).toBe(AIProvider.ANTHROPIC);
     expect(service["config"].model).toBe("claude-3-sonnet-20240229");
-    expect(service["config"].baseUrl).toBe("https://api.anthropic.com/v1");
+    expect(service["config"].baseUrl).toBe("https://api.anthropic.com");
   });
 
   it("should validate message correctly", async () => {

@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 import { AIProvider, ParsedRaidData } from "../../types";
 import { preprocessMessage } from "../../utils/message-preprocessor";
+import { extractSlotLines } from "../../utils/slot-preprocessor";
 import { BaseAIService } from "../base";
 
 export class AnthropicService extends BaseAIService {
@@ -13,7 +14,7 @@ export class AnthropicService extends BaseAIService {
       provider: AIProvider.ANTHROPIC,
       apiKey: config.apiKey,
       model: config.model || "claude-3-sonnet-20240229",
-      baseUrl: config.baseUrl || "https://api.anthropic.com/v1",
+      baseUrl: config.baseUrl || "https://api.anthropic.com",
       maxTokens: 1000,
       temperature: 0.1,
     });
@@ -25,13 +26,24 @@ export class AnthropicService extends BaseAIService {
   }
 
   async parseDiscordPing(message: string): Promise<ParsedRaidData> {
-    const prompt = this.createRaidParsingPrompt(message);
+    // Extract slots using the preprocessor (guarantees 100% slot extraction)
+    const extractedSlots = extractSlotLines(message);
+    const slotStrings = extractedSlots.map(
+      (slot) => `${slot.buildName}${slot.userMention ? ` <@${slot.userMention}>` : ""}`,
+    );
+
+    logger.info(`Extracted ${extractedSlots.length} slots for AI mapping`, {
+      slots: slotStrings,
+    });
+
+    const prompt = this.createRaidParsingPrompt(message, slotStrings);
 
     try {
       logger.debug("Making Anthropic API request for Discord message parsing", {
         provider: this.provider,
         model: this.config.model,
         messageLength: message.length,
+        extractedSlotsCount: extractedSlots.length,
       });
 
       const response = await this.client.messages.create({
@@ -88,7 +100,7 @@ export class AnthropicService extends BaseAIService {
     // Pre-process message to reduce tokens
     const preprocessed = preprocessMessage(message);
 
-    const validationPrompt = `Is this Albion Online raid msg? Look for: raid,dungeon,group,party,guild,boss,chest,corrupted,roads,outlands,pve,pvp,tank,healer,dps,support,bau,saida,montaria,energias,spec,call,swap,food,full,t8,8.1,7.3,gear,weapon,armor,departure,start,time,requirements,spec,build,mazmorra,grupo,gremio,jefe,cofre,corrupto,caminos,tierras exteriores,salida,inicio,hora,requisitos,рейд,подземелье,группа,гильдия,босс,сундук,испорченный,дороги,внешние земли,выход,начало,время,требования,специализация,билд,副本,团队,公会,boss,宝箱,腐化,道路,外域,出发,开始,时间,要求,坦克,治疗,输出,辅助,坐骑,食物,能量,装备,武器,护甲
+    const validationPrompt = `Is this an Albion Online raid/group activity? Look for: raid,dungeon,party,tank,healer,dps,pve,pvp,gear,weapon,time,requirements in any language. If possibly raid-related, respond 'true'.
 
 Msg: "${preprocessed.content}"
 
