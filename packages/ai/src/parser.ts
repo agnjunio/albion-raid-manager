@@ -7,8 +7,8 @@ const aiService = getAIService();
 
 export async function parseDiscordMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData> {
   try {
-    logger.debug("Parsing Discord message with AI", {
-      message: message.substring(0, 100) + "...",
+    logger.debug("Parsing Discord message with AI.", {
+      content: message.substring(0, 100) + "...",
       provider: aiService.provider,
       context: context
         ? {

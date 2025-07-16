@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "tsx .",
-    "dev": "tsx watch --env-file=.env .",
+    "dev": "tsx watch --env-file=.env --exclude=logs/** .",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

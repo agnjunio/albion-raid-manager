@@ -30,7 +30,7 @@ export const handleMessageCreate = async ({ discord: _discord, message }: { disc
     if (!guild || message.channel.id !== guild.raidAnnouncementChannelId) return;
 
     // Log the message for debugging
-    logger.info(`Message received in raid channel: ${message.content}`, {
+    logger.debug(`Message received in raid channel: #${message.guild.channels.cache.get(message.channel.id)?.name}`, {
       guildId: message.guild.id,
       channelId: message.channel.id,
       authorId: message.author.id,
