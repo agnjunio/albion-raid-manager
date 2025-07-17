@@ -1,6 +1,6 @@
 import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
-import { Guild, Raid, RaidRole } from "@albion-raid-manager/core/types";
+import { Guild, Raid, RaidRole, RaidSlot } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
@@ -65,10 +65,7 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
     const { raid } = await createRaidFromParsedData(guild, parsedData);
 
     // Create confirmation message using the messages module
-    const replyMessage = buildRaidCreationConfirmationMessage(raid, {
-      location: parsedData.location,
-      requirements: parsedData.requirements,
-    });
+    const replyMessage = buildRaidCreationConfirmationMessage(raid, raid.slots || [], parsedData);
 
     await message.reply(replyMessage);
   } catch (error) {
@@ -83,7 +80,10 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
 
 // Function to create raid from parsed data
 // Now returns the created raid and slots for message building
-async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData): Promise<{ raid: Raid }> {
+async function createRaidFromParsedData(
+  guild: Guild,
+  parsedData: ParsedRaidData,
+): Promise<{ raid: Raid & { slots: RaidSlot[] } }> {
   logger.info("Creating raid from parsed data", {
     parsedData,
   });

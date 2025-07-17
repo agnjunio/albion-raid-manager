@@ -29,18 +29,16 @@ export abstract class BaseAIService implements AIService {
         ? `\nPRE-ASSIGNED: ${preAssignedRoles.map((role: PreAssignedRole) => `${role.name}→${role.role}`).join(", ")}\n`
         : "";
 
-    return `Parse Albion raid → JSON: {title, date(ISO), time, location, requirements[], roles[{name, role, preAssignedUser}], confidence(0-1)}
+    return `Parse Albion raid → JSON: {title, date(ISO), location, requirements[], roles[{name, role, preAssignedUser}], confidence(0-1)}
 
-Title: Use the main event/raid name or announcement (usually the first prominent line, including emojis). Do NOT use gear, requirements, or composition lines as the title. Preserve emojis in the title.
+Title: Use the actual raid/dungeon name (e.g., "BAÚ DOURADO", ESTRADAS AVALON, CAVERNAS"). Do NOT use meeting points, departure locations, or "SAIDA DE" lines as the title. The title should be the destination/dungeon name, not where you're leaving from.
 
 Msg: "${preprocessed.content}"${slotSection}${preAssignedSection}
 
 Roles: TANK, HEALER, SUPPORT, RANGED_DPS, MELEE_DPS, CALLER, BATTLEMOUNT
 - Use pre-assigned roles when available
 - FB=Fura-Bruma (bow), Tank builds→TANK, Healer→HEALER, Staff weapons→RANGED_DPS, Cursed→SUPPORT
-- Date: ${new Date().toISOString().split("T")[0]} (today)
-- Time: extract or "Not specified"
-- Location: prioritize departure/destination info, normalize city names
+- Date: Combine date and time into a full ISO datetime (e.g., 2025077400 no time specified, use todays date at 0cation: prioritize departure/destination info, normalize city names
 - Requirements: extract gear/food/requirements
 
 Return JSON only.`;
@@ -50,9 +48,57 @@ Return JSON only.`;
     // Basic validation and transformation
     const parsedData = data as Record<string, unknown>;
 
-    // Always use today's date regardless of what the AI returns
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of day
+    // Parse and combine date and time into full datetime
+    let raidDateTime = new Date();
+    raidDateTime.setHours(0, 0, 0, 0); // Default to start of today
+
+    const aiDate = parsedData.date as string | undefined;
+    const aiTime = parsedData.time as string | undefined;
+
+    if (aiDate) {
+      try {
+        // Try to parse the AI's date response as a full datetime
+        const parsedDate = new Date(aiDate);
+        if (!isNaN(parsedDate.getTime())) {
+          raidDateTime = parsedDate;
+        }
+      } catch (error) {
+        // If parsing fails, keep today's date
+        console.warn("Failed to parse AI date:", aiDate);
+      }
+    }
+
+    // If AI provided separate time, combine it with the date
+    if (aiTime && aiTime !== "Not specified") {
+      try {
+        // Parse time in various formats
+        let hours = 0;
+        let minutes = 0;
+        // Try HH:MM format
+        const timeMatch = aiTime.match(/(\d{1,2}):(\d{2})/);
+        if (timeMatch) {
+          hours = parseInt(timeMatch[1], 10);
+          minutes = parseInt(timeMatch[2], 10);
+        } else {
+          // Try HHh format
+          const hourMatch = aiTime.match(/(\d{1,2})h/);
+          if (hourMatch) {
+            hours = parseInt(hourMatch[1], 10);
+          } else {
+            // Try just HH format
+            const justHourMatch = aiTime.match(/^(\d{1,2})$/);
+            if (justHourMatch) {
+              hours = parseInt(justHourMatch[1], 10);
+            }
+          }
+        }
+
+        // Set the time on the raid date
+        raidDateTime.setHours(hours, minutes, 0, 0);
+      } catch (error) {
+        console.warn("Failed to parse AI time:", aiTime);
+      }
+    }
 
     // Normalize roles to ensure consistent user mention format
     const normalizedRoles = (parsedData.roles as RaidRole[] | undefined) || [];
@@ -64,8 +110,7 @@ Return JSON only.`;
     const parsed: ParsedRaidData = {
       title: (parsedData.title as string) || "Raid",
       description: parsedData.description as string | undefined,
-      date: today, // Always use today's date
-      time: parsedData.time as string | undefined,
+      date: raidDateTime,
       location: parsedData.location as string | undefined,
       requirements: (parsedData.requirements as string[] | undefined) || [],
       roles: processedRoles,

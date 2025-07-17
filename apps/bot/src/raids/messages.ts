@@ -100,6 +100,7 @@ export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User
 
 export const buildRaidCreationConfirmationMessage = (
   raid: Raid,
+  slots: RaidSlot[],
   parsedData: { location?: string; requirements?: string[] },
 ): MessageCreateOptions => {
   const embed = new EmbedBuilder()

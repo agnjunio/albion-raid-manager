@@ -30,7 +30,6 @@ export interface ParsedRaidData {
   title: string;
   description?: string;
   date: Date;
-  time?: string;
   location?: string;
   requirements?: string[];
   roles?: RaidRole[];
@@ -76,7 +75,6 @@ export const ParsedRaidDataSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
   date: z.date(),
-  time: z.string().optional(),
   location: z.string().optional(),
   requirements: z.array(z.string()).optional(),
   roles: z
