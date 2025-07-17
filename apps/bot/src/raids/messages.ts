@@ -97,3 +97,38 @@ export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User
     components: [row],
   };
 };
+
+export const buildRaidCreationConfirmationMessage = (
+  raid: Raid,
+  parsedData: { location?: string; requirements?: string[] },
+): MessageCreateOptions => {
+  const embed = new EmbedBuilder()
+    .setColor(0x57f287) // Green color for success
+    .setTitle("✅ Raid Created Successfully")
+    .setDescription(`**${raid.title}**`)
+    .addFields(
+      { name: "Date", value: raid.date.toLocaleDateString(), inline: true },
+      { name: "Status", value: String(raid.status), inline: true },
+      { name: "Slots", value: raid.slots ? raid.slots.length.toString() : "0", inline: true },
+    )
+    .setTimestamp();
+
+  if (parsedData.location) {
+    embed.addFields({ name: "Location", value: parsedData.location, inline: true });
+  }
+
+  if (parsedData.requirements && parsedData.requirements.length > 0) {
+    embed.addFields({ name: "Requirements", value: parsedData.requirements.join(", "), inline: false });
+  }
+
+  if (raid.slots && raid.slots.length > 0) {
+    const slotList = raid.slots
+      .map((slot) => `• ${emojis[slot.role] || emojis.DEFAULT} ${slot.name} — ${slot.role}`)
+      .join("\n");
+    embed.addFields({ name: "Slots", value: slotList, inline: false });
+  }
+
+  return {
+    embeds: [embed],
+  };
+};

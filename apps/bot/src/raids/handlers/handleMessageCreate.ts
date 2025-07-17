@@ -1,10 +1,12 @@
 import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
-import { Guild, RaidRole } from "@albion-raid-manager/core/types";
+import { Guild, Raid, RaidRole } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, Message } from "discord.js";
+
+import { buildRaidCreationConfirmationMessage } from "../messages";
 
 export const handleMessageCreate = async ({ message }: { discord: Client; message: Message }) => {
   try {
@@ -59,13 +61,16 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
       return;
     }
 
-    // Create the raid
-    await createRaidFromParsedData(guild, parsedData);
+    // Create the raid and get raid data for message building
+    const { raid } = await createRaidFromParsedData(guild, parsedData);
 
-    // Send confirmation message
-    await message.reply({
-      content: `✅ Raid created: **${parsedData.title}** on ${parsedData.date.toLocaleDateString()}`,
+    // Create confirmation message using the messages module
+    const replyMessage = buildRaidCreationConfirmationMessage(raid, {
+      location: parsedData.location,
+      requirements: parsedData.requirements,
     });
+
+    await message.reply(replyMessage);
   } catch (error) {
     logger.error(`Failed to handle message: ${getErrorMessage(error)}`, {
       guildId: message.guild?.id,
@@ -77,7 +82,8 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
 };
 
 // Function to create raid from parsed data
-async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData): Promise<void> {
+// Now returns the created raid and slots for message building
+async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData): Promise<{ raid: Raid }> {
   logger.info("Creating raid from parsed data", {
     parsedData,
   });
@@ -119,6 +125,9 @@ async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData
           create: slots,
         },
       },
+      include: {
+        slots: true,
+      },
     });
 
     logger.info("Successfully created raid from AI parsing", {
@@ -128,6 +137,8 @@ async function createRaidFromParsedData(guild: Guild, parsedData: ParsedRaidData
       guildId: guild.id,
       slotsCount: slots.length,
     });
+
+    return { raid };
   } catch (error) {
     logger.error("Failed to create raid from parsed data", {
       parsedData,
