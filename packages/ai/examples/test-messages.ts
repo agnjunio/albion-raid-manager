@@ -22,9 +22,12 @@ async function testMessage(message: string, name: string) {
           {
             title: result.title,
             date: result.date.toLocaleDateString(),
-            time: result.time || "Not specified",
             location: result.location || "Not specified",
             confidence: `${(result.confidence * 100).toFixed(1)}%`,
+            contentType: result.contentType || "Not detected",
+            contentTypeConfidence: result.contentTypeConfidence
+              ? `${(result.contentTypeConfidence * 100).toFixed(1)}%`
+              : "Not detected",
             maxParticipants: result.maxParticipants || "Not specified",
             description: result.description,
             requirements: result.requirements,

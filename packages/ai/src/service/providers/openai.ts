@@ -81,7 +81,7 @@ export class OpenAIService extends BaseAIService {
       }
 
       const parsedData = JSON.parse(jsonMatch[0]);
-      return this.validateParsedData(parsedData);
+      return this.validateParsedData(parsedData, message);
     } catch (error) {
       logger.error("OpenAI API request failed", {
         provider: this.provider,

@@ -15,7 +15,7 @@ export function getAIService(): AIService {
   switch (config.ai.provider) {
     case AIProvider.OPENAI:
       aiService = new OpenAIService({
-        apiKey: config.ai.apiKey,
+        apiKey: config.ai.apiKey || "",
         model: config.ai.model,
         baseUrl: config.ai.baseUrl,
       });
@@ -23,7 +23,7 @@ export function getAIService(): AIService {
 
     case AIProvider.ANTHROPIC:
       aiService = new AnthropicService({
-        apiKey: config.ai.apiKey,
+        apiKey: config.ai.apiKey || "",
         model: config.ai.model,
         baseUrl: config.ai.baseUrl,
       });

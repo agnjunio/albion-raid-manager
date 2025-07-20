@@ -60,24 +60,46 @@ model User {
 
 // Raids
 model Raid {
-  id                    String     @id @default(uuid())
-  type                  RaidType   @default(FIXED)
+  id                    String       @id @default(uuid())
+  type                  RaidType     @default(FIXED)
+  contentType           ContentType?
   guildId               String
-  guild                 Guild      @relation(fields: [guildId], references: [id])
+  guild                 Guild        @relation(fields: [guildId], references: [id])
   announcementMessageId String?
-  status                RaidStatus @default(SCHEDULED)
-  title                 String     @default("Raid")
+  status                RaidStatus   @default(SCHEDULED)
+  title                 String       @default("Raid")
   description           String?
   note                  String?
   date                  DateTime
   slots                 RaidSlot[]
-  createdAt             DateTime   @default(now())
-  updatedAt             DateTime   @updatedAt
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
 }
 
 enum RaidType {
   FIXED
   FLEX
+}
+
+enum ContentType {
+  SOLO_DUNGEON
+  OPEN_WORLD_FARMING
+  GROUP_DUNGEON
+  AVALONIAN_DUNGEON_FULL_CLEAR
+  AVALONIAN_DUNGEON_BUFF_ONLY
+  ROADS_OF_AVALON_PVE
+  ROADS_OF_AVALON_PVP
+  DEPTHS_DUO
+  DEPTHS_TRIO
+  GANKING_SQUAD
+  FIGHTING_SQUAD
+  ZVZ_CALL_TO_ARMS
+  HELLGATE_2V2
+  HELLGATE_5V5
+  HELLGATE_10V10
+  MISTS_SOLO
+  MISTS_DUO
+  OTHER
 }
 
 model RaidSlot {

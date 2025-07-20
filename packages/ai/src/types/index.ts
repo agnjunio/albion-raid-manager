@@ -1,3 +1,4 @@
+import { ContentType } from "@albion-raid-manager/core/types";
 import { z } from "zod";
 
 // AI Provider Types
@@ -36,6 +37,8 @@ export interface ParsedRaidData {
   maxParticipants?: number;
   notes?: string;
   confidence: number;
+  contentType?: ContentType;
+  contentTypeConfidence?: number;
 }
 
 // Raid Role Structure
@@ -91,6 +94,8 @@ export const ParsedRaidDataSchema = z.object({
   maxParticipants: z.number().positive().optional(),
   notes: z.string().optional(),
   confidence: z.number().min(0).max(1),
+  contentType: z.string().optional(),
+  contentTypeConfidence: z.number().min(0).max(1).optional(),
 });
 
 export const AIServiceConfigSchema = z.object({

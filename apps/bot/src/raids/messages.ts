@@ -1,4 +1,4 @@
-import { RaidRole, type Raid, type RaidSlot } from "@albion-raid-manager/core/types";
+import { RaidRole, type ContentType, type Raid, type RaidSlot } from "@albion-raid-manager/core/types";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -25,6 +25,50 @@ const emojis: Record<RaidRole | "DEFAULT", string> = {
   BATTLEMOUNT: "🐎",
 };
 
+// Content type emojis
+const contentTypeEmojis: Record<ContentType, string> = {
+  SOLO_DUNGEON: "🏰",
+  OPEN_WORLD_FARMING: "🌾",
+  GROUP_DUNGEON: "⚔️",
+  AVALONIAN_DUNGEON_FULL_CLEAR: "👑",
+  AVALONIAN_DUNGEON_BUFF_ONLY: "⚡",
+  ROADS_OF_AVALON_PVE: "🛤️",
+  ROADS_OF_AVALON_PVP: "🗡️",
+  DEPTHS_DUO: "🕳️",
+  DEPTHS_TRIO: "🕳️",
+  GANKING_SQUAD: "🎭",
+  FIGHTING_SQUAD: "⚔️",
+  ZVZ_CALL_TO_ARMS: "🏰",
+  HELLGATE_2V2: "🔥",
+  HELLGATE_5V5: "🔥",
+  HELLGATE_10V10: "🔥",
+  MISTS_SOLO: "🌫️",
+  MISTS_DUO: "🌫️",
+  OTHER: "❓",
+};
+
+// Content type display names
+const contentTypeNames: Record<ContentType, string> = {
+  SOLO_DUNGEON: "Solo Dungeon",
+  OPEN_WORLD_FARMING: "Open World Farming",
+  GROUP_DUNGEON: "Group Dungeon",
+  AVALONIAN_DUNGEON_FULL_CLEAR: "Avalonian Dungeon (Full Clear)",
+  AVALONIAN_DUNGEON_BUFF_ONLY: "Avalonian Dungeon (Buff Only)",
+  ROADS_OF_AVALON_PVE: "Roads of Avalon (PvE)",
+  ROADS_OF_AVALON_PVP: "Roads of Avalon (PvP)",
+  DEPTHS_DUO: "Depths (Duo)",
+  DEPTHS_TRIO: "Depths (Trio)",
+  GANKING_SQUAD: "Ganking Squad",
+  FIGHTING_SQUAD: "Fighting Squad",
+  ZVZ_CALL_TO_ARMS: "ZvZ/Call to Arms",
+  HELLGATE_2V2: "Hellgate (2v2)",
+  HELLGATE_5V5: "Hellgate (5v5)",
+  HELLGATE_10V10: "Hellgate (10v10)",
+  MISTS_SOLO: "Mists (Solo)",
+  MISTS_DUO: "Mists (Duo)",
+  OTHER: "Other",
+};
+
 export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
   raid: Raid,
   slots: RaidSlot[],
@@ -42,6 +86,17 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     name: "Status",
     value: raid.status,
   });
+
+  // Add content type field if available
+  if (raid.contentType && raid.contentType !== "OTHER") {
+    const contentTypeEmoji = contentTypeEmojis[raid.contentType];
+    const contentTypeName = contentTypeNames[raid.contentType];
+    embed.addFields({
+      name: "Content Type",
+      value: `${contentTypeEmoji} ${contentTypeName}`,
+      inline: true,
+    });
+  }
 
   const signups = slots.filter((slot) => !!slot.userId);
   embed.addFields({
@@ -113,6 +168,17 @@ export const buildRaidCreationConfirmationMessage = (
       { name: "Slots", value: raid.slots ? raid.slots.length.toString() : "0", inline: true },
     )
     .setTimestamp();
+
+  // Add content type field if available
+  if (raid.contentType && raid.contentType !== "OTHER") {
+    const contentTypeEmoji = contentTypeEmojis[raid.contentType];
+    const contentTypeName = contentTypeNames[raid.contentType];
+    embed.addFields({
+      name: "Content Type",
+      value: `${contentTypeEmoji} ${contentTypeName}`,
+      inline: true,
+    });
+  }
 
   if (parsedData.location) {
     embed.addFields({ name: "Location", value: parsedData.location, inline: true });

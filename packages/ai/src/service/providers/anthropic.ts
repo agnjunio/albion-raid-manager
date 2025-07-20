@@ -77,7 +77,7 @@ export class AnthropicService extends BaseAIService {
       }
 
       const parsedData = JSON.parse(jsonMatch[0]);
-      return this.validateParsedData(parsedData);
+      return this.validateParsedData(parsedData, message);
     } catch (error) {
       logger.error("Anthropic API request failed", {
         provider: this.provider,

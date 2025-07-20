@@ -1,4 +1,9 @@
-import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
+import {
+  DiscordMessageContext,
+  getContentTypeInfo,
+  parseDiscordMessage,
+  ParsedRaidData,
+} from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
 import { Guild, Raid, RaidRole, RaidSlot } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
@@ -89,6 +94,16 @@ async function createRaidFromParsedData(
   });
 
   try {
+    // Use content type information from parsed data (now integrated into parseDiscordMessage)
+    const contentType =
+      parsedData.contentType && parsedData.contentTypeConfidence && parsedData.contentTypeConfidence >= 0.1
+        ? parsedData.contentType
+        : null;
+
+    // Get content type info to determine raid type
+    const contentTypeInfo = contentType ? getContentTypeInfo(contentType) : null;
+    const raidType = contentTypeInfo?.raidType || "FLEX";
+
     const slots = [];
     if (parsedData.roles && parsedData.roles.length > 0) {
       for (const role of parsedData.roles) {
@@ -121,6 +136,8 @@ async function createRaidFromParsedData(
         date: parsedData.date,
         status: "SCHEDULED" as RaidStatus,
         note: parsedData.notes,
+        contentType,
+        type: raidType,
         slots: {
           create: slots,
         },
@@ -136,6 +153,8 @@ async function createRaidFromParsedData(
       date: raid.date,
       guildId: guild.id,
       slotsCount: slots.length,
+      contentType: contentType,
+      raidType: raidType,
     });
 
     return { raid };
