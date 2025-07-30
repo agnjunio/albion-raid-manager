@@ -1,0 +1,53 @@
+# Albion Raid Manager - Project Overview
+
+This is a monorepo for an Albion Online raid management system built with TypeScript, using Turbo for build orchestration and pnpm for package management.
+
+## Project Structure
+
+### Apps
+
+- **[apps/api](mdc:apps/api)** - Express.js REST API server
+- **[apps/web](mdc:apps/web)** - React + Vite frontend application
+- **[apps/bot](mdc:apps/bot)** - Discord.js bot for raid management
+
+### Shared Packages
+
+- **[packages/core](mdc:packages/core)** - Shared business logic and types
+- **[packages/database](mdc:packages/database)** - Prisma database schema and client
+- **[packages/config](mdc:packages/config)** - Shared configuration management
+- **[packages/logger](mdc:packages/logger)** - Centralized logging utilities
+- **[packages/discord](mdc:packages/discord)** - Discord.js utilities and types
+- **[packages/ai](mdc:packages/ai)** - AI/ML utilities for the application
+
+## Key Technologies
+
+- **Build System**: Turbo monorepo with pnpm workspaces
+- **Database**: PostgreSQL with Prisma ORM
+- **Frontend**: React + Vite + Tailwind CSS + Radix UI
+- **Backend**: Express.js with TypeScript
+- **Bot**: Discord.js for Discord integration
+- **Code Quality**: ESLint + Prettier + TypeScript
+
+## Development Commands
+
+- `pnpm dev` - Start all services in development mode
+- `pnpm api` - Start only the API server
+- `pnpm bot` - Start only the Discord bot
+- `pnpm web` - Start only the web frontend
+
+## Database Schema
+
+The database uses Prisma with PostgreSQL and includes models for:
+
+- Guilds and Guild Members
+- Users
+- Raids with different types (FIXED, FLEX)
+- Raid Slots and Roles
+- Sessions for authentication
+
+The schema is defined in [packages/database/prisma/schema.prisma](mdc:packages/database/prisma/schema.prisma).
+description:
+globs:
+alwaysApply: false
+
+---

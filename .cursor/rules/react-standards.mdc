@@ -1,0 +1,53 @@
+# React Coding Standards
+
+## Component Structure
+
+- Use functional components with hooks
+- Prefer named exports over default exports
+- Use TypeScript for all component props
+- Implement proper prop validation with Zod or TypeScript interfaces
+
+## State Management
+
+- Use Redux Toolkit for global state (configured in [apps/web/package.json](mdc:apps/web/package.json))
+- Use React Hook Form for form state management
+- Use local state with useState for component-specific state
+- Use useReducer for complex state logic
+
+## UI Components
+
+- Use Radix UI primitives for accessible components
+- Use Tailwind CSS for styling (configured in [apps/web/postcss.config.mjs](mdc:apps/web/postcss.config.mjs))
+- Use class-variance-authority for component variants
+- Implement proper ARIA attributes for accessibility
+
+## File Organization
+
+- Group related components in feature folders
+- Use index files for clean imports
+- Separate business logic from UI components
+- Use custom hooks for reusable logic
+
+## Performance
+
+- Use React.memo for expensive components
+- Implement proper dependency arrays in useEffect
+- Use useCallback and useMemo for expensive computations
+- Lazy load components when appropriate
+
+## Error Boundaries
+
+- Implement error boundaries for component error handling
+- Use react-error-boundary package for consistent error handling
+- Provide fallback UI for error states
+
+## Testing
+
+- Write unit tests for business logic
+- Test component behavior, not implementation details
+- Use React Testing Library for component testing
+  description:
+  globs:
+  alwaysApply: false
+
+---

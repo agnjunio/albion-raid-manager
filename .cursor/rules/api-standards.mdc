@@ -1,0 +1,59 @@
+# API Development Standards
+
+## Express.js Best Practices
+
+- Use TypeScript for all API endpoints
+- Implement proper error handling middleware
+- Use Zod for request/response validation
+- Use Morgan for HTTP request logging
+- Implement CORS properly for cross-origin requests
+
+## Database Operations
+
+- Use Prisma Client for all database operations
+- Implement proper transaction handling
+- Use the shared database package: `@albion-raid-manager/database`
+- Handle database connection errors gracefully
+- Use proper indexing for performance
+
+## Authentication & Sessions
+
+- Use express-session for session management
+- Implement proper session store with Prisma
+- Use secure session configuration
+- Implement proper logout functionality
+
+## API Structure
+
+- Use RESTful conventions for endpoints
+- Implement proper HTTP status codes
+- Use consistent response formats
+- Implement proper input validation
+- Use middleware for cross-cutting concerns
+
+## Error Handling
+
+- Implement global error handling middleware
+- Use proper HTTP status codes for different error types
+- Log errors appropriately using the shared logger package
+- Return consistent error response formats
+
+## Security
+
+- Validate all input data
+- Implement proper CORS configuration
+- Use environment variables for sensitive configuration
+- Implement rate limiting where appropriate
+- Sanitize user inputs
+
+## Testing
+
+- Write unit tests for business logic
+- Test API endpoints with proper mocking
+- Use integration tests for database operations
+- Test error scenarios and edge cases
+  description:
+  globs:
+  alwaysApply: false
+
+---

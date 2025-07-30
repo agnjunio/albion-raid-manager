@@ -1,0 +1,62 @@
+# Monorepo Development Standards
+
+## Package Management
+
+- Use pnpm for package management (configured in [package.json](mdc:package.json))
+- Use workspace dependencies with `workspace:*` syntax
+- Keep dependencies consistent across packages
+- Use the workspace configuration in [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml)
+
+## Build System
+
+- Use Turbo for build orchestration (configured in [turbo.json](mdc:turbo.json))
+- Implement proper task dependencies
+- Use caching for faster builds
+- Configure proper inputs and outputs for tasks
+
+## Package Structure
+
+- Keep shared logic in packages
+- Use clear package boundaries
+- Implement proper package exports
+- Use TypeScript for all packages
+
+## Development Workflow
+
+- Use `pnpm dev` to start all services
+- Use `pnpm api`, `pnpm bot`, `pnpm web` for individual services
+- Run linting and formatting across all packages
+- Use consistent TypeScript configuration
+
+## Code Quality
+
+- Use ESLint configuration from [eslint.config.js](mdc:eslint.config.js)
+- Use Prettier configuration from [.prettierrc.json](mdc:.prettierrc.json)
+- Run type checking across all packages
+- Maintain consistent code style
+
+## Testing Strategy
+
+- Implement tests for each package
+- Use consistent testing frameworks
+- Share test utilities across packages
+- Implement integration tests for cross-package functionality
+
+## Documentation
+
+- Document package APIs
+- Maintain README files for each package
+- Document shared types and interfaces
+- Keep documentation up to date with code changes
+
+## Deployment
+
+- Use Docker for containerization (see [docker-compose.yml](mdc:docker-compose.yml))
+- Implement proper environment configuration
+- Use consistent deployment strategies
+- Monitor application health
+  description:
+  globs:
+  alwaysApply: false
+
+---

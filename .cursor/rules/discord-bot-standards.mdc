@@ -1,0 +1,65 @@
+# Discord Bot Development Standards
+
+## Discord.js Best Practices
+
+- Use TypeScript for all bot functionality
+- Implement proper error handling for Discord API calls
+- Use the shared discord package: `@albion-raid-manager/discord`
+- Handle Discord rate limits appropriately
+- Implement proper command handling structure
+
+## Command Structure
+
+- Use slash commands for modern Discord integration
+- Implement proper command permissions
+- Use subcommands for complex functionality
+- Implement proper command cooldowns
+- Use proper command descriptions and help text
+
+## Guild Management
+
+- Handle guild join/leave events properly
+- Implement proper permission checking
+- Use the database schema for guild and member management
+- Handle guild-specific configurations
+
+## Raid Management
+
+- Implement proper raid creation and management
+- Handle raid slots and participant management
+- Use proper Discord embeds for raid announcements
+- Implement raid status tracking
+- Handle raid role assignments
+
+## Error Handling
+
+- Implement proper error handling for Discord API failures
+- Log errors using the shared logger package
+- Provide user-friendly error messages
+- Handle network timeouts gracefully
+
+## Security
+
+- Validate all user inputs
+- Implement proper permission checks
+- Use environment variables for sensitive data
+- Implement proper bot token security
+
+## Performance
+
+- Use proper caching for Discord API responses
+- Implement efficient database queries
+- Use pagination for large data sets
+- Implement proper memory management
+
+## Testing
+
+- Mock Discord API calls for testing
+- Test command functionality in isolation
+- Test permission handling
+- Test error scenarios
+  description:
+  globs:
+  alwaysApply: false
+
+---

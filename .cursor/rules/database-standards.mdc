@@ -1,0 +1,64 @@
+# Database Development Standards
+
+## Prisma Schema Management
+
+- Use the schema defined in [packages/database/prisma/schema.prisma](mdc:packages/database/prisma/schema.prisma)
+- Generate Prisma client after schema changes: `pnpm db:generate`
+- Use proper relationships between models
+- Implement proper cascading deletes where appropriate
+
+## Model Design
+
+- Use UUIDs for primary keys where appropriate
+- Implement proper foreign key relationships
+- Use enums for fixed value sets (RaidType, ContentType, etc.)
+- Implement proper indexing for performance
+- Use proper data types for each field
+
+## Database Operations
+
+- Use Prisma Client for all database operations
+- Implement proper transaction handling for complex operations
+- Use proper error handling for database failures
+- Implement proper connection pooling
+- Use prepared statements (handled by Prisma)
+
+## Migration Strategy
+
+- Use Prisma migrations for schema changes
+- Test migrations on development data first
+- Implement proper rollback strategies
+- Document breaking changes in migrations
+
+## Performance
+
+- Use proper indexing for frequently queried fields
+- Implement efficient query patterns
+- Use pagination for large result sets
+- Monitor query performance
+
+## Data Validation
+
+- Use Prisma's built-in validation
+- Implement application-level validation with Zod
+- Validate data before database operations
+- Handle constraint violations gracefully
+
+## Security
+
+- Use parameterized queries (handled by Prisma)
+- Implement proper access control
+- Validate all input data
+- Use environment variables for database credentials
+
+## Testing
+
+- Use test database for integration tests
+- Mock database operations for unit tests
+- Test migration scripts
+- Test data integrity constraints
+  description:
+  globs:
+  alwaysApply: false
+
+---

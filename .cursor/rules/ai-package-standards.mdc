@@ -1,0 +1,61 @@
+# AI Package Development Standards
+
+## AI/ML Utilities
+
+- Use TypeScript for all AI-related functionality
+- Implement proper error handling for AI model calls
+- Use the message preprocessor utilities in [packages/ai/src/utils/message-preprocessor.ts](mdc:packages/ai/src/utils/message-preprocessor.ts)
+- Handle AI API rate limits appropriately
+- Implement proper fallback mechanisms
+
+## Message Processing
+
+- Implement proper message preprocessing
+- Handle different message formats consistently
+- Use proper text normalization
+- Implement efficient text processing algorithms
+- Handle edge cases in message content
+
+## AI Integration
+
+- Use proper API client patterns
+- Implement retry logic for failed requests
+- Use proper timeout handling
+- Implement proper error recovery
+- Cache AI responses when appropriate
+
+## Performance
+
+- Optimize message processing for speed
+- Use efficient algorithms for text analysis
+- Implement proper memory management
+- Use streaming responses when possible
+- Monitor AI API usage and costs
+
+## Testing
+
+- Mock AI API calls for testing
+- Test message preprocessing logic
+- Test error handling scenarios
+- Test performance with large datasets
+- Implement integration tests for AI functionality
+
+## Security
+
+- Validate all input data
+- Sanitize user inputs before AI processing
+- Implement proper API key management
+- Use environment variables for sensitive data
+- Implement proper data privacy measures
+
+## Documentation
+
+- Document AI model usage patterns
+- Document message preprocessing steps
+- Document API integration details
+- Keep documentation up to date with AI model changes
+  description:
+  globs:
+  alwaysApply: false
+
+---
