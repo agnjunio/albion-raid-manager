@@ -1,3 +1,104 @@
-# Development
+# Albion Raid Manager
 
-A list of preconfigures services can be found in docker-compose.yml. These have synergy with the .env.example files so you can develop locally.
+A comprehensive Discord bot and web application for managing Albion Online raids and guild activities.
+
+## Quick Start
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Node.js 20+ and pnpm
+
+### Development Setup
+
+Use Docker for infrastructure and Turbo for applications:
+
+1. **Start infrastructure services:**
+
+   ```bash
+   pnpm infra:up
+   ```
+
+2. **Start applications locally:**
+
+   ```bash
+   # Start all applications
+   pnpm dev
+
+   # Or start individual applications
+   pnpm api    # API server
+   pnpm web    # Web application
+   pnpm bot    # Discord bot
+   ```
+
+3. **Access the services:**
+   - Web App: http://localhost:5173
+   - API: http://localhost:3001
+   - Database Admin: http://localhost:8080
+   - Redis Admin: http://localhost:8081
+
+4. **Infrastructure management:**
+
+   ```bash
+   pnpm infra:logs      # View infrastructure logs
+   pnpm infra:status    # Check infrastructure status
+   pnpm infra:down      # Stop infrastructure
+   pnpm infra:reset     # Reset infrastructure (removes all data)
+   ```
+
+### Local Development
+
+1. **Install dependencies:**
+
+   ```bash
+   pnpm install
+   ```
+
+2. **Set up environment variables:**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+3. **Start infrastructure (if using hybrid approach):**
+
+   ```bash
+   pnpm infra:up
+   ```
+
+4. **Start services:**
+
+   ```bash
+   # Start all services
+   pnpm dev
+
+   # Start individual services
+   pnpm api    # API server
+   pnpm web    # Web application
+   pnpm bot    # Discord bot
+   ```
+
+## Project Structure
+
+- **apps/api** - Express.js REST API
+- **apps/web** - React + Vite frontend
+- **apps/bot** - Discord.js bot
+- **packages/core** - Shared business logic
+- **packages/database** - Prisma database schema
+- **packages/config** - Shared configuration
+- **packages/logger** - Logging utilities
+- **packages/discord** - Discord utilities
+- **packages/ai** - AI/ML utilities
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test with Turbo: `pnpm dev`
+5. Submit a pull request
+
+## License
+
+[Add your license here]
