@@ -28,12 +28,32 @@ This is a monorepo for an Albion Online raid management system built with TypeSc
 - **Bot**: Discord.js for Discord integration
 - **Code Quality**: ESLint + Prettier + TypeScript
 
+## Development Approach
+
+This project uses a **hybrid development approach**:
+
+- **Infrastructure in Docker**: PostgreSQL Database, Redis, Admin tools
+- **Applications in Turbo**: API, Web, Bot run locally with hot reload
+- **Best of both worlds**: Fast development with reliable infrastructure
+
 ## Development Commands
 
-- `pnpm dev` - Start all services in development mode
+### Infrastructure (Docker)
+
+- `pnpm infra:up` - Start database and Redis
+- `pnpm infra:down` - Stop infrastructure
+- `pnpm infra:logs` - View infrastructure logs
+- `pnpm infra:status` - Check infrastructure status
+- `pnpm infra:reset` - Reset infrastructure (removes all data)
+
+### Applications (Turbo)
+
+- `pnpm dev` - Start all applications
 - `pnpm api` - Start only the API server
 - `pnpm bot` - Start only the Discord bot
 - `pnpm web` - Start only the web frontend
+
+
 
 ## Database Schema
 
@@ -46,6 +66,15 @@ The database uses Prisma with PostgreSQL and includes models for:
 - Sessions for authentication
 
 The schema is defined in [packages/database/prisma/schema.prisma](mdc:packages/database/prisma/schema.prisma).
+
+## Infrastructure Services
+
+- **PostgreSQL Database** - Main application database (port 5432)
+- **Redis** - Session storage and caching (port 6379)
+- **Adminer** - Database administration tool (port 8080)
+- **Redis Commander** - Redis administration tool (port 8081)
+
+Configuration is in [docker-compose.yml](mdc:docker-compose.yml).
 description:
 globs:
 alwaysApply: false

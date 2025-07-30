@@ -23,7 +23,13 @@
 
 ## Development Workflow
 
-- Use `pnpm dev` to start all services
+### Hybrid Development (Recommended)
+1. Start infrastructure: `pnpm infra:up`
+2. Start applications: `pnpm dev` (or individual: `pnpm api`, `pnpm bot`, `pnpm web`)
+3. Manage infrastructure: `pnpm infra:logs`, `pnpm infra:status`, `pnpm infra:down`
+
+### Local Development
+- Use `pnpm dev` to start all applications
 - Use `pnpm api`, `pnpm bot`, `pnpm web` for individual services
 - Run linting and formatting across all packages
 - Use consistent TypeScript configuration
