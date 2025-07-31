@@ -12,7 +12,7 @@ export const discord = new Client({
 
 async function run() {
   if (!config.discord.token) {
-    throw new Error("Please define the discord token.");
+    throw new Error("Please define the DISCORD_TOKEN environment variable.");
   }
 
   logger.info("Starting the Bot Client.");
