@@ -3,7 +3,8 @@ import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
-import { type Command } from "../../commands";
+import { Command } from "@/commands";
+import { getGuild, getGuildMember } from "@/utils/discord";
 
 export const registerCommand: Command = {
   data: new SlashCommandBuilder()
@@ -23,10 +24,8 @@ export const registerCommand: Command = {
 
     const username = interaction.options.getString("username", true);
     const userId = interaction.user.id;
-    const guild = interaction.guild;
-    let member = interaction.member;
 
-    if (!member || !guild) {
+    if (!interaction.guildId) {
       await interaction.reply({
         content: "❌ This command can only be used in a Discord server.",
         flags: MessageFlags.Ephemeral,
@@ -34,15 +33,12 @@ export const registerCommand: Command = {
       return;
     }
 
-    if (member.pending) {
-      member = await guild.members.fetch(userId);
-    }
+    const guild = await getGuild(interaction.client, interaction.guildId);
+    const member = await getGuildMember(interaction.client, interaction.guildId, userId);
 
     try {
       // Defer the reply
-      await interaction.deferReply({
-        flags: MessageFlags.Ephemeral,
-      });
+      await interaction.deferReply();
 
       // Verify the user exists in Albion Online
       const userData = await verifyAlbionPlayer(username, "AMERICAS");
@@ -60,7 +56,7 @@ export const registerCommand: Command = {
           id: userId,
           username: interaction.user.username,
           avatar: interaction.user.avatar ?? null,
-          nickname: "nickname" in member ? member.nickname : null,
+          nickname: userData.Name,
         },
         server: {
           id: guild.id,
@@ -89,6 +85,15 @@ export const registerCommand: Command = {
       await interaction.editReply({
         content: `✅ Successfully registered as **${userData.Name}**!\n\n**Player Info:**\n• Guild: ${userData.GuildName || "None"}\n• Kill Fame: ${userData.KillFame.toLocaleString()}\n• Death Fame: ${userData.DeathFame.toLocaleString()}\n• Fame Ratio: ${(userData.FameRatio * 100).toFixed(1)}%`,
       });
+
+      // Update the user's nickname to their Albion character name
+      try {
+        await member.setNickname(userData.Name);
+        logger.info(`Updated nickname for user ${userId} to ${userData.Name}`);
+      } catch (nicknameError) {
+        logger.warn(`Failed to update nickname for user ${userId}:`, nicknameError);
+        // Don't fail the registration if nickname update fails
+      }
 
       logger.info(`User ${userId} registered as ${userData.Name}`, {
         userId,
