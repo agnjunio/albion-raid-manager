@@ -25,7 +25,7 @@ export class AlbionAPIError extends Error {
 
 // Single Axios instance for the entire package
 const albionApiClient = axios.create({
-  timeout: 10000,
+  timeout: 60000,
   headers: {
     "User-Agent": "Albion-Raid-Manager/1.0.0",
     Accept: "application/json",
