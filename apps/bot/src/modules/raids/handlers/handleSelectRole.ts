@@ -1,5 +1,5 @@
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
-import { prisma, RaidStatus } from "@albion-raid-manager/database";
+import { ensureUser, prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, Interaction } from "discord.js";
 
@@ -43,18 +43,7 @@ export const handleSelectRole = async ({ interaction }: { discord: Client; inter
       });
     }
 
-    const user = await prisma.user.upsert({
-      where: { id: interaction.user.id },
-      update: {
-        username: interaction.user.username,
-        avatar: interaction.user.avatar,
-      },
-      create: {
-        id: interaction.user.id,
-        username: interaction.user.username,
-        avatar: interaction.user.avatar,
-      },
-    });
+    const user = await ensureUser(interaction.user.id, interaction.user.username);
 
     await prisma.raidSlot.update({
       where: {

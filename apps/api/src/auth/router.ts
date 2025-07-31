@@ -1,6 +1,6 @@
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { GetMeResponse } from "@albion-raid-manager/core/types/api/auth";
-import { prisma } from "@albion-raid-manager/database";
+import { ensureUser } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
 import { logger } from "@albion-raid-manager/logger";
@@ -17,21 +17,9 @@ authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<
       type: "user",
       token: req.session.accessToken,
     });
-    const user = await prisma.user.upsert({
-      where: {
-        id: discordUser.id,
-      },
-      update: {
-        username: discordUser.username,
-        nickname: discordUser.global_name,
-        avatar: discordUser.avatar ?? undefined,
-      },
-      create: {
-        id: discordUser.id,
-        username: discordUser.username,
-        nickname: discordUser.global_name,
-        avatar: discordUser.avatar ?? undefined,
-      },
+    const user = await ensureUser(discordUser.id, discordUser.username, {
+      nickname: discordUser.global_name ?? undefined,
+      avatar: discordUser.avatar ?? undefined,
     });
 
     res.json(APIResponse.Success({ user }));

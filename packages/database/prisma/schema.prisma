@@ -20,42 +20,49 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Guilds and Players
-model Guild {
-  id                        String        @id @default(uuid())
+// Servers and Users
+model Server {
+  id                        String         @id @default(uuid())
   name                      String
   icon                      String?
-  discordId                 String        @unique
-  members                   GuildMember[]
+  discordId                 String         @unique
+  members                   ServerMember[]
   raids                     Raid[]
   // Settings
-  adminRoles                String[]      @default([])
-  raidRoles                 String[]      @default([])
-  compositionRoles          String[]      @default([])
+  adminRoles                String[]       @default([])
+  raidRoles                 String[]       @default([])
+  compositionRoles          String[]       @default([])
   raidAnnouncementChannelId String?
 }
 
-model GuildMember {
-  guild                 Guild   @relation(fields: [guildId], references: [id], onDelete: Cascade)
+model ServerMember {
+  server                Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
   user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guildId               String
+  serverId              String
   userId                String
   nickname              String?
   adminPermission       Boolean @default(false)
   raidPermission        Boolean @default(false)
   compositionPermission Boolean @default(false)
 
-  @@id([guildId, userId])
+  // Albion player data
+  albionPlayerId String?
+  albionGuildId  String?
+  killFame       Int      @default(0)
+  deathFame      Int      @default(0)
+  lastUpdated    DateTime @default(now())
+
+  @@id([serverId, userId])
 }
 
 model User {
-  id             String        @id
-  username       String
-  avatar         String?
-  nickname       String?
-  defaultGuildId String?
-  GuildMember    GuildMember[]
-  RaidSlot       RaidSlot[]
+  id              String         @id
+  username        String
+  avatar          String?
+  nickname        String?
+  defaultServerId String?
+  ServerMember    ServerMember[]
+  RaidSlot        RaidSlot[]
 }
 
 // Raids
@@ -63,8 +70,8 @@ model Raid {
   id                    String       @id @default(uuid())
   type                  RaidType     @default(FIXED)
   contentType           ContentType?
-  guildId               String
-  guild                 Guild        @relation(fields: [guildId], references: [id])
+  serverId              String
+  server                Server       @relation(fields: [serverId], references: [id])
   announcementMessageId String?
   status                RaidStatus   @default(SCHEDULED)
   title                 String       @default("Raid")

@@ -36,6 +36,105 @@ This project uses a **hybrid development approach**:
 - **Applications in Turbo**: API, Web, Bot run locally with hot reload
 - **Best of both worlds**: Fast development with reliable infrastructure
 
+## Function Parameter Patterns
+
+When writing functions in this codebase, follow these parameter patterns:
+
+### Required Parameters
+
+Use sequential parameters for required values:
+
+```typescript
+function example(required1: string, required2: number, required3: boolean) {
+  // Implementation
+}
+```
+
+### Optional Parameters
+
+Use object destructuring for optional parameters:
+
+```typescript
+function example(
+  required1: string,
+  required2: number,
+  { optional1 = "default", optional2 = 0, optional3 = false } = {},
+) {
+  // Implementation
+}
+```
+
+### Examples
+
+```typescript
+// ✅ Good - Required params sequential, optional as object
+function createUser(discordId: string, username: string, { nickname, avatar, defaultServerId } = {}) {
+  // Implementation
+}
+
+// ✅ Good - All required params
+function ensureUser(discordUserId: string, username: string) {
+  // Implementation
+}
+
+// ❌ Bad - Mixed pattern
+function badExample(
+  required1: string,
+  { optional1 } = {},
+  required2: number, // Required after optional
+) {
+  // Implementation
+}
+```
+
+## Database Transaction Guidelines
+
+### When to Use Transactions
+
+**Use transactions when:**
+
+- Performing multiple database operations in a single function
+- Operations need to be atomic (all succeed or all fail)
+- Creating related entities that depend on each other
+- Updating multiple records that must remain consistent
+
+**Don't use transactions for:**
+
+- Single database operations
+- Simple CRUD operations
+- Read-only operations
+- Operations that don't depend on each other
+
+### Examples
+
+```typescript
+// ✅ Good - Single operation, no transaction needed
+async function createUser(userData: UserData) {
+  return await prisma.user.create({ data: userData });
+}
+
+// ✅ Good - Multiple operations, transaction needed
+async function createUserWithProfile(userData: UserData, profileData: ProfileData) {
+  return await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({ data: userData });
+    const profile = await tx.profile.create({
+      data: { ...profileData, userId: user.id }
+    });
+    return { user, profile };
+  });
+}
+
+// ✅ Good - Related entities, transaction needed
+async function ensureUserAndServer(userId: string, serverId: string) {
+  return await prisma.$transaction(async (tx) => {
+    const user = await tx.user.upsert({ ... });
+    const server = await tx.server.upsert({ ... });
+    const member = await tx.serverMember.upsert({ ... });
+    return { user, server, member };
+  });
+}
+```
+
 ## Development Commands
 
 ### Infrastructure (Docker)
@@ -53,13 +152,11 @@ This project uses a **hybrid development approach**:
 - `pnpm bot` - Start only the Discord bot
 - `pnpm web` - Start only the web frontend
 
-
-
 ## Database Schema
 
 The database uses Prisma with PostgreSQL and includes models for:
 
-- Guilds and Guild Members
+- Servers and Server Members
 - Users
 - Raids with different types (FIXED, FLEX)
 - Raid Slots and Roles
