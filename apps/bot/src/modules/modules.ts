@@ -1,8 +1,9 @@
 import { logger } from "@albion-raid-manager/logger";
 import { Client, Collection, Events } from "discord.js";
 
-import { Command, loadCommands } from "./commands";
-import { raids } from "./raids";
+import { Command, loadCommands } from "../commands";
+
+import { MODULES_LIST } from ".";
 
 export interface ModuleParams {
   discord: Client;
@@ -16,7 +17,6 @@ export type Module = {
   onReady?: ({ discord }: ModuleParams) => Promise<void>;
 };
 
-export const MODULES_LIST: Module[] = [raids];
 export const modules = new Collection<Module["id"], Module>();
 
 export async function initModules({ discord }: ModuleParams) {

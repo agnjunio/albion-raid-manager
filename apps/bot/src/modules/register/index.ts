@@ -1,7 +1,7 @@
 import config from "@albion-raid-manager/config";
 import { logger } from "@albion-raid-manager/logger";
 
-import { type Module } from "@/modules";
+import { type Module } from "@/modules/modules";
 
 export const register: Module = {
   id: "register",

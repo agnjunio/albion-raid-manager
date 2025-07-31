@@ -1,7 +1,7 @@
 import { logger } from "@albion-raid-manager/logger";
 import { Events } from "discord.js";
 
-import { type Module } from "@/modules";
+import { type Module } from "@/modules/modules";
 
 import { raidCommand } from "./commands/raid";
 import { handleMessageCreate, handleSelectRole, handleSignout, handleSignup } from "./handlers";

@@ -11,7 +11,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 
-import { Module } from "./modules";
+import { type Module } from "./modules";
 
 if (!config.discord.token || !config.discord.clientId) {
   throw new Error("Please define the DISCORD_TOKEN and DISCORD_CLIENT_ID.");
