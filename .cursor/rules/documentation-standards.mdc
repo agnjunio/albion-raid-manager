@@ -2,7 +2,7 @@
 
 ## Manual Documentation Management
 
-This project uses Cursor Rules that are manually maintained. Rules should be updated when major changes occur:
+This project uses Cursor Rules that are maintained by the AI Agent. Rules should be updated when major changes occur:
 
 ### When to Update Rules
 
@@ -17,7 +17,9 @@ This project uses Cursor Rules that are manually maintained. Rules should be upd
 
 ### Documentation Files to Keep Updated
 
-- **[README.md](mdc:README.md)** - Project overview and quick start
+- **[apps/api/README.md](mdc:README.md)** - API project overview and quick start
+- **[apps/bot/README.md](mdc:README.md)** - Bot project overview and quick start
+- **[apps/web/README.md](mdc:README.md)** - Web project overview and quick start
 - **[package.json](mdc:package.json)** - Scripts and dependencies
 - **[turbo.json](mdc:turbo.json)** - Build configuration
 - **[docker-compose.yml](mdc:docker-compose.yml)** - Infrastructure configuration

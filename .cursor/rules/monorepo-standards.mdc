@@ -2,10 +2,30 @@
 
 ## Package Management
 
-- Use pnpm for package management (configured in [package.json](mdc:package.json))
+**IMPORTANT: This project uses pnpm exclusively for package management.**
+
+- **Always use pnpm** for package management (configured in [package.json](mdc:package.json))
+- **Never use npm or yarn** - this project is configured for pnpm workspaces
 - Use workspace dependencies with `workspace:*` syntax
 - Keep dependencies consistent across packages
 - Use the workspace configuration in [pnpm-workspace.yaml](mdc:pnpm-workspace.yaml)
+
+### Package Management Commands
+
+**Correct (use these):**
+
+- `pnpm install` - Install dependencies
+- `pnpm add <package>` - Add dependency
+- `pnpm add -D <package>` - Add dev dependency
+- `pnpm run <script>` - Run package scripts
+- `pnpm run lint` - Run linting
+- `pnpm run test` - Run tests
+- `pnpm run type-check` - Run TypeScript checking
+
+**Incorrect (never use these):**
+
+- `npm install`, `npm run`, `npm test`
+- `yarn install`, `yarn run`, `yarn test`
 
 ## Build System
 
@@ -24,11 +44,13 @@
 ## Development Workflow
 
 ### Hybrid Development (Recommended)
+
 1. Start infrastructure: `pnpm infra:up`
 2. Start applications: `pnpm dev` (or individual: `pnpm api`, `pnpm bot`, `pnpm web`)
 3. Manage infrastructure: `pnpm infra:logs`, `pnpm infra:status`, `pnpm infra:down`
 
 ### Local Development
+
 - Use `pnpm dev` to start all applications
 - Use `pnpm api`, `pnpm bot`, `pnpm web` for individual services
 - Run linting and formatting across all packages
@@ -43,7 +65,8 @@
 
 ## Testing Strategy
 
-- Implement tests for each package
+- Implement tests for each package using `pnpm run test`
+- Use vitest for unit testing (configured in packages)
 - Use consistent testing frameworks
 - Share test utilities across packages
 - Implement integration tests for cross-package functionality

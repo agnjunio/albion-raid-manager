@@ -1,0 +1,161 @@
+# Package Management Standards
+
+## pnpm Workspace Configuration
+
+This project uses **pnpm workspaces** exclusively for package management. This is a critical requirement for the monorepo structure.
+
+### Why pnpm?
+
+- **Workspace Support**: Native workspace dependency management
+- **Performance**: Faster installation and better disk space usage
+- **Consistency**: Lockfile ensures reproducible builds
+- **Monorepo Optimized**: Built for monorepo workflows
+
+## Package Management Commands
+
+### ✅ Correct Commands (Always Use These)
+
+**Installation:**
+
+- `pnpm install` - Install all dependencies
+- `pnpm install --frozen-lockfile` - Install with exact lockfile versions
+
+**Adding Dependencies:**
+
+- `pnpm add <package>` - Add production dependency
+- `pnpm add -D <package>` - Add development dependency
+- `pnpm add <package>@<version>` - Add specific version
+
+**Workspace Dependencies:**
+
+- `pnpm add @albion-raid-manager/config@workspace:*` - Add workspace dependency
+- `pnpm add -D @albion-raid-manager/logger@workspace:*` - Add workspace dev dependency
+
+**Running Scripts:**
+
+- `pnpm run <script>` - Run package script
+- `pnpm run lint` - Run ESLint
+- `pnpm run test` - Run tests
+- `pnpm run type-check` - Run TypeScript checking
+- `pnpm run build` - Build package
+
+**Development:**
+
+- `pnpm dev` - Start all applications
+- `pnpm api` - Start API server
+- `pnpm bot` - Start Discord bot
+- `pnpm web` - Start web frontend
+
+### ❌ Incorrect Commands (Never Use These)
+
+**Never use npm:**
+
+- `npm install`
+- `npm run <script>`
+- `npm test`
+- `npm run lint`
+
+**Never use yarn:**
+
+- `yarn install`
+- `yarn run <script>`
+- `yarn test`
+- `yarn run lint`
+
+## Workspace Structure
+
+### Apps (Applications)
+
+- `apps/api` - Express.js REST API
+- `apps/web` - React + Vite frontend
+- `apps/bot` - Discord.js bot
+
+### Packages (Shared Libraries)
+
+- `packages/core` - Shared business logic
+- `packages/database` - Prisma database
+- `packages/config` - Configuration management
+- `packages/logger` - Logging utilities
+- `packages/discord` - Discord utilities
+- `packages/ai` - AI utilities
+- `packages/albion` - Albion API client
+
+## Dependency Management
+
+### Workspace Dependencies
+
+Use `workspace:*` syntax for internal dependencies:
+
+```json
+{
+  "dependencies": {
+    "@albion-raid-manager/config": "workspace:*",
+    "@albion-raid-manager/logger": "workspace:*"
+  }
+}
+```
+
+### External Dependencies
+
+Add external packages normally:
+
+```json
+{
+  "dependencies": {
+    "axios": "^1.8.4",
+    "discord.js": "^14.0.0"
+  }
+}
+```
+
+## Development Workflow
+
+1. **Install Dependencies**: `pnpm install`
+2. **Start Infrastructure**: `pnpm infra:up`
+3. **Start Applications**: `pnpm dev`
+4. **Run Tests**: `pnpm run test`
+5. **Run Linting**: `pnpm run lint`
+6. **Type Checking**: `pnpm run type-check`
+
+## Package.json Configuration
+
+Each package should have:
+
+```json
+{
+  "packageManager": "pnpm@10.6.1",
+  "scripts": {
+    "dev": "echo 'JIT compilation - no build needed'",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run"
+  }
+}
+```
+
+## Troubleshooting
+
+### Common Issues
+
+- **Wrong package manager**: Always use `pnpm`, never `npm` or `yarn`
+- **Workspace dependencies**: Use `workspace:*` for internal packages
+- **Lockfile conflicts**: Use `pnpm install --frozen-lockfile` in CI
+
+### Reset Dependencies
+
+```bash
+rm -rf node_modules
+rm pnpm-lock.yaml
+pnpm install
+```
+
+## CI/CD Considerations
+
+- Use `pnpm install --frozen-lockfile` in CI
+- Ensure pnpm is installed in CI environment
+- Use workspace-aware caching strategies
+  description:
+  globs:
+  alwaysApply: false
+
+---
