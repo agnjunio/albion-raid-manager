@@ -34,13 +34,17 @@ export const registerCommand: Command = {
     }
 
     try {
+      // Defer the reply
+      await interaction.deferReply({
+        ephemeral: true,
+      });
+
       // Verify the user exists in Albion Online
       const userData = await verifyAlbionPlayer(username, "AMERICAS");
 
       if (!userData) {
-        await interaction.reply({
+        await interaction.editReply({
           content: `❌ User "${username}" not found in Albion Online. Please check the spelling and try again.`,
-          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -48,17 +52,15 @@ export const registerCommand: Command = {
       // Store the registration in database
       await storeUserRegistration(userId, userData, serverId);
 
-      await interaction.reply({
+      await interaction.editReply({
         content: `✅ Successfully registered as **${userData.Name}**!\n\n**Player Info:**\n• Guild: ${userData.GuildName || "None"}\n• Kill Fame: ${userData.KillFame.toLocaleString()}\n• Death Fame: ${userData.DeathFame.toLocaleString()}\n• Fame Ratio: ${(userData.FameRatio * 100).toFixed(1)}%`,
-        flags: MessageFlags.Ephemeral,
       });
 
       logger.info(`User ${userId} registered as ${userData.Name}`);
     } catch (error) {
       logger.error("Register command error:", error);
-      await interaction.reply({
+      await interaction.editReply({
         content: "❌ An error occurred while registering. Please try again later.",
-        flags: MessageFlags.Ephemeral,
       });
     }
   },
