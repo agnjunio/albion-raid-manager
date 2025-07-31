@@ -45,6 +45,7 @@ export const schema = z.object({
   }),
 
   ai: z.object({
+    enabled: z.any().optional().transform(parseBool).default(false),
     provider: z.enum(["openai", "anthropic", "google", "azure"]).default("openai"),
     apiKey: z.string().optional(),
     model: z.string().optional(),

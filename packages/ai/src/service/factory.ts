@@ -8,6 +8,11 @@ import { OpenAIService } from "./providers/openai";
 let aiService: AIService | null = null;
 
 export function getAIService(): AIService {
+  // Check if AI is enabled - throw error if disabled
+  if (!config.ai.enabled) {
+    throw new Error("AI features are disabled. Set AI_ENABLED=true to enable.");
+  }
+
   if (aiService) {
     return aiService;
   }
