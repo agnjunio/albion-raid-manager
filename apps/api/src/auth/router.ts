@@ -17,9 +17,11 @@ authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<
       type: "user",
       token: req.session.accessToken,
     });
-    const user = await ensureUser(discordUser.id, discordUser.username, {
-      nickname: discordUser.global_name ?? undefined,
-      avatar: discordUser.avatar ?? undefined,
+    const user = await ensureUser({
+      id: discordUser.id,
+      username: discordUser.username,
+      nickname: discordUser.global_name ?? null,
+      avatar: discordUser.avatar ?? null,
     });
 
     res.json(APIResponse.Success({ user }));

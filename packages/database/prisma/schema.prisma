@@ -22,10 +22,9 @@ datasource db {
 
 // Servers and Users
 model Server {
-  id                        String         @id @default(uuid())
+  id                        String         @id // Discord server ID
   name                      String
   icon                      String?
-  discordId                 String         @unique
   members                   ServerMember[]
   raids                     Raid[]
   // Settings

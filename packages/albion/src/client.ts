@@ -1,4 +1,10 @@
-import type { AlbionGuildResponse, AlbionKillboardResponse, AlbionPlayerResponse, AlbionSearchResponse } from "./types";
+import type {
+  AlbionGuildResponse,
+  AlbionKillboardResponse,
+  AlbionPlayerResponse,
+  AlbionSearchResponse,
+  AlbionUser,
+} from "./types";
 
 import { sleep } from "@albion-raid-manager/core/scheduler";
 import { logger } from "@albion-raid-manager/logger";
@@ -169,10 +175,7 @@ export async function getAlbionGuildKillboard(
 /**
  * Verify if a player exists in Albion Online
  */
-export async function verifyAlbionPlayer(
-  username: string,
-  server: ServerId = "AMERICAS",
-): Promise<AlbionPlayerResponse | null> {
+export async function verifyAlbionPlayer(username: string, server: ServerId = "AMERICAS"): Promise<AlbionUser | null> {
   try {
     const searchResults = await searchAlbionPlayers(username, server);
 
@@ -180,13 +183,13 @@ export async function verifyAlbionPlayer(
     const exactMatch = searchResults.players.find((player) => player.Name.toLowerCase() === username.toLowerCase());
 
     if (exactMatch) {
-      // Get detailed player info
-      return await getAlbionPlayer(exactMatch.Id, server);
+      // Return the search result directly
+      return exactMatch;
     }
 
     // If no exact match, return the first result if there's only one
     if (searchResults.players.length === 1) {
-      return await getAlbionPlayer(searchResults.players[0].Id, server);
+      return searchResults.players[0];
     }
 
     return null;

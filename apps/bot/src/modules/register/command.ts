@@ -1,4 +1,4 @@
-import { verifyAlbionPlayer, type AlbionUser } from "@albion-raid-manager/albion";
+import { AlbionAPIError, verifyAlbionPlayer } from "@albion-raid-manager/albion";
 import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
@@ -23,9 +23,10 @@ export const registerCommand: Command = {
 
     const username = interaction.options.getString("username", true);
     const userId = interaction.user.id;
-    const serverId = interaction.guildId;
+    const guild = interaction.guild;
+    let member = interaction.member;
 
-    if (!serverId) {
+    if (!member || !guild) {
       await interaction.reply({
         content: "❌ This command can only be used in a Discord server.",
         flags: MessageFlags.Ephemeral,
@@ -33,10 +34,14 @@ export const registerCommand: Command = {
       return;
     }
 
+    if (member.pending) {
+      member = await guild.members.fetch(userId);
+    }
+
     try {
       // Defer the reply
       await interaction.deferReply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
 
       // Verify the user exists in Albion Online
@@ -44,55 +49,94 @@ export const registerCommand: Command = {
 
       if (!userData) {
         await interaction.editReply({
-          content: `❌ User "${username}" not found in Albion Online. Please check the spelling and try again.`,
+          content: `❌ User "${username}" not found in Albion Online.\n\n**Possible reasons:**\n• Check the spelling of your username\n• Make sure you're searching on the correct server (Americas)\n• The player might not exist or have a different name\n\n**Tips:**\n• Usernames are case-sensitive\n• Try searching for your exact in-game name\n• If you recently changed your name, try your old username`,
         });
         return;
       }
 
-      // Store the registration in database
-      await storeUserRegistration(userId, userData, serverId);
+      // Ensure user and server exist, then get the server member
+      const { serverMember } = await ensureUserAndServer({
+        user: {
+          id: userId,
+          username: interaction.user.username,
+          avatar: interaction.user.avatar ?? null,
+          nickname: "nickname" in member ? member.nickname : null,
+        },
+        server: {
+          id: guild.id,
+          name: guild.name,
+          icon: guild.iconURL() ?? null,
+        },
+      });
+
+      // Update the server member with Albion data
+      await prisma.serverMember.update({
+        where: {
+          serverId_userId: {
+            serverId: serverMember.serverId,
+            userId: serverMember.userId,
+          },
+        },
+        data: {
+          albionPlayerId: userData.Id,
+          albionGuildId: userData.GuildId || null,
+          killFame: userData.KillFame,
+          deathFame: userData.DeathFame,
+          lastUpdated: new Date(),
+        },
+      });
 
       await interaction.editReply({
         content: `✅ Successfully registered as **${userData.Name}**!\n\n**Player Info:**\n• Guild: ${userData.GuildName || "None"}\n• Kill Fame: ${userData.KillFame.toLocaleString()}\n• Death Fame: ${userData.DeathFame.toLocaleString()}\n• Fame Ratio: ${(userData.FameRatio * 100).toFixed(1)}%`,
       });
 
-      logger.info(`User ${userId} registered as ${userData.Name}`);
+      logger.info(`User ${userId} registered as ${userData.Name}`, {
+        userId,
+        member,
+        guild,
+      });
     } catch (error) {
       logger.error("Register command error:", error);
+
+      let errorMessage = "❌ An error occurred while registering. Please try again later.";
+
+      if (error instanceof AlbionAPIError) {
+        // Handle specific Albion API errors
+        switch (error.status) {
+          case 404:
+            errorMessage = `❌ User "${username}" not found in Albion Online.\n\n**Possible reasons:**\n• Check the spelling of your username\n• Make sure you're searching on the correct server (Americas)\n• The player might not exist or have a different name\n\n**Tips:**\n• Usernames are case-sensitive\n• Try searching for your exact in-game name\n• If you recently changed your name, try your old username`;
+            break;
+          case 429:
+            errorMessage = "❌ Too many requests to Albion Online API. Please wait a moment and try again.";
+            break;
+          case 500:
+          case 502:
+          case 503:
+          case 504:
+            errorMessage =
+              "❌ Albion Online servers are currently experiencing issues. Please try again in a few minutes.";
+            break;
+          case 403:
+            errorMessage = "❌ Access to Albion Online API is currently restricted. Please try again later.";
+            break;
+          default:
+            errorMessage = `❌ Albion Online API error (${error.status}). Please try again later.\n\n**Error details:** ${error.message}`;
+            break;
+        }
+      } else if (error instanceof Error) {
+        // Handle network or other errors
+        if (error.message.includes("timeout") || error.message.includes("ECONNRESET")) {
+          errorMessage = "❌ Connection to Albion Online timed out. Please try again later.";
+        } else if (error.message.includes("network") || error.message.includes("fetch")) {
+          errorMessage = "❌ Network error while connecting to Albion Online. Please try again later.";
+        } else {
+          errorMessage = `❌ An unexpected error occurred: ${error.message}\n\nPlease try again later.`;
+        }
+      }
+
       await interaction.editReply({
-        content: "❌ An error occurred while registering. Please try again later.",
+        content: errorMessage,
       });
     }
   },
 };
-
-async function storeUserRegistration(discordUserId: string, userData: AlbionUser, serverId: string): Promise<void> {
-  try {
-    // Ensure user and server exist, then get the server member
-    const { serverMember } = await ensureUserAndServer(discordUserId, userData.Name, serverId);
-
-    // Update the server member with Albion data
-    await prisma.serverMember.update({
-      where: {
-        serverId_userId: {
-          serverId: serverMember.serverId,
-          userId: serverMember.userId,
-        },
-      },
-      data: {
-        albionPlayerId: userData.Id,
-        albionGuildId: userData.GuildId || null,
-        killFame: userData.KillFame,
-        deathFame: userData.DeathFame,
-        lastUpdated: new Date(),
-      },
-    });
-
-    logger.info(
-      `Stored Albion player data: ${userData.Name} (${userData.Id}) for Discord user ${discordUserId} in server ${serverId}`,
-    );
-  } catch (error) {
-    logger.error("Error storing user registration:", error);
-    throw error;
-  }
-}

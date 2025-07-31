@@ -1,41 +1,35 @@
 import { logger } from "@albion-raid-manager/logger";
 
+import { Server, User } from "../generated/prisma";
+
 import { prisma } from "./client";
 
 /**
  * Ensures a Discord user exists in the database.
  * Creates the user if they don't exist, or updates their username if they do.
  *
- * @param discordUserId - The Discord user ID
- * @param username - The username to set/update
- * @param options - Optional parameters
- * @param options.nickname - The user's nickname/global name
- * @param options.avatar - The user's avatar URL
+ * @param user - The user to ensure
  * @returns The user record
  */
-export async function ensureUser(
-  discordUserId: string,
-  username: string,
-  { nickname, avatar }: { nickname?: string; avatar?: string | null } = {},
-) {
+export async function ensureUser(user: Pick<User, "id" | "username" | "nickname" | "avatar">) {
   try {
-    const user = await prisma.user.upsert({
-      where: { id: discordUserId },
+    const updatedUser = await prisma.user.upsert({
+      where: { id: user.id },
       update: {
-        username, // Update with provided username
-        ...(nickname !== undefined && { nickname }),
-        ...(avatar !== undefined && { avatar }),
+        username: user.username,
+        nickname: user.nickname ?? undefined,
+        avatar: user.avatar ?? undefined,
       },
       create: {
-        id: discordUserId,
-        username,
-        ...(nickname !== undefined && { nickname }),
-        ...(avatar !== undefined && { avatar }),
+        id: user.id,
+        username: user.username,
+        nickname: user.nickname ?? undefined,
+        avatar: user.avatar ?? undefined,
       },
     });
 
-    logger.debug(`Ensured user exists: ${username} (${discordUserId})`);
-    return user;
+    logger.debug(`Ensured user exists: ${user.username} (${user.id})`);
+    return updatedUser;
   } catch (error) {
     logger.error("Error ensuring user exists:", error);
     throw error;
@@ -46,26 +40,26 @@ export async function ensureUser(
  * Ensures a Discord server exists in the database.
  * Creates the server if it doesn't exist.
  *
- * @param discordServerId - The Discord server ID
- * @param serverName - Optional server name (defaults to "Unknown Server")
+ * @param server - The server to ensure
  * @returns The server record
  */
-export async function ensureServer(discordServerId: string, { serverName = "Unknown Server" } = {}) {
+export async function ensureServer(server: Pick<Server, "id" | "name" | "icon">) {
   try {
-    const server = await prisma.server.upsert({
-      where: { discordId: discordServerId },
+    const updatedServer = await prisma.server.upsert({
+      where: { id: server.id },
       update: {
-        // Only update name if provided and different from "Unknown Server"
-        ...(serverName !== "Unknown Server" && { name: serverName }),
+        name: server.name,
+        icon: server.icon ?? undefined,
       },
       create: {
-        discordId: discordServerId,
-        name: serverName,
+        id: server.id,
+        name: server.name,
+        icon: server.icon ?? undefined,
       },
     });
 
-    logger.debug(`Ensured server exists: ${server.name} (${discordServerId})`);
-    return server;
+    logger.debug(`Ensured server exists: ${server.name} (${server.id})`);
+    return updatedServer;
   } catch (error) {
     logger.error("Error ensuring server exists:", error);
     throw error;
@@ -76,29 +70,29 @@ export async function ensureServer(discordServerId: string, { serverName = "Unkn
  * Ensures a server member exists in the database.
  * Creates the server member if they don't exist.
  *
- * @param serverId - The server ID (from ensureServer)
- * @param userId - The user ID (from ensureUser)
+ * @param server - The server to ensure
+ * @param user - The user to ensure
  * @returns The server member record
  */
-export async function ensureServerMember(serverId: string, userId: string) {
+export async function ensureServerMember(server: Pick<Server, "id">, user: Pick<User, "id">) {
   try {
     const serverMember = await prisma.serverMember.upsert({
       where: {
         serverId_userId: {
-          serverId,
-          userId,
+          serverId: server.id,
+          userId: user.id,
         },
       },
       update: {
         // No updates needed for existing members
       },
       create: {
-        serverId,
-        userId,
+        serverId: server.id,
+        userId: user.id,
       },
     });
 
-    logger.debug(`Ensured server member exists: ${userId} in server ${serverId}`);
+    logger.debug(`Ensured server member exists: ${user.id} in server ${server.id}`);
     return serverMember;
   } catch (error) {
     logger.error("Error ensuring server member exists:", error);
@@ -110,53 +104,46 @@ export async function ensureServerMember(serverId: string, userId: string) {
  * Convenience function to ensure both user and server exist, then create/update server member.
  * Uses a transaction to ensure all operations succeed or fail together.
  *
- * @param discordUserId - The Discord user ID
- * @param username - The username to set/update
- * @param discordServerId - The Discord server ID
- * @param options - Optional parameters
- * @param options.serverName - Server name (defaults to "Unknown Server")
- * @param options.nickname - The user's nickname/global name
- * @param options.avatar - The user's avatar URL
+ * @param user - The user to ensure
+ * @param server - The server to ensure
  * @returns Object containing user, server, and server member records
  */
-export async function ensureUserAndServer(
-  discordUserId: string,
-  username: string,
-  discordServerId: string,
-  {
-    serverName = "Unknown Server",
-    nickname,
-    avatar,
-  }: { serverName?: string; nickname?: string; avatar?: string | null } = {},
-) {
+export async function ensureUserAndServer({
+  user,
+  server,
+}: {
+  user: Pick<User, "id" | "username" | "nickname" | "avatar">;
+  server: Pick<Server, "id" | "name" | "icon">;
+}) {
   try {
     const result = await prisma.$transaction(async (tx) => {
       // Ensure user exists
-      const user = await tx.user.upsert({
-        where: { id: discordUserId },
+      const updatedUser = await tx.user.upsert({
+        where: { id: user.id },
         update: {
-          username,
-          ...(nickname !== undefined && { nickname }),
-          ...(avatar !== undefined && { avatar }),
+          username: user.username,
+          nickname: user.nickname ?? undefined,
+          avatar: user.avatar ?? undefined,
         },
         create: {
-          id: discordUserId,
-          username,
-          ...(nickname !== undefined && { nickname }),
-          ...(avatar !== undefined && { avatar }),
+          id: user.id,
+          username: user.username,
+          nickname: user.nickname ?? undefined,
+          avatar: user.avatar ?? undefined,
         },
       });
 
       // Ensure server exists
-      const server = await tx.server.upsert({
-        where: { discordId: discordServerId },
+      const updatedServer = await tx.server.upsert({
+        where: { id: server.id },
         update: {
-          // Only update name if provided and different from "Unknown Server"
-          ...(serverName !== "Unknown Server" && { name: serverName }),
+          name: server.name,
+          icon: server.icon ?? undefined,
         },
         create: {
-          discordId: discordServerId,
-          name: serverName,
+          id: server.id,
+          name: server.name,
+          icon: server.icon ?? undefined,
         },
       });
 
@@ -164,23 +151,23 @@ export async function ensureUserAndServer(
       const serverMember = await tx.serverMember.upsert({
         where: {
           serverId_userId: {
-            serverId: server.id,
-            userId: user.id,
+            serverId: updatedServer.id,
+            userId: updatedUser.id,
           },
         },
         update: {
           // No updates needed for existing members
         },
         create: {
-          serverId: server.id,
-          userId: user.id,
+          serverId: updatedServer.id,
+          userId: updatedUser.id,
         },
       });
 
       return { user, server, serverMember };
     });
 
-    logger.debug(`Ensured user and server exist: ${username} (${discordUserId}) in server ${discordServerId}`);
+    logger.debug(`Ensured user and server exist: ${user.username} (${user.id}) in server ${server.id}`);
     return result;
   } catch (error) {
     logger.error("Error ensuring user and server exist:", error);
