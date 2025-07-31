@@ -15,6 +15,10 @@ export const schema = z.object({
   }),
 
   bot: z.object({
+    register: z.object({
+      enabled: z.any().optional().transform(parseBool).default(false),
+    }),
+
     shards: z.object({
       total: z.custom<number | "auto">(parseShardsTotal).optional(),
       list: z.custom<number[] | "auto">(parseShardList).optional(),

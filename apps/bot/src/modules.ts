@@ -10,6 +10,7 @@ export interface ModuleParams {
 
 export type Module = {
   id: string;
+  enabled: boolean;
   commands: Command[];
   onLoad?: ({ discord }: ModuleParams) => Promise<void>;
   onReady?: ({ discord }: ModuleParams) => Promise<void>;
@@ -21,6 +22,8 @@ export const modules = new Collection<Module["id"], Module>();
 export async function initModules({ discord }: ModuleParams) {
   // Load modules and commands
   for (const module of MODULES_LIST) {
+    if (!module.enabled) continue;
+
     try {
       if (module.onLoad) {
         await module.onLoad({ discord });
