@@ -1,0 +1,151 @@
+import { prisma } from "@albion-raid-manager/database";
+import { logger } from "@albion-raid-manager/logger";
+import {
+  Interaction,
+  MessageFlags,
+  SlashCommandBuilder,
+  SlashCommandRoleOption,
+  SlashCommandStringOption,
+} from "discord.js";
+
+import { type Command } from "@/commands";
+
+export const configCommand: Command = {
+  data: new SlashCommandBuilder()
+    .setName("config")
+    .setDescription("Configure guild settings")
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("roles")
+        .setDescription("Configure server roles")
+        .addRoleOption((option: SlashCommandRoleOption) =>
+          option.setName("member-role").setDescription("Role for server members (guild members)").setRequired(false),
+        )
+        .addRoleOption((option: SlashCommandRoleOption) =>
+          option.setName("friend-role").setDescription("Role for friends (non-guild members)").setRequired(false),
+        ),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("guild")
+        .setDescription("Configure Albion guild ID")
+        .addStringOption((option: SlashCommandStringOption) =>
+          option.setName("guild-id").setDescription("Albion guild ID to match against").setRequired(true),
+        ),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand.setName("view").setDescription("View current server configuration"),
+    ) as SlashCommandBuilder,
+
+  execute: async (interaction: Interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    const guild = interaction.guild;
+    if (!guild) {
+      await interaction.reply({
+        content: "❌ This command can only be used in a Discord server.",
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    // Check if user has admin permissions
+    const member = await guild.members.fetch(interaction.user.id);
+    if (!member.permissions.has("Administrator")) {
+      await interaction.reply({
+        content: "❌ You need Administrator permissions to configure server settings.",
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    const subcommand = interaction.options.getSubcommand();
+
+    try {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+      switch (subcommand) {
+        case "roles": {
+          const memberRole = interaction.options.getRole("member-role");
+          const friendRole = interaction.options.getRole("friend-role");
+
+          if (!memberRole && !friendRole) {
+            await interaction.editReply({
+              content: "❌ Please provide at least one role ID to configure.",
+            });
+            return;
+          }
+
+          const updateData: { memberRoleId?: string; friendRoleId?: string } = {};
+          if (memberRole) updateData.memberRoleId = memberRole.id;
+          if (friendRole) updateData.friendRoleId = friendRole.id;
+
+          await prisma.server.update({
+            where: { id: guild.id },
+            data: updateData,
+          });
+
+          const roleConfig = [];
+          if (memberRole) roleConfig.push(`• Member Role: ${memberRole}`);
+          if (friendRole) roleConfig.push(`• Friend Role: ${friendRole}`);
+
+          await interaction.editReply({
+            content: `✅ Server roles configured successfully!\n\n${roleConfig.join("\n")}`,
+          });
+          break;
+        }
+
+        case "guild": {
+          const guildId = interaction.options.getString("guild-id", true);
+
+          await prisma.server.update({
+            where: { id: guild.id },
+            data: { serverGuildId: guildId },
+          });
+
+          await interaction.editReply({
+            content: `✅ Albion guild ID configured successfully!\n\n• Guild ID: \`${guildId}\`\n\nPlayers who register with this guild ID will receive the member role.`,
+          });
+          break;
+        }
+
+        case "view": {
+          const server = await prisma.server.findUnique({
+            where: { id: guild.id },
+            select: {
+              memberRoleId: true,
+              friendRoleId: true,
+              serverGuildId: true,
+            },
+          });
+
+          if (!server) {
+            await interaction.editReply({
+              content: "❌ Server configuration not found.",
+            });
+            return;
+          }
+
+          const config = [];
+          if (server.memberRoleId) config.push(`• Member Role: <@&${server.memberRoleId}>`);
+          if (server.friendRoleId) config.push(`• Friend Role: <@&${server.friendRoleId}>`);
+          if (server.serverGuildId) config.push(`• Albion Guild ID: \`${server.serverGuildId}\``);
+
+          if (config.length === 0) {
+            config.push("• No configuration set");
+          }
+
+          await interaction.editReply({
+            content: `📋 **Server Configuration**\n\n${config.join("\n")}`,
+          });
+          break;
+        }
+      }
+    } catch (error) {
+      logger.error("Error in config command:", error);
+      await interaction.editReply({
+        content: "❌ An error occurred while configuring server settings.",
+      });
+    }
+  },
+};

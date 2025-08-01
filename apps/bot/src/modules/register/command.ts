@@ -5,6 +5,7 @@ import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOptio
 
 import { Command } from "@/commands";
 import { getGuild, getGuildMember } from "@/utils/discord";
+import { assignRolesBasedOnGuild } from "@/utils/roles";
 
 export const registerCommand: Command = {
   data: new SlashCommandBuilder()
@@ -38,7 +39,9 @@ export const registerCommand: Command = {
 
     try {
       // Defer the reply
-      await interaction.deferReply();
+      await interaction.deferReply({
+        flags: MessageFlags.Ephemeral,
+      });
 
       // Verify the user exists in Albion Online
       const userData = await verifyAlbionPlayer(username, "AMERICAS");
@@ -56,7 +59,7 @@ export const registerCommand: Command = {
           id: userId,
           username: interaction.user.username,
           avatar: interaction.user.avatar ?? null,
-          nickname: userData.Name,
+          nickname: member.nickname ?? null,
         },
         server: {
           id: guild.id,
@@ -74,6 +77,7 @@ export const registerCommand: Command = {
           },
         },
         data: {
+          nickname: userData.Name,
           albionPlayerId: userData.Id,
           albionGuildId: userData.GuildId || null,
           killFame: userData.KillFame,
@@ -94,6 +98,9 @@ export const registerCommand: Command = {
         logger.warn(`Failed to update nickname for user ${userId}:`, nicknameError);
         // Don't fail the registration if nickname update fails
       }
+
+      // Assign roles based on guild membership
+      await assignRolesBasedOnGuild(member, guild.id, userData.GuildId || null);
 
       logger.info(`User ${userId} registered as ${userData.Name}`, {
         userId,

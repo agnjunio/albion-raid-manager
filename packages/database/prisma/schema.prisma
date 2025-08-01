@@ -5,8 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider   = "prisma-client-js"
+  engineType = "binary"
+  output     = "../generated/prisma"
 }
 
 generator typescriptInterfaces {
@@ -22,16 +23,22 @@ datasource db {
 
 // Servers and Users
 model Server {
-  id                        String         @id // Discord server ID
-  name                      String
-  icon                      String?
-  members                   ServerMember[]
-  raids                     Raid[]
-  // Settings
-  adminRoles                String[]       @default([])
-  raidRoles                 String[]       @default([])
-  compositionRoles          String[]       @default([])
+  id      String         @id // Discord server ID
+  name    String
+  icon    String?
+  members ServerMember[]
+  raids   Raid[]
+
+  // Permissions configuration
+  adminRoles                String[] @default([])
+  raidRoles                 String[] @default([])
+  compositionRoles          String[] @default([])
   raidAnnouncementChannelId String?
+
+  // Registration configuration
+  memberRoleId  String?
+  friendRoleId  String?
+  serverGuildId String? // Albion guild ID to match against
 }
 
 model ServerMember {
