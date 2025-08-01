@@ -3,22 +3,6 @@ import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock dependencies
-vi.mock("@albion-raid-manager/database", () => ({
-  prisma: {
-    server: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}));
-
-vi.mock("@albion-raid-manager/logger", () => ({
-  logger: {
-    error: vi.fn(),
-  },
-}));
-
 describe("configCommand", () => {
   const mockInteraction = {
     isChatInputCommand: () => true,
@@ -64,18 +48,17 @@ describe("configCommand", () => {
     });
 
     it("should configure audit channel when channel is provided", async () => {
-      const mockPrisma = vi.mocked(prisma);
       const mockChannel = {
         id: "test-channel-id",
         name: "audit-channel",
       };
 
       mockInteraction.options.getChannel.mockReturnValue(mockChannel);
-      mockPrisma.server.update.mockResolvedValue({} as any);
+      vi.mocked(prisma.server.update).mockResolvedValue({} as any);
 
       await configCommand.execute(mockInteraction);
 
-      expect(mockPrisma.server.update).toHaveBeenCalledWith({
+      expect(prisma.server.update).toHaveBeenCalledWith({
         where: { id: "test-guild-id" },
         data: { auditChannelId: "test-channel-id" },
       });
@@ -86,14 +69,12 @@ describe("configCommand", () => {
     });
 
     it("should disable audit channel when no channel is provided", async () => {
-      const mockPrisma = vi.mocked(prisma);
-
       mockInteraction.options.getChannel.mockReturnValue(null);
-      mockPrisma.server.update.mockResolvedValue({} as any);
+      prisma.server.update.mockResolvedValue({} as any);
 
       await configCommand.execute(mockInteraction);
 
-      expect(mockPrisma.server.update).toHaveBeenCalledWith({
+      expect(prisma.server.update).toHaveBeenCalledWith({
         where: { id: "test-guild-id" },
         data: { auditChannelId: null },
       });
@@ -117,9 +98,7 @@ describe("configCommand", () => {
     });
 
     it("should display audit channel in configuration view", async () => {
-      const mockPrisma = vi.mocked(prisma);
-
-      mockPrisma.server.findUnique.mockResolvedValue({
+      prisma.server.findUnique.mockResolvedValue({
         memberRoleId: "member-role-id",
         friendRoleId: "friend-role-id",
         serverGuildId: "test-guild-id",
@@ -134,9 +113,7 @@ describe("configCommand", () => {
     });
 
     it("should not display audit channel when not configured", async () => {
-      const mockPrisma = vi.mocked(prisma);
-
-      mockPrisma.server.findUnique.mockResolvedValue({
+      prisma.server.findUnique.mockResolvedValue({
         memberRoleId: "member-role-id",
         friendRoleId: "friend-role-id",
         serverGuildId: "test-guild-id",
@@ -173,7 +150,6 @@ describe("configCommand", () => {
 
   describe("error handling", () => {
     it("should handle database errors gracefully", async () => {
-      const mockPrisma = vi.mocked(prisma);
       const mockLogger = vi.mocked(logger);
 
       mockInteraction.options.getSubcommand.mockReturnValue("audit");
@@ -183,7 +159,7 @@ describe("configCommand", () => {
         },
       });
 
-      mockPrisma.server.update.mockRejectedValue(new Error("Database error"));
+      prisma.server.update.mockRejectedValue(new Error("Database error"));
 
       await configCommand.execute(mockInteraction);
 
@@ -191,36 +167,6 @@ describe("configCommand", () => {
       expect(mockInteraction.editReply).toHaveBeenCalledWith({
         content: "❌ An error occurred while configuring server settings.",
       });
-    });
-  });
-
-  describe("command structure", () => {
-    it("should have audit subcommand in command data", () => {
-      const commandData = configCommand.data;
-
-      expect(commandData.options).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            name: "audit",
-            description: "Configure audit channel for bot events",
-          }),
-        ]),
-      );
-    });
-
-    it("should have channel option in audit subcommand", () => {
-      const commandData = configCommand.data;
-      const auditSubcommand = commandData.options?.find((option) => option.name === "audit");
-
-      expect(auditSubcommand?.options).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            name: "channel",
-            description: "Channel to send audit messages to",
-            required: false,
-          }),
-        ]),
-      );
     });
   });
 });

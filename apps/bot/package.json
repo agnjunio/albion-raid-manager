@@ -5,13 +5,15 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "tsx .",
-    "dev": "tsx watch --env-file=.env --exclude=logs/** .",
+    "dev": "tsx watch --env-file=.env --exclude=logs/** --exclude=src/**/*.test.ts .",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier -c src/",
     "prettier:fix": "prettier --write src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",

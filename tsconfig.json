@@ -25,6 +25,7 @@
       "~/*": ["./src/*"],
       "@albion-raid-manager/ai": ["./packages/ai/src/index.ts"],
       "@albion-raid-manager/core": ["./packages/core/src/index.ts"],
+      "@albion-raid-manager/core/*": ["./packages/core/src/*"],
       "@albion-raid-manager/config": ["./packages/config/src/index.ts"],
       "@albion-raid-manager/database": ["./packages/database/src/index.ts"],
       "@albion-raid-manager/discord": ["./packages/discord/src/index.ts"],
