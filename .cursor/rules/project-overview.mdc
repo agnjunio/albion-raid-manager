@@ -185,8 +185,29 @@ The database uses Prisma with PostgreSQL and includes models for:
 - Raids with different types (FIXED, FLEX)
 - Raid Slots and Roles
 - Sessions for authentication
+- Audit configuration for user registration monitoring
 
 The schema is defined in [packages/database/prisma/schema.prisma](mdc:packages/database/prisma/schema.prisma).
+
+## Bot Features
+
+### User Registration and Role Management
+
+- **Registration System**: Users can register their Albion Online characters using `/register`
+- **Role Assignment**: Automatic role assignment based on guild membership
+- **Audit Channel**: Configurable audit logging for user registrations and role assignments
+- **Configuration**: Server administrators can configure roles, guild IDs, and audit channels
+
+### Audit Channel Feature
+
+The bot includes an audit channel feature that allows server administrators to monitor user registrations and role assignments:
+
+- **Configuration**: Use `/config audit` to set up audit channel
+- **Rich Embeds**: Detailed Discord embeds with player information
+- **Non-intrusive**: Audit failures don't break main functionality
+- **Security**: Only administrators can configure audit channels
+
+See [AUDIT_CHANNEL_FEATURE.md](mdc:AUDIT_CHANNEL_FEATURE.md) for detailed documentation.
 
 ## Infrastructure Services
 

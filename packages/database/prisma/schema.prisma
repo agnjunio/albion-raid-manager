@@ -38,7 +38,10 @@ model Server {
   // Registration configuration
   memberRoleId  String?
   friendRoleId  String?
-  serverGuildId String? // Albion guild ID to match against
+  serverGuildId String?
+
+  // Audit configuration
+  auditChannelId String?
 }
 
 model ServerMember {

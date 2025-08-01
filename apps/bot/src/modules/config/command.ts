@@ -4,6 +4,7 @@ import {
   Interaction,
   MessageFlags,
   SlashCommandBuilder,
+  SlashCommandChannelOption,
   SlashCommandRoleOption,
   SlashCommandStringOption,
 } from "discord.js";
@@ -33,8 +34,14 @@ export const configCommand: Command = {
           option.setName("guild-id").setDescription("Albion guild ID to match against").setRequired(true),
         ),
     )
+    .addSubcommand((subcommand) => subcommand.setName("view").setDescription("View current server configuration"))
     .addSubcommand((subcommand) =>
-      subcommand.setName("view").setDescription("View current server configuration"),
+      subcommand
+        .setName("audit")
+        .setDescription("Configure audit channel for bot events")
+        .addChannelOption((option: SlashCommandChannelOption) =>
+          option.setName("channel").setDescription("Channel to send audit messages to").setRequired(false),
+        ),
     ) as SlashCommandBuilder,
 
   execute: async (interaction: Interaction) => {
@@ -109,6 +116,26 @@ export const configCommand: Command = {
           break;
         }
 
+        case "audit": {
+          const auditChannel = interaction.options.getChannel("channel");
+
+          await prisma.server.update({
+            where: { id: guild.id },
+            data: { auditChannelId: auditChannel?.id || null },
+          });
+
+          if (auditChannel) {
+            await interaction.editReply({
+              content: `✅ Audit channel configured successfully!\n\n• Audit Channel: ${auditChannel}. All events will be logged to this channel.`,
+            });
+          } else {
+            await interaction.editReply({
+              content: `✅ Audit channel disabled successfully!\n\n All events will no longer be logged.`,
+            });
+          }
+          break;
+        }
+
         case "view": {
           const server = await prisma.server.findUnique({
             where: { id: guild.id },
@@ -116,6 +143,7 @@ export const configCommand: Command = {
               memberRoleId: true,
               friendRoleId: true,
               serverGuildId: true,
+              auditChannelId: true,
             },
           });
 
@@ -130,6 +158,7 @@ export const configCommand: Command = {
           if (server.memberRoleId) config.push(`• Member Role: <@&${server.memberRoleId}>`);
           if (server.friendRoleId) config.push(`• Friend Role: <@&${server.friendRoleId}>`);
           if (server.serverGuildId) config.push(`• Albion Guild ID: \`${server.serverGuildId}\``);
+          if (server.auditChannelId) config.push(`• Audit Channel: <#${server.auditChannelId}>`);
 
           if (config.length === 0) {
             config.push("• No configuration set");

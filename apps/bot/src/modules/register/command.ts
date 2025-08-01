@@ -4,6 +4,7 @@ import { logger } from "@albion-raid-manager/logger";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
 import { Command } from "@/commands";
+import { sendAuditMessage } from "@/utils/audit";
 import { getGuild, getGuildMember } from "@/utils/discord";
 import { assignRolesBasedOnGuild } from "@/utils/roles";
 
@@ -101,6 +102,9 @@ export const registerCommand: Command = {
 
       // Assign roles based on guild membership
       await assignRolesBasedOnGuild(member, guild.id, userData.GuildId || null);
+
+      // Send audit message for registration
+      await sendAuditMessage(interaction.client, guild.id, member, userData, "registration");
 
       logger.info(`User ${userId} registered as ${userData.Name}`, {
         userId,
