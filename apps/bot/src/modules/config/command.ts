@@ -42,6 +42,14 @@ export const configCommand: Command = {
         .addChannelOption((option: SlashCommandChannelOption) =>
           option.setName("channel").setDescription("Channel to send audit messages to").setRequired(false),
         ),
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("raid")
+        .setDescription("Configure raid announcement channel")
+        .addChannelOption((option: SlashCommandChannelOption) =>
+          option.setName("channel").setDescription("Channel to send raid announcements to").setRequired(false),
+        ),
     ) as SlashCommandBuilder,
 
   execute: async (interaction: Interaction) => {
@@ -136,6 +144,26 @@ export const configCommand: Command = {
           break;
         }
 
+        case "raid": {
+          const raidChannel = interaction.options.getChannel("channel");
+
+          await prisma.server.update({
+            where: { id: guild.id },
+            data: { raidAnnouncementChannelId: raidChannel?.id || null },
+          });
+
+          if (raidChannel) {
+            await interaction.editReply({
+              content: `✅ Raid announcement channel configured successfully!\n\n• Raid Channel: ${raidChannel}. All raid announcements will be sent to this channel.`,
+            });
+          } else {
+            await interaction.editReply({
+              content: `✅ Raid announcement channel disabled successfully!\n\n All raid announcements will no longer be sent.`,
+            });
+          }
+          break;
+        }
+
         case "view": {
           const server = await prisma.server.findUnique({
             where: { id: guild.id },
@@ -144,6 +172,7 @@ export const configCommand: Command = {
               friendRoleId: true,
               serverGuildId: true,
               auditChannelId: true,
+              raidAnnouncementChannelId: true,
             },
           });
 
@@ -159,6 +188,7 @@ export const configCommand: Command = {
           if (server.friendRoleId) config.push(`• Friend Role: <@&${server.friendRoleId}>`);
           if (server.serverGuildId) config.push(`• Albion Guild ID: \`${server.serverGuildId}\``);
           if (server.auditChannelId) config.push(`• Audit Channel: <#${server.auditChannelId}>`);
+          if (server.raidAnnouncementChannelId) config.push(`• Raid Channel: <#${server.raidAnnouncementChannelId}>`);
 
           if (config.length === 0) {
             config.push("• No configuration set");

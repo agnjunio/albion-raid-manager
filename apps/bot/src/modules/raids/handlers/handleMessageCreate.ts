@@ -5,7 +5,7 @@ import {
   ParsedRaidData,
 } from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
-import { Guild, Raid, RaidRole, RaidSlot } from "@albion-raid-manager/core/types";
+import { Raid, RaidRole, RaidSlot, Server } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
@@ -23,9 +23,9 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
       `guild-${message.guild.id}`,
       async () => {
         if (!message.guild) return;
-        return await prisma.guild.findUnique({
+        return await prisma.server.findUnique({
           where: {
-            discordId: message.guild.id,
+            id: message.guild.id,
           },
         });
       },
@@ -86,7 +86,7 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
 // Function to create raid from parsed data
 // Now returns the created raid and slots for message building
 async function createRaidFromParsedData(
-  guild: Guild,
+  guild: Server,
   parsedData: ParsedRaidData,
 ): Promise<{ raid: Raid & { slots: RaidSlot[] } }> {
   logger.info("Creating raid from parsed data", {
@@ -130,7 +130,7 @@ async function createRaidFromParsedData(
     // Create the raid
     const raid = await prisma.raid.create({
       data: {
-        guildId: guild.id,
+        serverId: guild.id,
         title: parsedData.title,
         description: parsedData.description || `Raid created from Discord message`,
         date: parsedData.date,

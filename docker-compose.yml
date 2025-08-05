@@ -1,5 +1,4 @@
 services:
-  # Database
   database:
     image: postgres:15-alpine
     container_name: albion-raid-manager-db
@@ -23,56 +22,8 @@ services:
     networks:
       - albion-network
 
-  # Redis for sessions and caching
-  redis:
-    image: redis:7-alpine
-    container_name: albion-raid-manager-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    command: redis-server --appendonly yes
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - albion-network
-
-  # Database Admin (Optional)
-  adminer:
-    image: adminer:latest
-    container_name: albion-raid-manager-adminer
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
-      ADMINER_DEFAULT_SERVER: database
-    depends_on:
-      - database
-    networks:
-      - albion-network
-
-  # Redis Admin (Optional)
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: albion-raid-manager-redis-commander
-    restart: unless-stopped
-    ports:
-      - "8081:8081"
-    environment:
-      REDIS_HOSTS: local:redis:6379
-    depends_on:
-      - redis
-    networks:
-      - albion-network
-
 volumes:
   database-data:
-    driver: local
-  redis-data:
     driver: local
 
 networks:

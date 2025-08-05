@@ -8,7 +8,7 @@ import reactHooksPlugin from "eslint-plugin-react-hooks";
 import globals from "globals";
 import * as tseslint from "typescript-eslint";
 
-const baseConfig = {
+const ignoreConfig = {
   ignores: ["**/node_modules/**", "**/dist/**", "**/.turbo/**", "**/build/**", "**/.next/**", "**/generated/**"],
 };
 
@@ -82,6 +82,13 @@ const typescriptConfig = {
   },
 };
 
+const typescriptTestConfig = {
+  files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+  rules: {
+    "@typescript-eslint/no-explicit-any": "off",
+  },
+};
+
 const reactConfig = {
   files: ["**/*.{jsx,tsx}"],
   languageOptions: {
@@ -145,9 +152,10 @@ const viteConfig = {
 };
 
 export default [
-  baseConfig,
+  ignoreConfig,
   js.configs.recommended,
   typescriptConfig,
+  typescriptTestConfig,
   reactConfig,
   commonConfig,
   viteConfig,
