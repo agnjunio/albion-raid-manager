@@ -1,3 +1,9 @@
+---
+description: Monorepo development standards and package management guidelines
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/package.json", "**/turbo.json"]
+alwaysApply: true
+---
+
 # Monorepo Development Standards
 
 ## Package Management
@@ -84,8 +90,9 @@
 - Implement proper environment configuration
 - Use consistent deployment strategies
 - Monitor application health
-  description:
-  globs:
-  alwaysApply: false
 
 ---
+
+description: Monorepo development standards and package management guidelines
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/package.json", "**/turbo.json"]
+alwaysApply: true

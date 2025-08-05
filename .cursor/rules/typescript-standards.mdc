@@ -1,3 +1,9 @@
+---
+description: TypeScript coding standards and best practices for the Albion Raid Manager project
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
 # TypeScript Coding Standards
 
 ## Code Style
@@ -42,8 +48,9 @@ Follow the import order defined in [eslint.config.js](mdc:eslint.config.js):
 - Implement proper error boundaries in React components
 - Use Zod for runtime type validation
 - Handle async operations with try-catch blocks
-  description:
-  globs:
-  alwaysApply: false
 
 ---
+
+description: TypeScript coding standards and best practices for the Albion Raid Manager project
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true

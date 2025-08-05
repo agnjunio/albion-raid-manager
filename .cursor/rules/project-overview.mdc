@@ -1,3 +1,9 @@
+---
+description: Project overview and development guidelines for the Albion Raid Manager monorepo
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.md"]
+alwaysApply: true
+---
+
 # Albion Raid Manager - Project Overview
 
 This is a monorepo for an Albion Online raid management system built with TypeScript, using Turbo for build orchestration and pnpm for package management.
@@ -217,8 +223,9 @@ See [AUDIT_CHANNEL_FEATURE.md](mdc:AUDIT_CHANNEL_FEATURE.md) for detailed docume
 - **Redis Commander** - Redis administration tool (port 8081)
 
 Configuration is in [docker-compose.yml](mdc:docker-compose.yml).
-description:
-globs:
-alwaysApply: false
 
 ---
+
+description: Project overview and development guidelines for the Albion Raid Manager monorepo
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.md"]
+alwaysApply: true

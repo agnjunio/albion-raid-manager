@@ -1,3 +1,9 @@
+---
+description: AI package development standards and guidelines
+globs: ["packages/ai/**/*.ts", "packages/ai/**/*.tsx"]
+alwaysApply: true
+---
+
 # AI Package Development Standards
 
 ## AI/ML Utilities
@@ -54,8 +60,3 @@
 - Document message preprocessing steps
 - Document API integration details
 - Keep documentation up to date with AI model changes
-  description:
-  globs:
-  alwaysApply: false
-
----

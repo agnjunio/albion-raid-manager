@@ -1,3 +1,9 @@
+---
+description: React development standards and frontend best practices
+globs: ["apps/web/**/*.tsx", "apps/web/**/*.ts", "apps/web/**/*.jsx", "apps/web/**/*.js"]
+alwaysApply: true
+---
+
 # React Coding Standards
 
 ## Component Structure
@@ -46,8 +52,9 @@
 - Write unit tests for business logic
 - Test component behavior, not implementation details
 - Use React Testing Library for component testing
-  description:
-  globs:
-  alwaysApply: false
 
 ---
+
+description: React development standards and frontend best practices
+globs: ["apps/web/**/*.tsx", "apps/web/**/*.ts", "apps/web/**/*.jsx", "apps/web/**/*.js"]
+alwaysApply: true

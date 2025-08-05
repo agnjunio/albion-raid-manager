@@ -1,3 +1,9 @@
+---
+description: Documentation standards and guidelines for the project
+globs: ["**/*.md", "**/*.mdx", "**/README.md"]
+alwaysApply: true
+---
+
 # Documentation Standards
 
 ## Manual Documentation Management
@@ -82,8 +88,9 @@ When making major changes, manually update:
 - **Check rule consistency** across the project
 - **Update rules** when major changes occur
 - **Maintain rule quality** through manual review
-  description:
-  globs:
-  alwaysApply: false
 
 ---
+
+description: Documentation standards and guidelines for the project
+globs: ["**/*.md", "**/*.mdx", "**/README.md"]
+alwaysApply: true

@@ -1,3 +1,9 @@
+---
+description: Package management standards and pnpm workspace guidelines
+globs: ["**/package.json", "**/pnpm-workspace.yaml", "**/pnpm-lock.yaml"]
+alwaysApply: true
+---
+
 # Package Management Standards
 
 ## pnpm Workspace Configuration
@@ -154,8 +160,9 @@ pnpm install
 - Use `pnpm install --frozen-lockfile` in CI
 - Ensure pnpm is installed in CI environment
 - Use workspace-aware caching strategies
-  description:
-  globs:
-  alwaysApply: false
 
 ---
+
+description: Package management standards and pnpm workspace guidelines
+globs: ["**/package.json", "**/pnpm-workspace.yaml", "**/pnpm-lock.yaml"]
+alwaysApply: true

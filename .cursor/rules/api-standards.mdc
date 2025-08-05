@@ -1,3 +1,9 @@
+---
+description: API development standards and Express.js best practices
+globs: ["apps/api/**/*.ts", "apps/api/**/*.js"]
+alwaysApply: true
+---
+
 # API Development Standards
 
 ## Express.js Best Practices
@@ -52,8 +58,9 @@
 - Test API endpoints with proper mocking
 - Use integration tests for database operations
 - Test error scenarios and edge cases
-  description:
-  globs:
-  alwaysApply: false
 
 ---
+
+description: API development standards and Express.js best practices
+globs: ["apps/api/**/*.ts", "apps/api/**/*.js"]
+alwaysApply: true

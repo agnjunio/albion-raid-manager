@@ -1,3 +1,9 @@
+---
+description: Database development standards and Prisma best practices
+globs: ["packages/database/**/*.ts", "packages/database/**/*.js", "**/*.prisma"]
+alwaysApply: true
+---
+
 # Database Development Standards
 
 ## Prisma Schema Management
@@ -57,8 +63,9 @@
 - Mock database operations for unit tests
 - Test migration scripts
 - Test data integrity constraints
-  description:
-  globs:
-  alwaysApply: false
 
 ---
+
+description: Database development standards and Prisma best practices
+globs: ["packages/database/**/*.ts", "packages/database/**/*.js", "**/*.prisma"]
+alwaysApply: true

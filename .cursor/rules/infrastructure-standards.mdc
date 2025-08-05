@@ -1,6 +1,13 @@
+---
+description: Infrastructure and deployment standards
+globs: ["docker-compose.yml", "docker-stack.yml", "**/Dockerfile", "**/*.yml", "**/*.yaml"]
+alwaysApply: true
+---
+
 # Infrastructure Development Standards
 
 ## Docker Compose Configuration
+
 - Use [docker-compose.yml](mdc:docker-compose.yml) for infrastructure services only
 - Keep application services in Turbo for fast development
 - Use proper health checks for all services
@@ -9,6 +16,7 @@
 ## Infrastructure Services
 
 ### Database (PostgreSQL)
+
 - Use PostgreSQL 15-alpine for consistency
 - Expose port 5432 for local development
 - Use named volumes for data persistence
@@ -16,6 +24,7 @@
 - Configure proper environment variables
 
 ### Redis
+
 - Use Redis 7-alpine for caching and sessions
 - Expose port 6379 for local development
 - Use named volumes for data persistence
@@ -23,53 +32,63 @@
 - Configure append-only mode for data durability
 
 ### Admin Tools
+
 - **Adminer**: Database administration (port 8080)
 - **Redis Commander**: Redis administration (port 8081)
 - Only available in development environment
 - Configure proper security settings
 
 ## Environment Variables
+
 - Use `.env` files for local configuration
 - Keep sensitive data in environment variables
 - Use consistent naming conventions
 - Document all required environment variables
 
 ## Volume Management
+
 - Use named volumes for data persistence
 - Implement proper backup strategies
 - Clean up volumes when resetting infrastructure
 - Use proper volume drivers for different environments
 
 ## Network Configuration
+
 - Use bridge networks for service communication
 - Implement proper network isolation
 - Use consistent network naming
 - Configure proper DNS resolution
 
 ## Health Checks
+
 - Implement health checks for all services
 - Use appropriate check intervals and timeouts
 - Configure proper retry strategies
 - Monitor service health in development
 
 ## Security Considerations
+
 - Use non-root users where possible
 - Implement proper file permissions
 - Use secrets management for sensitive data
 - Configure proper access controls
 
 ## Performance Optimization
+
 - Use appropriate resource limits
 - Implement proper caching strategies
 - Monitor resource usage
 - Optimize for development workflow
 
 ## Troubleshooting
+
 - Use `pnpm infra:logs` for debugging
 - Check service status with `pnpm infra:status`
 - Reset infrastructure with `pnpm infra:reset`
 - Monitor container resource usage
-description:
-globs:
-alwaysApply: false
+
 ---
+
+description: Infrastructure and deployment standards
+globs: ["docker-compose.yml", "docker-stack.yml", "**/Dockerfile", "**/*.yml", "**/*.yaml"]
+alwaysApply: true
