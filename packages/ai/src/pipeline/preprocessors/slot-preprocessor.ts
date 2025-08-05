@@ -1,5 +1,7 @@
 import { logger } from "@albion-raid-manager/logger";
 
+import { createPreprocessor, type Preprocessor } from "./";
+
 export interface ExtractedSlot {
   originalLine: string;
   buildName: string;
@@ -43,21 +45,6 @@ export function extractSlotLines(message: string): ExtractedSlot[] {
 
   logger.info(`Extracted ${slots.length} slots from message`);
   return slots;
-}
-
-/**
- * Extracts slots with user mentions in a format suitable for AI processing
- * @param message - The Discord message
- * @returns Array of slot strings with user mentions
- */
-export function extractSlotLinesWithUsers(message: string): string[] {
-  const slots = extractSlotLines(message);
-  return slots.map((slot) => {
-    if (slot.userMention) {
-      return `${slot.buildName} <@${slot.userMention}>`;
-    }
-    return slot.buildName;
-  });
 }
 
 /**
@@ -461,3 +448,33 @@ function parseRequirementLine(line: string): string | null {
 
   return requirement || null;
 }
+
+export const slotPreprocessor: Preprocessor = createPreprocessor((context) => {
+  const slots = extractSlotLines(context.originalMessage);
+  const slotStrings = slots.map((slot) => {
+    if (slot.userMention) {
+      return `${slot.buildName} <@${slot.userMention}>`;
+    }
+    return slot.buildName;
+  });
+
+  return {
+    extractedSlots: slotStrings,
+    metadata: {
+      ...context.metadata,
+      slotCount: slots.length,
+    },
+  };
+});
+
+export const requirementPreprocessor: Preprocessor = createPreprocessor((context) => {
+  const requirements = extractRequirements(context.originalMessage);
+
+  return {
+    extractedRequirements: requirements,
+    metadata: {
+      ...context.metadata,
+      requirementCount: requirements.length,
+    },
+  };
+});

@@ -1,4 +1,6 @@
-import { getMessageKeywordsForText } from "~/dictionaries/message-dictionaries";
+import { getMessageKeywordsForText } from "../../dictionaries/message-dictionaries";
+
+import { createPreprocessor, type Preprocessor } from "./";
 
 /**
  * Pre-processes Discord messages to reduce token usage while preserving essential raid information
@@ -107,3 +109,17 @@ export function createCompactMessage(message: string): string {
     .replace(/\s+/g, " ")
     .trim();
 }
+
+export const messagePreprocessor: Preprocessor = createPreprocessor((context) => {
+  const result = preprocessMessage(context.originalMessage);
+
+  return {
+    processedMessage: result.content,
+    metadata: {
+      ...context.metadata,
+      originalLength: result.originalLength,
+      processedLength: result.processedLength,
+      tokenReduction: result.tokenReduction,
+    },
+  };
+});

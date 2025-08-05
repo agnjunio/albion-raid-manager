@@ -8,4 +8,6 @@ export * from "./service";
 export { parseDiscordMessage, parseMultipleDiscordMessages, validateDiscordMessage } from "./parser";
 
 // Utils layer
-export * from "./utils";
+export * from "./pipeline/preprocessors";
+export { type ContentTypeInfo } from "./pipeline/preprocessors/content-type-preprocessor";
+export { getContentTypeInfo } from "./pipeline/utils";

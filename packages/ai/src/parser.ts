@@ -2,7 +2,7 @@ import { logger } from "@albion-raid-manager/logger";
 
 import { AIParsingError, DiscordMessageContext, ParsedRaidData } from "./types";
 
-import { getAIService } from "~/service/factory";
+import { getAIService } from "./service/factory";
 
 // Lazy initialization to allow test mocks to work properly
 let aiService: ReturnType<typeof getAIService> | null = null;

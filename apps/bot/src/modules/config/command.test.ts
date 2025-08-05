@@ -4,7 +4,7 @@ import { logger } from "@albion-raid-manager/logger";
 import { ChatInputCommandInteraction } from "discord.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { configCommand } from "@/modules/config/command";
+import { configCommand } from "./command";
 
 describe("configCommand", () => {
   const mockInteraction = {

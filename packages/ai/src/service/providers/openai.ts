@@ -1,10 +1,10 @@
 import { logger } from "@albion-raid-manager/logger";
 import OpenAI from "openai";
 
-import { AIProvider, ParsedRaidData } from "../../types";
-import { preprocessMessage } from "../../utils/message-preprocessor";
-import { extractSlotLines } from "../../utils/slot-preprocessor";
+import { AIProvider } from "../../types";
 import { BaseAIService } from "../base";
+
+import { type PreprocessorContext } from "../../pipeline";
 
 export class OpenAIService extends BaseAIService {
   private client: OpenAI;
@@ -25,25 +25,19 @@ export class OpenAIService extends BaseAIService {
     });
   }
 
-  async parseDiscordPing(message: string): Promise<ParsedRaidData> {
-    // Extract slots using the preprocessor (guarantees 100% slot extraction)
-    const extractedSlots = extractSlotLines(message);
-    const slotStrings = extractedSlots.map(
-      (slot) => `${slot.buildName}${slot.userMention ? ` <@${slot.userMention}>` : ""}`,
-    );
-
-    logger.info(`Extracted ${extractedSlots.length} slots for AI mapping`, {
-      slots: slotStrings,
+  async generateResponse(context: PreprocessorContext): Promise<unknown> {
+    logger.info(`Generating OpenAI response for ${context.extractedSlots.length} slots`, {
+      slots: context.extractedSlots,
     });
 
-    const prompt = this.createRaidParsingPrompt(message, slotStrings);
+    const prompt = this.createRaidParsingPrompt(context);
 
     try {
       logger.debug("Making OpenAI API request for Discord message parsing", {
         provider: this.provider,
         model: this.config.model,
-        messageLength: message.length,
-        extractedSlotsCount: extractedSlots.length,
+        messageLength: context.originalMessage.length,
+        extractedSlotsCount: context.extractedSlots.length,
       });
 
       const response = await this.client.chat.completions.create({
@@ -80,8 +74,7 @@ export class OpenAIService extends BaseAIService {
         throw new Error("No valid JSON found in response");
       }
 
-      const parsedData = JSON.parse(jsonMatch[0]);
-      return this.validateParsedData(parsedData, message);
+      return JSON.parse(jsonMatch[0]);
     } catch (error) {
       logger.error("OpenAI API request failed", {
         provider: this.provider,
@@ -100,13 +93,10 @@ export class OpenAIService extends BaseAIService {
     }
   }
 
-  async validateMessage(message: string): Promise<boolean> {
-    // Pre-process message to reduce tokens
-    const preprocessed = preprocessMessage(message);
-
+  async generateValidationResponse(context: PreprocessorContext): Promise<unknown> {
     const validationPrompt = `Is this an Albion Online raid/group activity? Look for raid, dungeon, party, tank, healer, dps, pve, pvp, or similar concepts in any language. If possibly raid-related, respond 'true'.
 
-Msg: "${preprocessed.content}"
+Msg: "${context.processedMessage}"
 
 Respond: true/false`;
 
@@ -114,7 +104,7 @@ Respond: true/false`;
       logger.debug("Making OpenAI API request for message validation", {
         provider: this.provider,
         model: this.config.model,
-        messageLength: message.length,
+        messageLength: context.originalMessage.length,
       });
 
       const response = await this.client.chat.completions.create({
@@ -134,7 +124,7 @@ Respond: true/false`;
         temperature: 0,
       });
 
-      const content = response.choices[0]?.message?.content?.toLowerCase().trim();
+      const content = response.choices[0]?.message?.content;
 
       logger.debug("Received OpenAI validation response", {
         provider: this.provider,
@@ -143,7 +133,7 @@ Respond: true/false`;
         usage: response.usage,
       });
 
-      return content === "true";
+      return content;
     } catch (error) {
       logger.error(`OpenAI validation request failed: ${error instanceof Error ? error.message : "Unknown error"}`, {
         provider: this.provider,
@@ -152,7 +142,7 @@ Respond: true/false`;
       });
 
       // If validation fails, assume it's not a raid message
-      return false;
+      return "false";
     }
   }
 }

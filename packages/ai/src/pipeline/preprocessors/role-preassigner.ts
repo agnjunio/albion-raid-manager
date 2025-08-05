@@ -1,10 +1,6 @@
-import { findRoleAssignment } from "~/dictionaries";
+import { findRoleAssignment } from "../../dictionaries";
 
-export interface PreAssignedRole {
-  name: string;
-  role: string; // The role enum value (TANK, HEALER, SUPPORT, etc.)
-  confidence: number; // 0-1, how confident we are in this assignment
-}
+import { createPreprocessor, type PreAssignedRole, type Preprocessor } from "./";
 
 /**
  * Pre-assigns roles based on weapon/build knowledge
@@ -27,3 +23,11 @@ export function preAssignRoles(slotNames: string[]): PreAssignedRole[] {
 
   return preAssigned;
 }
+
+export const rolePreprocessor: Preprocessor = createPreprocessor((context) => {
+  const preAssignedRoles = preAssignRoles(context.extractedSlots);
+
+  return {
+    preAssignedRoles,
+  };
+});

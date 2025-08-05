@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { parseDiscordMessage, resetAIService } from "./parser";
-import { detectContentType } from "./utils/content-type-preprocessor";
-import { extractTimeFromMessage } from "./utils/datetime-preprocessor";
-import { extractRequirements } from "./utils/slot-preprocessor";
+import { detectContentType } from "./pipeline/preprocessors/content-type-preprocessor";
+import { extractTimeFromMessage } from "./pipeline/preprocessors/datetime-preprocessor";
+import { extractRequirements } from "./pipeline/preprocessors/slot-preprocessor";
 
 // Mock the AI service
-vi.mock("~/service/factory", () => ({
+vi.mock("./service/factory", () => ({
   getAIService: () => ({
     provider: "anthropic",
     validateMessage: vi.fn().mockResolvedValue(true),

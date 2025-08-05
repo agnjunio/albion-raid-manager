@@ -1,12 +1,14 @@
-import { registerCommand } from "@/modules/register/command";
-import { sendAuditMessage } from "@/utils/audit";
-import { getGuild, getGuildMember } from "@/utils/discord";
-import { assignRolesBasedOnGuild } from "@/utils/roles";
 import { AlbionAPIError, AlbionUser, verifyAlbionPlayer } from "@albion-raid-manager/albion";
 import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Guild, GuildMember } from "discord.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { sendAuditMessage } from "@/utils/audit";
+import { getGuild, getGuildMember } from "@/utils/discord";
+import { assignRolesBasedOnGuild } from "@/utils/roles";
+
+import { registerCommand } from "./command";
 
 vi.mock("@/utils/discord");
 vi.mock("@/utils/roles");

@@ -1,3 +1,5 @@
+import { createPreprocessor, Preprocessor } from "./";
+
 /**
  * Parses time from various formats and returns a Date object
  * @param timeString - Time string in various formats (20:30, 8:30 PM, etc.)
@@ -95,3 +97,11 @@ export function extractTimeFromMessage(message: string): string | null {
 
   return null;
 }
+
+export const timePreprocessor: Preprocessor = createPreprocessor((context) => {
+  const time = extractTimeFromMessage(context.originalMessage);
+
+  return {
+    extractedTime: time,
+  };
+});

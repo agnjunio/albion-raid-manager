@@ -1,10 +1,10 @@
 import { logger } from "@albion-raid-manager/logger";
 import Anthropic from "@anthropic-ai/sdk";
 
-import { AIProvider, ParsedRaidData } from "../../types";
-import { preprocessMessage } from "../../utils/message-preprocessor";
-import { extractSlotLinesWithUsers } from "../../utils/slot-preprocessor";
+import { AIProvider } from "../../types";
 import { BaseAIService } from "../base";
+
+import { type PreprocessorContext } from "../../pipeline";
 
 export class AnthropicService extends BaseAIService {
   private client: Anthropic;
@@ -25,22 +25,19 @@ export class AnthropicService extends BaseAIService {
     });
   }
 
-  async parseDiscordPing(message: string): Promise<ParsedRaidData> {
-    // Extract slots using the preprocessor (guarantees 100% slot extraction)
-    const extractedSlots = extractSlotLinesWithUsers(message);
-
-    logger.info(`Extracted ${extractedSlots.length} slots for AI mapping`, {
-      slots: extractedSlots,
+  async generateResponse(context: PreprocessorContext): Promise<unknown> {
+    logger.info(`Generating Anthropic response for ${context.extractedSlots.length} slots`, {
+      slots: context.extractedSlots,
     });
 
-    const prompt = this.createRaidParsingPrompt(message, extractedSlots);
+    const prompt = this.createRaidParsingPrompt(context);
 
     try {
       logger.debug("Making Anthropic API request for Discord message parsing", {
         provider: this.provider,
         model: this.config.model,
-        messageLength: message.length,
-        extractedSlotsCount: extractedSlots.length,
+        messageLength: context.originalMessage.length,
+        extractedSlotsCount: context.extractedSlots.length,
       });
 
       const response = await this.client.messages.create({
@@ -73,8 +70,7 @@ export class AnthropicService extends BaseAIService {
         throw new Error("No valid JSON found in response");
       }
 
-      const parsedData = JSON.parse(jsonMatch[0]);
-      return this.validateParsedData(parsedData, message);
+      return JSON.parse(jsonMatch[0]);
     } catch (error) {
       logger.error("Anthropic API request failed", {
         provider: this.provider,
@@ -93,13 +89,10 @@ export class AnthropicService extends BaseAIService {
     }
   }
 
-  async validateMessage(message: string): Promise<boolean> {
-    // Pre-process message to reduce tokens
-    const preprocessed = preprocessMessage(message);
-
+  async generateValidationResponse(context: PreprocessorContext): Promise<unknown> {
     const validationPrompt = `Is this an Albion Online raid/group activity? Look for: raid,dungeon,party,tank,healer,dps,pve,pvp,gear,weapon,time,requirements in any language. If possibly raid-related, respond 'true'.
 
-Msg: "${preprocessed.content}"
+Msg: "${context.processedMessage}"
 
 Respond: true/false`;
 
@@ -107,7 +100,7 @@ Respond: true/false`;
       logger.debug("Making Anthropic API request for message validation", {
         provider: this.provider,
         model: this.config.model,
-        messageLength: message.length,
+        messageLength: context.originalMessage.length,
       });
 
       const response = await this.client.messages.create({
@@ -124,9 +117,9 @@ Respond: true/false`;
 
       const contentBlock = response.content[0];
       if (!contentBlock || contentBlock.type !== "text") {
-        return false;
+        return "false";
       }
-      const content = contentBlock.text.toLowerCase().trim();
+      const content = contentBlock.text;
 
       logger.debug("Received Anthropic validation response", {
         provider: this.provider,
@@ -135,7 +128,7 @@ Respond: true/false`;
         usage: response.usage,
       });
 
-      return content === "true";
+      return content;
     } catch (error) {
       logger.error("Anthropic validation request failed", {
         provider: this.provider,
@@ -144,7 +137,7 @@ Respond: true/false`;
       });
 
       // If validation fails, assume it's not a raid message
-      return false;
+      return "false";
     }
   }
 }

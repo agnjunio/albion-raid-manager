@@ -1,5 +1,12 @@
 import { ContentType, RaidType } from "@albion-raid-manager/core/types";
 
+import {
+  getDefaultLocation as getDefaultLocationUtils,
+  normalizeContentType as normalizeContentTypeUtils,
+} from "../utils";
+
+import { createPreprocessor, type Preprocessor } from "./";
+
 // Content type mapping with keywords and metadata
 export interface ContentTypeInfo {
   type: ContentType;
@@ -1064,28 +1071,7 @@ function detectFixedSizeContentType(
  * @returns Default location or null if no default
  */
 export function getDefaultLocation(contentType: ContentType): string | null {
-  const locationDefaults: Record<ContentType, string | null> = {
-    SOLO_DUNGEON: null,
-    OPEN_WORLD_FARMING: null,
-    GROUP_DUNGEON: null,
-    AVALONIAN_DUNGEON_FULL_CLEAR: null,
-    AVALONIAN_DUNGEON_BUFF_ONLY: null,
-    ROADS_OF_AVALON_PVE: "Brecilien",
-    ROADS_OF_AVALON_PVP: "Brecilien",
-    DEPTHS_DUO: null,
-    DEPTHS_TRIO: null,
-    GANKING_SQUAD: null,
-    FIGHTING_SQUAD: null,
-    ZVZ_CALL_TO_ARMS: null,
-    HELLGATE_2V2: null,
-    HELLGATE_5V5: null,
-    HELLGATE_10V10: null,
-    MISTS_SOLO: "Brecilien",
-    MISTS_DUO: "Brecilien",
-    OTHER: null,
-  };
-
-  return locationDefaults[contentType] || null;
+  return getDefaultLocationUtils(contentType);
 }
 
 /**
@@ -1184,206 +1170,26 @@ export function preAssignContentType(
 }
 
 /**
- * Get content type information by type
- * @param type - The content type
- * @returns Content type information or null if not found
- */
-export function getContentTypeInfo(type: ContentType): ContentTypeInfo | null {
-  return CONTENT_TYPE_MAPPING.find((info) => info.type === type) || null;
-}
-
-/**
- * Get all content types
- * @returns Array of all content types
- */
-export function getAllContentTypes(): ContentType[] {
-  return CONTENT_TYPE_MAPPING.map((info) => info.type);
-}
-
-/**
- * Get content types by raid type (FIXED or FLEX)
- * @param raidType - The raid type to filter by
- * @returns Array of content types for the specified raid type
- */
-export function getContentTypesByRaidType(raidType: RaidType): ContentType[] {
-  return CONTENT_TYPE_MAPPING.filter((info) => info.raidType === raidType).map((info) => info.type);
-}
-
-/**
  * Normalize and map AI content type response to our defined ContentType enum
  * Handles variations, typos, and similar content type names
  * @param aiContentType - The content type returned by AI
  * @returns The normalized ContentType or null if no match found
  */
 export function normalizeContentType(aiContentType: string): ContentType | null {
-  if (!aiContentType) return null;
-
-  const normalized = aiContentType.trim().toUpperCase();
-
-  // Direct matches first
-  const directMatch = CONTENT_TYPE_MAPPING.find((info) => info.type === normalized);
-  if (directMatch) return directMatch.type;
-
-  // Common variations and mappings
-  const variations: Record<string, ContentType> = {
-    // Solo variations
-    SOLO: "SOLO_DUNGEON",
-    SOLO_DG: "SOLO_DUNGEON",
-    SOLO_DUNGEONS: "SOLO_DUNGEON",
-    SOLOING: "SOLO_DUNGEON",
-    SOLO_FARM: "SOLO_DUNGEON",
-    SOLO_CLEAR: "SOLO_DUNGEON",
-    SOZINHO: "SOLO_DUNGEON",
-    INDIVIDUAL: "SOLO_DUNGEON",
-    INDIVIDUEL: "SOLO_DUNGEON",
-    EINZELN: "SOLO_DUNGEON",
-
-    // Open world variations
-    OPEN_WORLD: "OPEN_WORLD_FARMING",
-    OW_FARM: "OPEN_WORLD_FARMING",
-    OW_FARMING: "OPEN_WORLD_FARMING",
-    RESOURCE_GATHERING: "OPEN_WORLD_FARMING",
-    GATHERING: "OPEN_WORLD_FARMING",
-    FARMING: "OPEN_WORLD_FARMING",
-    MUNDO_ABERTO: "OPEN_WORLD_FARMING",
-    COLETA: "OPEN_WORLD_FARMING",
-    MUNDO_ABIERTO: "OPEN_WORLD_FARMING",
-    RECOLECCIÓN: "OPEN_WORLD_FARMING",
-    MONDE_OUVERT: "OPEN_WORLD_FARMING",
-    RÉCOLTE: "OPEN_WORLD_FARMING",
-    OFFENE_WELT: "OPEN_WORLD_FARMING",
-    SAMMELN: "OPEN_WORLD_FARMING",
-
-    // Group variations
-    GROUP: "GROUP_DUNGEON",
-    GROUP_DG: "GROUP_DUNGEON",
-    GROUP_DUNGEONS: "GROUP_DUNGEON",
-    DUNGEON: "GROUP_DUNGEON",
-    DG: "GROUP_DUNGEON",
-    GRUPO: "GROUP_DUNGEON",
-    MASMORRA: "GROUP_DUNGEON",
-    MAZMORRA: "GROUP_DUNGEON",
-    DONJON: "GROUP_DUNGEON",
-    EINZELDUNGEON: "GROUP_DUNGEON",
-
-    // Avalonian variations
-    AVALON: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    AVALON_DUNGEON: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    AVALON_FULL: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    AVALON_CLEAR: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    AVALON_FULL_CLEAR: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    AVALONIAN: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    AVALONIAN_DUNGEON: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    AVALON_BUFF: "AVALONIAN_DUNGEON_BUFF_ONLY",
-    AVALON_BUFF_ONLY: "AVALONIAN_DUNGEON_BUFF_ONLY",
-    AVALONIAN_BUFF: "AVALONIAN_DUNGEON_BUFF_ONLY",
-    AVALONIAN_BUFF_ONLY: "AVALONIAN_DUNGEON_BUFF_ONLY",
-
-    // Roads variations
-    ROADS: "ROADS_OF_AVALON_PVE",
-    ROADS_PVE: "ROADS_OF_AVALON_PVE",
-    ROADS_OF_AVALON: "ROADS_OF_AVALON_PVE",
-    ROADS_PVP: "ROADS_OF_AVALON_PVP",
-    ROADS_GANKING: "ROADS_OF_AVALON_PVP",
-    BAU_DOURADO: "ROADS_OF_AVALON_PVE",
-    BAÚ_DOURADO: "ROADS_OF_AVALON_PVE",
-    GOLDEN_CHEST: "ROADS_OF_AVALON_PVE",
-    BAU: "ROADS_OF_AVALON_PVE",
-    BAÚ: "ROADS_OF_AVALON_PVE",
-
-    // Depths variations
-    DEPTHS: "DEPTHS_DUO",
-    DEPTHS_2V2: "DEPTHS_DUO",
-    DEPTHS_2VS2: "DEPTHS_DUO",
-    DEPTHS_2_MAN: "DEPTHS_DUO",
-    DEPTHS_2_PLAYER: "DEPTHS_DUO",
-    DEPTHS_3V3: "DEPTHS_TRIO",
-    DEPTHS_3VS3: "DEPTHS_TRIO",
-    DEPTHS_3_MAN: "DEPTHS_TRIO",
-    DEPTHS_3_PLAYER: "DEPTHS_TRIO",
-    PROFUNDEZAS: "DEPTHS_DUO",
-    PROFUNDIDADES: "DEPTHS_DUO",
-    PROFONDEURS: "DEPTHS_DUO",
-    TIEFEN: "DEPTHS_DUO",
-
-    // Ganking variations
-    GANK: "GANKING_SQUAD",
-    GANKING: "GANKING_SQUAD",
-    GANK_SQUAD: "GANKING_SQUAD",
-    GANK_GROUP: "GANKING_SQUAD",
-    GANK_ROAM: "GANKING_SQUAD",
-    EMBOSCADA: "GANKING_SQUAD",
-    EMBOSCAR: "GANKING_SQUAD",
-    EMBUSCADE: "GANKING_SQUAD",
-    EMBUSQUER: "GANKING_SQUAD",
-    ÜBERFALL: "GANKING_SQUAD",
-    ÜBERFALLEN: "GANKING_SQUAD",
-
-    // Fighting variations
-    FIGHT: "FIGHTING_SQUAD",
-    FIGHTING: "FIGHTING_SQUAD",
-    FIGHT_SQUAD: "FIGHTING_SQUAD",
-    FIGHT_GROUP: "FIGHTING_SQUAD",
-    FIGHT_ROAM: "FIGHTING_SQUAD",
-    ZERG: "FIGHTING_SQUAD",
-    ZERG_FIGHT: "FIGHTING_SQUAD",
-    ZERG_FIGHTING: "FIGHTING_SQUAD",
-
-    // ZvZ variations
-    ZVZ: "ZVZ_CALL_TO_ARMS",
-    ZERG_VS_ZERG: "ZVZ_CALL_TO_ARMS",
-    CALL_TO_ARMS: "ZVZ_CALL_TO_ARMS",
-    CTA: "ZVZ_CALL_TO_ARMS",
-    TERRITORY_WAR: "ZVZ_CALL_TO_ARMS",
-    TERRITORY_FIGHT: "ZVZ_CALL_TO_ARMS",
-    TERRITORY_BATTLE: "ZVZ_CALL_TO_ARMS",
-    CASTLE_FIGHT: "ZVZ_CALL_TO_ARMS",
-    CASTLE_BATTLE: "ZVZ_CALL_TO_ARMS",
-
-    // Hellgate variations
-    HELLGATE: "HELLGATE_5V5",
-    HG: "HELLGATE_5V5",
-    HG_2V2: "HELLGATE_2V2",
-    HG_2VS2: "HELLGATE_2V2",
-    HELLGATE_2VS2: "HELLGATE_2V2",
-    HG_5V5: "HELLGATE_5V5",
-    HG_5VS5: "HELLGATE_5V5",
-    HELLGATE_5VS5: "HELLGATE_5V5",
-    HG_10V10: "HELLGATE_10V10",
-    HG_10VS10: "HELLGATE_10V10",
-    HELLGATE_10VS10: "HELLGATE_10V10",
-
-    // Mists variations
-    MISTS: "MISTS_SOLO",
-    MISTS_1V1: "MISTS_SOLO",
-    MISTS_1VS1: "MISTS_SOLO",
-    MISTS_1_MAN: "MISTS_SOLO",
-    MISTS_1_PLAYER: "MISTS_SOLO",
-    MISTS_2V2: "MISTS_DUO",
-    MISTS_2VS2: "MISTS_DUO",
-    MISTS_2_MAN: "MISTS_DUO",
-    MISTS_2_PLAYER: "MISTS_DUO",
-  };
-
-  // Check for exact variation match
-  if (variations[normalized]) {
-    return variations[normalized];
-  }
-
-  // Check for partial matches (e.g., "SOLO_DUNGEON_T8" should match "SOLO_DUNGEON")
-  for (const [variation, contentType] of Object.entries(variations)) {
-    if (normalized.includes(variation) || variation.includes(normalized)) {
-      return contentType;
-    }
-  }
-
-  // Check for partial matches with our defined content types
-  for (const contentInfo of CONTENT_TYPE_MAPPING) {
-    if (normalized.includes(contentInfo.type) || contentInfo.type.includes(normalized)) {
-      return contentInfo.type;
-    }
-  }
-
-  // If no match found, return OTHER
-  return "OTHER";
+  return normalizeContentTypeUtils(aiContentType);
 }
+
+export const contentTypePreprocessor: Preprocessor = createPreprocessor((context) => {
+  const contentType = preAssignContentType(context.originalMessage);
+
+  return {
+    preAssignedContentType: contentType
+      ? {
+          type: contentType.type,
+          confidence: contentType.confidence,
+          partySize: contentType.info.partySize,
+          raidType: contentType.info.raidType,
+        }
+      : null,
+  };
+});
