@@ -1,5 +1,7 @@
 import { resolve } from "path";
+
 import { defineProject, mergeConfig } from "vitest/config";
+
 import { sharedConfig } from "../../vitest.shared";
 
 export default mergeConfig(
@@ -10,7 +12,7 @@ export default mergeConfig(
       // Project-specific overrides
       alias: {
         ...sharedConfig.test.alias,
-        "@": resolve(__dirname, "./src"),
+        "~": resolve(__dirname, "./src"),
       },
     },
   }),

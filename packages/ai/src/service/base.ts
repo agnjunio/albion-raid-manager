@@ -1,9 +1,16 @@
 import { ContentType } from "@albion-raid-manager/core/types";
 
 import { AIProvider, AIService, AIServiceConfig, ParsedRaidData, RaidRole } from "../types";
-import { detectContentType, normalizeContentType, preAssignContentType } from "../utils/content-type-preprocessor";
+import {
+  detectContentType,
+  getDefaultLocation,
+  normalizeContentType,
+  preAssignContentType,
+} from "../utils/content-type-preprocessor";
+import { extractTimeFromMessage, parseTimeString } from "../utils/datetime-preprocessor";
 import { preprocessMessage } from "../utils/message-preprocessor";
 import { PreAssignedRole, preAssignRoles } from "../utils/role-preassigner";
+import { extractRequirements } from "../utils/slot-preprocessor";
 
 export abstract class BaseAIService implements AIService {
   protected config: AIServiceConfig;
@@ -32,23 +39,60 @@ export abstract class BaseAIService implements AIService {
         ? `\nPRE-ASSIGNED: ${preAssignedRoles.map((role: PreAssignedRole) => `${role.name}→${role.role}`).join(", ")}\n`
         : "";
 
-    // Pre-assign content type based on keyword matching
+    // Pre-assign content type based on keyword matching and party size
     const suggestedContentType = preAssignContentType(message);
     const contentTypeSection = suggestedContentType
       ? `\nSUGGESTED_CONTENT_TYPE: ${suggestedContentType.type} (confidence: ${(suggestedContentType.confidence * 100).toFixed(0)}%, party size: ${suggestedContentType.info.partySize.min}-${suggestedContentType.info.partySize.max})\n`
       : "";
 
+    // Extract requirements
+    const extractedRequirements = extractRequirements(message);
+    const requirementsSection =
+      extractedRequirements.length > 0 ? `\nEXTRACTED_REQUIREMENTS: ${extractedRequirements.join(", ")}\n` : "";
+
+    // Extract time information
+    const extractedTime = extractTimeFromMessage(message);
+    const timeSection = extractedTime ? `\nEXTRACTED_TIME: ${extractedTime}\n` : "";
+
     return `Parse Albion Online raid → JSON: {title, contentType, contentTypeConfidence, date(ISO), location, requirements[], roles[{name, role, preAssignedUser}], confidence(0-1)}
 
-Msg: "${preprocessed.content}"${slotSection}${preAssignedSection}${contentTypeSection}
+Msg: "${preprocessed.content}"${slotSection}${preAssignedSection}${contentTypeSection}${requirementsSection}${timeSection}
+
+CRITICAL RULES:
+1. Content Type Detection: Use party size to determine content type:
+   - 7 players = ROADS_OF_AVALON_PVE (Avalon Roads)
+   - 2 players = DEPTHS_DUO
+   - 3 players = DEPTHS_TRIO
+   - 5 players = HELLGATE_5V5
+   - 10 players = HELLGATE_10V10
+   - 1 player = SOLO_DUNGEON or MISTS_SOLO
+   - Variable size = OPEN_WORLD_FARMING, GROUP_DUNGEON, etc.
+
+2. Location Handling:
+   - For ROADS_OF_AVALON_PVE, default location is "Brecilien"
+   - For other Avalon content, default location is "Brecilien"
+   - "Montaria: Lobo +" is a REQUIREMENT, not a location
+   - Only use actual city/location names as location
+
+3. Requirements Extraction:
+   - Extract all gear/food/mount requirements
+   - "Montaria: Lobo +" goes in requirements array
+   - "T8", "1 food boa", "2 ruins" are requirements
+   - Gear tiers (T8, T7, etc.) are requirements
+   - Food and consumables are requirements
+
+4. Preassigned Users:
+   - Include Discord user IDs in preAssignedUser field for each role
+   - Format: "<@userId>" or just "userId"
+   - Extract from the original message
+
+5. Date Format:
+   - Use Discord timestamp format for relative time display
+   - Combine date and time into full ISO datetime
 
 Roles: TANK, HEALER, SUPPORT, RANGED_DPS, MELEE_DPS, CALLER, BATTLEMOUNT
 - Use pre-assigned roles when available
 - FB=Fura-Bruma (bow), Tank builds→TANK, Healer→HEALER, Staff weapons→RANGED_DPS, Cursed→SUPPORT
-- Content Type: Use the suggested content type if it makes sense, or override with a more appropriate one based on all Albion Online available content types (e.g. SOLO_DUNGEON, OPEN_WORLD_FARMING, etc.)
-- Date: Combine date and time into a full ISO datetime (e.g., 2025077400 no time specified, use todays date at 0cation: prioritize departure/destination info, normalize city names
-- Requirements: extract gear/food/requirements
-- Party Size: For fixed-size content types, ensure the number of roles matches the expected party size
 - Confidence: Set high confidence (0.8-1.0) for clear raid messages with roles, medium (0.6-0.8) for basic raid messages, low (0.3-0.6) for unclear messages
 
 Return JSON only.`;
@@ -110,6 +154,13 @@ Return JSON only.`;
       }
     }
 
+    // Extract time from message if not provided by AI
+    const extractedTime = extractTimeFromMessage(originalMessage);
+    if (extractedTime && (!aiTime || aiTime === "Not specified")) {
+      const timeDate = parseTimeString(extractedTime);
+      raidDateTime.setHours(timeDate.getHours(), timeDate.getMinutes(), 0, 0);
+    }
+
     // Normalize roles to ensure consistent user mention format
     const normalizedRoles = (parsedData.roles as RaidRole[] | undefined) || [];
     const processedRoles = normalizedRoles.map((role) => ({
@@ -146,12 +197,24 @@ Return JSON only.`;
     // Use AI confidence without boosting/penalties
     const finalConfidence = Math.max(0, Math.min(1, (parsedData.confidence as number) || 0.5));
 
+    // Get default location for content type if no location provided
+    let finalLocation = parsedData.location as string | undefined;
+    if (!finalLocation) {
+      finalLocation = getDefaultLocation(finalContentType) || undefined;
+    }
+
+    // Extract requirements from message if not provided by AI
+    let finalRequirements = (parsedData.requirements as string[] | undefined) || [];
+    if (finalRequirements.length === 0) {
+      finalRequirements = extractRequirements(originalMessage);
+    }
+
     const parsed: ParsedRaidData = {
       title: (parsedData.title as string) || "Raid",
       description: parsedData.description as string | undefined,
       date: raidDateTime,
-      location: parsedData.location as string | undefined,
-      requirements: (parsedData.requirements as string[] | undefined) || [],
+      location: finalLocation,
+      requirements: finalRequirements,
       roles: processedRoles,
       maxParticipants: parsedData.maxParticipants as number | undefined,
       notes: parsedData.notes as string | undefined,

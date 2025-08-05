@@ -1,14 +1,19 @@
-import { defineConfig } from "vitest/config";
+import { resolve } from "path";
 
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: "node",
-    setupFiles: ["./test/setup.ts"],
-  },
-  resolve: {
-    alias: {
-      "@": "./src",
+import { defineProject, mergeConfig } from "vitest/config";
+
+import { sharedConfig } from "../../vitest.shared";
+
+export default mergeConfig(
+  sharedConfig,
+  defineProject({
+    test: {
+      setupFiles: ["./vitest.setup.ts"],
+      // Project-specific overrides
+      alias: {
+        ...sharedConfig.test.alias,
+        "~": resolve(__dirname, "./src"),
+      },
     },
-  },
-});
+  }),
+);

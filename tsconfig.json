@@ -22,7 +22,6 @@
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "paths": {
-      "~/*": ["./src/*"],
       "@albion-raid-manager/ai": ["./packages/ai/src/index.ts"],
       "@albion-raid-manager/core": ["./packages/core/src/index.ts"],
       "@albion-raid-manager/core/*": ["./packages/core/src/*"],
@@ -32,8 +31,8 @@
       "@albion-raid-manager/logger": ["./packages/logger/src/index.ts"]
     }
   },
-  "include": ["packages/**/*", "apps/**/*"],
-  "exclude": ["node_modules", "dist"],
+  "include": ["packages/**/src", "apps/**/src"],
+  "exclude": ["packages/**/node_modules", "packages/**/dist", "node_modules"],
   "ts-node": {
     "require": ["tsconfig-paths/register", "dotenv/config"],
     "esm": true

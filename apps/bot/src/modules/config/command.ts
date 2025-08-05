@@ -9,7 +9,7 @@ import {
   SlashCommandStringOption,
 } from "discord.js";
 
-import { type Command } from "@/commands";
+import { Command } from "~/commands";
 
 export const configCommand: Command = {
   data: new SlashCommandBuilder()

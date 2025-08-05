@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
-import { AnthropicService, OpenAIService } from "../src/service";
-import { getAIService } from "../src/service/factory";
-import { AIProvider } from "../src/types";
+import { AIProvider } from "../types";
+
+import { getAIService } from "./factory";
+
+import { AnthropicService, OpenAIService } from ".";
 
 describe("AI Service Factory", () => {
   beforeEach(() => {

@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 import { AIProvider, ParsedRaidData } from "../../types";
 import { preprocessMessage } from "../../utils/message-preprocessor";
-import { extractSlotLines } from "../../utils/slot-preprocessor";
+import { extractSlotLinesWithUsers } from "../../utils/slot-preprocessor";
 import { BaseAIService } from "../base";
 
 export class AnthropicService extends BaseAIService {
@@ -27,16 +27,13 @@ export class AnthropicService extends BaseAIService {
 
   async parseDiscordPing(message: string): Promise<ParsedRaidData> {
     // Extract slots using the preprocessor (guarantees 100% slot extraction)
-    const extractedSlots = extractSlotLines(message);
-    const slotStrings = extractedSlots.map(
-      (slot) => `${slot.buildName}${slot.userMention ? ` <@${slot.userMention}>` : ""}`,
-    );
+    const extractedSlots = extractSlotLinesWithUsers(message);
 
     logger.info(`Extracted ${extractedSlots.length} slots for AI mapping`, {
-      slots: slotStrings,
+      slots: extractedSlots,
     });
 
-    const prompt = this.createRaidParsingPrompt(message, slotStrings);
+    const prompt = this.createRaidParsingPrompt(message, extractedSlots);
 
     try {
       logger.debug("Making Anthropic API request for Discord message parsing", {

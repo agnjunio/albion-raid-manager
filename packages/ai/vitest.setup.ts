@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 
 // Mock environment variables
+process.env.AI_ENABLED = "true";
 process.env.AI_PROVIDER = "openai";
 process.env.AI_API_KEY = "test-api-key";
 process.env.AI_MODEL = "gpt-4";

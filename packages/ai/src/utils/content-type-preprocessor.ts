@@ -900,6 +900,27 @@ export function detectContentType(text: string): { type: ContentType; confidence
   // Extract role count from the message
   const roleCount = extractRoleCount(text);
 
+  // First, try to detect based on party size for fixed-size content types
+  if (roleCount > 0) {
+    const fixedSizeMatch = detectFixedSizeContentType(roleCount);
+    if (fixedSizeMatch) {
+      // Special handling for Roads of Avalon: check for golden chest keywords
+      if (fixedSizeMatch.type === "ROADS_OF_AVALON_PVE") {
+        const hasGoldenChestKeywords = checkForGoldenChestKeywords(normalizedText);
+        if (!hasGoldenChestKeywords) {
+          // If no golden chest keywords, prioritize PvP
+          const pvpMatch = {
+            type: "ROADS_OF_AVALON_PVP" as ContentType,
+            confidence: fixedSizeMatch.confidence,
+            info: CONTENT_TYPE_MAPPING.find((info) => info.type === "ROADS_OF_AVALON_PVP") as ContentTypeInfo,
+          };
+          return pvpMatch;
+        }
+      }
+      return fixedSizeMatch;
+    }
+  }
+
   for (const contentInfo of CONTENT_TYPE_MAPPING) {
     let matchCount = 0;
     const totalKeywords = contentInfo.keywords.length;
@@ -975,6 +996,99 @@ export function detectContentType(text: string): { type: ContentType; confidence
 }
 
 /**
+ * Check if the text contains golden chest keywords
+ * @param text - The normalized text to check
+ * @returns True if golden chest keywords are found
+ */
+function checkForGoldenChestKeywords(text: string): boolean {
+  const goldenChestKeywords = [
+    // Portuguese
+    "bau dourado",
+    "baú dourado",
+    "bau de ouro",
+    "baú de ouro",
+    "bau dourado",
+    "baú dourado",
+    "bau de ouro",
+    "baú de ouro",
+    // English
+    "golden chest",
+    "golden chests",
+    "gold chest",
+    "gold chests",
+    // Spanish
+    "cofre dorado",
+    "cofres dorados",
+    "cofre de oro",
+    "cofres de oro",
+    // French
+    "coffre doré",
+    "coffres dorés",
+    "coffre d'or",
+    "coffres d'or",
+    // German
+    "goldene truhe",
+    "goldene truhen",
+    "goldene kiste",
+    "goldene kisten",
+  ];
+
+  return goldenChestKeywords.some((keyword) => text.includes(keyword));
+}
+
+/**
+ * Detect fixed-size content types based on party size
+ * This is more reliable than keyword matching for fixed-size content
+ */
+function detectFixedSizeContentType(
+  roleCount: number,
+): { type: ContentType; confidence: number; info: ContentTypeInfo } | null {
+  const fixedSizeContentTypes = CONTENT_TYPE_MAPPING.filter((info) => info.partySize.min === info.partySize.max);
+
+  for (const contentInfo of fixedSizeContentTypes) {
+    if (contentInfo.partySize.min === roleCount) {
+      return {
+        type: contentInfo.type,
+        confidence: 0.9, // High confidence for exact party size match
+        info: contentInfo,
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Get default location for a content type
+ * @param contentType - The content type
+ * @returns Default location or null if no default
+ */
+export function getDefaultLocation(contentType: ContentType): string | null {
+  const locationDefaults: Record<ContentType, string | null> = {
+    SOLO_DUNGEON: null,
+    OPEN_WORLD_FARMING: null,
+    GROUP_DUNGEON: null,
+    AVALONIAN_DUNGEON_FULL_CLEAR: null,
+    AVALONIAN_DUNGEON_BUFF_ONLY: null,
+    ROADS_OF_AVALON_PVE: "Brecilien",
+    ROADS_OF_AVALON_PVP: "Brecilien",
+    DEPTHS_DUO: null,
+    DEPTHS_TRIO: null,
+    GANKING_SQUAD: null,
+    FIGHTING_SQUAD: null,
+    ZVZ_CALL_TO_ARMS: null,
+    HELLGATE_2V2: null,
+    HELLGATE_5V5: null,
+    HELLGATE_10V10: null,
+    MISTS_SOLO: "Brecilien",
+    MISTS_DUO: "Brecilien",
+    OTHER: null,
+  };
+
+  return locationDefaults[contentType] || null;
+}
+
+/**
  * Extract the number of roles from a message
  * @param text - The message text
  * @returns The number of roles found
@@ -984,8 +1098,26 @@ function extractRoleCount(text: string): number {
   const lines = text.split("\n");
   let roleCount = 0;
 
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmedLine = line.trim();
+
+    // Skip empty lines
+    if (!trimmedLine) {
+      continue;
+    }
+
+    // Skip lines that are clearly not roles
+    if (isNonRoleLine(trimmedLine)) {
+      continue;
+    }
+
+    // Look for Discord user mentions (this indicates a role assignment)
+    if (trimmedLine.includes("<@") && trimmedLine.includes(">")) {
+      roleCount++;
+      continue;
+    }
+
     // Look for patterns like "Role -", "Role:", "Role =", etc.
     // Simple pattern: any text followed by - or : (with optional spaces)
     if (trimmedLine.match(/^.+[-:=]\s*$/)) {
@@ -993,9 +1125,33 @@ function extractRoleCount(text: string): number {
     } else if (trimmedLine.match(/^.+[-:=]\s*[^-\s]+$/)) {
       roleCount++;
     }
+
+    // Look for emoji patterns that indicate roles
+    if (/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥]/u.test(trimmedLine)) {
+      roleCount++;
+    }
   }
 
   return roleCount;
+}
+
+/**
+ * Determines if a line is clearly NOT a role
+ */
+function isNonRoleLine(line: string): boolean {
+  // Lines that are clearly not roles
+  const nonRolePatterns = [
+    /^roaming\s+as\s+\d{1,2}:\d{2}$/i,
+    /^build\s+t\d+$/i,
+    /^\d+\s+food\s+/i,
+    /^montaria:\s+/i,
+    /^@everyone$/i,
+    /^@here$/i,
+    /^https?:\/\//, // URLs
+    /^\*\*.*\*\*$/, // Bold text (often titles/headers)
+  ];
+
+  return nonRolePatterns.some((pattern) => pattern.test(line));
 }
 
 /**

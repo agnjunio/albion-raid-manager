@@ -22,6 +22,7 @@ async function testMessage(message: string, name: string) {
           {
             title: result.title,
             date: result.date.toLocaleDateString(),
+            time: result.date.toLocaleTimeString(),
             location: result.location || "Not specified",
             confidence: `${(result.confidence * 100).toFixed(1)}%`,
             contentType: result.contentType || "Not detected",

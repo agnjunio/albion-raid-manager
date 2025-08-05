@@ -8,7 +8,7 @@ import { handleMessageCreate, handleSelectRole, handleSignout, handleSignup } fr
 
 export const raids: Module = {
   id: "raids",
-  enabled: false,
+  enabled: true,
   commands: [raidCommand],
   onReady: async ({ discord }) => {
     discord.on(Events.MessageCreate, async (message) => handleMessageCreate({ discord, message }));

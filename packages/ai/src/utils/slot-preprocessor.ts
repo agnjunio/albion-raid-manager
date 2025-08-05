@@ -46,6 +46,21 @@ export function extractSlotLines(message: string): ExtractedSlot[] {
 }
 
 /**
+ * Extracts slots with user mentions in a format suitable for AI processing
+ * @param message - The Discord message
+ * @returns Array of slot strings with user mentions
+ */
+export function extractSlotLinesWithUsers(message: string): string[] {
+  const slots = extractSlotLines(message);
+  return slots.map((slot) => {
+    if (slot.userMention) {
+      return `${slot.buildName} <@${slot.userMention}>`;
+    }
+    return slot.buildName;
+  });
+}
+
+/**
  * Determines if a line is a slot/role/build line
  */
 function isSlotLine(line: string): boolean {
@@ -280,4 +295,169 @@ function parseSlotLine(line: string): ExtractedSlot | null {
     buildName: buildLine,
     userMention,
   };
+}
+
+/**
+ * Extracts requirements from a message
+ * @param message - The Discord message
+ * @returns Array of requirement strings
+ */
+export function extractRequirements(message: string): string[] {
+  const lines = message.split("\n");
+  const requirements: string[] = [];
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) continue;
+
+    // Look for requirement patterns
+    if (isRequirementLine(trimmedLine)) {
+      const requirement = parseRequirementLine(trimmedLine);
+      if (requirement) {
+        requirements.push(requirement);
+      }
+    }
+  }
+
+  // Also check for requirements that span multiple lines or are in the same line
+  const fullText = message.toLowerCase();
+
+  // Extract gear tier requirements
+  const gearTierMatch = fullText.match(/\bt\d+\.?\d*\b/gi);
+  if (gearTierMatch) {
+    requirements.push(...gearTierMatch.map((match) => match.toUpperCase()));
+  }
+
+  // Extract food requirements
+  const foodPatterns = [/\d+\s+food\s+boa\s+e?\s*\d+\s+ruins?/gi, /\d+\s+food\s+boa/gi, /\d+\s+ruins?/gi];
+
+  for (const pattern of foodPatterns) {
+    const match = fullText.match(pattern);
+    if (match) {
+      requirements.push(...match);
+    }
+  }
+
+  return requirements;
+}
+
+/**
+ * Determines if a line contains requirements
+ */
+function isRequirementLine(line: string): boolean {
+  const lowerLine = line.toLowerCase();
+
+  // Gear tier patterns
+  if (/t\d+\.?\d*/.test(line)) return true;
+  if (/\d+\.\d+/.test(line)) return true;
+
+  // Food and consumable patterns
+  const foodKeywords = [
+    "food",
+    "comida",
+    "energia",
+    "energy",
+    "potion",
+    "poção",
+    "pocao",
+    "ruins",
+    "ruinas",
+    "ruína",
+    "ruina",
+    "boa",
+    "bread",
+    "pão",
+    "pao",
+    "sandwich",
+    "sanduíche",
+    "sanduiche",
+  ];
+
+  if (foodKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
+
+  // Mount patterns - expanded to catch more mount references
+  const mountKeywords = [
+    "mount",
+    "montaria",
+    "lobo",
+    "wolf",
+    "horse",
+    "cavalo",
+    "swiftclaw",
+    "direwolf",
+    "dire wolf",
+    "lobo direto",
+    "lobo direto",
+    "montaria:",
+    "mount:",
+    "lobo +",
+    "wolf +",
+  ];
+
+  if (mountKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
+
+  // Build requirements
+  const buildKeywords = [
+    "build",
+    "construção",
+    "construcao",
+    "gear",
+    "equipamento",
+    "weapon",
+    "arma",
+    "armor",
+    "armadura",
+  ];
+
+  if (buildKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
+
+  // Specific patterns that indicate requirements
+  if (line.includes(":")) {
+    const colonKeywords = [
+      "montaria",
+      "mount",
+      "gear",
+      "equipamento",
+      "food",
+      "comida",
+      "build",
+      "construção",
+      "construcao",
+    ];
+
+    if (colonKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
+  }
+
+  return false;
+}
+
+/**
+ * Parses a requirement line to extract the requirement text
+ */
+function parseRequirementLine(line: string): string | null {
+  const trimmedLine = line.trim();
+  if (!trimmedLine) return null;
+
+  // Remove common prefixes
+  let requirement = trimmedLine
+    .replace(/^(?:build|gear|equipamento|weapon|arma|armor|armadura)\s*:?\s*/i, "")
+    .replace(/^(?:food|comida|energia|energy)\s*:?\s*/i, "")
+    .replace(/^(?:mount|montaria)\s*:?\s*/i, "")
+    .trim();
+
+  // If the line contains ':', extract the part after the colon
+  if (requirement.includes(":")) {
+    const parts = requirement.split(":");
+    if (parts.length > 1 && parts.slice(1).join(":").trim()) {
+      requirement = parts.slice(1).join(":").trim();
+    } else {
+      requirement = parts[0].trim();
+    }
+  }
+
+  // Clean up extra whitespace and remove trailing punctuation
+  requirement = requirement.replace(/\s+/g, " ").trim();
+  requirement = requirement.replace(/[.!?]+$/, "").trim();
+
+  return requirement || null;
 }

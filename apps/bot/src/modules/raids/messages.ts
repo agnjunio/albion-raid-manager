@@ -1,4 +1,5 @@
 import { RaidRole, type ContentType, type Raid, type RaidSlot } from "@albion-raid-manager/core/types";
+import { createDiscordTimestamp } from "@albion-raid-manager/discord";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -163,7 +164,7 @@ export const buildRaidCreationConfirmationMessage = (
     .setTitle("✅ Raid Created Successfully")
     .setDescription(`**${raid.title}**`)
     .addFields(
-      { name: "Date", value: raid.date.toLocaleDateString(), inline: true },
+      { name: "Date", value: createDiscordTimestamp(raid.date), inline: true },
       { name: "Status", value: String(raid.status), inline: true },
       { name: "Slots", value: raid.slots ? raid.slots.length.toString() : "0", inline: true },
     )
@@ -185,12 +186,13 @@ export const buildRaidCreationConfirmationMessage = (
   }
 
   if (parsedData.requirements && parsedData.requirements.length > 0) {
-    embed.addFields({ name: "Requirements", value: parsedData.requirements.join(", "), inline: false });
+    const requirementsList = parsedData.requirements.map((req) => `• ${req}`).join("\n");
+    embed.addFields({ name: "Requirements", value: requirementsList, inline: false });
   }
 
   if (raid.slots && raid.slots.length > 0) {
     const slotList = raid.slots
-      .map((slot) => `• ${emojis[slot.role] || emojis.DEFAULT} ${slot.name} — ${slot.role}`)
+      .map((slot) => `${emojis[slot.role] || emojis.DEFAULT} ${slot.name} — ${slot.role}`)
       .join("\n");
     embed.addFields({ name: "Slots", value: slotList, inline: false });
   }
