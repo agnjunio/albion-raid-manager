@@ -4,8 +4,7 @@ import {
   BUILD_START_PATTERNS,
   NON_SLOT_PATTERNS,
   SLOT_EMOJI_INDICATORS,
-  getRequirementKeywordsForText,
-  getSlotKeywordsForText,
+  getSlotDictionaryForText,
 } from "../../dictionaries";
 
 import { createPreprocessor, type Preprocessor } from "./";
@@ -83,7 +82,7 @@ function isSlotLine(line: string): boolean {
   }
 
   // Get language-specific keywords
-  const slotKeywords = getSlotKeywordsForText(line);
+  const slotKeywords = getSlotDictionaryForText(line);
 
   // Lines that contain role/build names without colons
   if (slotKeywords.roleKeywords.some((keyword: string) => lowerLine.includes(keyword))) {
@@ -218,25 +217,16 @@ export function extractRequirements(message: string): string[] {
 function isRequirementLine(line: string): boolean {
   const lowerLine = line.toLowerCase();
 
-  // Gear tier patterns
   if (/t\d+\.?\d*/.test(line)) return true;
   if (/\d+\.\d+/.test(line)) return true;
 
-  // Get language-specific requirement keywords
-  const requirementKeywords = getRequirementKeywordsForText(line);
+  const dictionary = getSlotDictionaryForText(line);
 
-  // Food and consumable patterns
-  if (requirementKeywords.foodKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
-
-  // Mount patterns
-  if (requirementKeywords.mountKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
-
-  // Build requirements
-  if (requirementKeywords.buildKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
-
-  // Specific patterns that indicate requirements
+  if (dictionary.foodKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
+  if (dictionary.mountKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
+  if (dictionary.buildKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
   if (line.includes(":")) {
-    if (requirementKeywords.colonKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
+    if (dictionary.colonKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
   }
 
   return false;

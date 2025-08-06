@@ -1,4 +1,4 @@
-import { getMessageKeywordsForText } from "../../dictionaries/message-dictionaries";
+import { getMessageDictionaryForText } from "../../dictionaries/message-dictionaries";
 
 import { createPreprocessor, type Preprocessor } from "./";
 
@@ -77,15 +77,14 @@ function extractRelevantContent(message: string): string {
  */
 function isRelevantLine(line: string): boolean {
   const lowerLine = line.toLowerCase();
-
-  // Get keywords for the detected language
-  const keywords = getMessageKeywordsForText(line);
-
-  // Broad role line detection: any line with a colon and at least one word before it
+  const dictionary = getMessageDictionaryForText(line);
   const isRoleLine = /\w[^\n]{0,30}:/.test(line);
 
-  // Check if line contains any relevant keywords or looks like a role line
-  const allKeywords = [...keywords.roleKeywords, ...keywords.requirementKeywords, ...keywords.timeLocationKeywords];
+  const allKeywords = [
+    ...dictionary.roleKeywords,
+    ...dictionary.requirementKeywords,
+    ...dictionary.timeLocationKeywords,
+  ];
 
   return (
     allKeywords.some((keyword) => lowerLine.includes(keyword)) ||

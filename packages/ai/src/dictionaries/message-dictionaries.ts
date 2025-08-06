@@ -1,12 +1,12 @@
-import { detectLanguage, MultiLanguageDictionary, type SupportedLanguage } from "./index";
+import { detectLanguages, MultiLanguageDictionary } from "./index";
 
-export interface MessageKeywords {
+export interface MessageDictionary {
   roleKeywords: string[];
   requirementKeywords: string[];
   timeLocationKeywords: string[];
 }
 
-export const MESSAGE_KEYWORDS: MultiLanguageDictionary<MessageKeywords> = {
+export const MESSAGE_KEYWORDS: MultiLanguageDictionary<MessageDictionary> = {
   en: {
     roleKeywords: ["tank", "healer", "dps", "support", "caller", "mount"],
     requirementKeywords: [
@@ -170,16 +170,35 @@ export const MESSAGE_KEYWORDS: MultiLanguageDictionary<MessageKeywords> = {
   },
 };
 
-export function getMessageKeywordsForLanguage(language: SupportedLanguage): MessageKeywords {
-  return MESSAGE_KEYWORDS[language] || MESSAGE_KEYWORDS.en;
-}
+/**
+ * Get message keywords for multiple languages detected in text
+ *
+ * @param text The text to analyze
+ * @returns Combined message keywords from detected languages
+ */
+export function getMessageDictionaryForText(text: string): MessageDictionary {
+  const detectedLanguages = detectLanguages(text);
 
-export function getMessageKeywordsForText(text: string): MessageKeywords {
-  const language = detectLanguage(text);
-  return getMessageKeywordsForLanguage(language);
-}
+  if (detectedLanguages.length === 0) {
+    return MESSAGE_KEYWORDS.en;
+  }
 
-export function getKeywordsByCategory(language: SupportedLanguage, category: keyof MessageKeywords): string[] {
-  const keywords = getMessageKeywordsForLanguage(language);
-  return keywords[category] || [];
+  const combinedDictionary: MessageDictionary = {
+    roleKeywords: [],
+    requirementKeywords: [],
+    timeLocationKeywords: [],
+  };
+
+  detectedLanguages.forEach((detectedLanguage) => {
+    const langKeywords = MESSAGE_KEYWORDS[detectedLanguage.language] || MESSAGE_KEYWORDS.en;
+    combinedDictionary.roleKeywords.push(...langKeywords.roleKeywords);
+    combinedDictionary.requirementKeywords.push(...langKeywords.requirementKeywords);
+    combinedDictionary.timeLocationKeywords.push(...langKeywords.timeLocationKeywords);
+  });
+
+  combinedDictionary.roleKeywords = [...new Set(combinedDictionary.roleKeywords)];
+  combinedDictionary.requirementKeywords = [...new Set(combinedDictionary.requirementKeywords)];
+  combinedDictionary.timeLocationKeywords = [...new Set(combinedDictionary.timeLocationKeywords)];
+
+  return combinedDictionary;
 }

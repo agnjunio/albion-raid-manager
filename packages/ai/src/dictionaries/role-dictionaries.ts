@@ -1,12 +1,14 @@
-import { detectLanguage, type MultiLanguageDictionary } from "./index";
+import { RaidRole } from "@albion-raid-manager/core/types";
 
-interface RoleDictionary {
-  [role: string]: {
+import { detectLanguages, type MultiLanguageDictionary } from "./index";
+
+export type RoleDictionary = {
+  [role in RaidRole]: {
     role: string;
     confidence: number;
     patterns: string[];
   };
-}
+};
 
 const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
   en: {
@@ -144,15 +146,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "prowling",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "staff", "pole", "rod"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "damage", "attacker", "striker", "slayer"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
   pt: {
@@ -177,6 +179,7 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "main tank",
         "mt",
         "martelo",
+        "malho",
         "maça",
         "maca",
         "monarca",
@@ -262,8 +265,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "batalha",
         "alabarda",
         "tomahawk",
-        "martelo",
-        "malho",
         "estrela da manhã",
         "mangual",
         "clava",
@@ -280,15 +281,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "kris",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "cajado", "vara", "bastão"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "dano", "atacante", "golpeador", "matador"],
+    BATTLEMOUNT: {
+      role: "",
+      confidence: 0,
+      patterns: [],
     },
   },
   es: {
@@ -391,15 +392,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "kris",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "bastón", "vara", "palo"],
+    CALLER: {
+      role: "",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "daño", "atacante", "golpeador", "asesino"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
   ru: {
@@ -502,15 +503,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "крис",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "посох", "палка", "жезл"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["дпс", "урон", "атакующий", "ударник", "убийца"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
   zh: {
@@ -601,15 +602,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "克里斯",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "法杖", "棍", "杖"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "伤害", "攻击者", "打击者", "杀手"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
   fr: {
@@ -712,15 +713,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "kris",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "bâton", "baguette", "bâtonnet"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "dégâts", "attaquant", "frappeur", "tueur"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
   de: {
@@ -823,15 +824,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "kris",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "stab", "rute", "stange"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "schaden", "angreifer", "schläger", "mörder"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
   ja: {
@@ -934,15 +935,15 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "クリス",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "杖", "棒", "ロッド"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "ダメージ", "攻撃者", "ストライカー", "スレイヤー"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
   ko: {
@@ -985,6 +986,11 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "단궁",
         "전투활",
         "복합활",
+        "dps",
+        "데미지",
+        "공격자",
+        "스트라이커",
+        "슬레이어",
       ],
     },
     SUPPORT: {
@@ -1043,22 +1049,81 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "데스기버",
         "스틸레토",
         "크리스",
+        "quarter",
+        "quarterstaff",
+        "지팡이",
+        "막대",
+        "로드",
       ],
     },
-    QUARTER_STAFF: {
-      role: "MELEE_DPS",
-      confidence: 0.7,
-      patterns: ["quarter", "quarterstaff", "지팡이", "막대", "로드"],
+    CALLER: {
+      role: "CALLER",
+      confidence: 0,
+      patterns: [],
     },
-    GENERIC_DPS: {
-      role: "RANGED_DPS",
-      confidence: 0.5,
-      patterns: ["dps", "데미지", "공격자", "스트라이커", "슬레이어"],
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0,
+      patterns: [],
     },
   },
 };
 
 export function getRoleDictionaryForText(text: string): RoleDictionary {
-  const language = detectLanguage(text);
-  return ROLE_DICTIONARIES[language] || ROLE_DICTIONARIES.en;
+  const detectedLanguages = detectLanguages(text);
+
+  if (detectedLanguages.length === 0) {
+    return ROLE_DICTIONARIES.en;
+  }
+
+  const combinedDictionary: RoleDictionary = {
+    TANK: {
+      role: "TANK",
+      confidence: 0.95,
+      patterns: [],
+    },
+    HEALER: {
+      role: "HEALER",
+      confidence: 0.95,
+      patterns: [],
+    },
+    RANGED_DPS: {
+      role: "RANGED_DPS",
+      confidence: 0.95,
+      patterns: [],
+    },
+    SUPPORT: {
+      role: "SUPPORT",
+      confidence: 0.8,
+      patterns: [],
+    },
+    MELEE_DPS: {
+      role: "MELEE_DPS",
+      confidence: 0.9,
+      patterns: [],
+    },
+    CALLER: {
+      role: "CALLER",
+      confidence: 0.95,
+      patterns: [],
+    },
+    BATTLEMOUNT: {
+      role: "BATTLEMOUNT",
+      confidence: 0.95,
+      patterns: [],
+    },
+  };
+
+  detectedLanguages.forEach((detectedLanguage) => {
+    const langKeywords = ROLE_DICTIONARIES[detectedLanguage.language] || ROLE_DICTIONARIES.en;
+    for (const role in combinedDictionary) {
+      combinedDictionary[role as RaidRole].patterns.push(...langKeywords[role as RaidRole].patterns);
+    }
+  });
+
+  for (const role in combinedDictionary) {
+    combinedDictionary[role as RaidRole].patterns = [...new Set(combinedDictionary[role as RaidRole].patterns)];
+  }
+
+  return combinedDictionary;
 }

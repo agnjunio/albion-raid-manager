@@ -7,7 +7,8 @@ function findRoleAssignment(slotName: string): { role: string; confidence: numbe
   const lowerSlot = slotName.toLowerCase();
 
   for (const [role, entry] of Object.entries(dictionary)) {
-    if (entry.patterns.some((pattern) => lowerSlot.includes(pattern))) {
+    const matchedPattern = entry.patterns.find((pattern) => lowerSlot.includes(pattern));
+    if (matchedPattern) {
       return {
         role,
         confidence: entry.confidence,
@@ -37,9 +38,23 @@ function preAssignRoles(slotNames: string[]): PreAssignedRole[] {
 }
 
 export const rolePreprocessor: Preprocessor = createPreprocessor((context) => {
-  const preAssignedRoles = preAssignRoles(context.extractedSlots);
+  // Get new role assignments from extracted slots
+  const newRoleAssignments = preAssignRoles(context.extractedSlots);
+
+  // Create a map of existing roles by name for quick lookup
+  const existingRolesByName = new Map(context.preAssignedRoles.map((role) => [role.name, role]));
+
+  // Combine existing and new roles, with new roles taking precedence for the same slot name
+  const combinedRoles = [...context.preAssignedRoles];
+
+  // Add new roles that don't exist in the existing roles
+  for (const newRole of newRoleAssignments) {
+    if (!existingRolesByName.has(newRole.name)) {
+      combinedRoles.push(newRole);
+    }
+  }
 
   return {
-    preAssignedRoles,
+    preAssignedRoles: combinedRoles,
   };
 });

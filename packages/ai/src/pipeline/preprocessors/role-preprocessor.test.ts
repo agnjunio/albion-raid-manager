@@ -208,7 +208,13 @@ describe("Role Preprocessor Pipeline", () => {
       originalMessage: "test message",
       processedMessage: "processed",
       extractedSlots: ["martelo", "machado", "claymore"],
-      preAssignedRoles: [],
+      preAssignedRoles: [
+        {
+          name: "machado",
+          role: "MELEE_DPS",
+          confidence: 0.9,
+        },
+      ],
       extractedRequirements: [],
       extractedTime: null,
       preAssignedContentType: null,

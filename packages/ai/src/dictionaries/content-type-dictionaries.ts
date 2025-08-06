@@ -1,46 +1,13 @@
 import { ContentType } from "@albion-raid-manager/core/types";
 
-import { detectLanguage, type MultiLanguageDictionary } from "./index";
+import { detectLanguages, type MultiLanguageDictionary } from "./index";
 
-/**
- * Fixed-size content type mappings based on role count
- */
-export const FIXED_SIZE_MAPPINGS = [
-  { count: 1, type: "SOLO_DUNGEON" as ContentType },
-  { count: 2, type: "DEPTHS_DUO" as ContentType },
-  { count: 3, type: "DEPTHS_TRIO" as ContentType },
-  { count: 5, type: "HELLGATE_5V5" as ContentType },
-  { count: 10, type: "HELLGATE_10V10" as ContentType },
-];
-
-/**
- * Patterns that indicate a line is clearly NOT a role
- */
-export const NON_ROLE_PATTERNS = [
-  /^roaming\s+as\s+\d{1,2}:\d{2}$/i,
-  /^build\s+t\d+$/i,
-  /^\d+\s+food\s+/i,
-  /^montaria:\s+/i,
-  /^@everyone$/i,
-  /^@here$/i,
-  /^https?:\/\//,
-  /^\*\*.*\*\*$/,
-];
-
-/**
- * Role indicators (emojis) that suggest a line contains a role
- */
-export const ROLE_INDICATORS = /[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥]/u;
-
-/**
- * Content type keywords by language for Roads of Avalon content
- */
-export interface ContentTypeKeywords {
+export interface ContentTypeDictionary {
   pvpKeywords: string[];
   pveKeywords: string[];
 }
 
-export const CONTENT_TYPE_KEYWORDS: MultiLanguageDictionary<ContentTypeKeywords> = {
+export const CONTENT_TYPE_KEYWORDS: MultiLanguageDictionary<ContentTypeDictionary> = {
   en: {
     pvpKeywords: ["roaming", "ganking", "pvp", "gank", "roam", "zvz", "small-scale", "small scale"],
     pveKeywords: ["chest", "pve", "golden", "avalon", "ava", "avalonian", "dungeon", "fame farm", "fame farming"],
@@ -79,6 +46,27 @@ export const CONTENT_TYPE_KEYWORDS: MultiLanguageDictionary<ContentTypeKeywords>
   },
 };
 
+export const FIXED_SIZE_MAPPINGS = [
+  { count: 1, type: "SOLO_DUNGEON" as ContentType },
+  { count: 2, type: "DEPTHS_DUO" as ContentType },
+  { count: 3, type: "DEPTHS_TRIO" as ContentType },
+  { count: 5, type: "HELLGATE_5V5" as ContentType },
+  { count: 10, type: "HELLGATE_10V10" as ContentType },
+];
+
+export const NON_ROLE_PATTERNS = [
+  /^roaming\s+as\s+\d{1,2}:\d{2}$/i,
+  /^build\s+t\d+$/i,
+  /^\d+\s+food\s+/i,
+  /^montaria:\s+/i,
+  /^@everyone$/i,
+  /^@here$/i,
+  /^https?:\/\//,
+  /^\*\*.*\*\*$/,
+];
+
+export const ROLE_INDICATORS = /[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥]/u;
+
 export const DEFAULT_OTHER_CONTENT_TYPE = {
   type: "OTHER" as ContentType,
   keywords: [] as string[],
@@ -87,7 +75,32 @@ export const DEFAULT_OTHER_CONTENT_TYPE = {
   description: "Other content type",
 };
 
-export function getContentTypeKeywordsForText(text: string): ContentTypeKeywords {
-  const language = detectLanguage(text);
-  return CONTENT_TYPE_KEYWORDS[language] || CONTENT_TYPE_KEYWORDS.en;
+/**
+ * Get content type dictionary for multiple languages detected in text
+ *
+ * @param text The text to analyze
+ * @returns Combined content type dictionary from detected languages
+ */
+export function getContentTypeDictionaryForText(text: string): ContentTypeDictionary {
+  const detectedLanguages = detectLanguages(text);
+
+  if (detectedLanguages.length === 0) {
+    return CONTENT_TYPE_KEYWORDS.en;
+  }
+
+  const combinedDictionary: ContentTypeDictionary = {
+    pvpKeywords: [],
+    pveKeywords: [],
+  };
+
+  detectedLanguages.forEach((detectedLanguage) => {
+    const langKeywords = CONTENT_TYPE_KEYWORDS[detectedLanguage.language] || CONTENT_TYPE_KEYWORDS.en;
+    combinedDictionary.pvpKeywords.push(...langKeywords.pvpKeywords);
+    combinedDictionary.pveKeywords.push(...langKeywords.pveKeywords);
+  });
+
+  combinedDictionary.pvpKeywords = [...new Set(combinedDictionary.pvpKeywords)];
+  combinedDictionary.pveKeywords = [...new Set(combinedDictionary.pveKeywords)];
+
+  return combinedDictionary;
 }

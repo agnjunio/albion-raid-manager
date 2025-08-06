@@ -6,7 +6,7 @@ import {
   FIXED_SIZE_MAPPINGS,
   NON_ROLE_PATTERNS,
   ROLE_INDICATORS,
-  getContentTypeKeywordsForText,
+  getContentTypeDictionaryForText,
 } from "../../dictionaries";
 
 import { createPreprocessor, type Preprocessor } from "./";
@@ -59,9 +59,9 @@ function detectFixedSizeContentType(
   // Special handling for 7 players - could be either ROADS_OF_AVALON_PVE or ROADS_OF_AVALON_PVP
   if (roleCount === 7 && text) {
     const normalizedText = text.toLowerCase();
-    const contentKeywords = getContentTypeKeywordsForText(text);
-    const hasPvpKeywords = contentKeywords.pvpKeywords.some((keyword: string) => normalizedText.includes(keyword));
-    const hasPveKeywords = contentKeywords.pveKeywords.some((keyword: string) => normalizedText.includes(keyword));
+    const dictionary = getContentTypeDictionaryForText(text);
+    const hasPvpKeywords = dictionary.pvpKeywords.some((keyword: string) => normalizedText.includes(keyword));
+    const hasPveKeywords = dictionary.pveKeywords.some((keyword: string) => normalizedText.includes(keyword));
 
     let contentType: ContentType;
     if (hasPvpKeywords) {
