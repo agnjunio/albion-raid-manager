@@ -1,4 +1,4 @@
-import { processAIResponse, processMessage, processValidationResponse, type PreprocessorContext } from "../pipeline";
+import { preprocessMessage, processAIResponse, processValidationResponse, type PreprocessorContext } from "../pipeline";
 import { AIProvider, AIService, AIServiceConfig, ParsedRaidData } from "../types";
 
 export abstract class BaseAIService implements AIService {
@@ -13,13 +13,13 @@ export abstract class BaseAIService implements AIService {
   }
 
   async parseDiscordPing(message: string): Promise<ParsedRaidData> {
-    const context = processMessage(message);
+    const context = preprocessMessage(message);
     const aiResponse = await this.generateResponse(context);
     return processAIResponse(aiResponse, message, context);
   }
 
   async validateMessage(message: string): Promise<boolean> {
-    const context = processMessage(message);
+    const context = preprocessMessage(message);
     const validationResponse = await this.generateValidationResponse(context);
     return processValidationResponse(validationResponse, context);
   }

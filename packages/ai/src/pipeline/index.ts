@@ -7,10 +7,8 @@ import { messagePreprocessor } from "./preprocessors/message-preprocessor";
 import { rolePreprocessor } from "./preprocessors/role-preprocessor";
 import { requirementPreprocessor, slotPreprocessor } from "./preprocessors/slot-preprocessor";
 
-// Re-export types for external use
-export type { Preprocessor, PreprocessorContext };
+export type { PreprocessorContext };
 
-// Default pipeline with all preprocessors enabled
 const PREPROCESSORS: Preprocessor[] = [
   messagePreprocessor,
   slotPreprocessor,
@@ -20,11 +18,7 @@ const PREPROCESSORS: Preprocessor[] = [
   contentTypePreprocessor,
 ];
 
-/**
- * Processes a message through the preprocessor pipeline
- */
-export function processMessage(message: string): PreprocessorContext {
-  // Initialize context
+export function preprocessMessage(message: string): PreprocessorContext {
   const initialContext: PreprocessorContext = {
     originalMessage: message,
     processedMessage: message,
@@ -42,14 +36,11 @@ export function processMessage(message: string): PreprocessorContext {
     },
   };
 
-  // Run through all preprocessors
   return PREPROCESSORS.reduce((context, preprocessor) => {
     return preprocessor(context);
   }, initialContext);
 }
 
-// Export utility functions for backward compatibility
 export { detectContentType, getDefaultLocation, normalizeContentType, parseTimeString };
 
-// Re-export response processing methods from postprocessors
 export { processAIResponse, processValidationResponse } from "./postprocessors";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { processMessage } from "./index";
+import { preprocessMessage } from "./index";
 
 describe("Pipeline Integration Tests", () => {
   it("should process a complete raid message through all preprocessors", () => {
@@ -34,7 +34,7 @@ SAIDA 16:20
 
 @everyone`;
 
-    const result = processMessage(message);
+    const result = preprocessMessage(message);
 
     // Check basic structure
     expect(result.originalMessage).toBe(message);
@@ -81,16 +81,16 @@ ARMA T8 - BUILD T7
 🔥 FULGURANTE [DOBLE CANCEL] :
 ⚔️ FB (CAPUZ MANA;`;
 
-    const result = processMessage(message);
+    const result = preprocessMessage(message);
 
     // Should extract slots with Portuguese content
     expect(result.extractedSlots.length).toBeGreaterThan(0);
-    expect(result.extractedSlots.some(slot => slot.includes("TANK"))).toBe(true);
+    expect(result.extractedSlots.some((slot) => slot.includes("TANK"))).toBe(true);
 
     // Should extract requirements
     expect(result.extractedRequirements.length).toBeGreaterThan(0);
-    expect(result.extractedRequirements.some(req => req.includes("T8"))).toBe(true);
-    expect(result.extractedRequirements.some(req => req.includes("8.0"))).toBe(true);
+    expect(result.extractedRequirements.some((req) => req.includes("T8"))).toBe(true);
+    expect(result.extractedRequirements.some((req) => req.includes("8.0"))).toBe(true);
 
     // Should detect content type
     expect(result.preAssignedContentType).not.toBeNull();
@@ -99,7 +99,7 @@ ARMA T8 - BUILD T7
   it("should handle simple messages", () => {
     const message = "Solo dungeon run at 20:00";
 
-    const result = processMessage(message);
+    const result = preprocessMessage(message);
 
     // Should process even simple messages
     expect(result.processedMessage).toBeDefined();
@@ -113,7 +113,7 @@ ARMA T8 - BUILD T7
   it("should handle empty messages", () => {
     const message = "";
 
-    const result = processMessage(message);
+    const result = preprocessMessage(message);
 
     // Should handle empty messages gracefully
     expect(result.originalMessage).toBe("");
@@ -131,7 +131,7 @@ ARMA T8 - BUILD T7
   it("should handle messages with only irrelevant content", () => {
     const message = "Hello world! This is just a regular chat message about the weather today.";
 
-    const result = processMessage(message);
+    const result = preprocessMessage(message);
 
     // Should still process but may result in minimal content
     expect(result.processedMessage.length).toBeLessThanOrEqual(message.length);
@@ -145,7 +145,7 @@ ARMA T8 - BUILD T7
   it("should preserve context through all preprocessors", () => {
     const message = "🛡️ TANK: @user123\n💚 HEALER: @user456\n🔥 DPS: @user789\nTime: 16:30\nRequirements: T8.1 gear";
 
-    const result = processMessage(message);
+    const result = preprocessMessage(message);
 
     // Should extract all information
     expect(result.extractedSlots.length).toBe(3);
@@ -159,4 +159,4 @@ ARMA T8 - BUILD T7
     expect(result.metadata.requirementCount).toBeGreaterThan(0);
     expect(result.metadata.tokenReduction).toBeGreaterThan(0);
   });
-}); 
+});

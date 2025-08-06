@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { processMessage } from "./index";
+import { preprocessMessage } from "./index";
 
 describe("Preprocessor Pipeline", () => {
   const sampleMessage = `:white_check_mark: BAU PVE/PVP :white_check_mark: 
@@ -34,7 +34,7 @@ SAIDA 16:20
 @everyone`;
 
   it("should process message with default pipeline", () => {
-    const result = processMessage(sampleMessage);
+    const result = preprocessMessage(sampleMessage);
 
     // Check basic structure
     expect(result.originalMessage).toBe(sampleMessage);
@@ -71,7 +71,7 @@ SAIDA 16:20
   });
 
   it("should handle empty message", () => {
-    const result = processMessage("");
+    const result = preprocessMessage("");
 
     expect(result.originalMessage).toBe("");
     expect(result.processedMessage).toBe("");
@@ -86,7 +86,7 @@ SAIDA 16:20
   });
 
   it("should preserve context through pipeline", () => {
-    const result = processMessage(sampleMessage);
+    const result = preprocessMessage(sampleMessage);
 
     // Each step should build upon the previous
     expect(result.originalMessage).toBe(sampleMessage);
