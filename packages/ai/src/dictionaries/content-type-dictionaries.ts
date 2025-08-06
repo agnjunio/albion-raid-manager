@@ -9,11 +9,32 @@ export interface ContentTypeDictionary {
 
 export const CONTENT_TYPE_KEYWORDS: MultiLanguageDictionary<ContentTypeDictionary> = {
   en: {
-    pvpKeywords: ["roaming", "ganking", "pvp", "gank", "roam", "zvz", "small-scale", "small scale"],
+    pvpKeywords: [
+      "roaming",
+      "ganking",
+      "pvp",
+      "gank",
+      "roam",
+      "zvz",
+      "small-scale",
+      "small scale",
+      "roads",
+      "avalon roads",
+    ],
     pveKeywords: ["chest", "pve", "golden", "avalon", "ava", "avalonian", "dungeon", "fame farm", "fame farming"],
   },
   pt: {
-    pvpKeywords: ["roaming", "ganking", "pvp", "gank", "roam", "zvz", "pequena escala"],
+    pvpKeywords: [
+      "roaming",
+      "ganking",
+      "pvp",
+      "gank",
+      "roam",
+      "zvz",
+      "pequena escala",
+      "estradas",
+      "estradas de avalon",
+    ],
     pveKeywords: ["baú", "bau", "pve", "dourado", "avalon", "ava", "avaloniano", "masmorra", "farm de fama"],
   },
   es: {

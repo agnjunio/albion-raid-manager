@@ -223,6 +223,8 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "arco composto",
         "fb",
         "fura bruma",
+        "pútrido",
+        "putrido",
       ],
     },
     SUPPORT: {
@@ -230,8 +232,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
       confidence: 0.8,
       patterns: [
         "maldito",
-        "pútrido",
-        "putrido",
         "demoníaco",
         "sombra",
         "suporte",
@@ -262,6 +262,7 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "sabre",
         "machado",
         "machadão",
+        "machadao",
         "batalha",
         "alabarda",
         "tomahawk",
