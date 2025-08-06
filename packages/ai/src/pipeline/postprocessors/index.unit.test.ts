@@ -1,14 +1,28 @@
 import { ContentType } from "@albion-raid-manager/core/types";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { AiRaid } from "../../types";
 import { PreprocessorContext } from "../preprocessors";
 
-import { processAIResponse, processValidationResponse, type PostprocessorContext } from "./index";
+import { Postprocessor, processAIResponse, processValidationResponse } from "./index";
 
 describe("Process AI Response", () => {
+  let aiData: AiRaid;
+  let originalMessage: string;
   let preprocessedContext: PreprocessorContext;
 
   beforeEach(() => {
+    aiData = {
+      title: "Avalonian Dungeon Run",
+      contentType: "ROADS_OF_AVALON_PVE" as ContentType,
+      timestamp: "2023-06-15",
+      location: "Martlock",
+      requirements: [],
+      roles: [],
+    };
+
+    originalMessage = "Let's do an Avalonian Dungeon at 14:30";
+
     preprocessedContext = {
       originalMessage: "Let's do an Avalonian Dungeon at 14:30",
       processedMessage: "Let's do an Avalonian Dungeon at 14:30",
@@ -36,35 +50,7 @@ describe("Process AI Response", () => {
   });
 
   it("should process AI response through the postprocessor pipeline", () => {
-    const aiResponse = {
-      title: "Avalonian Dungeon Run",
-      description: "T8 Avalonian Dungeon",
-      date: "2023-06-15",
-      time: "14:30",
-      location: "Martlock",
-      requirements: ["T7 Gear", "1000 IP minimum"],
-      roles: [
-        {
-          name: "Tank",
-          role: "TANK",
-          count: 1,
-        },
-        {
-          name: "Healer",
-          role: "HEALER",
-          count: 1,
-        },
-      ],
-      maxParticipants: 7,
-      notes: "Bring food and potions",
-      confidence: 0.85,
-      contentType: "ROADS_OF_AVALON_PVE",
-      contentTypeConfidence: 0.9,
-    };
-
-    const originalMessage = "Let's do an Avalonian Dungeon at 14:30";
-
-    const result = processAIResponse(aiResponse, originalMessage, preprocessedContext);
+    const result = processAIResponse(aiData, originalMessage, preprocessedContext);
 
     // We don't need to check every field exactly since the implementation might change
     // Just check a few key fields to ensure the pipeline is working
@@ -77,21 +63,12 @@ describe("Process AI Response", () => {
   });
 
   it("should throw error when processing fails", () => {
-    // Create a custom postprocessor pipeline that doesn't set finalResult
-    const customPostprocessor = (context: PostprocessorContext): PostprocessorContext => {
-      return {
-        ...context,
-        data: null, // Explicitly set to null to ensure test fails
-      };
-    };
-
-    const aiResponse = {
-      title: "Test Raid",
-      contentType: "GROUP_DUNGEON" as ContentType,
+    const customPostprocessor: Postprocessor = () => {
+      return null;
     };
 
     expect(() => {
-      processAIResponse(aiResponse, "Test message", preprocessedContext, [customPostprocessor]);
+      processAIResponse(aiData, "Test message", preprocessedContext, [customPostprocessor]);
     }).toThrow("Failed to process AI response");
   });
 });

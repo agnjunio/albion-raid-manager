@@ -1,64 +1,74 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { type RaidRole } from "../../types";
-import { PreprocessorContext } from "../preprocessors";
+import { type AiRaidRole } from "../../types";
 
-import { rolesPostprocessor, type PostprocessorContext } from "./index";
+import { rolesPostprocessor } from "./roles-postprocessor";
+import { type PostprocessorContext } from "./types";
 
 describe("Roles Postprocessor", () => {
-  let preprocessedContext: PreprocessorContext;
+  let initialContext: PostprocessorContext;
 
   beforeEach(() => {
-    preprocessedContext = {
+    initialContext = {
       originalMessage: "Test message",
-      processedMessage: "Test message",
-      extractedSlots: [],
-      preAssignedRoles: [],
-      extractedRequirements: [],
-      extractedTime: null,
-      preAssignedContentType: null,
-      metadata: {
-        originalLength: 0,
-        processedLength: 0,
-        tokenReduction: 0,
-        slotCount: 0,
-        requirementCount: 0,
+      preprocessedContext: {
+        originalMessage: "Test message",
+        processedMessage: "Test message",
+        extractedSlots: [],
+        preAssignedRoles: [],
+        extractedRequirements: [],
+        extractedTime: null,
+        preAssignedContentType: null,
+        metadata: {
+          originalLength: 0,
+          processedLength: 0,
+          tokenReduction: 0,
+          slotCount: 0,
+          requirementCount: 0,
+        },
       },
-    };
-  });
-
-  it("should normalize roles with string preAssignedUser", () => {
-    const roles: RaidRole[] = [
-      {
-        name: "Tank",
-        role: "TANK",
-        count: 1,
-        preAssignedUser: "user123",
+      aiData: {
+        title: "Test Raid",
+        contentType: "GROUP_DUNGEON",
+        timestamp: "2023-06-15",
+        location: "Fort Sterling",
+        requirements: ["T6 Gear"],
+        roles: [],
       },
-      {
-        name: "Healer",
-        role: "HEALER",
-        count: 1,
-        preAssignedUser: "user456",
+      parsedData: {
+        title: "",
+        date: new Date(),
+        confidence: 0,
+        notes: "",
       },
-    ];
-
-    const initialContext: PostprocessorContext = {
-      originalMessage: "Test message",
-      preprocessedContext,
-      aiResponse: {},
-      aiData: { roles },
-      data: null,
       metadata: {
         processingTime: 0,
         validationErrors: [],
         confidence: 0,
       },
     };
+  });
+
+  it("should normalize roles with string preAssignedUser", () => {
+    const roles: AiRaidRole[] = [
+      {
+        name: "Tank",
+        role: "TANK",
+        preAssignedUser: "user123",
+      },
+      {
+        name: "Healer",
+        role: "HEALER",
+        preAssignedUser: "user456",
+      },
+    ];
+
+    initialContext.aiData.roles = roles;
 
     const result = rolesPostprocessor(initialContext);
 
-    expect(result.aiData.roles).toEqual([
+    expect(result).not.toBeNull();
+    expect(result!.parsedData.roles).toEqual([
       {
         name: "Tank",
         role: "TANK",
@@ -75,31 +85,20 @@ describe("Roles Postprocessor", () => {
   });
 
   it("should handle non-string preAssignedUser", () => {
-    const roles: RaidRole[] = [
+    const roles: AiRaidRole[] = [
       {
         name: "Tank",
         role: "TANK",
-        count: 1,
         preAssignedUser: 123 as unknown as string, // Simulating incorrect type
       },
     ];
 
-    const initialContext: PostprocessorContext = {
-      originalMessage: "Test message",
-      preprocessedContext,
-      aiResponse: {},
-      aiData: { roles },
-      data: null,
-      metadata: {
-        processingTime: 0,
-        validationErrors: [],
-        confidence: 0,
-      },
-    };
+    initialContext.aiData.roles = roles;
 
     const result = rolesPostprocessor(initialContext);
 
-    expect(result.aiData.roles).toEqual([
+    expect(result).not.toBeNull();
+    expect(result!.parsedData.roles).toEqual([
       {
         name: "Tank",
         role: "TANK",
@@ -110,57 +109,34 @@ describe("Roles Postprocessor", () => {
   });
 
   it("should handle undefined roles", () => {
-    const initialContext: PostprocessorContext = {
-      originalMessage: "Test message",
-      preprocessedContext,
-      aiResponse: {},
-      aiData: {},
-      data: null,
-      metadata: {
-        processingTime: 0,
-        validationErrors: [],
-        confidence: 0,
-      },
-    };
+    delete initialContext.aiData.roles;
 
     const result = rolesPostprocessor(initialContext);
 
-    expect(result.aiData.roles).toEqual([]);
+    expect(result).not.toBeNull();
+    expect(result!.parsedData.roles).toEqual([]);
   });
 
   it("should preserve other role properties", () => {
-    const roles: RaidRole[] = [
+    const roles: AiRaidRole[] = [
       {
         name: "Tank",
         role: "TANK",
-        count: 1,
         preAssignedUser: "user123",
-        requirements: ["Heavy Armor", "Shield"],
       },
     ];
 
-    const initialContext: PostprocessorContext = {
-      originalMessage: "Test message",
-      preprocessedContext,
-      aiResponse: {},
-      aiData: { roles },
-      data: null,
-      metadata: {
-        processingTime: 0,
-        validationErrors: [],
-        confidence: 0,
-      },
-    };
+    initialContext.aiData.roles = roles;
 
     const result = rolesPostprocessor(initialContext);
 
-    expect(result.aiData.roles).toEqual([
+    expect(result).not.toBeNull();
+    expect(result!.parsedData.roles).toEqual([
       {
         name: "Tank",
         role: "TANK",
         count: 1,
         preAssignedUser: "user123",
-        requirements: ["Heavy Armor", "Shield"],
       },
     ]);
   });

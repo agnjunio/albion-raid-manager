@@ -1,12 +1,11 @@
-import { ParsedRaidData } from "../../types";
+import { AiRaid, ParsedRaidData } from "../../types";
 import { PreprocessorContext } from "../preprocessors";
 
 export interface PostprocessorContext {
   originalMessage: string;
   preprocessedContext: PreprocessorContext;
-  aiResponse: unknown;
-  aiData: Record<string, unknown>;
-  data: ParsedRaidData | null;
+  aiData: AiRaid;
+  parsedData: ParsedRaidData;
   metadata: {
     processingTime: number;
     validationErrors: string[];
@@ -14,6 +13,4 @@ export interface PostprocessorContext {
   };
 }
 
-export type Postprocessor = (context: PostprocessorContext) => PostprocessorContext;
-
-export const DEFAULT_POSTPROCESSORS: Postprocessor[] = [];
+export type Postprocessor = (context: PostprocessorContext) => PostprocessorContext | null;

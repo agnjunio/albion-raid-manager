@@ -4,32 +4,23 @@ import { ContentType } from "@albion-raid-manager/core/types";
 import { type Postprocessor } from "./types";
 
 export const contentTypePostprocessor: Postprocessor = (context) => {
-  const { aiData: responseData, preprocessedContext } = context;
+  const { aiData, preprocessedContext, parsedData } = context;
 
-  // Use AI's content type decision if provided, otherwise fall back to pipeline detection
-  const aiContentType = responseData.contentType as string | undefined;
-  const aiContentTypeConfidence = responseData.contentTypeConfidence as number | undefined;
+  const aiContentType = aiData.contentType;
+  let contentType: ContentType;
 
-  let finalContentType: ContentType;
-  let finalContentTypeConfidence: number;
-
-  if (aiContentType && aiContentTypeConfidence !== undefined) {
-    // Use AI's decision, but normalize it to ensure it matches our enum
+  if (aiContentType) {
     const normalizedContentType = normalizeContentType(aiContentType);
-    finalContentType = normalizedContentType || "OTHER";
-    finalContentTypeConfidence = aiContentTypeConfidence;
+    contentType = normalizedContentType || "OTHER";
   } else {
-    // Fall back to pipeline detection
-    finalContentType = preprocessedContext.preAssignedContentType?.type || "OTHER";
-    finalContentTypeConfidence = preprocessedContext.preAssignedContentType?.confidence || 0.5;
+    contentType = preprocessedContext.preAssignedContentType?.type || "OTHER";
   }
 
   return {
     ...context,
-    aiData: {
-      ...responseData,
-      contentType: finalContentType,
-      contentTypeConfidence: finalContentTypeConfidence,
+    parsedData: {
+      ...parsedData,
+      contentType,
     },
   };
 };

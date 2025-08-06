@@ -1,5 +1,5 @@
 import { preprocessMessage, processAIResponse, processValidationResponse, type PreprocessorContext } from "../pipeline";
-import { AIProvider, AIService, AIServiceConfig, ParsedRaidData } from "../types";
+import { AIProvider, AiRaid, AIService, AIServiceConfig, ParsedRaidData } from "../types";
 
 export abstract class BaseAIService implements AIService {
   protected config: AIServiceConfig;
@@ -25,7 +25,7 @@ export abstract class BaseAIService implements AIService {
   }
 
   abstract generateValidationResponse(context: PreprocessorContext): Promise<unknown>;
-  abstract generateResponse(context: PreprocessorContext): Promise<unknown>;
+  abstract generateResponse(context: PreprocessorContext): Promise<AiRaid>;
 
   protected createRaidParsingPrompt(context: PreprocessorContext): string {
     const slotSection = context.extractedSlots.length > 0 ? `\nSLOTS: ${context.extractedSlots.join(", ")}\n` : "";
@@ -46,7 +46,7 @@ export abstract class BaseAIService implements AIService {
 
     const timeSection = context.extractedTime ? `\nEXTRACTED_TIME: ${context.extractedTime}\n` : "";
 
-    return `Parse Albion Online raid → JSON: {title, contentType, contentTypeConfidence, timestamp, location, requirements[], roles[{name, role, preAssignedUser}], confidence(0-1)}
+    return `Parse Albion Online raid → JSON: {title, contentType, timestamp, location, requirements[], roles[{name, role, preAssignedUser}], confidence(0-1)}
 
 Msg: "${context.processedMessage}"${slotSection}${preAssignedSection}${contentTypeSection}${requirementsSection}${timeSection}
 

@@ -2,7 +2,7 @@ import { logger } from "@albion-raid-manager/logger";
 import OpenAI from "openai";
 
 import { type PreprocessorContext } from "../../pipeline";
-import { AIProvider } from "../../types";
+import { AIProvider, AiRaid } from "../../types";
 import { BaseAIService } from "../base";
 
 export class OpenAIService extends BaseAIService {
@@ -24,7 +24,7 @@ export class OpenAIService extends BaseAIService {
     });
   }
 
-  async generateResponse(context: PreprocessorContext): Promise<unknown> {
+  async generateResponse(context: PreprocessorContext): Promise<AiRaid> {
     try {
       logger.info(`Generating OpenAI response for ${context.extractedSlots.length} slots`, {
         slots: context.extractedSlots,

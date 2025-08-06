@@ -1,34 +1,23 @@
 export * from "./types";
 
-export { contentTypePostprocessor } from "./content-type-postprocessor";
-export { dateTimePostprocessor } from "./datetime-postprocessor";
-export { finalizePostprocessor } from "./finalize-postprocessor";
-export { locationRequirementsPostprocessor } from "./location-requirements-postprocessor";
-export { rolesPostprocessor } from "./roles-postprocessor";
-export { validationPostprocessor } from "./validation-postprocessor";
-
-import { ParsedRaidData } from "../../types";
+import { AiRaid, ParsedRaidData } from "../../types";
 import { PreprocessorContext } from "../preprocessors";
 
+import { basicPostprocessor } from "./basic-postprocessor";
 import { contentTypePostprocessor } from "./content-type-postprocessor";
 import { dateTimePostprocessor } from "./datetime-postprocessor";
-import { finalizePostprocessor } from "./finalize-postprocessor";
-import { locationRequirementsPostprocessor } from "./location-requirements-postprocessor";
 import { rolesPostprocessor } from "./roles-postprocessor";
 import { Postprocessor, PostprocessorContext } from "./types";
-import { validationPostprocessor } from "./validation-postprocessor";
 
 export const DEFAULT_POSTPROCESSORS: Postprocessor[] = [
-  validationPostprocessor,
+  basicPostprocessor,
+  contentTypePostprocessor,
   dateTimePostprocessor,
   rolesPostprocessor,
-  contentTypePostprocessor,
-  locationRequirementsPostprocessor,
-  finalizePostprocessor,
 ];
 
 export function processAIResponse(
-  aiResponse: unknown,
+  aiData: AiRaid,
   originalMessage: string,
   preprocessedContext: PreprocessorContext,
   postprocessors: Postprocessor[] = DEFAULT_POSTPROCESSORS,
@@ -39,9 +28,13 @@ export function processAIResponse(
   const initialContext: PostprocessorContext = {
     originalMessage,
     preprocessedContext,
-    aiResponse,
-    aiData: {},
-    data: null,
+    aiData,
+    parsedData: {
+      title: "",
+      date: new Date(),
+      confidence: 0,
+      notes: "",
+    },
     metadata: {
       processingTime: 0,
       validationErrors: [],
@@ -49,19 +42,23 @@ export function processAIResponse(
     },
   };
 
-  // Run through all postprocessors
+  const confidenceBoost = 1 / postprocessors.length;
   const finalContext = postprocessors.reduce((context, postprocessor) => {
-    return postprocessor(context);
+    const result = postprocessor(context);
+    if (!result) {
+      return context;
+    }
+    result.parsedData.confidence += confidenceBoost;
+    return result;
   }, initialContext);
 
-  // Update processing time
   finalContext.metadata.processingTime = Date.now() - startTime;
 
-  if (!finalContext.data) {
+  if (finalContext.parsedData.confidence < 0.5) {
     throw new Error("Failed to process AI response");
   }
 
-  return finalContext.data;
+  return finalContext.parsedData;
 }
 
 export function processValidationResponse(validationResponse: unknown): boolean {

@@ -1,25 +1,20 @@
-import { RaidRole } from "../../types";
-
 import { type Postprocessor } from "./types";
 
-/**
- * Processes roles and user assignments
- */
 export const rolesPostprocessor: Postprocessor = (context) => {
-  const { aiData } = context;
+  const { aiData, parsedData } = context;
 
-  // Normalize roles to ensure consistent user mention format
-  const normalizedRoles = (aiData.roles as RaidRole[] | undefined) || [];
-  const processedRoles = normalizedRoles.map((role) => ({
+  const normalizedRoles = aiData.roles || [];
+  const roles = normalizedRoles.map((role) => ({
     ...role,
     preAssignedUser: typeof role.preAssignedUser === "string" ? role.preAssignedUser : undefined,
+    count: 1,
   }));
 
   return {
     ...context,
-    aiData: {
-      ...aiData,
-      roles: processedRoles,
+    parsedData: {
+      ...parsedData,
+      roles,
     },
   };
 };
