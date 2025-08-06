@@ -1,4 +1,4 @@
-import { detectLanguage, type SupportedLanguage } from "./index";
+import { detectLanguage, MultiLanguageDictionary, type SupportedLanguage } from "./index";
 
 export interface MessageKeywords {
   roleKeywords: string[];
@@ -6,10 +6,7 @@ export interface MessageKeywords {
   timeLocationKeywords: string[];
 }
 
-export type MultiLanguageMessageKeywords = Record<SupportedLanguage, MessageKeywords>;
-
-// Comprehensive message keywords for all supported languages
-export const MESSAGE_KEYWORDS: MultiLanguageMessageKeywords = {
+export const MESSAGE_KEYWORDS: MultiLanguageDictionary<MessageKeywords> = {
   en: {
     roleKeywords: ["tank", "healer", "dps", "support", "caller", "mount"],
     requirementKeywords: [
@@ -173,24 +170,15 @@ export const MESSAGE_KEYWORDS: MultiLanguageMessageKeywords = {
   },
 };
 
-/**
- * Gets message keywords for a specific language
- */
 export function getMessageKeywordsForLanguage(language: SupportedLanguage): MessageKeywords {
   return MESSAGE_KEYWORDS[language] || MESSAGE_KEYWORDS.en;
 }
 
-/**
- * Gets message keywords for the detected language of a text
- */
 export function getMessageKeywordsForText(text: string): MessageKeywords {
   const language = detectLanguage(text);
   return getMessageKeywordsForLanguage(language);
 }
 
-/**
- * Gets all keywords for a specific language and category
- */
 export function getKeywordsByCategory(language: SupportedLanguage, category: keyof MessageKeywords): string[] {
   const keywords = getMessageKeywordsForLanguage(language);
   return keywords[category] || [];

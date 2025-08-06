@@ -1,7 +1,14 @@
-import type { MultiLanguageDictionary } from "./index";
+import { detectLanguage, type MultiLanguageDictionary } from "./index";
 
-// Comprehensive role dictionaries for all supported languages
-export const ROLE_DICTIONARIES: MultiLanguageDictionary = {
+interface RoleDictionary {
+  [role: string]: {
+    role: string;
+    confidence: number;
+    patterns: string[];
+  };
+}
+
+const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
   en: {
     TANK: {
       role: "TANK",
@@ -1050,3 +1057,8 @@ export const ROLE_DICTIONARIES: MultiLanguageDictionary = {
     },
   },
 };
+
+export function getRoleDictionaryForText(text: string): RoleDictionary {
+  const language = detectLanguage(text);
+  return ROLE_DICTIONARIES[language] || ROLE_DICTIONARIES.en;
+}

@@ -1,6 +1,14 @@
 import { CONTENT_TYPE_MAPPING, ContentTypeInfo } from "@albion-raid-manager/core/entities";
 import { ContentType } from "@albion-raid-manager/core/types";
 
+import {
+  DEFAULT_OTHER_CONTENT_TYPE,
+  FIXED_SIZE_MAPPINGS,
+  NON_ROLE_PATTERNS,
+  ROLE_INDICATORS,
+  getContentTypeKeywordsForText,
+} from "../../dictionaries";
+
 import { createPreprocessor, type Preprocessor } from "./";
 
 /**
@@ -26,7 +34,7 @@ function extractRoleCount(text: string): number {
       roleCount++;
     }
 
-    if (/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥]/u.test(trimmedLine)) {
+    if (ROLE_INDICATORS.test(trimmedLine)) {
       roleCount++;
     }
   }
@@ -38,18 +46,7 @@ function extractRoleCount(text: string): number {
  * Determines if a line is clearly NOT a role
  */
 function isNonRoleLine(line: string): boolean {
-  const nonRolePatterns = [
-    /^roaming\s+as\s+\d{1,2}:\d{2}$/i,
-    /^build\s+t\d+$/i,
-    /^\d+\s+food\s+/i,
-    /^montaria:\s+/i,
-    /^@everyone$/i,
-    /^@here$/i,
-    /^https?:\/\//,
-    /^\*\*.*\*\*$/,
-  ];
-
-  return nonRolePatterns.some((pattern) => pattern.test(line));
+  return NON_ROLE_PATTERNS.some((pattern: RegExp) => pattern.test(line));
 }
 
 /**
@@ -59,21 +56,12 @@ function detectFixedSizeContentType(
   roleCount: number,
   text?: string,
 ): { type: ContentType; confidence: number; info: ContentTypeInfo } | null {
-  const fixedSizeMappings = [
-    { count: 1, type: "SOLO_DUNGEON" as ContentType },
-    { count: 2, type: "DEPTHS_DUO" as ContentType },
-    { count: 3, type: "DEPTHS_TRIO" as ContentType },
-    { count: 5, type: "HELLGATE_5V5" as ContentType },
-    { count: 10, type: "HELLGATE_10V10" as ContentType },
-  ];
-
   // Special handling for 7 players - could be either ROADS_OF_AVALON_PVE or ROADS_OF_AVALON_PVP
   if (roleCount === 7 && text) {
     const normalizedText = text.toLowerCase();
-    const pvpKeywords = ["roaming", "ganking", "pvp", "gank", "roam"];
-    const pveKeywords = ["chest", "baú", "bau", "pve", "golden", "avalon", "ava", "avalonian"];
-    const hasPvpKeywords = pvpKeywords.some((keyword) => normalizedText.includes(keyword));
-    const hasPveKeywords = pveKeywords.some((keyword) => normalizedText.includes(keyword));
+    const contentKeywords = getContentTypeKeywordsForText(text);
+    const hasPvpKeywords = contentKeywords.pvpKeywords.some((keyword: string) => normalizedText.includes(keyword));
+    const hasPveKeywords = contentKeywords.pveKeywords.some((keyword: string) => normalizedText.includes(keyword));
 
     let contentType: ContentType;
     if (hasPvpKeywords) {
@@ -90,7 +78,7 @@ function detectFixedSizeContentType(
     }
   }
 
-  const mapping = fixedSizeMappings.find((m) => m.count === roleCount);
+  const mapping = FIXED_SIZE_MAPPINGS.find((m: { count: number; type: ContentType }) => m.count === roleCount);
   if (mapping) {
     const info = CONTENT_TYPE_MAPPING.find((ct) => ct.type === mapping.type);
     if (info) {
@@ -155,13 +143,7 @@ export function detectContentType(text: string): { type: ContentType; confidence
       return {
         type: "OTHER",
         confidence: 0,
-        info: {
-          type: "OTHER",
-          keywords: [],
-          partySize: { min: 1, max: 20 },
-          raidType: "FLEX",
-          description: "Other content type",
-        },
+        info: DEFAULT_OTHER_CONTENT_TYPE,
       };
     }
     return bestMatch;
@@ -170,13 +152,7 @@ export function detectContentType(text: string): { type: ContentType; confidence
   return {
     type: "OTHER",
     confidence: 0,
-    info: {
-      type: "OTHER",
-      keywords: [],
-      partySize: { min: 1, max: 20 },
-      raidType: "FLEX",
-      description: "Other content type",
-    },
+    info: DEFAULT_OTHER_CONTENT_TYPE,
   };
 }
 

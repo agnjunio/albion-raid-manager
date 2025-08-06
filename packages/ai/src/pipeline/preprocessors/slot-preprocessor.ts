@@ -1,5 +1,13 @@
 import { logger } from "@albion-raid-manager/logger";
 
+import {
+  BUILD_START_PATTERNS,
+  NON_SLOT_PATTERNS,
+  SLOT_EMOJI_INDICATORS,
+  getRequirementKeywordsForText,
+  getSlotKeywordsForText,
+} from "../../dictionaries";
+
 import { createPreprocessor, type Preprocessor } from "./";
 
 export interface ExtractedSlot {
@@ -54,7 +62,7 @@ function isSlotLine(line: string): boolean {
   const lowerLine = line.toLowerCase();
 
   // Lines with emojis followed by build/role names (simplified detection)
-  if (/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥👑]/u.test(line)) {
+  if (SLOT_EMOJI_INDICATORS.test(line)) {
     logger.debug(`Emoji detected in line: "${line}"`);
     return true;
   }
@@ -65,19 +73,7 @@ function isSlotLine(line: string): boolean {
   }
 
   // Lines that start with build/role names (like "GARRA-")
-  const buildStartPatterns = [
-    /^garra\s*-/i,
-    /^patas\s*-/i,
-    /^stopper\s*-/i,
-    /^healer\s*-/i,
-    /^tank\s*-/i,
-    /^dps\s*-/i,
-    /^support\s*-/i,
-    /^caller\s*-/i,
-    /^mount\s*-/i,
-  ];
-
-  if (buildStartPatterns.some((pattern) => pattern.test(line))) {
+  if (BUILD_START_PATTERNS.some((pattern: RegExp) => pattern.test(line))) {
     return true;
   }
 
@@ -86,105 +82,17 @@ function isSlotLine(line: string): boolean {
     return true;
   }
 
-  // Lines that contain role/build names without colons (like "Par de adaga", "Pata /sussurante/")
-  const roleKeywords = [
-    "tank",
-    "healer",
-    "dps",
-    "support",
-    "caller",
-    "mount",
-    "tanque",
-    "sanador",
-    "suporte",
-    "chamador",
-    "montaria",
-    "fúnebre",
-    "paratempo",
-    "maça",
-    "redenção",
-    "pútrido",
-    "ártico",
-    "fura bruma",
-    "garra",
-    "patas",
-    "stopper",
-    "frost",
-    "cursed",
-    "bestona",
-    "susurrante",
-    "putrido",
-    "artico",
-    "canção",
-    "cancao",
-    "martelo",
-    "astral",
-    "aguia",
-    "buscador",
-    "garrinha",
-    "braçadeiras",
-    "mortificos",
-    "cajado",
-    "fogo",
-    "pustulento",
-    "urso",
-    "adagas",
-    "robe",
-    "malévolo",
-    "adaga",
-    "pata",
-    "maca",
-    "bruxo",
-    "besta",
-    "tirão",
-    "bilaminado",
-    "sussurante",
-    "fulgurante",
-    "badon",
-    "prisma",
-    "fb",
-    "sc",
-  ];
+  // Get language-specific keywords
+  const slotKeywords = getSlotKeywordsForText(line);
 
-  if (roleKeywords.some((keyword) => lowerLine.includes(keyword))) {
+  // Lines that contain role/build names without colons
+  if (slotKeywords.roleKeywords.some((keyword: string) => lowerLine.includes(keyword))) {
     return true;
   }
 
   // Lines that contain Discord user mentions and look like slots
   if (line.includes("<@") && line.includes(">")) {
-    const roleKeywords = [
-      "tank",
-      "healer",
-      "dps",
-      "support",
-      "caller",
-      "mount",
-      "fúnebre",
-      "paratempo",
-      "maça",
-      "redenção",
-      "pútrido",
-      "ártico",
-      "fura bruma",
-      "buscador",
-      "garrinha",
-      "braçadeiras",
-      "mortificos",
-      "cajado",
-      "fogo",
-      "pustulento",
-      "urso",
-      "adagas",
-      "robe",
-      "malévolo",
-      "fulgurante",
-      "badon",
-      "prisma",
-      "fb",
-      "sc",
-    ];
-
-    return roleKeywords.some((keyword) => lowerLine.includes(keyword));
+    return slotKeywords.roleMentionKeywords.some((keyword: string) => lowerLine.includes(keyword));
   }
 
   return false;
@@ -195,31 +103,7 @@ function isSlotLine(line: string): boolean {
  */
 function isNonSlotLine(line: string): boolean {
   // Skip lines that are clearly not slots
-  const nonSlotPatterns = [
-    /^@everyone$/,
-    /^@here$/,
-    /^set\s+/i,
-    /^gear\s+/i,
-    /^food\s+/i,
-    /^horario\s*:/i,
-    /^saida\s+/i,
-    /^departure\s+/i,
-    /^time\s*:/i,
-    /^location\s*:/i,
-    /^requirements\s*:/i,
-    /^mínimo\s+/i,
-    /^minimum\s+/i,
-    /^com\s+swaps/i,
-    /^with\s+swaps/i,
-    /^\*\*.*\*\*$/, // Bold text (often titles/headers)
-    /^\/join/i,
-    /^\/raid/i,
-    /^https?:\/\//, // URLs
-    /^equipamento\s+/i, // Equipment lines
-    /^dps\s+food/i, // DPS food requirements
-  ];
-
-  return nonSlotPatterns.some((pattern) => pattern.test(line));
+  return NON_SLOT_PATTERNS.some((pattern: RegExp) => pattern.test(line));
 }
 
 /**
@@ -242,7 +126,7 @@ function parseSlotLine(line: string): ExtractedSlot | null {
   // logger.debug(`After removing user mention: "${buildLine}"`);
 
   // Remove emojis and clean up the build name
-  buildLine = buildLine.replace(/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥]/gu, "").trim();
+  buildLine = buildLine.replace(SLOT_EMOJI_INDICATORS, "").trim();
 
   // logger.debug(`After removing emojis: "${buildLine}"`);
 
@@ -338,81 +222,21 @@ function isRequirementLine(line: string): boolean {
   if (/t\d+\.?\d*/.test(line)) return true;
   if (/\d+\.\d+/.test(line)) return true;
 
+  // Get language-specific requirement keywords
+  const requirementKeywords = getRequirementKeywordsForText(line);
+
   // Food and consumable patterns
-  const foodKeywords = [
-    "food",
-    "comida",
-    "energia",
-    "energy",
-    "potion",
-    "poção",
-    "pocao",
-    "ruins",
-    "ruinas",
-    "ruína",
-    "ruina",
-    "boa",
-    "bread",
-    "pão",
-    "pao",
-    "sandwich",
-    "sanduíche",
-    "sanduiche",
-  ];
+  if (requirementKeywords.foodKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
 
-  if (foodKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
-
-  // Mount patterns - expanded to catch more mount references
-  const mountKeywords = [
-    "mount",
-    "montaria",
-    "lobo",
-    "wolf",
-    "horse",
-    "cavalo",
-    "swiftclaw",
-    "direwolf",
-    "dire wolf",
-    "lobo direto",
-    "lobo direto",
-    "montaria:",
-    "mount:",
-    "lobo +",
-    "wolf +",
-  ];
-
-  if (mountKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
+  // Mount patterns
+  if (requirementKeywords.mountKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
 
   // Build requirements
-  const buildKeywords = [
-    "build",
-    "construção",
-    "construcao",
-    "gear",
-    "equipamento",
-    "weapon",
-    "arma",
-    "armor",
-    "armadura",
-  ];
-
-  if (buildKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
+  if (requirementKeywords.buildKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
 
   // Specific patterns that indicate requirements
   if (line.includes(":")) {
-    const colonKeywords = [
-      "montaria",
-      "mount",
-      "gear",
-      "equipamento",
-      "food",
-      "comida",
-      "build",
-      "construção",
-      "construcao",
-    ];
-
-    if (colonKeywords.some((keyword) => lowerLine.includes(keyword))) return true;
+    if (requirementKeywords.colonKeywords.some((keyword: string) => lowerLine.includes(keyword))) return true;
   }
 
   return false;

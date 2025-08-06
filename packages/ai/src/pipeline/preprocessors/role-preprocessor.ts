@@ -1,9 +1,9 @@
-import { getDictionaryForText } from "../../dictionaries";
+import { getRoleDictionaryForText } from "../../dictionaries";
 
 import { createPreprocessor, type PreAssignedRole, type Preprocessor } from ".";
 
 function findRoleAssignment(slotName: string): { role: string; confidence: number } | null {
-  const dictionary = getDictionaryForText(slotName);
+  const dictionary = getRoleDictionaryForText(slotName);
   const lowerSlot = slotName.toLowerCase();
 
   for (const [role, entry] of Object.entries(dictionary)) {

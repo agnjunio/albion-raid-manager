@@ -1,15 +1,5 @@
-export interface DictionaryEntry {
-  role: string;
-  confidence: number;
-  patterns: string[];
-}
-
-export interface LanguageDictionary {
-  [role: string]: DictionaryEntry;
-}
-
-export interface MultiLanguageDictionary {
-  [language: string]: LanguageDictionary;
+export interface MultiLanguageDictionary<T> {
+  [language: string]: T;
 }
 
 // Supported languages
@@ -91,35 +81,7 @@ export function detectLanguage(text: string): SupportedLanguage {
   return bestLanguage;
 }
 
-/**
- * Gets dictionary entries for a specific language
- */
-import { ROLE_DICTIONARIES } from "./role-dictionaries";
-
-export function getDictionaryForLanguage(language: SupportedLanguage): LanguageDictionary {
-  return ROLE_DICTIONARIES[language] || ROLE_DICTIONARIES.en;
-}
-
-/**
- * Gets dictionary entries for the detected language of a text
- */
-export function getDictionaryForText(text: string): LanguageDictionary {
-  const language = detectLanguage(text);
-  return getDictionaryForLanguage(language);
-}
-
-/**
- * Gets all role patterns for a specific role and language
- */
-export function getRolePatterns(role: string, language: SupportedLanguage = "en"): string[] {
-  const dictionary = getDictionaryForLanguage(language);
-  return dictionary[role]?.patterns || [];
-}
-
-/**
- * Gets all supported roles for a language
- */
-export function getSupportedRoles(language: SupportedLanguage = "en"): string[] {
-  const dictionary = getDictionaryForLanguage(language);
-  return Object.keys(dictionary);
-}
+export * from "./content-type-dictionaries";
+export * from "./message-dictionaries";
+export * from "./role-dictionaries";
+export * from "./slot-dictionaries";
