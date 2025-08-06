@@ -1,3 +1,4 @@
+import { getLocation } from "@albion-raid-manager/core/entities";
 import { RaidRole, type ContentType, type Raid, type RaidSlot } from "@albion-raid-manager/core/types";
 import { createDiscordTimestamp } from "@albion-raid-manager/discord";
 import {
@@ -182,7 +183,8 @@ export const buildRaidCreationConfirmationMessage = (
   }
 
   if (parsedData.location) {
-    embed.addFields({ name: "Location", value: parsedData.location, inline: true });
+    const location = getLocation(parsedData.location);
+    embed.addFields({ name: "Location", value: location.name, inline: true });
   }
 
   if (parsedData.requirements && parsedData.requirements.length > 0) {

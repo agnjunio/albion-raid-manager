@@ -55,8 +55,8 @@ IMPORTANT:
 - Today is ${new Date().toISOString()}.
 - If the message is not clear, return a confidence of 0.
 - Assume today's date if no date is provided in the message.
-- Dates can be in the past, present or future, and in the relative format (e.g. "tomorrow", "next week", "next month", "next year") in any language.
-- Assume rounded next hour if no time is provided in the message.
+- Dates can't be in the past, but can be in the present or future, and in the relative format (e.g. "tomorrow", "next week", "next month", "next year") in any language.
+- Assume 30 minutes ahead if no time is provided in the message.
 
 Return JSON only.`;
   }

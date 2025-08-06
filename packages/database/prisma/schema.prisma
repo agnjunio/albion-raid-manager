@@ -79,6 +79,7 @@ model Raid {
   id                    String       @id @default(uuid())
   type                  RaidType     @default(FIXED)
   contentType           ContentType?
+  location              String?
   serverId              String
   server                Server       @relation(fields: [serverId], references: [id])
   announcementMessageId String?

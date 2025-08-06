@@ -1,6 +1,3 @@
-import { getDefaultLocation } from "@albion-raid-manager/core/entities";
-import { ContentType } from "@albion-raid-manager/core/types";
-
 import { type Postprocessor } from "./types";
 
 /**
@@ -15,12 +12,6 @@ export const basicPostprocessor: Postprocessor = (context) => {
     title = "Raid";
   }
 
-  // Get default location for content type if no location provided
-  let location = aiData.location;
-  if (!location) {
-    location = getDefaultLocation(aiData.contentType as ContentType);
-  }
-
   // Extract requirements from message if not provided by AI
   let requirements = aiData.requirements;
   if (!requirements || requirements.length === 0) {
@@ -32,7 +23,6 @@ export const basicPostprocessor: Postprocessor = (context) => {
     parsedData: {
       ...parsedData,
       title,
-      location,
       requirements,
     },
   };

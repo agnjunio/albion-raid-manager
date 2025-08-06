@@ -6,12 +6,14 @@ import { PreprocessorContext } from "../preprocessors";
 import { basicPostprocessor } from "./basic-postprocessor";
 import { contentTypePostprocessor } from "./content-type-postprocessor";
 import { dateTimePostprocessor } from "./datetime-postprocessor";
+import { locationPostprocessor } from "./location-postprocessor";
 import { rolesPostprocessor } from "./roles-postprocessor";
 import { Postprocessor, PostprocessorContext } from "./types";
 
 export const DEFAULT_POSTPROCESSORS: Postprocessor[] = [
   basicPostprocessor,
   contentTypePostprocessor,
+  locationPostprocessor,
   dateTimePostprocessor,
   rolesPostprocessor,
 ];

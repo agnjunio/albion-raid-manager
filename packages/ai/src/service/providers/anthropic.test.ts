@@ -52,7 +52,6 @@ describe("Anthropic Service", () => {
     const result = await service.parseDiscordPing("test message");
 
     expect(result.title).toBe("Test Message");
-    expect(result.location).toBe("Fort Sterling");
     expect(result.requirements).toEqual(["t8 set"]);
     expect(result.confidence).toBeGreaterThan(0);
   });

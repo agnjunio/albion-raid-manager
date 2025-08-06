@@ -90,14 +90,8 @@ async function createRaidFromParsedData(
   });
 
   try {
-    // Use content type information from parsed data (now integrated into parseDiscordMessage)
-    const contentType =
-      parsedData.contentType && parsedData.contentTypeConfidence && parsedData.contentTypeConfidence >= 0.1
-        ? parsedData.contentType
-        : null;
-
     // Get content type info to determine raid type
-    const contentTypeInfo = contentType ? getContentTypeInfo(contentType) : null;
+    const contentTypeInfo = parsedData.contentType ? getContentTypeInfo(parsedData.contentType) : null;
     const raidType = contentTypeInfo?.raidType || "FLEX";
 
     const slots = [];
@@ -130,9 +124,10 @@ async function createRaidFromParsedData(
         title: parsedData.title,
         description: parsedData.description || `Raid created from Discord message`,
         date: parsedData.date,
+        location: parsedData.location,
         status: "SCHEDULED" as RaidStatus,
         note: parsedData.notes,
-        contentType,
+        contentType: parsedData.contentType,
         type: raidType,
         slots: {
           create: slots,
@@ -147,9 +142,10 @@ async function createRaidFromParsedData(
       raidId: raid.id,
       title: raid.title,
       date: raid.date,
+      location: raid.location,
       guildId: guild.id,
       slotsCount: slots.length,
-      contentType: contentType,
+      contentType: raid.contentType,
       raidType: raidType,
     });
 

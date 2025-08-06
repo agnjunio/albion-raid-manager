@@ -1,5 +1,3 @@
-import type { Composition } from "@albion-raid-manager/core/types";
-
 import { addMonths, startOfDay } from "date-fns";
 import { z } from "zod";
 
@@ -15,5 +13,5 @@ export const raidFormSchema = z.object({
     .date()
     .min(today, { message: "Start date must be today or later." })
     .max(maxDate, { message: "Start date cannot be more than 2 months ahead." }),
-  composition: z.custom<Composition>(),
+  location: z.string().optional(),
 });

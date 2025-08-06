@@ -26,10 +26,10 @@ raidsRouter.post(
     res: Response<APIResponse.Type<CreateGuildRaid.Response>>,
   ) => {
     const { guildId } = req.params;
-    const { description, date } = req.body;
+    const { description, date, location } = req.body;
 
     const raid = await prisma.raid.create({
-      data: { guildId, description, date },
+      data: { serverId: guildId, description, date, location },
     });
 
     res.json(APIResponse.Success({ raid }));
@@ -47,7 +47,7 @@ raidsRouter.get(
 
     const raids = await prisma.raid.findMany({
       where: {
-        guildId,
+        serverId: guildId,
       },
     });
 

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { basicPostprocessor } from "./basic-postprocessor";
 import { type PostprocessorContext } from "./types";
 
-describe("Location Requirements Postprocessor", () => {
+describe("Basic Postprocessor", () => {
   let initialContext: PostprocessorContext;
 
   beforeEach(() => {
@@ -65,24 +65,6 @@ describe("Location Requirements Postprocessor", () => {
 
     expect(result).not.toBeNull();
     expect(result!.parsedData.title).toBe("Raid");
-  });
-
-  it("should use AI-provided location", () => {
-    initialContext.aiData.location = "Fort Sterling";
-
-    const result = basicPostprocessor(initialContext);
-
-    expect(result).not.toBeNull();
-    expect(result!.parsedData.location).toBe("Fort Sterling");
-  });
-
-  it("should use default location when not provided", () => {
-    initialContext.aiData.location = "";
-
-    const result = basicPostprocessor(initialContext);
-
-    expect(result).not.toBeNull();
-    expect(result!.parsedData.location).toBeDefined();
   });
 
   it("should use AI-provided requirements", () => {

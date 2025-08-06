@@ -5,6 +5,7 @@ export namespace CreateGuildRaid {
   export type Body = {
     description: string;
     date: string;
+    location?: string;
   };
   export type Response = { raid: Raid };
 }
