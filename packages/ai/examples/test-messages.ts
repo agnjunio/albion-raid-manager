@@ -14,7 +14,15 @@ async function testMessage(message: string, name: string) {
     logger.info("🤖 Parsing with AI...");
 
     // Parse the message
-    const result = await parseDiscordMessage(message);
+    const result = await parseDiscordMessage(message, {
+      guildId: "1234567890",
+      channelId: "1234567890",
+      authorId: "1234567890",
+      messageId: "1234567890",
+      timestamp: new Date(),
+      mentions: [],
+      attachments: [],
+    });
 
     logger.info(
       `✅ Parsed Results for ${name}:\n` +

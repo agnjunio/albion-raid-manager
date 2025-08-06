@@ -4,21 +4,21 @@ import { type Postprocessor } from "./types";
  * Processes date and time information
  */
 export const dateTimePostprocessor: Postprocessor = (context) => {
-  const { aiData: parsedData, preprocessedContext: pipelineContext } = context;
+  const { aiData, preprocessedContext } = context;
 
   // Parse and combine date and time into full datetime
   let raidDateTime = new Date();
   raidDateTime.setHours(0, 0, 0, 0); // Default to start of today
 
-  const aiDate = parsedData.date as string | undefined;
-  const aiTime = parsedData.time as string | undefined;
+  const aiDate = aiData.date as string | undefined;
+  const aiTime = aiData.time as string | undefined;
 
   if (aiDate) {
     try {
       // Try to parse the AI's date response as a full datetime
-      const parsedDate = new Date(aiDate);
-      if (!isNaN(parsedDate.getTime())) {
-        raidDateTime = parsedDate;
+      const parsedAiDate = new Date(aiDate);
+      if (!isNaN(parsedAiDate.getTime())) {
+        raidDateTime = parsedAiDate;
       }
     } catch {
       console.warn("Failed to parse AI date:", aiDate);
@@ -58,9 +58,9 @@ export const dateTimePostprocessor: Postprocessor = (context) => {
   }
 
   // Extract time from message if not provided by AI
-  if (pipelineContext.extractedTime && (!aiTime || aiTime === "Not specified")) {
+  if (preprocessedContext.extractedTime && (!aiTime || aiTime === "Not specified")) {
     // Parse the extracted time string
-    const timeMatch = pipelineContext.extractedTime.match(/(\d{1,2}):(\d{2})/);
+    const timeMatch = preprocessedContext.extractedTime.match(/(\d{1,2}):(\d{2})/);
     if (timeMatch) {
       const hours = parseInt(timeMatch[1], 10);
       const minutes = parseInt(timeMatch[2], 10);
@@ -71,7 +71,7 @@ export const dateTimePostprocessor: Postprocessor = (context) => {
   return {
     ...context,
     aiData: {
-      ...parsedData,
+      ...aiData,
       date: raidDateTime,
     },
   };

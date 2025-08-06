@@ -5,7 +5,7 @@ export * from "./types";
 export * from "./service";
 
 // Parser layer
-export { parseDiscordMessage, parseMultipleDiscordMessages, validateDiscordMessage } from "./parser";
+export { parseDiscordMessage, validateDiscordMessage } from "./parser";
 
 // Utils layer
 export * from "./pipeline/preprocessors";

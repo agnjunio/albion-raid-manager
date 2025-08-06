@@ -1,10 +1,9 @@
 import { logger } from "@albion-raid-manager/logger";
 import OpenAI from "openai";
 
+import { type PreprocessorContext } from "../../pipeline";
 import { AIProvider } from "../../types";
 import { BaseAIService } from "../base";
-
-import { type PreprocessorContext } from "../../pipeline";
 
 export class OpenAIService extends BaseAIService {
   private client: OpenAI;
@@ -26,14 +25,14 @@ export class OpenAIService extends BaseAIService {
   }
 
   async generateResponse(context: PreprocessorContext): Promise<unknown> {
-    logger.info(`Generating OpenAI response for ${context.extractedSlots.length} slots`, {
-      slots: context.extractedSlots,
-    });
-
-    const prompt = this.createRaidParsingPrompt(context);
-
     try {
-      logger.debug("Making OpenAI API request for Discord message parsing", {
+      logger.info(`Generating OpenAI response for ${context.extractedSlots.length} slots`, {
+        slots: context.extractedSlots,
+      });
+
+      const prompt = this.createRaidParsingPrompt(context);
+
+      logger.debug("Making OpenAI API request for Discord message parsing\n" + prompt, {
         provider: this.provider,
         model: this.config.model,
         messageLength: context.originalMessage.length,
@@ -62,7 +61,8 @@ export class OpenAIService extends BaseAIService {
         throw new Error("No response content from OpenAI");
       }
 
-      logger.debug("Received OpenAI response", {
+      logger.debug("Received OpenAI response\n" + content, {
+        content,
         provider: this.provider,
         model: this.config.model,
         usage: response.usage,

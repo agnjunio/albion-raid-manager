@@ -46,46 +46,17 @@ export abstract class BaseAIService implements AIService {
 
     const timeSection = context.extractedTime ? `\nEXTRACTED_TIME: ${context.extractedTime}\n` : "";
 
-    return `Parse Albion Online raid → JSON: {title, contentType, contentTypeConfidence, date(ISO), location, requirements[], roles[{name, role, preAssignedUser}], confidence(0-1)}
+    return `Parse Albion Online raid → JSON: {title, contentType, contentTypeConfidence, timestamp, location, requirements[], roles[{name, role, preAssignedUser}], confidence(0-1)}
 
 Msg: "${context.processedMessage}"${slotSection}${preAssignedSection}${contentTypeSection}${requirementsSection}${timeSection}
 
-CRITICAL RULES:
-1. Content Type Detection: Use party size to determine content type:
-   - 7 players = ROADS_OF_AVALON_PVE (Avalon Roads)
-   - 2 players = DEPTHS_DUO
-   - 3 players = DEPTHS_TRIO
-   - 5 players = HELLGATE_5V5
-   - 10 players = HELLGATE_10V10
-   - 1 player = SOLO_DUNGEON or MISTS_SOLO
-   - Variable size = OPEN_WORLD_FARMING, GROUP_DUNGEON, etc.
-
-2. Location Handling:
-   - For ROADS_OF_AVALON_PVE, default location is "Brecilien"
-   - For other Avalon content, default location is "Brecilien"
-   - "Montaria: Lobo +" is a REQUIREMENT, not a location
-   - Only use actual city/location names as location
-
-3. Requirements Extraction:
-   - Extract all gear/food/mount requirements
-   - "Montaria: Lobo +" goes in requirements array
-   - "T8", "1 food boa", "2 ruins" are requirements
-   - Gear tiers (T8, T7, etc.) are requirements
-   - Food and consumables are requirements
-
-4. Preassigned Users:
-   - Include Discord user IDs in preAssignedUser field for each role
-   - Format: "<@userId>" or just "userId"
-   - Extract from the original message
-
-5. Date Format:
-   - Use Discord timestamp format for relative time display
-   - Combine date and time into full ISO datetime
-
-Roles: TANK, HEALER, SUPPORT, RANGED_DPS, MELEE_DPS, CALLER, BATTLEMOUNT
-- Use pre-assigned roles when available
-- FB=Fura-Bruma (bow), Tank builds→TANK, Healer→HEALER, Staff weapons→RANGED_DPS, Cursed→SUPPORT
-- Confidence: Set high confidence (0.8-1.0) for clear raid messages with roles, medium (0.6-0.8) for basic raid messages, low (0.3-0.6) for unclear messages
+IMPORTANT:
+- The message can be in any language, including a mix of languages.
+- Today is ${new Date().toISOString()}.
+- If the message is not clear, return a confidence of 0.
+- Assume today's date if no date is provided in the message.
+- Dates can be in the past, present or future, and in the relative format (e.g. "tomorrow", "next week", "next month", "next year") in any language.
+- Assume rounded next hour if no time is provided in the message.
 
 Return JSON only.`;
   }

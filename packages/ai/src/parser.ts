@@ -18,19 +18,13 @@ export function resetAIService() {
   aiService = null;
 }
 
-export async function parseDiscordMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData> {
+export async function parseDiscordMessage(message: string, context: DiscordMessageContext): Promise<ParsedRaidData> {
   try {
     const service = getAIServiceInstance();
     logger.debug("Parsing Discord message with AI.", {
       content: message.substring(0, 100) + "...",
       provider: service.provider,
-      context: context
-        ? {
-            guildId: context.guildId,
-            channelId: context.channelId,
-            authorId: context.authorId,
-          }
-        : undefined,
+      context,
     });
 
     // First validate if the message is raid-related
@@ -61,27 +55,6 @@ export async function parseDiscordMessage(message: string, context?: DiscordMess
       0.0,
     );
   }
-}
-
-export async function parseMultipleDiscordMessages(
-  messages: Array<{ content: string; context?: DiscordMessageContext }>,
-): Promise<Array<{ data: ParsedRaidData; originalMessage: string }>> {
-  const results = [];
-
-  for (const { content, context } of messages) {
-    try {
-      const data = await parseDiscordMessage(content, context);
-      results.push({ data, originalMessage: content });
-    } catch (error) {
-      logger.warn("Failed to parse message in batch", {
-        message: content.substring(0, 100) + "...",
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
-      // Continue with other messages
-    }
-  }
-
-  return results;
 }
 
 export async function validateDiscordMessage(message: string): Promise<boolean> {

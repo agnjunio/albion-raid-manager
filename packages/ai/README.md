@@ -96,7 +96,6 @@ const isRaidMessage = await validateDiscordMessage("Anyone up for a quick dungeo
 You can also use these functions directly without any initialization:
 
 - `parseDiscordMessage(message: string, context?: DiscordMessageContext): Promise<ParsedRaidData>`
-- `parseMultipleDiscordMessages(messages: Array<{content: string, context?: DiscordMessageContext}>): Promise<Array<{data: ParsedRaidData, originalMessage: string}>>`
 - `validateDiscordMessage(message: string): Promise<boolean>`
 
 ### ParsedRaidData
