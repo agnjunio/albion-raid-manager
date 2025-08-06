@@ -1,6 +1,6 @@
+import { getDefaultLocation, normalizeContentType } from "@albion-raid-manager/core/entities";
 import { ContentType } from "@albion-raid-manager/core/types";
 
-import { getDefaultLocation, normalizeContentType } from "../utils";
 import { ParsedRaidData, RaidRole } from "../../types";
 
 /**

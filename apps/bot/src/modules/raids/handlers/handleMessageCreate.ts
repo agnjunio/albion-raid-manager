@@ -1,10 +1,6 @@
-import {
-  DiscordMessageContext,
-  getContentTypeInfo,
-  parseDiscordMessage,
-  ParsedRaidData,
-} from "@albion-raid-manager/ai";
+import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { memoize } from "@albion-raid-manager/core/cache";
+import { getContentTypeInfo } from "@albion-raid-manager/core/entities";
 import { Raid, RaidRole, RaidSlot, Server } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";

@@ -31,6 +31,11 @@
       "import": "./src/utils/index.ts",
       "require": "./src/utils/index.ts"
     },
+    "./entities": {
+      "types": "./src/entities/index.ts",
+      "import": "./src/entities/index.ts",
+      "require": "./src/entities/index.ts"
+    },
     "./types": {
       "types": "./generated/types/index.ts",
       "import": "./generated/types/index.ts",

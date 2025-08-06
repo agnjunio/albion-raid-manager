@@ -9,5 +9,3 @@ export { parseDiscordMessage, parseMultipleDiscordMessages, validateDiscordMessa
 
 // Utils layer
 export * from "./pipeline/preprocessors";
-export { type ContentTypeInfo } from "./pipeline/preprocessors/content-type-preprocessor";
-export { getContentTypeInfo } from "./pipeline/utils";
