@@ -4,10 +4,16 @@ import { ContentType } from "@albion-raid-manager/core/types";
 import { type Postprocessor } from "./types";
 
 /**
- * Processes location and requirements
+ * Processes title, location and requirements
  */
 export const basicPostprocessor: Postprocessor = (context) => {
   const { aiData, preprocessedContext, parsedData } = context;
+
+  // Get default title if no title provided
+  let title = aiData.title;
+  if (!title) {
+    title = "Raid";
+  }
 
   // Get default location for content type if no location provided
   let location = aiData.location;
@@ -25,6 +31,7 @@ export const basicPostprocessor: Postprocessor = (context) => {
     ...context,
     parsedData: {
       ...parsedData,
+      title,
       location,
       requirements,
     },

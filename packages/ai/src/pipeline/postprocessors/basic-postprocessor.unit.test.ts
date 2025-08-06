@@ -49,6 +49,24 @@ describe("Location Requirements Postprocessor", () => {
     };
   });
 
+  it("should use AI-provided title", () => {
+    initialContext.aiData.title = "Test Raid";
+
+    const result = basicPostprocessor(initialContext);
+
+    expect(result).not.toBeNull();
+    expect(result!.parsedData.title).toBe("Test Raid");
+  });
+
+  it("should use default title when not provided", () => {
+    initialContext.aiData.title = "";
+
+    const result = basicPostprocessor(initialContext);
+
+    expect(result).not.toBeNull();
+    expect(result!.parsedData.title).toBe("Raid");
+  });
+
   it("should use AI-provided location", () => {
     initialContext.aiData.location = "Fort Sterling";
 
