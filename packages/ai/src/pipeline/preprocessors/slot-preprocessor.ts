@@ -1,11 +1,6 @@
 import { logger } from "@albion-raid-manager/logger";
 
-import {
-  BUILD_START_PATTERNS,
-  NON_SLOT_PATTERNS,
-  SLOT_EMOJI_INDICATORS,
-  getSlotDictionaryForText,
-} from "../../dictionaries";
+import { SLOT_EMOJI_INDICATORS, getSlotDictionaryForText } from "../../dictionaries";
 
 import { createPreprocessor, type Preprocessor } from "./";
 
@@ -31,23 +26,23 @@ export function extractSlotLines(message: string): ExtractedSlot[] {
 
     // Skip lines that are clearly not slots
     if (isNonSlotLine(trimmedLine)) {
-      // logger.debug(`Skipping non-slot line: "${trimmedLine}"`);
+      logger.debug(`Skipping non-slot line: "${trimmedLine}"`);
       continue;
     }
 
     // Check if this line looks like a slot
     if (isSlotLine(trimmedLine)) {
-      // logger.debug(`Line recognized as slot, parsing: "${trimmedLine}"`);
+      logger.debug(`Line recognized as slot, parsing: "${trimmedLine}"`);
       const slot = parseSlotLine(trimmedLine);
       if (slot) {
         slots.push(slot);
-        // logger.debug(`Extracted slot: ${slot.originalLine} -> ${slot.buildName}`);
+        logger.debug(`Extracted slot: ${slot.originalLine} -> ${slot.buildName}`);
       } else {
         logger.debug(`Failed to parse slot from: "${trimmedLine}"`);
       }
-    } // else {
-    // logger.debug(`Line not recognized as slot: "${trimmedLine}"`);
-    // }
+    } else {
+      logger.debug(`Line not recognized as slot: "${trimmedLine}"`);
+    }
   }
 
   logger.info(`Extracted ${slots.length} slots from message`);
@@ -60,6 +55,9 @@ export function extractSlotLines(message: string): ExtractedSlot[] {
 function isSlotLine(line: string): boolean {
   const lowerLine = line.toLowerCase();
 
+  // Get language-specific keywords and patterns
+  const slotKeywords = getSlotDictionaryForText(line);
+
   // Lines with emojis followed by build/role names (simplified detection)
   if (SLOT_EMOJI_INDICATORS.test(line)) {
     logger.debug(`Emoji detected in line: "${line}"`);
@@ -71,18 +69,15 @@ function isSlotLine(line: string): boolean {
     return true;
   }
 
-  // Lines that start with build/role names (like "GARRA-")
-  if (BUILD_START_PATTERNS.some((pattern: RegExp) => pattern.test(line))) {
+  // Lines that start with build/role names (language-specific patterns)
+  if (slotKeywords.buildStartPatterns.some((pattern: RegExp) => pattern.test(line))) {
     return true;
   }
 
-  // NEW: Any line with a colon and at least one word before it is a slot
-  if (/^\s*\S[^:]*:\s*/.test(line)) {
+  // Lines with a colon pattern that look like slots (but not time patterns)
+  if (/^\s*\S[^:]*:\s*/.test(line) && !/\d{1,2}:\d{2}/.test(line)) {
     return true;
   }
-
-  // Get language-specific keywords
-  const slotKeywords = getSlotDictionaryForText(line);
 
   // Lines that contain role/build names without colons
   if (slotKeywords.roleKeywords.some((keyword: string) => lowerLine.includes(keyword))) {
@@ -101,8 +96,11 @@ function isSlotLine(line: string): boolean {
  * Determines if a line is clearly NOT a slot
  */
 function isNonSlotLine(line: string): boolean {
-  // Skip lines that are clearly not slots
-  return NON_SLOT_PATTERNS.some((pattern: RegExp) => pattern.test(line));
+  // Get language-specific non-slot patterns
+  const slotKeywords = getSlotDictionaryForText(line);
+
+  // Skip lines that are clearly not slots using language-specific patterns
+  return slotKeywords.nonSlotPatterns.some((pattern: RegExp) => pattern.test(line));
 }
 
 /**
@@ -124,8 +122,9 @@ function parseSlotLine(line: string): ExtractedSlot | null {
 
   // logger.debug(`After removing user mention: "${buildLine}"`);
 
-  // Remove emojis and clean up the build name
-  buildLine = buildLine.replace(SLOT_EMOJI_INDICATORS, "").trim();
+  // Remove emojis and clean up the build name (global flag to remove all instances)
+  buildLine = buildLine.replace(/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥👑]/gu, "").trim();
+  buildLine = buildLine.replace(/<:[^:]+:\d+>/g, "").trim();
 
   // logger.debug(`After removing emojis: "${buildLine}"`);
 

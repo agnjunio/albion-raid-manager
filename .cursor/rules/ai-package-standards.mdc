@@ -45,6 +45,7 @@ alwaysApply: true
 - Test error handling scenarios
 - Test performance with large datasets
 - Implement integration tests for AI functionality
+- To test an example file located at `examples/*.txt`, use the `pnpm test:file` script
 
 ## Security
 
