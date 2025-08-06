@@ -21,7 +21,7 @@ export abstract class BaseAIService implements AIService {
   async validateMessage(message: string): Promise<boolean> {
     const context = preprocessMessage(message);
     const validationResponse = await this.generateValidationResponse(context);
-    return processValidationResponse(validationResponse, context);
+    return processValidationResponse(validationResponse);
   }
 
   abstract generateValidationResponse(context: PreprocessorContext): Promise<unknown>;
