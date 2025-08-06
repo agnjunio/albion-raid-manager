@@ -54,7 +54,7 @@ function isSlotLine(line: string): boolean {
   const lowerLine = line.toLowerCase();
 
   // Lines with emojis followed by build/role names (simplified detection)
-  if (/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥]/u.test(line)) {
+  if (/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥👑]/u.test(line)) {
     logger.debug(`Emoji detected in line: "${line}"`);
     return true;
   }

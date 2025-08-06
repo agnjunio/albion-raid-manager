@@ -71,7 +71,12 @@ describe("OpenAI Service", () => {
           message: {
             content: JSON.stringify({
               title: "Test Raid",
+              contentType: "GROUP_DUNGEON",
+              contentTypeConfidence: 0.85,
               date: new Date().toISOString(),
+              location: "Fort Sterling",
+              requirements: ["t8 set"],
+              roles: [{ name: "Tank 1", role: "TANK" }],
               confidence: 0.9,
             }),
           },
@@ -85,6 +90,7 @@ describe("OpenAI Service", () => {
     const result = await service.parseDiscordPing("test message");
 
     expect(result.title).toBe("Test Raid");
+    expect(result.contentType).toBe("GROUP_DUNGEON");
     expect(result.confidence).toBe(0.9);
   });
 
@@ -146,25 +152,29 @@ describe("Anthropic Service", () => {
   });
 
   it("should parse Discord ping correctly", async () => {
-    const mockResponse = {
+    mockCreate.mockResolvedValueOnce({
       content: [
         {
           type: "text",
           text: JSON.stringify({
-            title: "Test Raid",
+            title: "Test Message",
+            contentType: "GROUP_DUNGEON",
+            contentTypeConfidence: 0.85,
             date: new Date().toISOString(),
+            location: "Fort Sterling",
+            requirements: ["t8 set"],
+            roles: [{ name: "Tank 1", role: "TANK" }],
             confidence: 0.9,
           }),
         },
       ],
       usage: { input_tokens: 50, output_tokens: 100 },
-    };
-
-    mockCreate.mockResolvedValueOnce(mockResponse);
+    });
 
     const result = await service.parseDiscordPing("test message");
 
-    expect(result.title).toBe("Test Raid");
+    expect(result.title).toBe("Test Message");
+    expect(result.contentType).toBe("GROUP_DUNGEON");
     expect(result.confidence).toBe(0.9);
   });
 

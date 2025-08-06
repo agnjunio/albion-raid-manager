@@ -87,6 +87,59 @@ describe("Slot Preprocessor Pipeline", () => {
     expect(result.extractedSlots.every((slot) => !slot.includes("@"))).toBe(true);
   });
 
+  it("should handle crown emoji for caller role", () => {
+    const initialContext: PreprocessorContext = {
+      originalMessage: "👑 Martelo: @user123\n👑 Caller: @user456",
+      processedMessage: "processed",
+      extractedSlots: [],
+      preAssignedRoles: [],
+      extractedRequirements: [],
+      extractedTime: null,
+      preAssignedContentType: null,
+      metadata: {
+        originalLength: 40,
+        processedLength: 30,
+        tokenReduction: 10,
+        slotCount: 0,
+        requirementCount: 0,
+      },
+    };
+
+    const result = slotPreprocessor(initialContext);
+
+    // Should extract slots with crown emoji
+    expect(result.extractedSlots.length).toBe(2);
+    expect(result.extractedSlots.some((slot) => slot.includes("Martelo") && slot.includes("@user123"))).toBe(true);
+    expect(result.extractedSlots.some((slot) => slot.includes("Caller") && slot.includes("@user456"))).toBe(true);
+    expect(result.metadata.slotCount).toBe(2);
+  });
+
+  it("should handle crown emoji without user mention", () => {
+    const initialContext: PreprocessorContext = {
+      originalMessage: "👑 Martelo: \n👑 Caller: -",
+      processedMessage: "processed",
+      extractedSlots: [],
+      preAssignedRoles: [],
+      extractedRequirements: [],
+      extractedTime: null,
+      preAssignedContentType: null,
+      metadata: {
+        originalLength: 30,
+        processedLength: 20,
+        tokenReduction: 10,
+        slotCount: 0,
+        requirementCount: 0,
+      },
+    };
+
+    const result = slotPreprocessor(initialContext);
+
+    // Should extract slots with crown emoji even without user mentions
+    expect(result.extractedSlots.length).toBe(2);
+    expect(result.extractedSlots.some((slot) => slot.includes("Martelo") && !slot.includes("@"))).toBe(true);
+    expect(result.extractedSlots.some((slot) => slot.includes("Caller") && !slot.includes("@"))).toBe(true);
+  });
+
   it("should handle empty message", () => {
     const initialContext: PreprocessorContext = {
       originalMessage: "",

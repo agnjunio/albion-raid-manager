@@ -1,4 +1,4 @@
-import type { AlbionGuildResponse, AlbionPlayerResponse, AlbionSearchResponse } from "../src/types";
+import type { AlbionGuildResponse, AlbionPlayerResponse, AlbionSearchResponse, AlbionUser } from "../src/types";
 
 import axios from "axios";
 import { beforeEach, describe, expect, it, MockedFunction, vi } from "vitest";
@@ -143,7 +143,7 @@ describe("Albion API Client", () => {
         guilds: [],
       };
 
-      const mockPlayerResponse: AlbionPlayerResponse = {
+      const mockPlayerResponse: AlbionUser = {
         Id: "test-id",
         Name: "TestPlayer",
         GuildId: "guild-id",
@@ -158,29 +158,14 @@ describe("Albion API Client", () => {
         totalKills: null,
         gvgKills: null,
         gvgWon: null,
-        Equipment: {
-          MainHand: null,
-          OffHand: null,
-          Head: null,
-          Armor: null,
-          Shoes: null,
-          Bag: null,
-          Cape: null,
-          Mount: null,
-          Potion: null,
-          Food: null,
-        },
-        Inventory: [],
       };
 
-      (axios.get as MockedFunction<typeof axios.get>)
-        .mockResolvedValueOnce({ data: mockSearchResponse })
-        .mockResolvedValueOnce({ data: mockPlayerResponse });
+      (axios.get as MockedFunction<typeof axios.get>).mockResolvedValueOnce({ data: mockSearchResponse });
 
       const result = await verifyAlbionPlayer("TestPlayer");
 
-      expect(result).toEqual(mockPlayerResponse);
-      expect(axios.get).toHaveBeenCalledTimes(2);
+      expect(result).toEqual(mockSearchResponse.players[0]);
+      expect(axios.get).toHaveBeenCalledTimes(1);
     });
 
     it("should return null for non-existent player", async () => {

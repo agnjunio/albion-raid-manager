@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { contentTypePreprocessor } from "./content-type-preprocessor";
+
 import { type PreprocessorContext } from "./index";
 
 describe("Content Type Preprocessor Pipeline", () => {
@@ -92,9 +93,9 @@ describe("Content Type Preprocessor Pipeline", () => {
 
   it("should handle avalonian dungeon content", () => {
     const initialContext: PreprocessorContext = {
-      originalMessage: "Avalon full clear",
+      originalMessage: "Avalonian Roads PvE, need 7 people",
       processedMessage: "processed",
-      extractedSlots: [],
+      extractedSlots: ["Tank", "Healer", "DPS 1", "DPS 2", "DPS 3", "DPS 4", "DPS 5"],
       preAssignedRoles: [],
       extractedRequirements: [],
       extractedTime: null,
@@ -103,7 +104,7 @@ describe("Content Type Preprocessor Pipeline", () => {
         originalLength: 20,
         processedLength: 15,
         tokenReduction: 5,
-        slotCount: 0,
+        slotCount: 7,
         requirementCount: 0,
       },
     };
@@ -111,17 +112,17 @@ describe("Content Type Preprocessor Pipeline", () => {
     const result = contentTypePreprocessor(initialContext);
 
     expect(result.preAssignedContentType).not.toBeNull();
-    expect(result.preAssignedContentType?.type).toBe("GROUP_DUNGEON");
-    expect(result.preAssignedContentType?.partySize.min).toBe(2);
-    expect(result.preAssignedContentType?.partySize.max).toBe(5);
-    expect(result.preAssignedContentType?.raidType).toBe("FLEX");
+    expect(result.preAssignedContentType?.type).toBe("ROADS_OF_AVALON_PVE");
+    expect(result.preAssignedContentType?.partySize.min).toBe(7);
+    expect(result.preAssignedContentType?.partySize.max).toBe(7);
+    expect(result.preAssignedContentType?.raidType).toBe("FIXED");
   });
 
   it("should handle roads of avalon content", () => {
     const initialContext: PreprocessorContext = {
-      originalMessage: "Roads of Avalon PvE with golden chest",
+      originalMessage: "Roads of Avalon PvE with golden chest - 7 people needed",
       processedMessage: "processed",
-      extractedSlots: [],
+      extractedSlots: ["Tank", "Healer", "DPS 1", "DPS 2", "DPS 3", "DPS 4", "DPS 5"],
       preAssignedRoles: [],
       extractedRequirements: [],
       extractedTime: null,
@@ -130,7 +131,7 @@ describe("Content Type Preprocessor Pipeline", () => {
         originalLength: 40,
         processedLength: 35,
         tokenReduction: 5,
-        slotCount: 0,
+        slotCount: 7,
         requirementCount: 0,
       },
     };
@@ -138,17 +139,17 @@ describe("Content Type Preprocessor Pipeline", () => {
     const result = contentTypePreprocessor(initialContext);
 
     expect(result.preAssignedContentType).not.toBeNull();
-    expect(result.preAssignedContentType?.type).toBe("AVALONIAN_DUNGEON_FULL_CLEAR");
-    expect(result.preAssignedContentType?.partySize.min).toBe(5);
-    expect(result.preAssignedContentType?.partySize.max).toBe(20);
-    expect(result.preAssignedContentType?.raidType).toBe("FLEX");
+    expect(result.preAssignedContentType?.type).toBe("ROADS_OF_AVALON_PVE");
+    expect(result.preAssignedContentType?.partySize.min).toBe(7);
+    expect(result.preAssignedContentType?.partySize.max).toBe(7);
+    expect(result.preAssignedContentType?.raidType).toBe("FIXED");
   });
 
   it("should handle unknown content type", () => {
     const initialContext: PreprocessorContext = {
-      originalMessage: "Some random message with no clear content type",
+      originalMessage: "Random activity with some specific roles",
       processedMessage: "processed",
-      extractedSlots: [],
+      extractedSlots: ["Role 1", "Role 2"],
       preAssignedRoles: [],
       extractedRequirements: [],
       extractedTime: null,
@@ -157,15 +158,18 @@ describe("Content Type Preprocessor Pipeline", () => {
         originalLength: 50,
         processedLength: 45,
         tokenReduction: 5,
-        slotCount: 0,
+        slotCount: 2,
         requirementCount: 0,
       },
     };
 
     const result = contentTypePreprocessor(initialContext);
 
-    // Should return a content type for unknown content type (fallback behavior)
+    // Should return GROUP_DUNGEON as fallback for messages with 2-5 roles
     expect(result.preAssignedContentType).not.toBeNull();
+    expect(result.preAssignedContentType?.type).toBe("GROUP_DUNGEON");
+    expect(result.preAssignedContentType?.partySize.min).toBe(2);
+    expect(result.preAssignedContentType?.partySize.max).toBe(5);
   });
 
   it("should handle empty message", () => {
@@ -222,4 +226,4 @@ describe("Content Type Preprocessor Pipeline", () => {
     expect(result.preAssignedContentType).not.toBeNull();
     expect(result.preAssignedContentType?.type).toBe("SOLO_DUNGEON");
   });
-}); 
+});

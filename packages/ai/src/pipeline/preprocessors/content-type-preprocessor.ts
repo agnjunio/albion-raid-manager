@@ -57,21 +57,44 @@ function isNonRoleLine(line: string): boolean {
  */
 function detectFixedSizeContentType(
   roleCount: number,
+  text?: string,
 ): { type: ContentType; confidence: number; info: ContentTypeInfo } | null {
   const fixedSizeMappings = [
     { count: 1, type: "SOLO_DUNGEON" as ContentType },
     { count: 2, type: "DEPTHS_DUO" as ContentType },
     { count: 3, type: "DEPTHS_TRIO" as ContentType },
     { count: 5, type: "HELLGATE_5V5" as ContentType },
-    { count: 7, type: "ROADS_OF_AVALON_PVE" as ContentType },
     { count: 10, type: "HELLGATE_10V10" as ContentType },
   ];
+
+  // Special handling for 7 players - could be either ROADS_OF_AVALON_PVE or ROADS_OF_AVALON_PVP
+  if (roleCount === 7 && text) {
+    const normalizedText = text.toLowerCase();
+    const pvpKeywords = ["roaming", "ganking", "pvp", "gank", "roam"];
+    const pveKeywords = ["chest", "baú", "bau", "pve", "golden", "avalon", "ava", "avalonian"];
+    const hasPvpKeywords = pvpKeywords.some((keyword) => normalizedText.includes(keyword));
+    const hasPveKeywords = pveKeywords.some((keyword) => normalizedText.includes(keyword));
+
+    let contentType: ContentType;
+    if (hasPvpKeywords) {
+      contentType = "ROADS_OF_AVALON_PVP"; // If PvP keywords are present, it's PvP
+    } else if (hasPveKeywords) {
+      contentType = "ROADS_OF_AVALON_PVE"; // Otherwise check for PvE keywords
+    } else {
+      contentType = "ROADS_OF_AVALON_PVP"; // Default to PvP for Roads content with no keywords
+    }
+
+    const info = CONTENT_TYPE_MAPPING.find((ct) => ct.type === contentType);
+    if (info) {
+      return { type: contentType, confidence: 0.85, info };
+    }
+  }
 
   const mapping = fixedSizeMappings.find((m) => m.count === roleCount);
   if (mapping) {
     const info = CONTENT_TYPE_MAPPING.find((ct) => ct.type === mapping.type);
     if (info) {
-      return { type: mapping.type, confidence: 0.8, info };
+      return { type: mapping.type, confidence: 0.85, info };
     }
   }
 
@@ -88,7 +111,7 @@ export function detectContentType(text: string): { type: ContentType; confidence
   const roleCount = extractRoleCount(text);
 
   if (roleCount > 0) {
-    const fixedSizeMatch = detectFixedSizeContentType(roleCount);
+    const fixedSizeMatch = detectFixedSizeContentType(roleCount, normalizedText);
     if (fixedSizeMatch) {
       return fixedSizeMatch;
     }
@@ -157,13 +180,48 @@ export function detectContentType(text: string): { type: ContentType; confidence
   };
 }
 
-function preAssignContentType(text: string): { type: ContentType; confidence: number; info: ContentTypeInfo } | null {
+function preAssignContentType(
+  text: string,
+  roleCount: number,
+): { type: ContentType; confidence: number; info: ContentTypeInfo } | null {
   const detection = detectContentType(text);
+
+  // If no specific content type was detected but we have 2-5 roles, default to GROUP_DUNGEON
+  if (detection.confidence < 0.1 && roleCount >= 2 && roleCount <= 5) {
+    const groupDungeonInfo = CONTENT_TYPE_MAPPING.find((ct) => ct.type === "GROUP_DUNGEON");
+    if (groupDungeonInfo) {
+      return {
+        type: "GROUP_DUNGEON",
+        confidence: 0.2,
+        info: groupDungeonInfo,
+      };
+    }
+  }
+
   return detection.confidence >= 0.1 ? detection : null;
 }
 
 export const contentTypePreprocessor: Preprocessor = createPreprocessor((context) => {
-  const contentType = preAssignContentType(context.originalMessage);
+  const roleCount = context.metadata.slotCount;
+  const contentType = preAssignContentType(context.originalMessage, roleCount);
+
+  // If no content type detected, but there are 2-5 roles, default to GROUP_DUNGEON
+  if (!contentType) {
+    const roleCount = extractRoleCount(context.originalMessage);
+    if (roleCount >= 2 && roleCount <= 5) {
+      const groupDungeonInfo = CONTENT_TYPE_MAPPING.find((ct) => ct.type === "GROUP_DUNGEON");
+      if (groupDungeonInfo) {
+        return {
+          preAssignedContentType: {
+            type: "GROUP_DUNGEON",
+            confidence: 0.2,
+            partySize: groupDungeonInfo.partySize,
+            raidType: groupDungeonInfo.raidType,
+          },
+        };
+      }
+    }
+  }
 
   return {
     preAssignedContentType: contentType

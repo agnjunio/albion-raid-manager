@@ -99,6 +99,10 @@ Use Docker for infrastructure and Turbo for applications:
 4. Test with Turbo: `pnpm dev`
 5. Submit a pull request
 
+## Code Agent Standards
+
+**Important:** For all Code Agent prompts (including Copilot, AI agents, and automation tools), always read the contents of the markdown files in `.cursor/rules` before executing any tasks. These files define the project standards, best practices, and conventions for this repository. Agents should use these rules to guide all code generation, refactoring, and automation.
+
 ## License
 
 [Add your license here]

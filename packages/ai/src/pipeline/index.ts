@@ -4,7 +4,7 @@ import { type Preprocessor, type PreprocessorContext } from "./preprocessors";
 import { contentTypePreprocessor } from "./preprocessors/content-type-preprocessor";
 import { parseTimeString, timePreprocessor } from "./preprocessors/datetime-preprocessor";
 import { messagePreprocessor } from "./preprocessors/message-preprocessor";
-import { rolePreprocessor } from "./preprocessors/role-preassigner";
+import { rolePreprocessor } from "./preprocessors/role-preprocessor";
 import { requirementPreprocessor, slotPreprocessor } from "./preprocessors/slot-preprocessor";
 
 // Re-export types for external use

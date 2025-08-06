@@ -30,7 +30,23 @@ export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 // Language detection patterns
 export const LANGUAGE_PATTERNS: Record<SupportedLanguage, string[]> = {
   en: ["tank", "healer", "dps", "support", "mount", "gear", "weapon"],
-  pt: ["tanque", "sanador", "suporte", "montaria", "equipamento", "arma"],
+  pt: [
+    "tanque",
+    "guardiao",
+    "guardião",
+    "lider",
+    "líder",
+    "caller",
+    "sanador",
+    "suporte",
+    "montaria",
+    "equipamento",
+    "martelo",
+    "machado",
+    "claymore",
+    "lider do grupo",
+    "líder do grupo",
+  ],
   es: ["tanque", "sanador", "soporte", "montura", "equipo", "arma"],
   ru: ["танк", "хилер", "дпс", "саппорт", "маунт", "снаряжение", "оружие"],
   zh: ["坦克", "治疗", "输出", "辅助", "坐骑", "装备", "武器"],
@@ -90,25 +106,6 @@ export function getDictionaryForLanguage(language: SupportedLanguage): LanguageD
 export function getDictionaryForText(text: string): LanguageDictionary {
   const language = detectLanguage(text);
   return getDictionaryForLanguage(language);
-}
-
-/**
- * Finds a role assignment for a given slot name using the appropriate language dictionary
- */
-export function findRoleAssignment(slotName: string): { role: string; confidence: number } | null {
-  const dictionary = getDictionaryForText(slotName);
-  const lowerSlot = slotName.toLowerCase();
-
-  for (const [role, entry] of Object.entries(dictionary)) {
-    if (entry.patterns.some((pattern) => lowerSlot.includes(pattern))) {
-      return {
-        role,
-        confidence: entry.confidence,
-      };
-    }
-  }
-
-  return null;
 }
 
 /**

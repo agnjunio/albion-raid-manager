@@ -80,7 +80,9 @@ export async function searchAlbionPlayers(query: string, server: ServerId = "AME
       params: { q: query },
     });
 
-    logger.debug(`Search results: ${response.data.players.length} players, ${response.data.guilds.length} guilds`);
+    logger.debug(
+      `Search results: ${response.data.players?.length || 0} players, ${response.data.guilds?.length || 0} guilds`,
+    );
     return response.data;
   } catch (error) {
     logger.error("Search failed:", error);

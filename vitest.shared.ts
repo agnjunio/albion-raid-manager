@@ -7,6 +7,7 @@ export const sharedConfig = {
     // More specific paths needs to be first
     alias: {
       "@albion-raid-manager/ai": resolve(__dirname, "packages/ai/src/index.ts"),
+      "@albion-raid-manager/core/entities": resolve(__dirname, "packages/core/src/entities/index.ts"),
       "@albion-raid-manager/core/scheduler": resolve(__dirname, "packages/core/src/scheduler.ts"),
       "@albion-raid-manager/core/utils": resolve(__dirname, "packages/core/src/utils/index.ts"),
       "@albion-raid-manager/core": resolve(__dirname, "packages/core/src/index.ts"),

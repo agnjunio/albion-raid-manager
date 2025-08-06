@@ -12,7 +12,7 @@ export default mergeConfig(
       // Project-specific overrides
       alias: {
         ...sharedConfig.test.alias,
-        "~": resolve(__dirname, "./src"),
+        "@": resolve(__dirname, "./src"),
       },
     },
   }),
