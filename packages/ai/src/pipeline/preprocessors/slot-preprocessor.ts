@@ -4,6 +4,43 @@ import { SLOT_EMOJI_INDICATORS, getSlotDictionaryForText } from "../../dictionar
 
 import { createPreprocessor, type Preprocessor } from "./";
 
+/**
+ * Regular expressions used for slot detection and parsing
+ */
+const PATTERNS = {
+  /** Matches time patterns like "12:30" or "23:45" */
+  TIME_PATTERN: /\d{1,2}:\d{2}/,
+  /** Matches colon-based slot definitions, excluding time patterns */
+  SLOT_WITH_COLON: /^\s*\S[^:]*:\s*/,
+  /** Matches lines starting with letters/numbers, optionally followed by a user mention */
+  BUILD_WITH_MENTION: /^\s*[\p{L}\p{N}]+(?:\s*[/]?\s*[\p{L}\p{N}]+)*\s*(?:@\w+|<@!?\d+>)?/u,
+  /** Matches Discord user ID mentions like "<@123456789>" */
+  DISCORD_ID_MENTION: /<@!?(\d+)>/,
+  /** Matches regular @ mentions with support for accented characters */
+  REGULAR_MENTION: /@([\w\u00C0-\u017F]+)/u,
+  /** Matches any emoji or emoji component */
+  EMOJI: /[\p{Emoji}\p{Emoji_Component}]/gu,
+  /** Matches custom Discord emoji format like "<:name:123456789>" */
+  CUSTOM_EMOJI: /<:[^:]+:\d+>/g,
+  /** Matches parenthetical content (typically armor requirements) */
+  PARENTHESES: /\([^)]*\)/g,
+  /** Matches trailing punctuation */
+  TRAILING_PUNCTUATION: /[.!?]+$/,
+  /** Matches non-alphanumeric leading characters */
+  NON_ALPHANUMERIC_START: /^\s*[^\p{L}\p{N}]*\s*/u,
+};
+
+/**
+ * Represents an extracted slot from a Discord message
+ * @example
+ * // Message: "Bruxa: <@123456789>"
+ * // Results in:
+ * {
+ *   originalLine: "Bruxa: <@123456789>",
+ *   buildName: "Bruxa",
+ *   userMention: "123456789"
+ * }
+ */
 export interface ExtractedSlot {
   originalLine: string;
   buildName: string;
@@ -75,7 +112,12 @@ function isSlotLine(line: string): boolean {
   }
 
   // Lines with a colon pattern that look like slots (but not time patterns)
-  if (/^\s*\S[^:]*:\s*/.test(line) && !/\d{1,2}:\d{2}/.test(line)) {
+  if (PATTERNS.SLOT_WITH_COLON.test(line) && !PATTERNS.TIME_PATTERN.test(line)) {
+    return true;
+  }
+
+  // Lines that follow a slot definition and contain a user mention or build-related patterns
+  if (PATTERNS.BUILD_WITH_MENTION.test(line)) {
     return true;
   }
 
@@ -110,21 +152,21 @@ function parseSlotLine(line: string): ExtractedSlot | null {
   const trimmedLine = line.trim();
 
   // Extract user mention if present (both Discord ID format and regular @ mentions)
-  const discordIdMatch = trimmedLine.match(/<@(\d+)>/);
-  const regularMentionMatch = trimmedLine.match(/@(\w+)/);
+  const discordIdMatch = trimmedLine.match(PATTERNS.DISCORD_ID_MENTION);
+  const regularMentionMatch = trimmedLine.match(PATTERNS.REGULAR_MENTION);
   const userMention = discordIdMatch ? discordIdMatch[1] : regularMentionMatch ? regularMentionMatch[1] : undefined;
 
   // Remove user mention from the line for build name extraction
   let buildLine = trimmedLine
-    .replace(/<@\d+>/, "")
-    .replace(/@\w+/, "")
+    .replace(new RegExp(PATTERNS.DISCORD_ID_MENTION.source, "g"), "") // Convert to global regex
+    .replace(new RegExp(PATTERNS.REGULAR_MENTION.source, "gu"), "") // Convert to global regex
     .trim();
 
-  // logger.debug(`After removing user mention: "${buildLine}"`);
+  logger.debug(`After removing user mention: "${buildLine}"`);
 
-  // Remove emojis and clean up the build name (global flag to remove all instances)
-  buildLine = buildLine.replace(/[🛡💚⚔🎯🐎❇💀🧊⚡🔴🟢🔵🟡🟣⚫🟤🌿🔥👑]/gu, "").trim();
-  buildLine = buildLine.replace(/<:[^:]+:\d+>/g, "").trim();
+  // Remove emojis and custom Discord emojis, preserve accented characters
+  buildLine = buildLine.replace(PATTERNS.EMOJI, "").trim();
+  buildLine = buildLine.replace(PATTERNS.CUSTOM_EMOJI, "").trim();
 
   // logger.debug(`After removing emojis: "${buildLine}"`);
 
@@ -148,9 +190,12 @@ function parseSlotLine(line: string): ExtractedSlot | null {
   // Remove parentheses content (armor requirements)
   buildLine = buildLine.replace(/\([^)]*\)/g, "").trim();
 
-  // Clean up extra whitespace
-  buildLine = buildLine.replace(/\s+/g, " ").trim();
-  buildLine = buildLine.replace(/^\s*[^\w]*\s*/, "").trim(); // Remove leading invisible characters
+  // Clean up extra whitespace and normalize the build name
+  buildLine = buildLine
+    .replace(/\s*\/\s*/g, " ") // Replace slashes with spaces
+    .replace(/\s+/g, " ") // Normalize whitespace
+    .replace(PATTERNS.NON_ALPHANUMERIC_START, "") // Remove leading non-alphanumeric chars
+    .trim();
 
   // logger.debug(`Final build name: "${buildLine}"`);
 

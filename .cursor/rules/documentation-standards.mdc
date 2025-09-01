@@ -43,7 +43,6 @@ This project uses Cursor Rules that are maintained by the AI Agent. Rules should
 ### Package.json Scripts
 
 - Add new scripts for common operations
-- Document script purposes in comments
 - Keep script names consistent and descriptive
 - Group related scripts together
 
