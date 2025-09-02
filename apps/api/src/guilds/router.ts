@@ -19,7 +19,7 @@ guildsRouter.use(auth);
 
 guildsRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetGuildsResponse>>) => {
   try {
-    const guilds = await prisma.guild.findMany({
+    const guilds = await prisma.server.findMany({
       where: {
         members: {
           some: {
@@ -50,7 +50,7 @@ guildsRouter.get("/:guildId", async (req: Request, res: Response<APIResponse.Typ
       return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST));
     }
 
-    const guild = await prisma.guild.findUnique({
+    const guild = await prisma.server.findUnique({
       where: { id: guildId },
       include: {
         members: {
@@ -76,9 +76,9 @@ guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<Creat
   const { server } = createGuildSchema.parse(req.body);
 
   try {
-    const existingGuild = await prisma.guild.findUnique({
+    const existingGuild = await prisma.server.findUnique({
       where: {
-        discordId: server.id,
+        id: server.id,
       },
     });
     if (existingGuild) {
@@ -93,9 +93,9 @@ guildsRouter.post("/", async (req: Request, res: Response<APIResponse.Type<Creat
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
 
-    const guild = await prisma.guild.create({
+    const guild = await prisma.server.create({
       data: {
-        discordId: server.id,
+        id: server.id,
         name: server.name,
         icon: server.icon,
         members: {

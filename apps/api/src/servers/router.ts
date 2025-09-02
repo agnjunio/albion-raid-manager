@@ -46,9 +46,9 @@ serverRouter.post(
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
-      const existingGuild = await prisma.guild.findUnique({
+      const existingGuild = await prisma.server.findUnique({
         where: {
-          discordId: serverId,
+          id: serverId,
         },
       });
       if (existingGuild) {
@@ -60,9 +60,9 @@ serverRouter.post(
         return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
       }
 
-      const guild = await prisma.guild.create({
+      const guild = await prisma.server.create({
         data: {
-          discordId: serverId,
+          id: serverId,
           name: server.name,
           icon: server.icon,
           members: {

@@ -1,4 +1,4 @@
-import type { Guild } from "@albion-raid-manager/core/types";
+import type { Server } from "@albion-raid-manager/core/types";
 
 import { cn } from "@albion-raid-manager/core/helpers";
 import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
@@ -52,7 +52,7 @@ export function DashboardSidebar() {
   const guilds = fetchGuilds.data?.guilds ?? [];
 
   return (
-    <Sidebar collapsible="icon" variant="sidebar">
+    <Sidebar collapsible="icon" variant="sidebar" data-state="collapsed">
       <SidebarHeader>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -60,7 +60,7 @@ export function DashboardSidebar() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <GuildSelection guild={selectedGuild} icon={faChevronDown} isLoading={fetchGuilds.isLoading} />
+              <GuildSelection server={selectedGuild} icon={faChevronDown} isLoading={fetchGuilds.isLoading} />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
 
@@ -68,7 +68,7 @@ export function DashboardSidebar() {
             {guilds.map((guild) => (
               <Link key={guild.id} to={`/dashboard/${guild.id}`}>
                 <DropdownMenuItem>
-                  <GuildSelection guild={guild} icon={guild === selectedGuild ? faCheck : undefined} />
+                  <GuildSelection server={guild} icon={guild === selectedGuild ? faCheck : undefined} />
                 </DropdownMenuItem>
               </Link>
             ))}
@@ -132,26 +132,26 @@ export function DashboardSidebar() {
 }
 
 interface GuildSelectionProps {
-  guild?: Guild;
+  server?: Server;
   icon?: IconDefinition;
   isLoading?: boolean;
 }
 
-export function GuildSelection({ guild, icon, isLoading }: GuildSelectionProps) {
+export function GuildSelection({ server, icon, isLoading }: GuildSelectionProps) {
   return (
     <div className="flex w-full items-center gap-2">
       <div
         className={cn(
           "text-sidebar-primary-foreground relative flex aspect-square size-8 items-center justify-center",
-          { "bg-sidebar-primary rounded-lg": !guild },
+          { "bg-sidebar-primary rounded-lg": !server },
         )}
       >
         {isLoading ? (
           <Skeleton className="size-8" />
-        ) : guild ? (
+        ) : server ? (
           <Avatar>
-            <AvatarImage src={getServerPictureUrl(guild.discordId, guild.icon)} />
-            <AvatarFallback>{guild.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
+            <AvatarImage src={getServerPictureUrl(server.id, server.icon)} />
+            <AvatarFallback>{server.name?.substring(0, 1).toUpperCase()}</AvatarFallback>
           </Avatar>
         ) : (
           <FontAwesomeIcon icon={faShield} className="size-4" />
@@ -165,8 +165,8 @@ export function GuildSelection({ guild, icon, isLoading }: GuildSelectionProps) 
         </div>
       ) : (
         <div className={cn("leading-right flex min-w-0 grow flex-col whitespace-nowrap")}>
-          <span className="truncate font-semibold">{guild ? guild.name : "Select server"} </span>
-          <span className="text-muted-foreground text-xs">{!guild && "No server selected"}</span>
+          <span className="truncate font-semibold">{server ? server.name : "Select server"} </span>
+          <span className="text-muted-foreground text-xs">{!server && "No server selected"}</span>
         </div>
       )}
 
