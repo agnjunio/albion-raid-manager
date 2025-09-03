@@ -1,0 +1,255 @@
+# Service Layer Development Standards
+
+## Service Architecture
+
+### Functional Approach
+
+**IMPORTANT: Use functions instead of classes for all service implementations.**
+
+- **Export individual functions** from service modules
+- **No service interfaces** - functions are self-documenting
+- **No singleton instances** - import functions directly
+- **Pure functions** where possible for better testability
+
+### Service Structure
+
+```typescript
+// ✅ Good - Functional approach
+export async function createRaid(input: CreateRaidInput): Promise<RaidWithSlots> {
+  // Implementation
+}
+
+export async function findRaidById(id: string, includeSlots = false): Promise<RaidData | RaidWithSlots | null> {
+  // Implementation
+}
+
+// ❌ Bad - Class-based approach
+export class RaidServiceImpl implements RaidService {
+  async create(input: CreateRaidInput): Promise<RaidWithSlots> {
+    // Implementation
+  }
+}
+```
+
+## Service Organization
+
+### File Structure
+
+```
+packages/core/src/services/
+├── index.ts              # Export all service functions
+├── raid.ts               # Raid-related operations
+├── raid-slot.ts          # Raid slot operations
+├── user.ts               # User operations
+└── server.ts             # Server operations
+```
+
+### Naming Conventions
+
+- **Function names**: Use verb-noun pattern (`createRaid`, `findRaidById`, `updateRaid`)
+- **File names**: Use kebab-case (`raid-slot.ts`, `user-profile.ts`)
+- **Export names**: Use camelCase function names
+
+### Service Function Patterns
+
+```typescript
+// CRUD Operations
+export async function createRaid(input: CreateRaidInput): Promise<RaidWithSlots>;
+export async function findRaidById(id: string, includeSlots?: boolean): Promise<RaidData | RaidWithSlots | null>;
+export async function findRaids(filters?: RaidFilters, includeSlots?: boolean): Promise<RaidData[] | RaidWithSlots[]>;
+export async function updateRaid(id: string, input: UpdateRaidInput): Promise<RaidData>;
+export async function deleteRaid(id: string): Promise<void>;
+
+// Business Logic Operations
+export async function openRaidForSignups(id: string): Promise<RaidData>;
+export async function closeRaidForSignups(id: string): Promise<RaidData>;
+export async function announceRaid(id: string, messageId: string): Promise<RaidData>;
+```
+
+## Service Implementation Guidelines
+
+### Error Handling
+
+- **Throw descriptive errors** with clear messages
+- **Validate inputs** before database operations
+- **Use proper error types** for different scenarios
+- **Log important operations** for debugging
+
+```typescript
+export async function createRaid(input: CreateRaidInput): Promise<RaidWithSlots> {
+  // Validate input
+  if (input.date < new Date()) {
+    throw new Error("Raid date cannot be in the past");
+  }
+
+  // Ensure dependencies exist
+  await ensureServerExists(input.serverId);
+
+  // Perform operation
+  const raid = await prisma.raid.create({
+    data: { ...input, status: RaidStatus.SCHEDULED },
+    include: { slots: true },
+  });
+
+  // Log operation
+  logger.info(`Raid created: ${raid.id}`, { raidId: raid.id, serverId: input.serverId });
+
+  return raid as RaidWithSlots;
+}
+```
+
+### Database Operations
+
+- **Use Prisma client** for all database operations
+- **Implement proper transactions** for complex operations
+- **Handle database errors** gracefully
+- **Use proper includes** for related data
+
+### Validation
+
+- **Validate all inputs** before processing
+- **Check business rules** (e.g., date in future, user permissions)
+- **Ensure data consistency** across operations
+- **Handle edge cases** appropriately
+
+## Service Usage
+
+### Importing Services
+
+```typescript
+// ✅ Good - Import specific functions
+import { createRaid, findRaidById, updateRaid } from "@albion-raid-manager/core/services";
+
+// ❌ Bad - Import service instances
+import { raidService } from "@albion-raid-manager/core/services";
+```
+
+### Using Services in Controllers
+
+```typescript
+// API Router
+export const raidsRouter: Router = Router({ mergeParams: true });
+
+raidsRouter.post("/", async (req, res) => {
+  const { guildId } = req.params;
+  const { description, date, location } = req.body;
+
+  const raid = await createRaid({
+    title: "Raid",
+    description,
+    date: new Date(date),
+    serverId: guildId,
+    location,
+  });
+
+  res.json(APIResponse.Success({ raid }));
+});
+```
+
+### Using Services in Bot Commands
+
+```typescript
+// Bot Command
+async function handleCreateRaid(interaction: ChatInputCommandInteraction) {
+  const title = interaction.options.getString("title", true);
+  const dateString = interaction.options.getString("date", true);
+  const raidDate = new Date(dateString);
+
+  const raid = await createRaid({
+    title,
+    date: raidDate,
+    serverId: interaction.guild!.id,
+    slotCount: 8,
+  });
+
+  await interaction.reply({ content: `Raid created: ${raid.id}` });
+}
+```
+
+## Testing Services
+
+### Unit Testing
+
+```typescript
+// Mock dependencies
+vi.mock("@albion-raid-manager/database", () => ({
+  prisma: {
+    raid: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      findMany: vi.fn(),
+    },
+  },
+}));
+
+// Test service functions
+describe("createRaid", () => {
+  it("should create raid with valid input", async () => {
+    const mockRaid = createMockRaid();
+    vi.mocked(prisma.raid.create).mockResolvedValue(mockRaid);
+
+    const result = await createRaid(validInput);
+
+    expect(prisma.raid.create).toHaveBeenCalledWith(expect.any(Object));
+    expect(result).toEqual(mockRaid);
+  });
+
+  it("should throw error for past date", async () => {
+    const pastDate = new Date(Date.now() - 86400000); // Yesterday
+
+    await expect(createRaid({ ...validInput, date: pastDate })).rejects.toThrow("Raid date cannot be in the past");
+  });
+});
+```
+
+## Service Dependencies
+
+### Core Package Dependencies
+
+- **Database**: Use `@albion-raid-manager/database` for Prisma client
+- **Logger**: Use `@albion-raid-manager/logger` for logging
+- **Types**: Define types in `@albion-raid-manager/core/types`
+
+### External Dependencies
+
+- **Minimize external dependencies** in service layer
+- **Use dependency injection** for testability
+- **Avoid circular dependencies** between services
+
+## Performance Considerations
+
+### Database Queries
+
+- **Use proper indexing** for frequently queried fields
+- **Implement pagination** for large result sets
+- **Use select/include** to limit data transfer
+- **Cache frequently accessed data** when appropriate
+
+### Memory Management
+
+- **Avoid loading large datasets** into memory
+- **Use streaming** for large data processing
+- **Implement proper cleanup** for resources
+- **Monitor memory usage** in production
+
+## Security
+
+### Input Validation
+
+- **Validate all inputs** before processing
+- **Sanitize user data** before database operations
+- **Use proper type checking** with TypeScript
+- **Implement rate limiting** for sensitive operations
+
+### Access Control
+
+- **Check permissions** before operations
+- **Validate ownership** of resources
+- **Implement proper authorization** checks
+- **Log security-relevant operations**
+
+---
+
+description: Service layer development standards and functional programming guidelines
+globs: ["packages/core/src/services/**/*.ts", "apps/api/src/**/*.ts", "apps/bot/src/**/*.ts"]
+alwaysApply: true
