@@ -1,0 +1,449 @@
+---
+description: Testing standards and best practices for the Albion Raid Manager project
+globs: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"]
+alwaysApply: true
+---
+
+# Testing Standards
+
+## Core Testing Principles
+
+### Test Direct Functionality Only
+
+**CRITICAL RULE: Never test dependencies or external services directly.**
+
+- **Test your code's behavior**, not the behavior of libraries, frameworks, or external APIs
+- **Mock all external dependencies** including databases, APIs, Discord.js, and third-party services
+- **Focus on business logic** and user-facing functionality
+- **Verify interactions** with dependencies through mocks, not actual calls
+
+### What to Test
+
+**✅ DO Test:**
+
+- Business logic and algorithms
+- Input validation and error handling
+- State management and data transformations
+- User interactions and command responses
+- Edge cases and error conditions
+- Integration between your modules (with mocked dependencies)
+
+**❌ DON'T Test:**
+
+- Discord.js internal functionality
+- Database query execution (test the logic that builds queries)
+- External API responses (mock them)
+- Framework behavior (React, Express, etc.)
+- Third-party library functionality
+
+## Testing Patterns
+
+### Unit Tests
+
+```typescript
+// ✅ Good - Testing business logic with mocked dependencies
+describe("Raid Creation", () => {
+  it("should validate date format", async () => {
+    const mockInteraction = createMockInteraction({
+      options: { getString: vi.fn(() => "invalid-date") }
+    });
+
+    await raidCommand.execute(mockInteraction);
+
+    expect(mockInteraction.reply).toHaveBeenCalledWith({
+      content: "Invalid date format. Please use format: YYYY-MM-DD HH:MM",
+      ephemeral: true,
+    });
+  });
+});
+
+// ❌ Bad - Testing Discord.js functionality
+describe("Discord Interaction", () => {
+  it("should create slash command", () => {
+    const command = new SlashCommandBuilder()
+      .setName("test")
+      .setDescription("test");
+
+    expect(command.toJSON()).toEqual({...}); // Don't test Discord.js
+  });
+});
+```
+
+### Mocking Strategy
+
+```typescript
+// ✅ Good - Mock external dependencies
+vi.mock("@albion-raid-manager/database", () => ({
+  prisma: {
+    raid: {
+      create: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+    },
+  },
+  RaidStatus: { OPEN: "OPEN", CLOSED: "CLOSED" },
+}));
+
+// ✅ Good - Mock Discord.js interactions
+const mockInteraction = {
+  guild: { id: "guild123", name: "Test Guild" },
+  user: { id: "user123", username: "testuser" },
+  options: {
+    getString: vi.fn(),
+    getInteger: vi.fn(),
+  },
+  reply: vi.fn(),
+} as any;
+```
+
+### Test Structure
+
+```typescript
+describe("Feature Name", () => {
+  let mockDependency: MockedFunction;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDependency = vi.fn();
+  });
+
+  describe("Happy Path", () => {
+    it("should handle valid input", async () => {
+      // Arrange
+      const input = "valid-input";
+      mockDependency.mockResolvedValue(expectedResult);
+
+      // Act
+      const result = await functionUnderTest(input);
+
+      // Assert
+      expect(result).toEqual(expectedResult);
+      expect(mockDependency).toHaveBeenCalledWith(input);
+    });
+  });
+
+  describe("Error Handling", () => {
+    it("should handle invalid input", async () => {
+      // Test error conditions
+    });
+  });
+
+  describe("Edge Cases", () => {
+    it("should handle boundary conditions", async () => {
+      // Test edge cases
+    });
+  });
+});
+```
+
+## Testing Tools and Setup
+
+### Vitest Configuration
+
+- Use Vitest for all testing
+- Configure proper TypeScript support
+- Set up test environment variables
+- Use proper mocking utilities
+
+### Global Test Setup (vitest.setup.ts)
+
+**CRITICAL: Move all generic dependencies to `vitest.setup.ts`**
+
+```typescript
+// vitest.setup.ts - Global mocks for all tests
+vi.mock("@albion-raid-manager/database", () => ({
+  prisma: {
+    server: { findUnique: vi.fn(), upsert: vi.fn(), update: vi.fn() },
+    raid: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
+    // ... all database mocks
+  },
+  RaidStatus: { SCHEDULED: "SCHEDULED", OPEN: "OPEN", CLOSED: "CLOSED" },
+  RaidType: { FIXED: "FIXED", FLEX: "FLEX" },
+  // ... all enums
+}));
+
+vi.mock("discord.js", () => ({
+  SlashCommandBuilder: vi.fn().mockImplementation(() => ({
+    /* ... */
+  })),
+  EmbedBuilder: vi.fn().mockImplementation(() => ({
+    /* ... */
+  })),
+  // ... all Discord.js mocks
+}));
+
+// Import test helpers and make them globally available
+import {
+  createMockUser,
+  createMockInteraction,
+  createMockRaid,
+  createMockInteractionWithSubcommand,
+  createMockInteractionWithOptions,
+  createMockFutureDate,
+  createMockDateString,
+} from "./src/test-helpers";
+
+global.createMockUser = createMockUser;
+global.createMockInteraction = createMockInteraction;
+global.createMockRaid = createMockRaid;
+global.createMockInteractionWithSubcommand = createMockInteractionWithSubcommand;
+global.createMockInteractionWithOptions = createMockInteractionWithOptions;
+global.createMockFutureDate = createMockFutureDate;
+global.createMockDateString = createMockDateString;
+```
+
+### Test Helpers (test-helpers.ts)
+
+**Create dedicated test helper functions for common scenarios**
+
+```typescript
+// test-helpers.ts - Reusable test utilities
+export const createMockInteractionWithSubcommand = (subcommand: string, options = {}) => {
+  return createMockInteraction({
+    options: {
+      getSubcommand: vi.fn(() => subcommand),
+      getString: vi.fn(),
+      getInteger: vi.fn(),
+      ...options,
+    },
+  });
+};
+
+export const createMockInteractionWithOptions = (optionValues: Record<string, any>) => {
+  return createMockInteraction({
+    options: {
+      getSubcommand: vi.fn(),
+      getString: vi.fn((name: string) => optionValues[name] || null),
+      getInteger: vi.fn((name: string) => optionValues[name] || null),
+    },
+  });
+};
+
+export const createMockFutureDate = (daysFromNow = 1) => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysFromNow);
+  return date;
+};
+
+export const createMockDateString = (date: Date) => {
+  return date.toISOString().split("T")[0] + " 20:00";
+};
+```
+
+### Test File Structure
+
+```typescript
+// test-file.test.ts - Clean, focused tests
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Import after mocking (mocks are in vitest.setup.ts)
+import { RaidStatus, RaidType } from "@albion-raid-manager/database";
+import { raidCommand } from "./raid";
+
+describe("Raid Command", () => {
+  let mockPrisma: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPrisma = vi.mocked(await import("@albion-raid-manager/database")).prisma;
+  });
+
+  it("should create raid with valid data", async () => {
+    const futureDate = global.createMockFutureDate(1);
+    const futureDateString = global.createMockDateString(futureDate);
+
+    const mockInteraction = global.createMockInteractionWithOptions({
+      title: "Test Raid",
+      date: futureDateString,
+      type: "FIXED",
+    });
+    mockInteraction.options.getSubcommand = vi.fn(() => "create");
+
+    const mockRaid = global.createMockRaid({ date: futureDate });
+    mockPrisma.raid.create.mockResolvedValue(mockRaid);
+
+    await raidCommand.execute(mockInteraction);
+
+    expect(mockPrisma.raid.create).toHaveBeenCalledWith(expect.any(Object));
+    expect(mockInteraction.reply).toHaveBeenCalled();
+  });
+});
+```
+
+### Benefits of Global Setup
+
+**✅ Advantages:**
+
+- **DRY Principle**: No duplicate mocks across test files
+- **Consistency**: All tests use the same mock implementations
+- **Maintainability**: Update mocks in one place
+- **Performance**: Faster test execution (mocks loaded once)
+- **Clean Tests**: Focus on business logic, not setup
+- **Reusability**: Mock factories available everywhere
+
+**❌ Avoid:**
+
+- **Per-test mocks**: Don't mock the same dependencies in every test file
+- **Inline mocks**: Don't create mocks inside individual tests
+- **Duplicate factories**: Don't recreate the same mock objects repeatedly
+
+## Test Coverage Guidelines
+
+### Minimum Coverage Requirements
+
+- **Unit Tests**: 80%+ coverage for business logic
+- **Integration Tests**: Cover critical user workflows
+- **Error Handling**: Test all error conditions
+- **Edge Cases**: Test boundary conditions
+
+### Coverage Exclusions
+
+- **Generated code** (Prisma client, TypeScript interfaces)
+- **Configuration files** (unless they contain business logic)
+- **Simple getters/setters** (unless they have validation)
+- **External library wrappers** (test your usage, not the library)
+
+## Performance Testing
+
+### When to Performance Test
+
+- **Database queries** with large datasets
+- **API endpoints** with high load
+- **Discord bot** command processing
+- **File processing** operations
+
+### Performance Test Patterns
+
+```typescript
+describe("Performance", () => {
+  it("should process large datasets efficiently", async () => {
+    const startTime = Date.now();
+    const largeDataset = generateLargeDataset(10000);
+
+    await processData(largeDataset);
+
+    const duration = Date.now() - startTime;
+    expect(duration).toBeLessThan(1000); // Should complete in under 1 second
+  });
+});
+```
+
+## Integration Testing
+
+### API Integration Tests
+
+```typescript
+// ✅ Good - Test API endpoints with mocked database
+describe("Raid API", () => {
+  it("should create raid via API", async () => {
+    const mockRaid = createMockRaid();
+    vi.mocked(prisma.raid.create).mockResolvedValue(mockRaid);
+
+    const response = await request(app)
+      .post("/api/guilds/guild123/raids")
+      .send({ title: "Test Raid", date: "2024-12-31T20:00:00Z" });
+
+    expect(response.status).toBe(200);
+    expect(response.body.raid.title).toBe("Test Raid");
+  });
+});
+```
+
+### Bot Integration Tests
+
+```typescript
+// ✅ Good - Test bot commands with mocked Discord
+describe("Bot Commands", () => {
+  it("should handle raid creation command", async () => {
+    const mockInteraction = createMockInteraction();
+    mockInteraction.options.getSubcommand.mockReturnValue("create");
+    mockInteraction.options.getString.mockImplementation((name) => {
+      if (name === "title") return "Test Raid";
+      if (name === "date") return "2024-12-31 20:00";
+      return null;
+    });
+
+    await raidCommand.execute(mockInteraction);
+
+    expect(mockInteraction.reply).toHaveBeenCalled();
+  });
+});
+```
+
+## Test Data Management
+
+### Test Data Patterns
+
+```typescript
+// Use factories for consistent test data
+export const raidFactory = {
+  create: (overrides = {}) => ({
+    id: "raid123",
+    title: "Test Raid",
+    date: new Date("2024-12-31T20:00:00Z"),
+    status: "SCHEDULED",
+    serverId: "guild123",
+    ...overrides,
+  }),
+
+  createMany: (count: number, overrides = {}) =>
+    Array.from({ length: count }, (_, i) => raidFactory.create({ id: `raid${i}`, ...overrides })),
+};
+```
+
+### Database Testing
+
+```typescript
+// ✅ Good - Test database logic with mocked Prisma
+describe("Raid Repository", () => {
+  it("should find raids by status", async () => {
+    const mockRaids = [raidFactory.create({ status: "OPEN" })];
+    vi.mocked(prisma.raid.findMany).mockResolvedValue(mockRaids);
+
+    const result = await findRaidsByStatus("OPEN");
+
+    expect(prisma.raid.findMany).toHaveBeenCalledWith({
+      where: { status: "OPEN" },
+    });
+    expect(result).toEqual(mockRaids);
+  });
+});
+```
+
+## Error Testing
+
+### Error Handling Tests
+
+```typescript
+describe("Error Handling", () => {
+  it("should handle database connection errors", async () => {
+    vi.mocked(prisma.raid.create).mockRejectedValue(new Error("Database connection failed"));
+
+    await expect(createRaid(validRaidData)).rejects.toThrow("Database connection failed");
+  });
+
+  it("should handle invalid input gracefully", async () => {
+    const result = await validateRaidData(invalidData);
+
+    expect(result.success).toBe(false);
+    expect(result.errors).toContain("Invalid date format");
+  });
+});
+```
+
+## Best Practices Summary
+
+1. **Mock Everything External**: Never test third-party libraries or services
+2. **Test Behavior, Not Implementation**: Focus on what the code does, not how
+3. **Use Descriptive Test Names**: Make it clear what each test validates
+4. **Arrange-Act-Assert**: Structure tests clearly
+5. **Test Edge Cases**: Include boundary conditions and error scenarios
+6. **Keep Tests Fast**: Use mocks to avoid slow external calls
+7. **Maintain Test Data**: Use factories and builders for consistent data
+8. **Test User Scenarios**: Focus on end-user functionality
+9. **Mock at the Right Level**: Mock external dependencies, not internal modules
+10. **Verify Interactions**: Ensure your code calls dependencies correctly
+
+---
+
+**Remember**: The goal is to test YOUR code's behavior, not the behavior of external dependencies. Mock everything external and focus on business logic, error handling, and user-facing functionality.

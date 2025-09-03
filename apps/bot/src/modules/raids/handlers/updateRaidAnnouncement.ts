@@ -7,12 +7,12 @@ import { buildRaidAnnouncementMessage } from "../messages";
 export const updateRaidAnnouncement = async (discord: Client, raid: Raid) => {
   if (!raid.announcementMessageId) return;
 
-  const guild = await prisma.guild.findUnique({
-    where: { id: raid.guildId },
+  const server = await prisma.server.findUnique({
+    where: { id: raid.serverId },
   });
-  if (!guild || !guild.raidAnnouncementChannelId) return;
+  if (!server || !server.raidAnnouncementChannelId) return;
 
-  const channel = discord.channels.cache.get(guild.raidAnnouncementChannelId);
+  const channel = discord.channels.cache.get(server.raidAnnouncementChannelId);
   if (!channel?.isTextBased()) return;
 
   const message = await channel.messages.fetch(raid.announcementMessageId);

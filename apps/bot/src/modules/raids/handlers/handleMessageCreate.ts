@@ -2,7 +2,7 @@ import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@alb
 import { memoize } from "@albion-raid-manager/core/cache";
 import { getContentTypeInfo } from "@albion-raid-manager/core/entities";
 import { Raid, RaidRole, RaidSlot, Server } from "@albion-raid-manager/core/types";
-import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
+import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, Message } from "discord.js";

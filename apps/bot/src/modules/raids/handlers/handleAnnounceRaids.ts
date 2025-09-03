@@ -1,4 +1,4 @@
-import { getErrorMessage } from "@albion-raid-manager/core/utils/errors";
+import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { prisma, RaidStatus } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, MessageCreateOptions } from "discord.js";
