@@ -1,5 +1,5 @@
 import { User } from "@albion-raid-manager/core/types";
-import { Server } from "@albion-raid-manager/core/types/discord";
+import { APIServer } from "@albion-raid-manager/core/types/api/servers";
 import { APIGuild, APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
 
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;
@@ -47,11 +47,11 @@ export function transformUser(user: APIUser): User {
     username: user.username,
     nickname: user.global_name,
     avatar: user.avatar ?? null,
-    defaultGuildId: null,
+    defaultServerId: null,
   };
 }
 
-export function transformGuild(guild: APIGuild): Server {
+export function transformGuild(guild: APIGuild): APIServer {
   const transformedGuild = {
     id: guild.id,
     name: guild.name,
@@ -80,6 +80,7 @@ export function transformChannel(channel: APIGuildChannel<ChannelType>) {
   };
 }
 
-export function getAuthorization(type: "user" | "bot", token: string) {
+export function getAuthorization(type: "user" | "bot", token?: string) {
+  if (!token) throw new Error("Token is required for authorization");
   return type === "user" ? `Bearer ${token}` : `Bot ${token}`;
 }

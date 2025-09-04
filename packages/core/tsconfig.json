@@ -2,10 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["node"],
-    "paths": {
-      "@types": ["./generated/types/index.ts"]
-    }
+    "types": ["node"]
   },
   "include": ["src/**/*", "generated/**/*"],
   "exclude": ["node_modules", "dist"]

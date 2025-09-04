@@ -1,7 +1,7 @@
 export enum APIErrorType {
   AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED",
   BAD_REQUEST = "BAD_REQUEST",
-  GUILD_ALREADY_EXISTS = "GUILD_ALREADY_EXISTS",
+  SERVER_ALREADY_EXISTS = "SERVER_ALREADY_EXISTS",
   INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
   NOT_AUTHORIZED = "NOT_AUTHORIZED",
   NOT_FOUND = "NOT_FOUND",
@@ -38,5 +38,6 @@ export namespace APIResponse {
 }
 
 export * from "./auth";
+export * from "./compositions";
 export * from "./raids";
 export * from "./servers";

@@ -1,4 +1,12 @@
-import { Server } from "@types";
+import { Server } from "@albion-raid-manager/core/types";
+
+export type APIServer = {
+  id: string;
+  name: string;
+  icon: string | null;
+  owner?: boolean;
+  admin: boolean;
+};
 
 export namespace AddServer {
   export type Body = { serverId: string };

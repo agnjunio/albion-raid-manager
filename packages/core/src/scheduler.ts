@@ -41,7 +41,7 @@ export function sleep(milliseconds: number) {
 }
 
 export function timeout(fn: SchedulerCallback, milliseconds: number) {
-  const timeout = new Promise((resolve, reject) => {
+  const timeout = new Promise((_, reject) => {
     const timeoutId = setTimeout(() => {
       clearTimeout(timeoutId);
       reject(new Error(`Operation timeout (${milliseconds} ms)`));

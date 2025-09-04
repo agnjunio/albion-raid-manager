@@ -6,6 +6,7 @@ export namespace CreateGuildRaid {
     description: string;
     date: string;
     location?: string;
+    compositionId?: string;
   };
   export type Response = { raid: Raid };
 }
