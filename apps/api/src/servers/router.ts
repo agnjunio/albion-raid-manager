@@ -1,6 +1,6 @@
 import { ServersService } from "@albion-raid-manager/core/services";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import { DiscordServer, GetServers, SetupServer } from "@albion-raid-manager/core/types/api/servers";
+import { DiscordServer, GetServer, GetServers, SetupServer } from "@albion-raid-manager/core/types/api/servers";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
@@ -111,3 +111,17 @@ serverRouter.post(
     }
   },
 );
+
+serverRouter.get("/:serverId", async (req: Request, res: Response<APIResponse.Type<GetServer.Response>>) => {
+  const { serverId } = req.params;
+
+  const server = await prisma.server.findUnique({
+    where: { id: serverId },
+  });
+
+  if (!server) {
+    return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
+  }
+
+  res.json(APIResponse.Success({ server }));
+});

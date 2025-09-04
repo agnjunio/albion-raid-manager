@@ -5,7 +5,7 @@ type DashboardContextType = {};
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-  return <DashboardContext.Provider value={{}}>{children}</DashboardContext.Provider>;
+  return <DashboardContext.Provider value={undefined}>{children}</DashboardContext.Provider>;
 }
 
 export function useDashboard() {

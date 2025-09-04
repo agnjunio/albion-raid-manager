@@ -30,6 +30,8 @@ export function useAuth(): Auth {
   const signOut = async () => {
     await logout();
     localStorage.removeItem(AUTH_FLAG_KEY);
+    // Redirect to home page after logout
+    window.location.href = "/";
   };
 
   return {
