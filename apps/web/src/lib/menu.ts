@@ -11,16 +11,14 @@ export interface MenuLink {
 
 export const useMenu = (): MenuLink[] => {
   return [
-    { href: "raids", label: "Raids", icon: faFlag },
-    { href: "compositions", label: "Compositions", icon: faPeopleGroup },
     {
       href: "settings",
       label: "Settings",
       icon: faGear,
       submenu: [
         {
-          href: "discord",
-          label: "Discord",
+          href: "register",
+          label: "Register",
         },
         {
           href: "raids",
@@ -28,5 +26,7 @@ export const useMenu = (): MenuLink[] => {
         },
       ],
     },
+    { href: "raids", label: "Raids", icon: faFlag },
+    { href: "compositions", label: "Compositions", icon: faPeopleGroup },
   ];
 };

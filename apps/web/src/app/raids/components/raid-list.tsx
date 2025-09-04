@@ -7,7 +7,7 @@ import { faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
-import { RaidStatusBadge } from "@/app/dashboard/guildId/raids/raid-status";
+import { RaidStatusBadge } from "@/components/raids/raid-badge";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -20,8 +20,7 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar";
-
-import { raidStatuses } from "./constants";
+import { raidStatuses } from "@/lib/constants";
 
 const statusOrder: (keyof typeof raidStatuses)[] = ["ALL", "SCHEDULED", "OPEN", "CLOSED", "ONGOING", "FINISHED"];
 

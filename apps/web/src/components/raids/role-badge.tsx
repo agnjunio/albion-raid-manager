@@ -1,7 +1,7 @@
-import type { BuildRole } from "@albion-raid-manager/core/types";
+import { RaidRole } from "@albion-raid-manager/core/types";
 
-export function RoleBadge({ role }: { role: BuildRole }) {
-  const roleClassName: { [key in BuildRole]: string } = {
+export function RoleBadge({ role }: { role: RaidRole }) {
+  const roleClassName: { [key in RaidRole]: string } = {
     TANK: "bg-role-tank/25",
     CALLER: "bg-role-caller/25",
     SUPPORT: "bg-role-support/25",

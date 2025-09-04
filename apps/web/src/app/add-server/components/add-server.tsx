@@ -1,9 +1,8 @@
-import type { AddServer } from "@albion-raid-manager/core/types/api/servers";
-import type { Server } from "@albion-raid-manager/core/types/discord";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { APIErrorType } from "@albion-raid-manager/core/types/api";
+import { Server } from "@albion-raid-manager/core/types";
+import { APIErrorType } from "@albion-raid-manager/core/types/api/index";
+import { AddServer, APIServer } from "@albion-raid-manager/core/types/api/servers";
 import { getServerInviteUrl, getServerPictureUrl } from "@albion-raid-manager/discord/helpers";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { isAPIError } from "@/lib/api";
 import { useAddServerMutation } from "@/store/servers";
-
 enum CreateStep {
   SERVER_SELECT,
   SERVER_INVITATION,
@@ -26,16 +24,16 @@ interface AddServerProps {
   servers: Server[];
 }
 
-export function AddServerPage({ servers }: AddServerProps) {
+export function AddServerForm({ servers }: AddServerProps) {
   const [step, setStep] = useState(CreateStep.SERVER_SELECT);
   const [error, setError] = useState<string | null>(null);
   const [popup, setPopup] = useState<WindowProxy | null>(null);
   const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<AddServer.Response>();
-  const [server, setServer] = useState<Server>();
+  const [server, setServer] = useState<APIServer>();
   const [addServer] = useAddServerMutation();
 
   const handleServerSelect = useCallback(
-    async (server: Server) => {
+    async (server: APIServer) => {
       setServer(server);
       setError(null);
 
@@ -156,7 +154,7 @@ function ServerInvitation({ popup, onPopupClosed }: ServerInviationProps) {
 }
 
 interface ServerVerificationProps {
-  server?: Server;
+  server?: APIServer;
 }
 
 function ServerVerification({ server }: ServerVerificationProps) {
@@ -176,11 +174,11 @@ function Complete({ addServerResponse }: CompleteProps) {
 
   useEffect(() => {
     if (addServerResponse) {
-      navigate(`/dashboard/${addServerResponse.guild.id}`);
+      navigate(`/dashboard/${addServerResponse.server.id}`);
     }
   }, [addServerResponse, navigate]);
 
-  const link = `/dashboard/${addServerResponse?.guild.id}`;
+  const link = `/dashboard/${addServerResponse?.server.id}`;
   return (
     <CardContent className="flex flex-col items-center gap-3">
       <FontAwesomeIcon icon={faCheck} size="2xl" />

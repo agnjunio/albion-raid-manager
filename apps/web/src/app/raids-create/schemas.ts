@@ -14,4 +14,10 @@ export const raidFormSchema = z.object({
     .min(today, { message: "Start date must be today or later." })
     .max(maxDate, { message: "Start date cannot be more than 2 months ahead." }),
   location: z.string().optional(),
+  composition: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .optional(),
 });

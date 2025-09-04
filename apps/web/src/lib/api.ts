@@ -1,3 +1,5 @@
+import type { BaseQueryFn } from "@reduxjs/toolkit/query";
+
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import axios, { isAxiosError, type AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
 
@@ -25,7 +27,7 @@ apiClient.interceptors.response.use(
 );
 
 // Request connector for RTK Query
-export const apiRTKRequest = async (args: AxiosRequestConfig) => {
+export const apiRTKRequest: BaseQueryFn<AxiosRequestConfig> = async (args) => {
   try {
     const response = await apiClient.request(args);
     const data = response.data as APIResponse.Type<unknown>;

@@ -6,7 +6,7 @@ import Loading from "@/components/ui/loading";
 import { PageError } from "@/components/ui/page";
 import { useGetServersQuery } from "@/store/servers";
 
-import { AddServerPage } from "./add-server";
+import { AddServerForm } from "./components/add-server";
 
 export function CreateGuildPage() {
   const getServers = useGetServersQuery();
@@ -23,7 +23,7 @@ export function CreateGuildPage() {
           <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
           <span className="font-sans">Back to dashboard</span>
         </Link>
-        <AddServerPage servers={servers} />
+        <AddServerForm servers={servers} />
       </div>
     </div>
   );

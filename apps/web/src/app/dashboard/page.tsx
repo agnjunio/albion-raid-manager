@@ -7,7 +7,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { useDashboard } from "./context";
+import { useDashboard } from "./contexts/dashboard-context";
 
 export function DashboardPage() {
   const location = useLocation();

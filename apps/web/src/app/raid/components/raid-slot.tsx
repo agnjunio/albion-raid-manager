@@ -13,7 +13,7 @@ export function RaidSlotCard({ slot }: Props) {
       key={slot.id}
       className={cn(
         "flex min-h-12 items-center justify-between rounded px-4 py-2",
-        slot.build
+        slot.role
           ? {
               TANK: "bg-role-tank/25",
               CALLER: "bg-role-caller/25",
@@ -22,7 +22,7 @@ export function RaidSlotCard({ slot }: Props) {
               RANGED_DPS: "bg-role-ranged/25",
               MELEE_DPS: "bg-role-melee/25",
               BATTLEMOUNT: "bg-role-battlemount/25",
-            }[slot.build.role]
+            }[slot.role]
           : "bg-secondary-violet/25",
       )}
     >

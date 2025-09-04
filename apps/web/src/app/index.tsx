@@ -4,20 +4,20 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import { PageError } from "@/components/ui/page";
 
+import { CreateGuildPage } from "./add-server/page";
 import { AuthCallback } from "./auth/callback";
-import { CreateGuildPage } from "./dashboard/create/page";
-import { CreateRaidPage } from "./dashboard/guildId/raids/create/page";
-import { RaidsPage } from "./dashboard/guildId/raids/page";
-import { RaidPage } from "./dashboard/guildId/raids/raidId/page";
 import { DashboardLayout } from "./dashboard/layout";
 import { DashboardPage } from "./dashboard/page";
 import { Home } from "./home/page";
+import { RaidPage } from "./raid/page";
+import { CreateRaidPage } from "./raids-create/page";
+import { RaidsPage } from "./raids/page";
 
 export default function App() {
   return (
     <div
       className={cn(
-        "bg-background text-foreground flex h-screen flex-col items-center font-sans antialiased",
+        "bg-background text-foreground flex h-screen w-screen flex-col items-center font-sans antialiased",
         "font-dm-sans",
       )}
     >

@@ -40,16 +40,14 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { useMenu } from "@/lib/menu";
-import { useGetGuildsQuery } from "@/store/guilds";
 
-import { useDashboard } from "./context";
+import { useDashboard } from "../contexts/dashboard-context";
 
 export function DashboardSidebar() {
   const { selectedGuild } = useDashboard();
-  const fetchGuilds = useGetGuildsQuery();
   const links = useMenu();
 
-  const guilds = fetchGuilds.data?.guilds ?? [];
+  const servers: Server[] = [];
 
   return (
     <Sidebar collapsible="icon" variant="sidebar" data-state="collapsed">
@@ -65,14 +63,14 @@ export function DashboardSidebar() {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] min-w-60" align="start">
-            {guilds.map((guild) => (
-              <Link key={guild.id} to={`/dashboard/${guild.id}`}>
+            {servers.map((server) => (
+              <Link key={server.id} to={`/dashboard/${server.id}`}>
                 <DropdownMenuItem>
-                  <GuildSelection server={guild} icon={guild === selectedGuild ? faCheck : undefined} />
+                  <GuildSelection server={server} icon={server === selectedGuild ? faCheck : undefined} />
                 </DropdownMenuItem>
               </Link>
             ))}
-            {guilds.length > 0 && <DropdownMenuSeparator />}
+            {servers.length > 0 && <DropdownMenuSeparator />}
             <Link to="/dashboard/create">
               <DropdownMenuItem>
                 <FontAwesomeIcon icon={faPlus} className="size-4" />

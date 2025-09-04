@@ -1,12 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
 
 import { Container } from "@/components/ui/container";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth";
 
-import { DashboardProvider } from "./context";
-import { DashboardHeader } from "./header";
-import { DashboardSidebar } from "./sidebar";
+import { DashboardHeader } from "./components/header";
+import { DashboardProvider } from "./contexts/dashboard-context";
 
 export function DashboardLayout() {
   const { status } = useAuth();
@@ -17,13 +15,10 @@ export function DashboardLayout() {
 
   return (
     <DashboardProvider>
-      <SidebarProvider>
-        <DashboardSidebar />
-        <Container className="flex flex-1 flex-col">
-          <DashboardHeader />
-          <Outlet />
-        </Container>
-      </SidebarProvider>
+      <Container className="flex w-full flex-1 flex-col">
+        <DashboardHeader />
+        <Outlet />
+      </Container>
     </DashboardProvider>
   );
 }

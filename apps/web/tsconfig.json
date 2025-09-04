@@ -23,8 +23,7 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "@/*": ["./src/*"],
-      "@types": ["../../packages/core/generated/types/index.ts"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"],

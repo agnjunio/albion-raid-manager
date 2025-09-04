@@ -2,7 +2,7 @@ import type { RaidStatus } from "@albion-raid-manager/core/types";
 
 import { cn } from "@albion-raid-manager/core/helpers/classNames";
 
-import { raidStatuses } from "./constants";
+import { raidStatuses } from "@/lib/constants";
 
 interface Props {
   status: RaidStatus;

@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import Loading from "@/components/ui/loading";
 import { useGetGuildRaidsQuery } from "@/store/raids";
 
-import { RaidList } from "./raid-list";
+import { RaidList } from "./components/raid-list";
 
 export function RaidsPage() {
   const { guildId } = useParams();

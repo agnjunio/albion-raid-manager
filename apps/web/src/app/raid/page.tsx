@@ -2,6 +2,7 @@ import type { RaidSlot, RaidStatus } from "@albion-raid-manager/core/types";
 
 import { useParams } from "react-router-dom";
 
+import { RaidStatusBadge } from "@/components/raids/raid-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
@@ -9,9 +10,7 @@ import { Page, PageBackButton, PageError } from "@/components/ui/page";
 import { isAPIError } from "@/lib/api";
 import { useGetGuildRaidQuery, useUpdateGuildRaidMutation } from "@/store/raids";
 
-import { RaidStatusBadge } from "../raid-status";
-
-import { RaidSlotCard } from "./raid-slot";
+import { RaidSlotCard } from "./components/raid-slot";
 
 export function RaidPage() {
   const { guildId, raidId } = useParams();
