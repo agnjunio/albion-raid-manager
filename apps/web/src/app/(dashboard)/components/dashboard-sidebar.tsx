@@ -51,8 +51,8 @@ export function DashboardSidebar() {
   const { serverId } = useParams<{ serverId: string }>();
   const { data, isLoading } = useGetServersQuery();
 
-  const servers = data?.servers;
-  const selectedServer = servers?.find((server) => server.id === serverId);
+  const servers = useMemo(() => data?.servers.filter((server) => server.bot), [data]);
+  const selectedServer = useMemo(() => servers?.find((server) => server.id === serverId), [servers, serverId]);
 
   return (
     <Sidebar collapsible="icon" variant="sidebar">

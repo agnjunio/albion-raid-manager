@@ -1,9 +1,4 @@
-import type {
-  CreateGuildRaid,
-  GetGuildRaid,
-  GetGuildRaids,
-  UpdateGuildRaid,
-} from "@albion-raid-manager/core/types/api/raids";
+import type { CreateRaid, GetRaid, GetRaids, UpdateGuildRaid } from "@albion-raid-manager/core/types/api/raids";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -16,38 +11,35 @@ export const raidsApi = createApi({
   endpoints: (builder) => {
     const tagHelper = createTagHelper("Raid");
     return {
-      createGuildRaid: builder.mutation<
-        CreateGuildRaid.Response,
-        { params: CreateGuildRaid.Params; body: CreateGuildRaid.Body }
-      >({
-        query: ({ params, body }) => ({
-          url: `/guilds/${params.guildId}/raids`,
-          method: "POST",
-          data: body,
-        }),
-        invalidatesTags: tagHelper.list("raids"),
-      }),
-      getGuildRaids: builder.query<GetGuildRaids.Response, { params: GetGuildRaids.Params }>({
+      getRaids: builder.query<GetRaids.Response, { params: GetRaids.Params }>({
         query: ({ params }) => ({
-          url: `/guilds/${params.guildId}/raids`,
+          url: `/servers/${params.serverId}/raids`,
         }),
         providesTags: tagHelper.list("raids"),
       }),
-      getGuildRaid: builder.query<GetGuildRaid.Response, { params: GetGuildRaid.Params; query?: GetGuildRaid.Query }>({
+      getRaid: builder.query<GetRaid.Response, { params: GetRaid.Params; query?: GetRaid.Query }>({
         query: ({ params, query }) => ({
-          url: `/guilds/${params.guildId}/raids/${params.raidId}`,
+          url: `/servers/${params.serverId}/raids/${params.raidId}`,
           params: {
             ...query,
           },
         }),
         providesTags: tagHelper.single("raid"),
       }),
-      updateGuildRaid: builder.mutation<
+      createRaid: builder.mutation<CreateRaid.Response, { params: CreateRaid.Params; body: CreateRaid.Body }>({
+        query: ({ params, body }) => ({
+          url: `/servers/${params.serverId}/raids`,
+          method: "POST",
+          data: body,
+        }),
+        invalidatesTags: tagHelper.list("raids"),
+      }),
+      updateRaid: builder.mutation<
         UpdateGuildRaid.Response,
         { params: UpdateGuildRaid.Params; body: UpdateGuildRaid.Body }
       >({
         query: ({ params, body }) => ({
-          url: `/guilds/${params.guildId}/raids/${params.raidId}`,
+          url: `/servers/${params.serverId}/raids/${params.raidId}`,
           method: "PUT",
           data: body,
         }),
@@ -57,5 +49,4 @@ export const raidsApi = createApi({
   },
 });
 
-export const { useGetGuildRaidsQuery, useCreateGuildRaidMutation, useGetGuildRaidQuery, useUpdateGuildRaidMutation } =
-  raidsApi;
+export const { useGetRaidsQuery, useGetRaidQuery, useCreateRaidMutation, useUpdateRaidMutation } = raidsApi;

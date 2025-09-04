@@ -5,10 +5,10 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { PageError } from "@/components/ui/page";
 
 import { AuthCallback } from "./(auth)/callback/page";
+import { RaidPage } from "./(dashboard)/[serverId]/(raids)/[raidId]/page";
+import { CreateRaidPage } from "./(dashboard)/[serverId]/(raids)/create/page";
+import { RaidsPage } from "./(dashboard)/[serverId]/(raids)/page";
 import { ServerLayout } from "./(dashboard)/[serverId]/layout";
-import { RaidPage } from "./(dashboard)/[serverId]/raids/[raidId]/page";
-import { CreateRaidPage } from "./(dashboard)/[serverId]/raids/create/page";
-import { RaidsPage } from "./(dashboard)/[serverId]/raids/page";
 import { DashboardLayout } from "./(dashboard)/layout";
 import { DashboardPage } from "./(dashboard)/page";
 import { ServerSetupPage } from "./(setup)/[serverId]/page";

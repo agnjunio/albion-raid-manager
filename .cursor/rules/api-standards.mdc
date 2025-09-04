@@ -34,6 +34,68 @@ alwaysApply: true
 - Implement proper input validation
 - Use middleware for cross-cutting concerns
 
+## Express Router Organization
+
+### Nested Routes Structure
+
+- **Follow Express.js conventions** for nested routes
+- **Use proper directory structure** that mirrors the URL structure
+- **Create separate router files** for nested resources
+
+### Directory Organization
+
+```
+apps/api/src/
+├── router.ts                    # Main router
+├── auth/
+│   ├── middleware.ts
+│   └── router.ts
+├── servers/
+│   ├── router.ts                # Server routes
+│   └── raids/
+│       └── router.ts            # Nested raids routes
+└── shared/
+    └── middleware.ts            # Shared middleware
+```
+
+### Router Implementation
+
+- **Use `Router({ mergeParams: true })`** for nested routers to inherit parent parameters
+- **Mount nested routers** using `parentRouter.use("/:parentId/child", childRouter)`
+- **Keep related routes together** in the same directory
+- **Use descriptive router names** (e.g., `serverRaidsRouter` for nested raids)
+
+### Route Parameter Inheritance
+
+- **Parent parameters** (like `:serverId`) are automatically available in nested routers
+- **Access parameters** using `req.params.parentId` in nested routes
+- **Maintain type safety** with proper TypeScript parameter types
+- **Validate parameters** in middleware before reaching route handlers
+
+### Examples
+
+```typescript
+// Main router
+router.use("/servers", serverRouter);
+
+// Server router
+serverRouter.use("/:serverId/raids", serverRaidsRouter);
+
+// Nested raids router (with mergeParams: true)
+serverRaidsRouter.get("/", (req, res) => {
+  const { serverId } = req.params; // Inherited from parent
+  // Handle GET /servers/:serverId/raids
+});
+```
+
+### Benefits
+
+- **Clean separation** of concerns
+- **Proper Express conventions** for maintainability
+- **Type safety** throughout the route hierarchy
+- **Easy to understand** URL structure
+- **Scalable** for complex nested resources
+
 ## Error Handling
 
 - Implement global error handling middleware

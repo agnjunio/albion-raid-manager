@@ -8,23 +8,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { Page, PageBackButton, PageError } from "@/components/ui/page";
 import { isAPIError } from "@/lib/api";
-import { useGetGuildRaidQuery, useUpdateGuildRaidMutation } from "@/store/raids";
+import { useGetRaidQuery, useUpdateRaidMutation } from "@/store/raids";
 
 import { RaidSlotCard } from "./components/raid-slot";
 
 export function RaidPage() {
-  const { guildId, raidId } = useParams();
+  const { serverId, raidId } = useParams();
 
-  const { isLoading, data, error } = useGetGuildRaidQuery({
+  const { isLoading, data, error } = useGetRaidQuery({
     params: {
-      guildId: guildId as string,
+      serverId: serverId as string,
       raidId: raidId as string,
     },
     query: {
       slots: true,
     },
   });
-  const [updateRaidStatus, updateRaidStatusResult] = useUpdateGuildRaidMutation();
+  const [updateRaidStatus, updateRaidStatusResult] = useUpdateRaidMutation();
 
   if (isLoading || updateRaidStatusResult.isLoading) {
     return <Loading />;
@@ -38,7 +38,7 @@ export function RaidPage() {
   const handleUpdateRaidStatus = async (status: RaidStatus) => {
     updateRaidStatus({
       params: {
-        guildId: guildId as string,
+        serverId: serverId as string,
         raidId: raidId as string,
       },
       body: { status },

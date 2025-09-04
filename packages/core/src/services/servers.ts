@@ -12,4 +12,19 @@ export namespace ServersService {
       },
     });
   }
+
+  export async function getServerWithMember(serverId: string, userId: string) {
+    return prisma.server.findUnique({
+      where: {
+        id: serverId,
+      },
+      include: {
+        members: {
+          where: {
+            userId,
+          },
+        },
+      },
+    });
+  }
 }

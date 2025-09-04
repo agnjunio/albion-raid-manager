@@ -7,7 +7,7 @@ interface Props {
 
 export default function Loading({ label, className }: Props) {
   return (
-    <div className={cn("flex h-full flex-col items-center justify-center gap-4 p-4", className)}>
+    <div className={cn("flex flex-col items-center justify-center gap-4 p-4", className)}>
       <div role="status">
         <svg
           aria-hidden="true"

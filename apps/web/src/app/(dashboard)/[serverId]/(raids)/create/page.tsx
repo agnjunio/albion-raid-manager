@@ -1,12 +1,9 @@
-import type { CreateGuildRaid } from "@albion-raid-manager/core/types/api/raids";
+import type { CreateRaid } from "@albion-raid-manager/core/types/api/raids";
 import type { z } from "zod";
 
 import { useState } from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers/classNames";
 import { APIErrorType } from "@albion-raid-manager/core/types/api";
-import { faCheck, faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -14,24 +11,19 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import Loading from "@/components/ui/loading";
 import { Page, PageTitle } from "@/components/ui/page";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { isAPIError } from "@/lib/api";
-import { useGetGuildCompositionsQuery } from "@/store/compositions";
-import { useCreateGuildRaidMutation } from "@/store/raids";
+import { useCreateRaidMutation } from "@/store/raids";
 
 import { raidFormSchema } from "./schemas";
 
 export function CreateRaidPage() {
   const navigate = useNavigate();
   const { guildId } = useParams();
-  const compositionQuery = useGetGuildCompositionsQuery({ params: { guildId: guildId as string } });
-  const [createGuild] = useCreateGuildRaidMutation();
+  const [createRaid] = useCreateRaidMutation();
   const [error, setError] = useState<APIErrorType | null>(null);
   const form = useForm<z.infer<typeof raidFormSchema>>({
     resolver: zodResolver(raidFormSchema),
@@ -41,18 +33,14 @@ export function CreateRaidPage() {
     },
   });
 
-  if (compositionQuery.isLoading) {
-    return <Loading />;
-  }
-
   const handleSubmit = async (data: z.infer<typeof raidFormSchema>) => {
-    const body: CreateGuildRaid.Body = {
+    const body: CreateRaid.Body = {
+      title: "Raid",
       description: data.description,
       date: data.date.toISOString(),
-      compositionId: data.composition ? data.composition.id : undefined,
     };
-    const createRaidResponse = await createGuild({
-      params: { guildId: guildId as string },
+    const createRaidResponse = await createRaid({
+      params: { serverId: guildId as string },
       body,
     });
 
@@ -68,7 +56,6 @@ export function CreateRaidPage() {
     }
   };
 
-  const compositions = compositionQuery.data?.compositions ?? [];
   return (
     <Page>
       <PageTitle>New Raid</PageTitle>
@@ -115,7 +102,7 @@ export function CreateRaidPage() {
                   )}
                 />
 
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="composition"
                   render={({ field }) => (
@@ -173,7 +160,7 @@ export function CreateRaidPage() {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
 
                 <div className="flex flex-row-reverse gap-2">
                   <Button type="submit">Create</Button>

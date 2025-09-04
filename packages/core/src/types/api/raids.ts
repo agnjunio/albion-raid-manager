@@ -1,8 +1,9 @@
 import { Raid, RaidStatus } from "@albion-raid-manager/core/types";
 
-export namespace CreateGuildRaid {
-  export type Params = { guildId: string };
+export namespace CreateRaid {
+  export type Params = { serverId: string };
   export type Body = {
+    title: string;
     description: string;
     date: string;
     location?: string;
@@ -11,19 +12,19 @@ export namespace CreateGuildRaid {
   export type Response = { raid: Raid };
 }
 
-export namespace GetGuildRaids {
-  export type Params = { guildId: string };
+export namespace GetRaids {
+  export type Params = { serverId: string };
   export type Response = { raids: Raid[] };
 }
 
-export namespace GetGuildRaid {
-  export type Params = { guildId: string; raidId: string };
+export namespace GetRaid {
+  export type Params = { serverId: string; raidId: string };
   export type Query = { slots?: boolean };
   export type Response = { raid: Raid };
 }
 
 export namespace UpdateGuildRaid {
-  export type Params = { guildId: string; raidId: string };
+  export type Params = { serverId: string; raidId: string };
   export type Body = { status: RaidStatus };
   export type Response = { raid: Raid };
 }

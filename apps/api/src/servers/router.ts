@@ -9,11 +9,14 @@ import { Request, Response, Router } from "express";
 import { auth } from "@/auth/middleware";
 import { validateRequest } from "@/request";
 
+import { serverRaidsRouter } from "./raids/router";
 import { addServerSchema } from "./schemas";
 
 export const serverRouter: Router = Router();
 
 serverRouter.use(auth);
+
+serverRouter.use("/:serverId/raids", serverRaidsRouter);
 
 serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetServers.Response>>) => {
   try {
