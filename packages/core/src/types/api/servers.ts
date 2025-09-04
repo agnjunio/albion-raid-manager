@@ -1,6 +1,6 @@
 import { Server } from "@albion-raid-manager/core/types";
 
-export type APIServer = {
+export type DiscordServer = {
   id: string;
   name: string;
   icon: string | null;
@@ -9,13 +9,13 @@ export type APIServer = {
   bot?: boolean;
 };
 
-export namespace AddServer {
-  export type Body = { serverId: string };
-  export type Response = { server: Server };
+export namespace GetServers {
+  export type Response = { servers: DiscordServer[] };
 }
 
-export namespace GetServers {
-  export type Response = { servers: APIServer[] };
+export namespace SetupServer {
+  export type Body = { serverId: string };
+  export type Response = { server: Server };
 }
 
 export namespace GetServer {

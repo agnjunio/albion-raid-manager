@@ -157,7 +157,7 @@ function ServerCard({ server }: ServerCardProps) {
 
   // If user can setup but bot isn't active, show setup button (non-clickable card)
   if (canSetup) {
-    return <div onClick={() => window.open(`/dashboard/setup/${server.id}`, "_blank")}>{cardContent}</div>;
+    return <Link to={`/setup/${server.id}`}>{cardContent}</Link>;
   }
 
   // If user has no permissions, show non-clickable card

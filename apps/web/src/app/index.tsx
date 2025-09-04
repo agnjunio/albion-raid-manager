@@ -11,7 +11,7 @@ import { CreateRaidPage } from "./(dashboard)/[serverId]/raids/create/page";
 import { RaidsPage } from "./(dashboard)/[serverId]/raids/page";
 import { DashboardLayout } from "./(dashboard)/layout";
 import { DashboardPage } from "./(dashboard)/page";
-import { ServerSetupPage } from "./(dashboard)/setup/[serverId]/page";
+import { ServerSetupPage } from "./(setup)/[serverId]/page";
 import { Home } from "./home";
 
 export default function App() {
@@ -27,7 +27,6 @@ export default function App() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
-          <Route path="setup/:serverId" element={<ServerSetupPage />} />
           <Route path=":serverId" element={<ServerLayout />}>
             <Route index element={<Navigate to="raids" replace />} />
             <Route path="raids">
@@ -41,6 +40,8 @@ export default function App() {
             />
           </Route>
         </Route>
+        <Route path="/setup/:serverId" element={<ServerSetupPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   );

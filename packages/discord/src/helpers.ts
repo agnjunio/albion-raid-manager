@@ -1,5 +1,5 @@
 import { User } from "@albion-raid-manager/core/types";
-import { APIServer } from "@albion-raid-manager/core/types/api/servers";
+import { DiscordServer } from "@albion-raid-manager/core/types/api/servers";
 import { APIGuild, APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
 
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;
@@ -51,7 +51,7 @@ export function transformUser(user: APIUser): User {
   };
 }
 
-export function transformGuild(guild: APIGuild): APIServer {
+export function transformGuild(guild: APIGuild): DiscordServer {
   const transformedGuild = {
     id: guild.id,
     name: guild.name,

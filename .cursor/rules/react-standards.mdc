@@ -26,6 +26,9 @@ alwaysApply: true
 - Use Tailwind CSS for styling (configured in [apps/web/postcss.config.mjs](mdc:apps/web/postcss.config.mjs))
 - Use class-variance-authority for component variants
 - Implement proper ARIA attributes for accessibility
+- **ALWAYS use UI Button components instead of HTML buttons** - Import from `@/components/ui/button`
+- Use consistent UI components from the design system
+- Avoid raw HTML form elements - use UI components instead
 
 ## File Organization
 

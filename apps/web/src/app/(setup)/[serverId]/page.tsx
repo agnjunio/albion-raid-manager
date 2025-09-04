@@ -1,20 +1,22 @@
+import { useMemo } from "react";
+
 import { faChevronCircleLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 
 import Loading from "@/components/ui/loading";
-import { PageError } from "@/components/ui/page";
 import { useGetServersQuery } from "@/store/servers";
 
-import { AddServerForm } from "./components/add-server";
+import { ServerSetup } from "./components/server-setup";
 
 export function ServerSetupPage() {
-  const getServers = useGetServersQuery();
+  const { data, isLoading } = useGetServersQuery();
+  const { serverId } = useParams<{ serverId: string }>();
 
-  if (getServers.isLoading) return <Loading />;
-  if (getServers.isError) return <PageError error="Failed to load servers" variant="error" />;
-  if (!getServers.data) return <PageError error="No servers found" />;
-  const { servers } = getServers.data;
+  const server = useMemo(() => data?.servers.find((server) => server.id === serverId), [data, serverId]);
+
+  if (isLoading) return <Loading label="Loading server..." />;
+  if (!server) return <Navigate to="/dashboard" />;
 
   return (
     <div className="flex grow items-center justify-center">
@@ -23,7 +25,7 @@ export function ServerSetupPage() {
           <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
           <span className="font-sans">Back to dashboard</span>
         </Link>
-        <AddServerForm servers={servers} />
+        <ServerSetup server={server} />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { ServersService } from "@albion-raid-manager/core/services";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import { AddServer, APIServer, GetServers } from "@albion-raid-manager/core/types/api/servers";
+import { DiscordServer, GetServers, SetupServer } from "@albion-raid-manager/core/types/api/servers";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
@@ -30,7 +30,7 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
       }),
     ]);
 
-    const servers = new Map<string, APIServer>();
+    const servers = new Map<string, DiscordServer>();
 
     for (const server of adminServers) {
       servers.set(server.id, {
@@ -67,7 +67,7 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
 serverRouter.post(
   "/",
   validateRequest({ body: addServerSchema }),
-  async (req: Request<{}, void, AddServer.Body>, res: Response<APIResponse.Type<AddServer.Response>>) => {
+  async (req: Request<{}, void, SetupServer.Body>, res: Response<APIResponse.Type<SetupServer.Response>>) => {
     try {
       const { serverId } = req.body;
 
@@ -83,7 +83,7 @@ serverRouter.post(
       });
       if (existingServer) {
         // TODO: If user is a server admin, join the guild automatically instead
-        return res.status(400).json(APIResponse.Error(APIErrorType.SERVER_ALREADY_EXISTS, "Server already exists"));
+        return res.json(APIResponse.Success({ server: existingServer }));
       }
 
       if (!req.session.user) {
