@@ -8,7 +8,7 @@ import { useGetServersQuery } from "@/store/servers";
 
 import { AddServerForm } from "./components/add-server";
 
-export function CreateGuildPage() {
+export function ServerSetupPage() {
   const getServers = useGetServersQuery();
 
   if (getServers.isLoading) return <Loading />;

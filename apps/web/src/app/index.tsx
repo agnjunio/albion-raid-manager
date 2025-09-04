@@ -4,14 +4,15 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import { PageError } from "@/components/ui/page";
 
-import { CreateGuildPage } from "./add-server/page";
-import { AuthCallback } from "./auth/callback";
-import { DashboardLayout } from "./dashboard/layout";
-import { DashboardPage } from "./dashboard/page";
-import { Home } from "./home/page";
-import { RaidPage } from "./raid/page";
-import { CreateRaidPage } from "./raids-create/page";
-import { RaidsPage } from "./raids/page";
+import { AuthCallback } from "./(auth)/callback/page";
+import { ServerLayout } from "./(dashboard)/[serverId]/layout";
+import { RaidPage } from "./(dashboard)/[serverId]/raids/[raidId]/page";
+import { CreateRaidPage } from "./(dashboard)/[serverId]/raids/create/page";
+import { RaidsPage } from "./(dashboard)/[serverId]/raids/page";
+import { DashboardLayout } from "./(dashboard)/layout";
+import { DashboardPage } from "./(dashboard)/page";
+import { ServerSetupPage } from "./(dashboard)/setup/[serverId]/page";
+import { Home } from "./home";
 
 export default function App() {
   return (
@@ -26,8 +27,8 @@ export default function App() {
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
-          <Route path="create" element={<CreateGuildPage />} />
-          <Route path=":guildId">
+          <Route path="setup/:serverId" element={<ServerSetupPage />} />
+          <Route path=":serverId" element={<ServerLayout />}>
             <Route index element={<Navigate to="raids" replace />} />
             <Route path="raids">
               <Route index element={<RaidsPage />} />
