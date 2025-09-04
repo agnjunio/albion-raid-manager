@@ -21,6 +21,8 @@
   --muted-foreground: #666666;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
+  --success: #00ff00;
+  --success-foreground: #ffffff;
   --ring: #d4af37;
 
   /* Card */
@@ -69,6 +71,8 @@
   --muted-foreground: #d3c0b6;
   --destructive: #e63946;
   --destructive-foreground: #ff4d4d;
+  --success: #22c55e;
+  --success-foreground: #ffffff;
   --ring: #b8860b;
 
   /* Card */
@@ -115,6 +119,8 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-ring: var(--ring);
 
   --color-card: var(--card);

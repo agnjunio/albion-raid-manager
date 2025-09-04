@@ -1,11 +1,12 @@
-import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
+import { createRaid, findRaidById, findRaids, updateRaid } from "@albion-raid-manager/core/services";
 import {
+  APIErrorType,
+  APIResponse,
   CreateGuildRaid,
   GetGuildRaid,
   GetGuildRaids,
   UpdateGuildRaid,
-} from "@albion-raid-manager/core/types/api/raids";
-import { prisma } from "@albion-raid-manager/database";
+} from "@albion-raid-manager/core/types/api";
 import { Request, Response, Router } from "express";
 
 import { auth } from "@/auth/middleware";
@@ -28,8 +29,12 @@ raidsRouter.post(
     const { guildId } = req.params;
     const { description, date, location } = req.body;
 
-    const raid = await prisma.raid.create({
-      data: { serverId: guildId, description, date, location },
+    const raid = await createRaid({
+      title: "Raid", // Default title, can be updated later
+      description,
+      date: new Date(date),
+      serverId: guildId,
+      location,
     });
 
     res.json(APIResponse.Success({ raid }));
@@ -45,11 +50,7 @@ raidsRouter.get(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Guild ID is required");
     }
 
-    const raids = await prisma.raid.findMany({
-      where: {
-        serverId: guildId,
-      },
-    });
+    const raids = await findRaids({ serverId: guildId });
 
     res.json(APIResponse.Success({ raids }));
   },
@@ -68,14 +69,7 @@ raidsRouter.get(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Guild ID and Raid ID are required");
     }
 
-    const raid = await prisma.raid.findUnique({
-      where: {
-        id: raidId,
-      },
-      include: {
-        slots: Boolean(slots),
-      },
-    });
+    const raid = await findRaidById(raidId, Boolean(slots));
 
     if (!raid) {
       return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Raid not found"));
@@ -99,10 +93,7 @@ raidsRouter.put(
 
     const { status } = req.body;
 
-    const raid = await prisma.raid.update({
-      where: { id: raidId },
-      data: { status },
-    });
+    const raid = await updateRaid(raidId, { status });
 
     res.json(APIResponse.Success({ raid }));
   },

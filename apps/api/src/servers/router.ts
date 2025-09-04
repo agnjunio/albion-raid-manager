@@ -1,5 +1,6 @@
+import { ServersService } from "@albion-raid-manager/core/services";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import { AddServer, GetServerResponse, GetServersResponse } from "@albion-raid-manager/core/types/api/servers";
+import { AddServer, APIServer, GetServers } from "@albion-raid-manager/core/types/api/servers";
 import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
@@ -8,22 +9,51 @@ import { Request, Response, Router } from "express";
 import { auth } from "@/auth/middleware";
 import { validateRequest } from "@/request";
 
-import { addServerSchema, getServerSchema } from "./schemas";
+import { addServerSchema } from "./schemas";
 
 export const serverRouter: Router = Router();
 
 serverRouter.use(auth);
 
-serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetServersResponse>>) => {
+serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetServers.Response>>) => {
   try {
-    const servers = await discordService.servers.getServers({
-      admin: true,
-    });
-    if (!servers) {
+    if (!req.session.user) {
+      return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+    }
+
+    const [botServers, adminServers] = await Promise.all([
+      ServersService.getServersForUser(req.session.user.id),
+      discordService.servers.getServers({
+        type: "user",
+        token: req.session.accessToken,
+        admin: true,
+      }),
+    ]);
+
+    const servers = new Map<string, APIServer>();
+
+    for (const server of adminServers) {
+      servers.set(server.id, {
+        ...server,
+        admin: true,
+        bot: botServers.some((botServer) => botServer.id === server.id),
+      });
+    }
+
+    for (const server of botServers) {
+      if (servers.has(server.id)) continue;
+      servers.set(server.id, {
+        ...server,
+        admin: false,
+        bot: true,
+      });
+    }
+
+    if (!adminServers) {
       return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get servers"));
     }
 
-    res.json(APIResponse.Success({ servers }));
+    res.json(APIResponse.Success({ servers: Array.from(servers.values()) }));
   } catch (error) {
     if (isAxiosError(error) && error.response?.status === 401) {
       res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
@@ -41,30 +71,30 @@ serverRouter.post(
     try {
       const { serverId } = req.body;
 
-      const server = await discordService.servers.getServer(serverId);
-      if (!server) {
+      const discordServer = await discordService.servers.getServer(serverId);
+      if (!discordServer) {
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
-      const existingGuild = await prisma.server.findUnique({
+      const existingServer = await prisma.server.findUnique({
         where: {
           id: serverId,
         },
       });
-      if (existingGuild) {
+      if (existingServer) {
         // TODO: If user is a server admin, join the guild automatically instead
-        return res.status(400).json(APIResponse.Error(APIErrorType.GUILD_ALREADY_EXISTS, "Guild already exists"));
+        return res.status(400).json(APIResponse.Error(APIErrorType.SERVER_ALREADY_EXISTS, "Server already exists"));
       }
 
       if (!req.session.user) {
         return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
       }
 
-      const guild = await prisma.server.create({
+      const server = await prisma.server.create({
         data: {
           id: serverId,
-          name: server.name,
-          icon: server.icon,
+          name: discordServer.name,
+          icon: discordServer.icon,
           members: {
             create: {
               userId: req.session.user.id,
@@ -74,38 +104,10 @@ serverRouter.post(
         },
       });
 
-      res.json(APIResponse.Success({ guild }));
+      res.json(APIResponse.Success({ server }));
     } catch (error) {
       logger.warn("Failed to add server", error);
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to add server"));
-    }
-  },
-);
-
-serverRouter.get(
-  "/:serverId",
-  validateRequest({ params: getServerSchema }),
-  async (req: Request, res: Response<APIResponse.Type<GetServerResponse>>) => {
-    try {
-      const { serverId } = req.params;
-
-      if (!serverId) {
-        return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST));
-      }
-
-      const server = await discordService.servers.getServer(serverId, {
-        type: "user",
-        token: req.session.accessToken,
-      });
-
-      if (!server) {
-        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-      }
-
-      res.json(APIResponse.Success({ server }));
-    } catch (error) {
-      logger.warn("Get server error", error);
-      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server"));
     }
   },
 );

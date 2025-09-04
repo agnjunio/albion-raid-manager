@@ -6,6 +6,7 @@ export type APIServer = {
   icon: string | null;
   owner?: boolean;
   admin: boolean;
+  bot?: boolean;
 };
 
 export namespace AddServer {
@@ -14,7 +15,7 @@ export namespace AddServer {
 }
 
 export namespace GetServers {
-  export type Response = { servers: Server[] };
+  export type Response = { servers: APIServer[] };
 }
 
 export namespace GetServer {

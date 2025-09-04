@@ -1,10 +1,13 @@
+import { cn } from "@albion-raid-manager/core/helpers/classNames";
+
 interface Props {
   label?: string;
+  className?: string;
 }
 
-export default function Loading({ label }: Props) {
+export default function Loading({ label, className }: Props) {
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
+    <div className={cn("flex h-full flex-col items-center justify-center gap-4 p-4", className)}>
       <div role="status">
         <svg
           aria-hidden="true"

@@ -1,3 +1,4 @@
+import { createRaid, findRaidById, findRaids } from "@albion-raid-manager/core/services";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { ContentType, prisma, RaidRole, RaidStatus, RaidType } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
@@ -189,24 +190,16 @@ async function handleCreateRaid(interaction: Interaction) {
     },
   });
 
-  // Create raid with default slots
-  const raid = await prisma.raid.create({
-    data: {
-      title,
-      description,
-      date: raidDate,
-      type,
-      contentType,
-      location,
-      serverId: chatInteraction.guild.id,
-      status: RaidStatus.SCHEDULED,
-      slots: {
-        create: generateDefaultSlots(slotCount),
-      },
-    },
-    include: {
-      slots: true,
-    },
+  // Create raid with default slots using the service
+  const raid = await createRaid({
+    title,
+    description,
+    date: raidDate,
+    type,
+    contentType,
+    location,
+    serverId: chatInteraction.guild.id,
+    slotCount,
   });
 
   const embed = new EmbedBuilder()
@@ -250,21 +243,13 @@ async function handleListRaids(interaction: Interaction) {
     return;
   }
 
-  const where = {
-    serverId: chatInteraction.guild.id,
-    ...(statusFilter && { status: statusFilter }),
-  };
-
-  const raids = await prisma.raid.findMany({
-    where,
-    include: {
-      slots: {
-        where: { userId: { not: null } },
-      },
+  const raids = await findRaids(
+    {
+      serverId: chatInteraction.guild.id,
+      ...(statusFilter && { status: statusFilter }),
     },
-    orderBy: { date: "asc" },
-    take: 10,
-  });
+    true, // include slots
+  );
 
   if (raids.length === 0) {
     await chatInteraction.reply({
@@ -299,10 +284,7 @@ async function handleAnnounceRaid(interaction: Interaction) {
   const chatInteraction = interaction as ChatInputCommandInteraction;
   const raidId = chatInteraction.options.getString("raid_id", true);
 
-  const raid = await prisma.raid.findUnique({
-    where: { id: raidId },
-    include: { slots: true },
-  });
+  const raid = await findRaidById(raidId, true);
 
   if (!raid) {
     await chatInteraction.reply({ content: "Raid not found.", ephemeral: true });
@@ -342,20 +324,11 @@ async function handleAnnounceRaid(interaction: Interaction) {
     return;
   }
 
-  // Update raid status to OPEN
-  await prisma.raid.update({
-    where: { id: raidId },
-    data: { status: RaidStatus.OPEN },
-  });
-
   const messageOptions = buildRaidAnnouncementMessage(raid, raid.slots);
   const message = await channel.send(messageOptions as any);
 
-  // Update raid with announcement message ID
-  await prisma.raid.update({
-    where: { id: raidId },
-    data: { announcementMessageId: message.id },
-  });
+  // Update raid with announcement message ID and open for signups
+  await announceRaid(raidId, message.id);
 
   await chatInteraction.reply({
     content: `✅ Raid announced in ${channel}!`,
@@ -367,9 +340,7 @@ async function handleCloseRaid(interaction: Interaction) {
   const chatInteraction = interaction as ChatInputCommandInteraction;
   const raidId = chatInteraction.options.getString("raid_id", true);
 
-  const raid = await prisma.raid.findUnique({
-    where: { id: raidId },
-  });
+  const raid = await findRaidById(raidId);
 
   if (!raid) {
     await chatInteraction.reply({ content: "Raid not found.", ephemeral: true });
@@ -386,10 +357,7 @@ async function handleCloseRaid(interaction: Interaction) {
     return;
   }
 
-  await prisma.raid.update({
-    where: { id: raidId },
-    data: { status: RaidStatus.CLOSED },
-  });
+  await closeRaidForSignups(raidId);
 
   await chatInteraction.reply({
     content: `✅ Raid ${raidId.slice(0, 8)} closed for signups.`,
@@ -401,9 +369,7 @@ async function handleOpenRaid(interaction: Interaction) {
   const chatInteraction = interaction as ChatInputCommandInteraction;
   const raidId = chatInteraction.options.getString("raid_id", true);
 
-  const raid = await prisma.raid.findUnique({
-    where: { id: raidId },
-  });
+  const raid = await findRaidById(raidId);
 
   if (!raid) {
     await chatInteraction.reply({ content: "Raid not found.", ephemeral: true });
@@ -420,10 +386,7 @@ async function handleOpenRaid(interaction: Interaction) {
     return;
   }
 
-  await prisma.raid.update({
-    where: { id: raidId },
-    data: { status: RaidStatus.OPEN },
-  });
+  await openRaidForSignups(raidId);
 
   await chatInteraction.reply({
     content: `✅ Raid ${raidId.slice(0, 8)} opened for signups.`,
