@@ -1,31 +1,56 @@
-import EventEmitter from "events";
-
-import { type Raid } from "@albion-raid-manager/core/types";
 import { logger } from "@albion-raid-manager/logger";
-import { User } from "discord.js";
+import { isRaidEvent, RaidEventSubscriber } from "@albion-raid-manager/redis";
+import { Client } from "discord.js";
 
-import { discord } from "@/bot";
+import { Redis } from "@/redis";
 
-import { updateRaidAnnouncement } from "./handlers";
+import { handleRaidCreated, handleRaidDeleted, handleRaidStatusChanged, handleRaidUpdated } from "./handlers";
 
-export const raidEvents = new EventEmitter();
+interface HandleRaidEventsProps {
+  discord: Client;
+}
 
-raidEvents.on("raidAnnounced", (raid: Raid) => {
-  logger.info(`Raid announced: ${raid.id}`, { raid });
-});
+export async function initRaidEvents({ discord }: HandleRaidEventsProps) {
+  try {
+    const subscriber = new RaidEventSubscriber(Redis.getClient());
+    await subscriber.subscribe(async ({ event, metadata }) => {
+      if (!isRaidEvent(event)) return;
+      // Do not process events from the bot itself
+      if (metadata.source === "bot") return;
 
-raidEvents.on("raidSignup", async (raid: Raid, user: User) => {
-  logger.info(`User ${user.displayName} signed up for raid: ${raid.id}`, {
-    raid,
-    user: user.toJSON(),
-  });
-  return updateRaidAnnouncement(discord, raid);
-});
+      const { type, entityId, serverId } = event;
+      logger.debug(`Processing raid event: ${type}`, {
+        entityId,
+        serverId,
+        eventType: type,
+      });
 
-raidEvents.on("raidSignout", async (raid: Raid, user: User) => {
-  logger.info(`User ${user.displayName} left raid: ${raid.id}`, {
-    raid,
-    user: user.toJSON(),
-  });
-  return updateRaidAnnouncement(discord, raid);
-});
+      try {
+        switch (type) {
+          case "raid.created":
+            await handleRaidCreated({ discord, event });
+            break;
+          case "raid.updated":
+            await handleRaidUpdated({ discord, event });
+            break;
+          case "raid.status_changed":
+            await handleRaidStatusChanged({ discord, event });
+            break;
+          case "raid.deleted":
+            await handleRaidDeleted({ discord, event });
+            break;
+          default:
+            logger.warn(`Unknown raid event type: ${type}`, { entityId, serverId });
+        }
+      } catch (error) {
+        logger.error(`Error handling raid event: ${type}`, {
+          entityId,
+          serverId,
+          error,
+        });
+      }
+    });
+  } catch (error) {
+    logger.error("Failed to subscribe to raid events via Redis", { error });
+  }
+}

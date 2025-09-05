@@ -26,6 +26,7 @@
     "@albion-raid-manager/database": "workspace:^",
     "@albion-raid-manager/discord": "workspace:^",
     "@albion-raid-manager/logger": "workspace:*",
+    "@albion-raid-manager/redis": "workspace:*",
     "discord.js": "^14.19.3"
   }
 }

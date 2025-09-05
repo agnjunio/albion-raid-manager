@@ -22,8 +22,28 @@ services:
     networks:
       - albion-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: albion-raid-manager-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - albion-network
+
 volumes:
   database-data:
+    driver: local
+  redis-data:
     driver: local
 
 networks:

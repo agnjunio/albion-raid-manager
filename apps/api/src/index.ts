@@ -1,69 +1,37 @@
-import config from "@albion-raid-manager/config";
-import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
-import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import cors from "cors";
-import express from "express";
-import session from "express-session";
-import morgan from "morgan";
 
-import { context } from "./context";
-import { errors } from "./errors";
-import { router } from "./router";
+import { run, cleanup } from "./app";
 
-const app = express();
-const port = config.api.port;
+async function start() {
+  try {
+    logger.info("Starting the API Server.");
 
-app.use(
-  cors({
-    origin: config.api.cors.origin,
-    credentials: true,
-  }),
-);
+    const server = await run();
 
-app.use(express.urlencoded({ extended: true }));
+    const shutdownHandler = async () => {
+      await cleanup(server);
+      process.exit(0);
+    };
 
-app.use(express.json());
+    // Handle cleanup on server shutdown
+    process.on("SIGTERM", shutdownHandler);
+    // Handle ts-node-dev reloads
+    process.on("SIGINT", shutdownHandler);
+    process.on("SIGUSR2", shutdownHandler);
 
-app.use(
-  morgan("dev", {
-    stream: {
-      write: (message: string) => {
-        logger.info(message.trim());
-      },
-    },
-  }),
-);
+    // Catches uncaught exceptions
+    process.on("uncaughtException", async (error) => {
+      logger.error(`Uncaught exception:`, error);
+    });
+  } catch (error) {
+    let message = "Unknown error";
+    if (error instanceof Error) message = error.message;
 
-app.use(
-  session({
-    secret: config.session.secret,
-    resave: false,
-    saveUninitialized: false,
-    cookie: config.session.cookie,
-    store: new PrismaSessionStore(prisma, {
-      checkPeriod: 12 * 60 * 60 * 1000, // 12 hours
-    }),
-  }),
-);
+    logger.error(`An error occurred while running: ${message}`, { error });
+    process.exit(1);
+  }
+}
 
-app.use(context);
-app.use(router);
-app.use(errors);
-
-const server = app.listen(port, () => {
-  logger.info(`Server is running on port ${port}`);
-});
-
-const shutdown = () => {
-  server.close(() => {
-    logger.info("Server shutdown");
-    process.exit(0);
-  });
-};
-
-// Handle cleanup on server shutdown
-process.on("SIGTERM", shutdown);
-// Handle ts-node-dev reloads
-process.on("SIGINT", shutdown);
-process.on("SIGUSR2", shutdown);
+if (require.main === module) {
+  start();
+}

@@ -28,7 +28,8 @@
       "@albion-raid-manager/config": ["./packages/config/src/index.ts"],
       "@albion-raid-manager/database": ["./packages/database/src/index.ts"],
       "@albion-raid-manager/discord": ["./packages/discord/src/index.ts"],
-      "@albion-raid-manager/logger": ["./packages/logger/src/index.ts"]
+      "@albion-raid-manager/logger": ["./packages/logger/src/index.ts"],
+      "@albion-raid-manager/redis": ["./packages/redis/src/index.ts"]
     }
   },
   "include": ["packages/**/src", "apps/**/src"],

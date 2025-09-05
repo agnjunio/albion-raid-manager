@@ -3,14 +3,16 @@ import { Events } from "discord.js";
 
 import { type Module } from "@/modules/modules";
 
-import { raidCommand } from "./commands/raid";
+import { initRaidEvents } from "./events";
 import { handleMessageCreate, handleSelectRole, handleSignout, handleSignup } from "./handlers";
 
 export const raids: Module = {
   id: "raids",
   enabled: true,
-  commands: [raidCommand],
+  commands: [],
   onReady: async ({ discord }) => {
+    initRaidEvents({ discord });
+
     discord.on(Events.MessageCreate, async (message) => handleMessageCreate({ discord, message }));
 
     discord.on(Events.InteractionCreate, async (interaction) => {

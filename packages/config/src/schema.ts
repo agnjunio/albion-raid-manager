@@ -38,6 +38,10 @@ export const schema = z.object({
     files: z.any().optional().transform(parseBool),
   }),
 
+  redis: z.object({
+    url: z.string().url(),
+  }),
+
   session: z.object({
     secret: z.string(),
     cookie: z.object({

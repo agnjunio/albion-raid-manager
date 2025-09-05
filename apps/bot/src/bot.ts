@@ -4,6 +4,7 @@ import { Client, Events, IntentsBitField, Partials } from "discord.js";
 
 import { deployCommands, handleCommand } from "./commands";
 import { initModules } from "./modules";
+import { Redis } from "./redis";
 
 export const discord = new Client({
   intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent],
@@ -16,13 +17,16 @@ async function run() {
   }
 
   logger.info("Starting the Bot Client.");
+
   await initModules({ discord });
   await deployCommands();
+  await Redis.initClient();
   await discord.login(config.discord.token);
 }
 
 async function cleanup() {
   logger.info("Shutting down Bot Client.");
+
   discord.removeAllListeners();
   await discord.destroy();
 }

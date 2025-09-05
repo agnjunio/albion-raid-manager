@@ -7,11 +7,13 @@ import {
   GetRaids,
   UpdateGuildRaid,
 } from "@albion-raid-manager/core/types/api";
+import { logger } from "@albion-raid-manager/logger";
 import { Request, Response, Router } from "express";
 
 import { validateRequest } from "@/request";
 
 import { raidPermission } from "./middleware";
+import { getRaidEventPublisher } from "./redis";
 import { createGuildRaidSchema } from "./schemas";
 
 export const serverRaidsRouter: Router = Router({ mergeParams: true });
@@ -36,6 +38,15 @@ serverRaidsRouter.post(
       location,
       description,
     });
+
+    try {
+      const publisher = await getRaidEventPublisher();
+      if (publisher) {
+        await publisher.publishRaidCreated(raid, serverId);
+      }
+    } catch (error) {
+      logger.error("Failed to publish raid created event:", error);
+    }
 
     res.json(APIResponse.Success({ raid }));
   },
@@ -92,7 +103,28 @@ serverRaidsRouter.put(
 
     const { status } = req.body;
 
+    // Get the current raid to check for status changes
+    const currentRaid = await RaidService.findRaidById(raidId);
+    const previousStatus = currentRaid?.status;
+
     const raid = await RaidService.updateRaid(raidId, { status });
+
+    // Publish raid updated event
+    try {
+      const publisher = await getRaidEventPublisher();
+      if (publisher) {
+        if (previousStatus && previousStatus !== status) {
+          // Status changed - publish status change event
+          await publisher.publishRaidStatusChanged(raid, serverId, previousStatus);
+        } else {
+          // General update - publish updated event
+          await publisher.publishRaidUpdated(raid, serverId);
+        }
+      }
+    } catch (error) {
+      // Log error but don't fail the request
+      logger.error("Failed to publish raid updated event:", error);
+    }
 
     res.json(APIResponse.Success({ raid }));
   },

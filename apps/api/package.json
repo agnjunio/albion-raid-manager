@@ -18,6 +18,7 @@
     "@albion-raid-manager/database": "workspace:*",
     "@albion-raid-manager/discord": "workspace:*",
     "@albion-raid-manager/logger": "workspace:*",
+    "@albion-raid-manager/redis": "workspace:*",
     "@quixo3/prisma-session-store": "^3.1.13",
     "axios": "^1.6.2",
     "cors": "^2.8.5",

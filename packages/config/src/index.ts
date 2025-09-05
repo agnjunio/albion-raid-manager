@@ -38,6 +38,10 @@ const config = schema.safeParse({
     files: process.env.LOGGER_FILES ?? isProd,
   },
 
+  redis: {
+    url: process.env.REDIS_URL || "redis://localhost:6379",
+  },
+
   session: {
     secret: process.env.SESSION_SECRET ?? "your-secret-key",
     cookie: {

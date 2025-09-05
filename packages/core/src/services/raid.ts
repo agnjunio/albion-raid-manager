@@ -9,11 +9,6 @@ export namespace RaidService {
   export async function createRaid(input: CreateRaidInput): Promise<Raid> {
     const { title, description, date, type = RaidType.FIXED, contentType, location, serverId, slotCount = 8 } = input;
 
-    // Validate date is in the future
-    if (date < new Date()) {
-      throw new Error("Raid date cannot be in the past");
-    }
-
     // Ensure server exists
     await ensureServerExists(serverId);
 
