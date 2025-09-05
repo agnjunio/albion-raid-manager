@@ -8,7 +8,11 @@ import { useCalendar, CalendarView } from "@/app/(dashboard)/[serverId]/(raids)/
 
 import { RaidEventCard } from "./raid-event-card";
 
-export function CalendarGrid() {
+interface CalendarGridProps {
+  onTimeSlotClick?: (date: Date, hour: number) => void;
+}
+
+export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
   const { filteredRaids: raids, currentDate, view, setCurrentDate, setView } = useCalendar();
   const timeSlots = useMemo(() => {
     const slots = [];
@@ -108,11 +112,14 @@ export function CalendarGrid() {
               <div
                 key={index}
                 className={cn(
-                  "bg-background hover:bg-muted/50 min-h-31 cursor-pointer p-2 transition-colors",
+                  "bg-background hover:bg-primary/25 min-h-31 cursor-pointer p-2 transition-colors",
                   !isCurrentMonth && "text-muted-foreground",
                   isToday && "bg-primary/5 ring-primary ring-1",
                 )}
-                onClick={() => handleDayClick(day)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDayClick(day);
+                }}
               >
                 <div className="flex items-center justify-between">
                   <span className={cn("text-sm", isToday && "font-semibold")}>{day.getDate()}</span>
@@ -198,7 +205,7 @@ export function CalendarGrid() {
           return (
             <div
               key={slot.hour}
-              className="bg-muted/10 relative grid"
+              className="bg-background hover:bg-muted/5 relative grid"
               style={{ gridTemplateColumns: `80px repeat(${days.length}, 1fr)` }}
             >
               {/* Current time line for this hour */}
@@ -242,14 +249,21 @@ export function CalendarGrid() {
                   <div
                     key={`${slot.hour}-${dayIndex}`}
                     className={cn(
-                      "border-border/20 hover:bg-muted/20 border-b p-1 transition-colors",
+                      "border-border/20 hover:bg-primary/20 border-b p-1 transition-colors",
                       isToday && "bg-primary/5 border-primary/10",
+                      onTimeSlotClick && "hover:bg-primary/10 group cursor-pointer",
                     )}
+                    onClick={() => onTimeSlotClick?.(day, slot.hour)}
                   >
                     <div className="space-y-1">
                       {timeSlotRaids.map((raid) => (
                         <RaidEventCard key={raid.id} raid={raid} variant="time-slot" />
                       ))}
+                      {timeSlotRaids.length === 0 && onTimeSlotClick && (
+                        <div className="text-muted-foreground/50 text-xs opacity-0 transition-opacity group-hover:opacity-100">
+                          Click to create raid
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

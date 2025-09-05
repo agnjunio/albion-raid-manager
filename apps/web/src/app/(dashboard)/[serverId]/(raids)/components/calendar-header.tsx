@@ -1,13 +1,14 @@
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faChevronLeft, faChevronRight, faCog, faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Link } from "react-router-dom";
 
 import { HotkeysHelp } from "@/components/hotkeys-help";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { useCalendar, CalendarView } from "../contexts/calendar-context";
+
+import { CreateRaidSidebar } from "./create-raid-sidebar";
 
 export function CalendarHeader() {
   const { currentDate, view, isRefreshing, hotkeys, setCurrentDate, setView, refresh } = useCalendar();
@@ -158,12 +159,12 @@ export function CalendarHeader() {
 
         <HotkeysHelp hotkeys={hotkeys} />
 
-        <Link to="create" tabIndex={-1}>
+        <CreateRaidSidebar>
           <Button className="h-8 gap-1 px-3 text-sm font-normal">
             <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
             <span className="hidden sm:inline">New Raid</span>
           </Button>
-        </Link>
+        </CreateRaidSidebar>
       </div>
     </div>
   );

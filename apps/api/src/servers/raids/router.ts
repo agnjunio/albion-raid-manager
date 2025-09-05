@@ -26,10 +26,11 @@ serverRaidsRouter.post(
     res: Response<APIResponse.Type<CreateRaid.Response>>,
   ) => {
     const { serverId } = req.params;
-    const { description, date, location, title } = req.body;
+    const { description, date, location, title, contentType } = req.body;
 
     const raid = await RaidService.createRaid({
       title,
+      contentType,
       description,
       date: new Date(date),
       serverId,
