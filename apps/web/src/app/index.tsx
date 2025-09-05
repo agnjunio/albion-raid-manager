@@ -3,6 +3,7 @@ import { faFileCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { PageError } from "@/components/ui/page";
+import { Toaster } from "@/components/ui/sonner";
 
 import { AuthCallback } from "./(auth)/callback/page";
 import { RaidPage } from "./(dashboard)/[serverId]/(raids)/[raidId]/page";
@@ -18,7 +19,7 @@ export default function App() {
   return (
     <div
       className={cn(
-        "bg-background text-foreground flex h-screen w-screen flex-col items-center font-sans antialiased",
+        "bg-background text-foreground relative flex h-screen w-screen flex-col items-center font-sans antialiased",
         "font-dm-sans",
       )}
     >
@@ -43,6 +44,8 @@ export default function App() {
         <Route path="/setup/:serverId" element={<ServerSetupPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      <Toaster />
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Page } from "@/components/ui/page";
 
 import { ServerList } from "./components/server-list";
 
 export function DashboardPage() {
   return (
-    <div className="flex size-full flex-col items-center justify-start gap-8 py-8">
+    <Page className="flex size-full flex-col items-center justify-start gap-8 py-8">
       <Card className="max-w-md text-center">
         <CardHeader>
           <div className="bg-primary/10 mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full">
@@ -22,6 +23,6 @@ export function DashboardPage() {
       </Card>
 
       <ServerList />
-    </div>
+    </Page>
   );
 }

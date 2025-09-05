@@ -28,7 +28,7 @@ export function DashboardLayout() {
         {isServerRoute && <DashboardSidebar />}
 
         <Container className="flex w-full flex-1 flex-col">
-          <DashboardHeader />
+          <DashboardHeader hasSidebar={isServerRoute} />
           <Outlet />
         </Container>
       </SidebarProvider>

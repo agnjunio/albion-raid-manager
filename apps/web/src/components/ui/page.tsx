@@ -10,7 +10,7 @@ import { Button } from "./button";
 import Loading from "./loading";
 
 export function Page({ children, className }: PropsWithChildren<{ className?: string }>) {
-  return <div className={cn("flex flex-1 grow flex-col gap-4 p-4", className)}>{children}</div>;
+  return <div className={cn("flex w-full grow flex-col gap-4 p-4", className)}>{children}</div>;
 }
 
 export function PageBackButton() {
@@ -62,7 +62,7 @@ export function PageError({ error, variant = "warning", iconSize = "2xl", classN
 export function PageLoading({ label }: { label?: string }) {
   return (
     <Page>
-      <Loading label={label} className="flex-1" />
+      <Loading label={label} className="absolute inset-0" />
     </Page>
   );
 }
