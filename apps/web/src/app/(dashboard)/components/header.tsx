@@ -5,7 +5,7 @@ import { AboutButton } from "./about";
 
 export function DashboardHeader({ hasSidebar }: { hasSidebar: boolean }) {
   return (
-    <div className="border-border/50 bg-background text-foreground sticky top-0 z-10 flex items-center justify-between border-b p-2 py-1">
+    <div className="border-border/50 bg-background text-foreground sticky top-0 z-10 flex items-center justify-between border-b px-4 py-2">
       <div className="flex w-full justify-start gap-2">{hasSidebar && <SidebarTrigger />}</div>
       <div className="flex w-full justify-end gap-2">
         <AboutButton variant="ghost" />

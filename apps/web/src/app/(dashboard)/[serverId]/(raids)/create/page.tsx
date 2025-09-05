@@ -22,7 +22,7 @@ import { raidFormSchema } from "./schemas";
 
 export function CreateRaidPage() {
   const navigate = useNavigate();
-  const { guildId } = useParams();
+  const { serverId } = useParams();
   const [createRaid] = useCreateRaidMutation();
   const [error, setError] = useState<APIErrorType | null>(null);
   const form = useForm<z.infer<typeof raidFormSchema>>({
@@ -40,7 +40,7 @@ export function CreateRaidPage() {
       date: data.date.toISOString(),
     };
     const createRaidResponse = await createRaid({
-      params: { serverId: guildId as string },
+      params: { serverId: serverId as string },
       body,
     });
 
@@ -58,22 +58,29 @@ export function CreateRaidPage() {
 
   return (
     <Page>
-      <PageTitle>New Raid</PageTitle>
+      <div className="mb-8 space-y-2 text-center">
+        <PageTitle className="text-3xl font-bold">Create New Raid</PageTitle>
+        <p className="text-muted-foreground text-lg">Schedule and organize your guild&apos;s next adventure</p>
+      </div>
 
       <div className="flex justify-center">
-        <div className="W-full max-w-xl">
-          <Card className="p-8">
-            {error && <Alert>{error}</Alert>}
+        <div className="w-full max-w-2xl">
+          <Card className="bg-card/50 border-0 p-8 shadow-lg backdrop-blur-sm">
+            {error && <Alert className="mb-6">{error}</Alert>}
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 lg:space-y-8">
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 lg:space-y-8">
                 <FormField
                   control={form.control}
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel className="text-base font-semibold">Raid Description</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter raid description..." {...field} />
+                        <Input
+                          placeholder="Enter a detailed description of your raid..."
+                          className="h-12 text-base"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -85,17 +92,18 @@ export function CreateRaidPage() {
                   name="date"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Start Time</FormLabel>
+                      <FormLabel className="text-base font-semibold">Start Time</FormLabel>
                       <FormControl>
                         <DateTimePicker
                           hourCycle={24}
-                          granularity="minute"
-                          displayFormat={{ hour24: "dd/MM/yyyy HH:mm" }}
+                          granularity="hour"
+                          displayFormat={{ hour24: "dd/MM/yyyy HH:00" }}
+                          className="h-12 text-base"
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        The start time is in your local timezone. Conversions will be done automatically.
+                      <FormDescription className="text-sm">
+                        Select the start time for your raid. Times are displayed in 1-hour windows for better planning.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -162,10 +170,14 @@ export function CreateRaidPage() {
                   )}
                 /> */}
 
-                <div className="flex flex-row-reverse gap-2">
-                  <Button type="submit">Create</Button>
+                <div className="flex flex-row-reverse gap-4 pt-4">
+                  <Button type="submit" size="lg" className="px-8">
+                    Create Raid
+                  </Button>
                   <Link to={`..`} tabIndex={-1}>
-                    <Button variant="secondary">Cancel</Button>
+                    <Button variant="secondary" size="lg" className="px-8">
+                      Cancel
+                    </Button>
                   </Link>
                 </div>
               </form>

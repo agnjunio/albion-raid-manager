@@ -8,5 +8,5 @@ interface Props {
 }
 
 export function Container({ className, children }: Props) {
-  return <main className={cn("overflow-auto bg-gray-500/10 dark:bg-gray-200/5", className)}>{children}</main>;
+  return <main className={cn("flex h-full flex-col bg-gray-500/10 dark:bg-gray-200/5", className)}>{children}</main>;
 }

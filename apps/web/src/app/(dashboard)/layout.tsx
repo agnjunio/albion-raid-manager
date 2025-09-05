@@ -25,12 +25,16 @@ export function DashboardLayout() {
   return (
     <DashboardProvider>
       <SidebarProvider>
-        {isServerRoute && <DashboardSidebar />}
+        <div className="flex h-screen w-full">
+          {isServerRoute && <DashboardSidebar />}
 
-        <Container className="flex w-full flex-1 flex-col">
-          <DashboardHeader hasSidebar={isServerRoute} />
-          <Outlet />
-        </Container>
+          <Container className="w-full flex-1">
+            <DashboardHeader hasSidebar={isServerRoute} />
+            <div className="flex min-h-0 flex-1">
+              <Outlet />
+            </div>
+          </Container>
+        </div>
       </SidebarProvider>
     </DashboardProvider>
   );

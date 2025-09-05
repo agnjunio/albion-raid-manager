@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { PageLoading } from "@/components/ui/page";
 import { useGetRaidsQuery } from "@/store/raids";
 
-import { RaidList } from "./components/raid-list";
+import { CalendarPage } from "./components/calendar-page";
 
 export function RaidsPage() {
   const { serverId } = useParams();
@@ -32,5 +32,5 @@ export function RaidsPage() {
     return <PageLoading label="Loading raids..." />;
   }
 
-  return <RaidList raids={data?.raids} status={status} onRefresh={refetch} />;
+  return <CalendarPage raids={data?.raids || []} onRefresh={refetch} isRefreshing={status === "pending"} />;
 }
