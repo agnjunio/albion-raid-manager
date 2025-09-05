@@ -13,7 +13,11 @@ export namespace CreateRaid {
 }
 
 export namespace GetRaids {
-  export type Params = { serverId: string };
+  export type Params = {
+    serverId: string;
+    from?: Date;
+    to?: Date;
+  };
   export type Response = { raids: Raid[] };
 }
 
