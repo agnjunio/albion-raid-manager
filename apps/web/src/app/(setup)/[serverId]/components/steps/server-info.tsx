@@ -12,10 +12,6 @@ export function ServerInfo({ server, onNext }: ServerInfoProps) {
   return (
     <CardContent className="space-y-4">
       <div className="text-center">
-        <h3 className="mb-2 text-lg font-semibold">Server Setup</h3>
-        <p className="text-muted-foreground mb-4">
-          You&apos;re about to add a Discord server to your account. Make sure you have admin permissions on the server.
-        </p>
         <div className="bg-muted mb-4 rounded-lg p-4">
           <div className="flex items-center gap-3">
             {server.icon && (

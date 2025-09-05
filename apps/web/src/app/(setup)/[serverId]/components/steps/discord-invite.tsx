@@ -3,6 +3,7 @@ import { useState } from "react";
 import { DiscordServer } from "@albion-raid-manager/core/types/api/servers";
 import { getServerInviteUrl } from "@albion-raid-manager/discord/helpers";
 
+import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 
@@ -34,16 +35,15 @@ export function DiscordInvite({ server, onStartVerification }: DiscordInviteProp
   };
 
   return (
-    <CardContent className="space-y-4">
+    <CardContent className="flex flex-col gap-4">
       <div className="text-center">
-        <h3 className="mb-2 text-lg font-semibold">Discord Invitation</h3>
         <p className="text-muted-foreground mb-4">
           Click the link below to open Discord and accept the bot invitation to your server.
         </p>
       </div>
 
-      <div className="space-y-3">
-        <Button asChild className="w-full">
+      <div className="flex flex-col gap-2">
+        <Button asChild className="w-full" variant="secondary">
           <a href={inviteUrl} target="_blank" rel="noopener noreferrer">
             Open Discord Invitation
           </a>
@@ -62,14 +62,11 @@ export function DiscordInvite({ server, onStartVerification }: DiscordInviteProp
         </div>
       </div>
 
-      <div className="rounded-lg bg-blue-50 p-3 dark:bg-blue-950">
-        <p className="text-sm text-blue-800 dark:text-blue-200">
-          <strong>Important:</strong> Make sure you have admin permissions on the server before accepting the
-          invitation.
-        </p>
-      </div>
+      <Alert variant="info" className="my-2 text-sm">
+        <strong>Important:</strong> Make sure you have admin permissions on the server before accepting the invitation.
+      </Alert>
 
-      <Button variant="secondary" onClick={onStartVerification} className="w-full">
+      <Button variant="primary" onClick={onStartVerification} className="w-full">
         Continue to verification
       </Button>
     </CardContent>

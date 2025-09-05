@@ -10,7 +10,7 @@ interface Props {
 
 export default function Alert({ children, className, variant = "error" }: Props) {
   const variantClassName = {
-    info: "bg-primary-50 text-primary-500",
+    info: "bg-blue-50 p-3 dark:bg-blue-950 text-blue-800 dark:text-blue-200",
     warning: "bg-yellow-500 text-yellow-50",
     error: "bg-red-500 text-red-100",
   }[variant];

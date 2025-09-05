@@ -24,10 +24,13 @@ export function Complete({ addServerResponse }: CompleteProps) {
 
   return (
     <CardContent className="flex flex-col items-center gap-3">
-      <FontAwesomeIcon icon={faCheck} size="2xl" />
-      <p className="text-muted-foreground text-base">
-        Verification complete. You will be redirected to the dashboard page. Please <Link to={link}>click here</Link> if
-        that doesn&apos;t happen.
+      <FontAwesomeIcon icon={faCheck} size="2xl" className="animate-pulse" />
+      <p className="text-muted-foreground text-center text-sm">
+        Verification complete. You will be redirected to the dashboard page. Please{" "}
+        <Link to={link} className="text-primary font-bold">
+          click here
+        </Link>{" "}
+        if that doesn&apos;t happen.
       </p>
     </CardContent>
   );
