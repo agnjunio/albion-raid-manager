@@ -19,7 +19,7 @@ export function ServerSetupPage() {
   if (!server) return <Navigate to="/dashboard" />;
 
   return (
-    <div className="flex grow items-center justify-center">
+    <div className="flex h-full items-center justify-center">
       <div className="flex flex-col items-start gap-3">
         <Link to="/dashboard" className="text-accent flex justify-center gap-1 text-sm leading-none">
           <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />

@@ -50,6 +50,122 @@ alwaysApply: true
 - Use react-error-boundary package for consistent error handling
 - Provide fallback UI for error states
 
+## Form Standards
+
+### Form Structure and Layout
+
+- **Use React Hook Form** with `zodResolver` for validation
+- **Form element must wrap all inputs and submit button** - submit button must be inside `<form>` tag
+- **Use proper form structure** with clear sections and dividers
+- **Implement proper form validation** with Zod schemas
+- **Use toast notifications** for success/error feedback instead of inline alerts
+
+### Form Layout Pattern
+
+```tsx
+<Form {...form}>
+  <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 py-6">
+    {/* Form Fields */}
+    <div className="space-y-6">
+      <FormField
+        control={form.control}
+        name="fieldName"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+              <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                <FontAwesomeIcon icon={faIcon} className="text-primary h-4 w-4" />
+              </div>
+              Field Label
+            </FormLabel>
+            <FormControl>
+              <Input
+                placeholder="Enter value..."
+                className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
+                {...field}
+              />
+            </FormControl>
+            <FormDescription className="text-muted-foreground mt-2 text-sm">Field description</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+
+    {/* Divider */}
+    <div className="border-border border-t"></div>
+
+    {/* Form Actions - MUST be inside form element */}
+    <div className="border-border bg-muted/30 -mx-6 -mb-6 mt-8 border-t px-6 py-6">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="hover:bg-muted flex-1 transition-all duration-200"
+          onClick={() => handleCancel()}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          size="lg"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 transition-all duration-200"
+        >
+          <FontAwesomeIcon icon={faIcon} className="mr-2 h-4 w-4" />
+          Submit
+        </Button>
+      </div>
+    </div>
+  </form>
+</Form>
+```
+
+### Form Field Standards
+
+- **Use FormField wrapper** for all form inputs
+- **Include proper labels** with icons and consistent styling
+- **Add FormDescription** for helpful text
+- **Use FormMessage** for validation errors
+- **Apply consistent input styling** with focus states and transitions
+- **Use proper input types** (Input, Select, Textarea, DateTimePicker)
+
+### Form Validation
+
+- **Define Zod schemas** in separate schema files
+- **Use zodResolver** with React Hook Form
+- **Implement proper error handling** with toast notifications
+- **Validate on submit** and show field-level errors
+
+### Form State Management
+
+- **Use form.reset()** after successful submission
+- **Clear error states** after successful operations
+- **Handle loading states** during async operations
+- **Implement proper form cleanup** on component unmount
+
+### Form Actions
+
+- **Submit button MUST be inside form element** with `type="submit"`
+- **Cancel button** should be `type="button"` to prevent form submission
+- **Use consistent button styling** and sizing
+- **Implement proper click handlers** for cancel actions
+
+### Error Handling
+
+- **Use toast notifications** instead of inline alerts
+- **Show success toasts** for completed actions
+- **Show error toasts** with descriptive messages
+- **Handle API errors** with proper error message extraction
+
+### Form Styling
+
+- **Use consistent spacing** with `space-y-6` and `space-y-8`
+- **Apply proper dividers** between form sections
+- **Use consistent input heights** (h-12 for main inputs, h-10 for optional)
+- **Implement proper focus states** with `focus:border-primary/50`
+- **Use consistent border styling** with `border-2`
+
 ## Testing
 
 - Write unit tests for business logic

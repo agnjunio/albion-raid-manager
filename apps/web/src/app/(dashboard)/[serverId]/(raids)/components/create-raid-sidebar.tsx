@@ -3,14 +3,24 @@ import type { z } from "zod";
 
 import React, { useState } from "react";
 
+import { CONTENT_TYPE_LIST, CONTENT_TYPE_MAPPING, getDefaultLocation } from "@albion-raid-manager/core/entities";
+import { ContentType } from "@albion-raid-manager/core/types";
 import { APIErrorType } from "@albion-raid-manager/core/types/api";
-import { faCalendar, faMapMarkerAlt, faUsers, faShieldAlt, faClock, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendar,
+  faShieldAlt,
+  faClock,
+  faPlus,
+  faGamepad,
+  faFileText,
+  faLocationDot,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
-import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { DateTimePicker } from "@/components/ui/datetime-picker";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -21,7 +31,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { isAPIError } from "@/lib/api";
 import { useCreateRaidMutation } from "@/store/raids";
 
-import { raidFormSchema } from "../create/schemas";
+import { raidFormSchema } from "../schemas";
+
+const CONTENT_TYPE_DISPLAY_NAMES: Record<ContentType, string> = CONTENT_TYPE_MAPPING.reduce(
+  (acc, contentInfo) => {
+    acc[contentInfo.type] = contentInfo.displayName;
+    return acc;
+  },
+  {} as Record<ContentType, string>,
+);
 
 interface CreateRaidSidebarProps {
   children: React.ReactNode;
@@ -30,20 +48,17 @@ interface CreateRaidSidebarProps {
 }
 
 export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSidebarProps) {
-  const navigate = useNavigate();
   const { serverId } = useParams();
   const [createRaid] = useCreateRaidMutation();
-  const [error, setError] = useState<APIErrorType | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm<z.infer<typeof raidFormSchema>>({
     resolver: zodResolver(raidFormSchema),
     defaultValues: {
       title: "",
-      contentType: "GROUP_DUNGEON",
+      contentType: CONTENT_TYPE_LIST[0],
       description: "",
-      location: "",
-      maxParticipants: 20,
+      location: getDefaultLocation(CONTENT_TYPE_LIST[0]),
       date:
         selectedDateTime ||
         (() => {
@@ -57,7 +72,6 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
     },
   });
 
-  // Update form when selectedDateTime changes
   React.useEffect(() => {
     if (selectedDateTime) {
       form.setValue("date", selectedDateTime);
@@ -77,16 +91,21 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
     });
 
     if (createRaidResponse.error) {
-      setError(
-        isAPIError(createRaidResponse.error) ? createRaidResponse.error.data : APIErrorType.INTERNAL_SERVER_ERROR,
-      );
+      const errorCode = isAPIError(createRaidResponse.error)
+        ? createRaidResponse.error.data
+        : APIErrorType.INTERNAL_SERVER_ERROR;
+
+      toast.error("Failed to create raid", {
+        description: errorCode,
+      });
       return;
     }
 
-    if (createRaidResponse.data) {
-      setIsOpen(false);
-      navigate(`../${createRaidResponse.data.raid.id}`, { replace: true });
-    }
+    setIsOpen(false);
+    form.reset();
+    toast.success("Raid created successfully", {
+      description: "Your raid has been scheduled and is now visible to participants.",
+    });
   };
 
   return (
@@ -111,210 +130,205 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
 
           {/* Form Section */}
           <div className="flex-1 overflow-y-auto px-6">
-            {error && (
-              <div className="mt-6">
-                <Alert className="border-destructive/50 bg-destructive/10 text-destructive">{error}</Alert>
-              </div>
-            )}
-
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-10 py-6">
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 py-6">
                 {/* Raid Title */}
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground mb-2 flex items-center gap-2 text-base font-semibold">
-                        <FontAwesomeIcon icon={faShieldAlt} className="text-primary h-4 w-4" />
-                        Raid Title
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter a compelling title for your raid..."
-                          className="h-12 text-base font-medium"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-muted-foreground mt-1.5 text-sm">
-                        Choose a clear, descriptive title that will attract participants
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Content Type */}
-                <FormField
-                  control={form.control}
-                  name="contentType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground mb-2 flex items-center gap-2 text-base font-semibold">
-                        <FontAwesomeIcon icon={faShieldAlt} className="text-primary h-4 w-4" />
-                        Content Type
-                      </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-12 text-base">
-                            <SelectValue placeholder="Select content type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="SOLO_DUNGEON">Solo Dungeon</SelectItem>
-                          <SelectItem value="OPEN_WORLD_FARMING">Open World Farming</SelectItem>
-                          <SelectItem value="GROUP_DUNGEON">Group Dungeon</SelectItem>
-                          <SelectItem value="AVALONIAN_DUNGEON_FULL_CLEAR">Avalonian Dungeon (Full Clear)</SelectItem>
-                          <SelectItem value="AVALONIAN_DUNGEON_BUFF_ONLY">Avalonian Dungeon (Buff Only)</SelectItem>
-                          <SelectItem value="ROADS_OF_AVALON_PVE">Roads of Avalon (PvE)</SelectItem>
-                          <SelectItem value="ROADS_OF_AVALON_PVP">Roads of Avalon (PvP)</SelectItem>
-                          <SelectItem value="DEPTHS_DUO">Depths (Duo)</SelectItem>
-                          <SelectItem value="DEPTHS_TRIO">Depths (Trio)</SelectItem>
-                          <SelectItem value="GANKING_SQUAD">Ganking Squad</SelectItem>
-                          <SelectItem value="FIGHTING_SQUAD">Fighting Squad</SelectItem>
-                          <SelectItem value="ZVZ_CALL_TO_ARMS">ZvZ Call to Arms</SelectItem>
-                          <SelectItem value="HELLGATE_2V2">Hellgate (2v2)</SelectItem>
-                          <SelectItem value="HELLGATE_5V5">Hellgate (5v5)</SelectItem>
-                          <SelectItem value="HELLGATE_10V10">Hellgate (10v10)</SelectItem>
-                          <SelectItem value="MISTS_SOLO">Mists (Solo)</SelectItem>
-                          <SelectItem value="MISTS_DUO">Mists (Duo)</SelectItem>
-                          <SelectItem value="OTHER">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormDescription className="text-muted-foreground mt-1.5 text-sm">
-                        Choose the type of content this raid will focus on
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Raid Description */}
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground mb-2 text-base font-semibold">Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Provide detailed information about the raid objectives, requirements, and what participants can expect..."
-                          className="min-h-[120px] text-base leading-relaxed"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-muted-foreground mt-1.5 text-sm">
-                        Include objectives, requirements, loot rules, and any special instructions
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Date and Time */}
-                <FormField
-                  control={form.control}
-                  name="date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground mb-2 flex items-center gap-2 text-base font-semibold">
-                        <FontAwesomeIcon icon={faCalendar} className="text-primary h-4 w-4" />
-                        Start Date & Time
-                      </FormLabel>
-                      <FormControl>
-                        <DateTimePicker
-                          hourCycle={24}
-                          granularity="minute"
-                          displayFormat={{ hour24: "dd/MM/yyyy HH:mm" }}
-                          className="h-12 text-base"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-muted-foreground mt-1.5 text-sm">
-                        <FontAwesomeIcon icon={faClock} className="mr-1 h-3 w-3" />
-                        Select the start time for your raid. Times are displayed in 1-hour windows for better planning.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Location and Max Participants Row */}
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                  {/* Location */}
+                <div className="space-y-6">
                   <FormField
                     control={form.control}
-                    name="location"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-foreground mb-2 flex items-center gap-2 text-base font-semibold">
-                          <FontAwesomeIcon icon={faMapMarkerAlt} className="text-primary h-4 w-4" />
-                          Location
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Black Zone, Royal City..." className="h-12 text-base" {...field} />
-                        </FormControl>
-                        <FormDescription className="text-muted-foreground mt-1.5 text-sm">
-                          Where will the raid take place?
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Max Participants */}
-                  <FormField
-                    control={form.control}
-                    name="maxParticipants"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-foreground mb-2 flex items-center gap-2 text-base font-semibold">
-                          <FontAwesomeIcon icon={faUsers} className="text-primary h-4 w-4" />
-                          Max Participants
+                        <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                            <FontAwesomeIcon icon={faShieldAlt} className="text-primary h-4 w-4" />
+                          </div>
+                          Raid Title
                         </FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            placeholder="20"
-                            className="h-12 text-base font-medium"
+                            placeholder="Enter a compelling title for your raid..."
+                            className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
                             {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           />
                         </FormControl>
-                        <FormDescription className="text-muted-foreground mt-1.5 text-sm">
-                          Maximum number of participants (1-50)
+                        <FormDescription className="text-muted-foreground mt-2 text-sm">
+                          Choose a clear, descriptive title that will attract participants
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+
+                {/* Divider */}
+                <div className="border-border border-t"></div>
+
+                {/* Content Type and Start Time */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {/* Content Type */}
+                  <FormField
+                    control={form.control}
+                    name="contentType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                            <FontAwesomeIcon icon={faGamepad} className="text-primary h-4 w-4" />
+                          </div>
+                          Content Type
+                        </FormLabel>
+                        <Select
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Set default location based on content type
+                            const defaultLocation = getDefaultLocation(value as ContentType);
+                            if (defaultLocation) {
+                              form.setValue("location", defaultLocation);
+                            }
+                          }}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="text-foreground focus:border-primary/50 h-12 w-full border-2 text-base transition-colors">
+                              <SelectValue placeholder="Select content type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {CONTENT_TYPE_LIST.map((contentType) => (
+                              <SelectItem key={contentType} value={contentType}>
+                                {CONTENT_TYPE_DISPLAY_NAMES[contentType]}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription className="text-muted-foreground mt-2 text-sm">
+                          Choose the type of content this raid will focus on
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Date and Time */}
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                            <FontAwesomeIcon icon={faCalendar} className="text-primary h-4 w-4" />
+                          </div>
+                          Start Date & Time
+                        </FormLabel>
+                        <FormControl>
+                          <DateTimePicker
+                            hourCycle={24}
+                            granularity="minute"
+                            displayFormat={{ hour24: "dd/MM/yyyy HH:mm" }}
+                            className="focus:border-primary/50 h-12 w-full border-2 text-base transition-colors"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription className="text-muted-foreground mt-2 text-sm">
+                          <FontAwesomeIcon icon={faClock} className="mr-1 h-3 w-3" />
+                          Select the start time for your raid
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Divider */}
+                <div className="border-border border-t"></div>
+
+                {/* Location - Optional Field */}
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-base font-medium">
+                          <div className="bg-muted flex h-6 w-6 items-center justify-center rounded-lg">
+                            <FontAwesomeIcon icon={faLocationDot} className="text-muted-foreground h-3 w-3" />
+                          </div>
+                          Location (Optional)
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., Black Zone, Royal City..."
+                            className="focus:border-primary/50 h-10 border-2 text-base transition-colors"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription className="text-muted-foreground mt-2 text-sm">
+                          Where will the raid take place? This is optional and can be added later.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Divider */}
+                <div className="border-border border-t"></div>
+
+                {/* Raid Description */}
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                            <FontAwesomeIcon icon={faFileText} className="text-primary h-4 w-4" />
+                          </div>
+                          Description
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Provide detailed information about the raid objectives, requirements, and what participants can expect..."
+                            className="focus:border-primary/50 min-h-[120px] resize-none border-2 text-base leading-relaxed transition-colors"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription className="text-muted-foreground mt-2 text-sm">
+                          Include objectives, requirements, loot rules, and any special instructions
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Form Actions */}
+                <div className="border-border bg-muted/30 -mx-6 -mb-6 mt-8 border-t px-6 py-6">
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      className="hover:bg-muted flex-1 transition-all duration-200"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 transition-all duration-200"
+                    >
+                      <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
+                      Create Raid
+                    </Button>
+                  </div>
+                </div>
               </form>
             </Form>
-          </div>
-
-          {/* Footer Actions */}
-          <div className="border-border bg-muted/30 border-t px-6 py-6">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                type="button"
-                variant="outline"
-                size="lg"
-                className="hover:bg-muted flex-1 transition-all duration-200"
-                onClick={() => setIsOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 transition-all duration-200"
-                onClick={form.handleSubmit(handleSubmit)}
-              >
-                <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
-                Create Raid
-              </Button>
-            </div>
           </div>
         </div>
       </SheetContent>

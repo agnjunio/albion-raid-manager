@@ -7,6 +7,7 @@ import {
   NON_ROLE_PATTERNS,
   ROLE_INDICATORS,
   getContentTypeDictionaryForText,
+  matchesContentType,
 } from "../../dictionaries";
 
 import { createPreprocessor, type Preprocessor } from "./";
@@ -90,7 +91,7 @@ function detectFixedSizeContentType(
 }
 
 /**
- * Detect content type from text using keyword matching
+ * Detect content type from text using comprehensive keyword matching
  */
 export function detectContentType(text: string): { type: ContentType; confidence: number; info: ContentTypeInfo } {
   const normalizedText = text.toLowerCase().trim();
@@ -105,35 +106,27 @@ export function detectContentType(text: string): { type: ContentType; confidence
     }
   }
 
+  // Use the new comprehensive keyword matching system
   for (const contentInfo of CONTENT_TYPE_MAPPING) {
-    let matchCount = 0;
-    const totalKeywords = contentInfo.keywords.length;
+    const matchResult = matchesContentType(text, contentInfo.type);
 
-    for (const keyword of contentInfo.keywords) {
-      if (normalizedText.includes(keyword.toLowerCase())) {
-        matchCount++;
+    if (matchResult.matches) {
+      let confidence = matchResult.confidence;
+
+      // Boost confidence for fixed-size content types when role count matches
+      const isFixedSize = contentInfo.partySize.min === contentInfo.partySize.max;
+      if (isFixedSize) {
+        const expectedRoleCount = contentInfo.partySize.min;
+        if (roleCount === expectedRoleCount) {
+          confidence += 0.3;
+        } else if (roleCount > 0) {
+          confidence -= 0.8;
+        }
       }
-    }
 
-    let confidence = matchCount / totalKeywords;
-
-    if (matchCount > 0) {
-      confidence = Math.max(confidence, 0.3);
-    }
-
-    const isFixedSize = contentInfo.partySize.min === contentInfo.partySize.max;
-    if (isFixedSize) {
-      const expectedRoleCount = contentInfo.partySize.min;
-
-      if (roleCount === expectedRoleCount) {
-        confidence += 0.3;
-      } else if (roleCount > 0) {
-        confidence -= 0.8;
+      if (confidence > 0 && (!bestMatch || confidence > bestMatch.confidence)) {
+        bestMatch = { type: contentInfo.type, confidence, info: contentInfo };
       }
-    }
-
-    if (confidence > 0 && (!bestMatch || confidence > bestMatch.confidence)) {
-      bestMatch = { type: contentInfo.type, confidence, info: contentInfo };
     }
   }
 

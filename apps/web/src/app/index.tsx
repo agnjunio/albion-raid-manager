@@ -8,7 +8,6 @@ import { Toaster } from "@/components/ui/sonner";
 
 import { AuthCallback } from "./(auth)/callback/page";
 import { RaidPage } from "./(dashboard)/[serverId]/(raids)/[raidId]/page";
-import { CreateRaidPage } from "./(dashboard)/[serverId]/(raids)/create/page";
 import { RaidsPage } from "./(dashboard)/[serverId]/(raids)/page";
 import { ServerLayout } from "./(dashboard)/[serverId]/layout";
 import { DashboardLayout } from "./(dashboard)/layout";
@@ -29,7 +28,6 @@ export default function App() {
               <Route index element={<Navigate to="raids" replace />} />
               <Route path="raids">
                 <Route index element={<RaidsPage />} />
-                <Route path="create" element={<CreateRaidPage />} />
                 <Route path=":raidId" element={<RaidPage />} />
               </Route>
               <Route
