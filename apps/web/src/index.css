@@ -156,58 +156,74 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* Global Overlay Scrollbar Styles */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+@layer components {
+  /* Global Overlay Scrollbar Styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
-  border: none;
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+    border: none;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--border);
-  opacity: 0.6;
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border);
+    opacity: 0.6;
+  }
 
-/* Hide scrollbar by default, show on hover */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
+  /* Hide scrollbar by default, show on hover */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
 
-*:hover {
-  scrollbar-color: var(--border) transparent;
-}
+  *:hover {
+    scrollbar-color: var(--border) transparent;
+  }
 
-/* Overlay scrollbar for webkit browsers */
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+  /* Overlay scrollbar for webkit browsers */
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
 
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-*::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 4px;
-  border: none;
-}
+  *::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+    border: none;
+  }
 
-*:hover::-webkit-scrollbar-thumb {
-  background: var(--border);
-}
+  *:hover::-webkit-scrollbar-thumb {
+    background: var(--border);
+  }
 
-*:hover::-webkit-scrollbar-thumb:hover {
-  background: var(--border);
-  opacity: 0.6;
+  *:hover::-webkit-scrollbar-thumb:hover {
+    background: var(--border);
+    opacity: 0.6;
+  }
+
+  .primary-scrollbar {
+    scrollbar-color: color-mix(in srgb, var(--primary) 50%, transparent) transparent;
+    transition: scrollbar-color 0.3s ease-in-out;
+  }
+
+  .primary-scrollbar::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--primary) 50%, transparent);
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .primary-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
+  }
 }

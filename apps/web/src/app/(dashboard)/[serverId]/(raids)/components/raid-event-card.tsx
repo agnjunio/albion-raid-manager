@@ -1,7 +1,7 @@
 import type { Raid } from "@albion-raid-manager/core/types";
 
 import { cn } from "@albion-raid-manager/core/helpers";
-import { faCheck, faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
@@ -72,22 +72,19 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
       <Link
         to={raid.id}
         className={cn(
-          "hover:bg-accent/50 block rounded border-l-2 transition-colors",
+          "hover:bg-accent/50 block rounded border-l-2 shadow-sm transition-colors",
           getStatusColor(raid.status),
           getVariantStyles(),
           className,
         )}
       >
         <div className="flex items-center justify-between">
-          <div className="truncate font-medium">{raid.title}</div>
-          <div className="flex items-center gap-1">
-            <FontAwesomeIcon icon={faCheck} className="h-3 w-3" />
-          </div>
+          <div className="truncate text-xs font-medium">{raid.title}</div>
         </div>
         <div className="text-xs opacity-75">{formatTime(raid.date)}</div>
         {raid.location && (
           <div className="flex items-center gap-1 text-xs opacity-75">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="h-3 w-3" />
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="h-2 w-2" />
             <span className="truncate">{raid.location}</span>
           </div>
         )}
@@ -127,10 +124,6 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
 
             {raid.description && <p className="line-clamp-2 text-xs opacity-75">{raid.description}</p>}
           </div>
-        </div>
-
-        <div className="ml-2 flex items-center gap-1">
-          <FontAwesomeIcon icon={faCheck} className="h-4 w-4 opacity-75" />
         </div>
       </div>
     </Link>

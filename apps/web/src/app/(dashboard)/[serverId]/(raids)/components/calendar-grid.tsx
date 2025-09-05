@@ -1,20 +1,15 @@
-import type { Raid } from "@albion-raid-manager/core/types";
-
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 import { cn } from "@albion-raid-manager/core/helpers";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { useCalendar, CalendarView } from "@/app/(dashboard)/[serverId]/(raids)/contexts/calendar-context";
+
 import { RaidEventCard } from "./raid-event-card";
 
-interface CalendarGridProps {
-  raids: Raid[];
-  currentDate: Date;
-  view: "day" | "week" | "month";
-}
-
-export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
+export function CalendarGrid() {
+  const { filteredRaids: raids, currentDate, view, setCurrentDate, setView } = useCalendar();
   const timeSlots = useMemo(() => {
     const slots = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -32,11 +27,11 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
     const days = [];
 
     switch (view) {
-      case "day": {
+      case CalendarView.DAY: {
         days.push(new Date(currentDate));
         break;
       }
-      case "week": {
+      case CalendarView.WEEK: {
         const startOfWeek = new Date(currentDate);
         startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
         for (let i = 0; i < 7; i++) {
@@ -46,7 +41,7 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
         }
         break;
       }
-      case "month": {
+      case CalendarView.MONTH: {
         const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
         const startOfCalendar = new Date(startOfMonth);
         startOfCalendar.setDate(startOfMonth.getDate() - startOfMonth.getDay());
@@ -78,16 +73,23 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
     const dayRaids = getRaidsForDay(date);
     return dayRaids.filter((raid) => {
       const raidDate = new Date(raid.date);
-      return raidDate.getHours() === hour;
+      const raidHour = raidDate.getHours();
+      // Include raids that start in this hour or span into this hour
+      return raidHour === hour;
     });
+  };
+
+  const handleDayClick = (day: Date) => {
+    setCurrentDate(day);
+    setView(CalendarView.WEEK);
   };
 
   const days = getDaysForView();
 
-  if (view === "month") {
+  if (view === CalendarView.MONTH) {
     return (
-      <div className="flex-1 overflow-auto">
-        <div className="bg-border grid grid-cols-7 gap-px">
+      <div className="primary-scrollbar h-full overflow-y-auto">
+        <div className="bg-border grid min-h-full grid-cols-7 gap-px">
           {/* Month view header */}
           <div className="bg-muted p-2 text-center text-sm font-medium">Sun</div>
           <div className="bg-muted p-2 text-center text-sm font-medium">Mon</div>
@@ -106,10 +108,11 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
               <div
                 key={index}
                 className={cn(
-                  "bg-background min-h-24 p-2",
+                  "bg-background hover:bg-muted/50 min-h-31 cursor-pointer p-2 transition-colors",
                   !isCurrentMonth && "text-muted-foreground",
                   isToday && "bg-primary/5 ring-primary ring-1",
                 )}
+                onClick={() => handleDayClick(day)}
               >
                 <div className="flex items-center justify-between">
                   <span className={cn("text-sm", isToday && "font-semibold")}>{day.getDate()}</span>
@@ -136,50 +139,101 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
   }
 
   return (
-    <div className="bg-background flex flex-1 overflow-hidden">
-      {/* Time column - Hidden on mobile for day/week views */}
-      <div
-        className={cn(
-          "bg-muted/20 border-border/30 flex-shrink-0 border-r-2",
-          view === "month" ? "hidden" : "w-16 sm:w-20",
-        )}
-      >
-        <div className="bg-muted/40 border-border/30 flex h-12 items-center justify-center border-b">
-          <FontAwesomeIcon icon={faClock} className="text-muted-foreground h-4 w-4" />
-        </div>
-        {timeSlots.map((slot) => (
-          <div
-            key={slot.hour}
-            className="text-muted-foreground border-border/30 flex h-12 items-center justify-center border-b font-mono text-xs"
-          >
-            {slot.hour.toString().padStart(2, "0")}:00
+    <div className="bg-background primary-scrollbar relative flex h-full flex-col overflow-y-auto overflow-x-hidden">
+      {/* Header */}
+      <div className="sticky top-0 z-30 w-full">
+        <div
+          className="bg-background grid shadow-sm"
+          style={{ gridTemplateColumns: `80px repeat(${days.length}, 1fr)` }}
+        >
+          {/* Time column header */}
+          <div className="bg-muted/30 border-border/30 flex h-12 items-center justify-center border-b-2 border-r-2">
+            <FontAwesomeIcon icon={faClock} className="text-muted-foreground h-4 w-4" />
           </div>
-        ))}
+
+          {/* Day headers */}
+          {days.map((day, index) => {
+            const isToday = day.toDateString() === new Date().toDateString();
+
+            return (
+              <div
+                key={`header-${index}`}
+                className={cn(
+                  "bg-background border-border/50 flex h-12 flex-col justify-center border-b-2 text-center",
+                  isToday && "bg-primary/5 border-primary/20",
+                )}
+              >
+                <div className="text-sm font-semibold">{day.toLocaleDateString("en-US", { weekday: "short" })}</div>
+                <div className={cn("mt-1 text-xs", isToday ? "text-primary" : "text-muted-foreground")}>
+                  {day.getDate()}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Calendar grid */}
-      <div className="flex-1 overflow-y-auto">
-        <div
-          className="bg-border/30 grid min-h-full"
-          style={{
-            gridTemplateColumns: `repeat(${days.length}, 1fr)`,
-            gridTemplateRows: `repeat(${timeSlots.length + 1}, 48px)`,
-          }}
-        >
-          {/* Day headers */}
-          {days.map((day, index) => (
-            <div
-              key={`header-${index}`}
-              className="bg-muted/60 border-border/50 sticky top-0 z-10 flex h-12 flex-col justify-center border-b-2 text-center shadow-sm"
-            >
-              <div className="text-sm font-semibold">{day.toLocaleDateString("en-US", { weekday: "short" })}</div>
-              <div className="text-muted-foreground mt-1 text-xs">{day.getDate()}</div>
-            </div>
-          ))}
+      {/* Calendar content */}
+      <div className="relative w-full">
+        {timeSlots.map((slot) => {
+          const currentTime = new Date();
+          const isCurrentHour = slot.hour === currentTime.getHours();
+          const currentMinutes = currentTime.getMinutes();
+          const currentSeconds = currentTime.getSeconds();
+          const positionInSlot = ((currentMinutes + currentSeconds / 60) / 60) * 100;
 
-          {/* Time slots */}
-          {timeSlots.map((slot) => (
-            <React.Fragment key={slot.hour}>
+          const shouldShowCurrentTime = (() => {
+            const today = new Date();
+            const todayString = today.toDateString();
+
+            if (view === CalendarView.DAY) {
+              return currentDate.toDateString() === todayString;
+            } else if (view === CalendarView.WEEK) {
+              return days.some((day) => day.toDateString() === todayString);
+            }
+
+            return false;
+          })();
+
+          return (
+            <div
+              key={slot.hour}
+              className="bg-muted/10 relative grid"
+              style={{ gridTemplateColumns: `80px repeat(${days.length}, 1fr)` }}
+            >
+              {/* Current time line for this hour */}
+              {isCurrentHour && shouldShowCurrentTime && (
+                <div
+                  className="pointer-events-none absolute left-0 right-0 z-10"
+                  style={{
+                    top: `${positionInSlot}%`,
+                  }}
+                >
+                  <div className="flex h-0">
+                    {/* Time column indicator */}
+                    <div className="flex w-20 items-center">
+                      <div className="bg-primary/50 h-[2px] w-full"></div>
+                    </div>
+                    {/* Day columns indicator */}
+                    <div className="flex flex-1">
+                      {days.map((_, dayIndex) => {
+                        return (
+                          <div key={dayIndex} className="flex flex-1 items-center">
+                            <div className={cn("bg-primary/50 h-[2px] w-full")}></div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Time column cell */}
+              <div className="bg-muted/20 text-muted-foreground border-border/30 flex min-h-14 items-center justify-center border-b font-mono text-xs">
+                {slot.hour.toString().padStart(2, "0")}:00
+              </div>
+
+              {/* Day cells */}
               {days.map((day, dayIndex) => {
                 const timeSlotRaids = getRaidsForTimeSlot(day, slot.hour);
                 const isToday = day.toDateString() === new Date().toDateString();
@@ -188,11 +242,11 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
                   <div
                     key={`${slot.hour}-${dayIndex}`}
                     className={cn(
-                      "bg-background border-border/20 hover:bg-muted/20 flex h-12 items-start border-b p-2 transition-colors",
-                      isToday && "bg-primary/10 border-primary/20",
+                      "border-border/20 hover:bg-muted/20 border-b p-1 transition-colors",
+                      isToday && "bg-primary/5 border-primary/10",
                     )}
                   >
-                    <div className="w-full space-y-1">
+                    <div className="space-y-1">
                       {timeSlotRaids.map((raid) => (
                         <RaidEventCard key={raid.id} raid={raid} variant="time-slot" />
                       ))}
@@ -200,9 +254,9 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
                   </div>
                 );
               })}
-            </React.Fragment>
-          ))}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -221,7 +221,7 @@ function genYears(yearRange = 50) {
 
 // ---------- utils end ----------
 
-function Calendar({
+export function Calendar({
   className,
   classNames,
   showOutsideDays = true,

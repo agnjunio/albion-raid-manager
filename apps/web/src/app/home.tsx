@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeButton } from "@/components/ui/theme";
 import { useAuth } from "@/lib/auth";
@@ -25,28 +24,28 @@ export function Home() {
         <div className="bg-radial translate-1/2 from-secondary/50 to-secondary/15 absolute bottom-0 right-0 size-[80vh] animate-pulse rounded-full to-100% blur-2xl [animation-duration:5000ms]" />
 
         <div className="flex size-full flex-col items-center justify-center gap-6">
-          <h1 className="text-secondary-foreground font-title text-6xl font-bold drop-shadow-2xl text-center">
+          <h1 className="text-secondary-foreground font-title text-center text-6xl font-bold drop-shadow-2xl">
             Albion Raid Manager
           </h1>
-          <p className="text-secondary-foreground mx-auto max-w-2xl text-xl text-center leading-relaxed font-medium">
+          <p className="text-secondary-foreground mx-auto max-w-2xl text-center text-xl font-medium leading-relaxed">
             Command every raid with precision. Plan, strategize, and lead your guild to victory with our comprehensive
             raid management system.
           </p>
         </div>
       </div>
 
-      <Container className="relative flex basis-1/2 flex-col items-center justify-center gap-8 lg:basis-1/3">
+      <div className="relative flex basis-1/2 flex-col items-center justify-center gap-8 lg:basis-1/3">
         <ThemeButton className="absolute right-4 top-4" />
         {status === "loading" ? (
           <div className="space-y-4">
-            <Skeleton className="size-16 rounded-full mx-auto" />
-            <Skeleton className="h-6 w-72 mx-auto" />
-            <Skeleton className="h-12 w-32 mx-auto" />
+            <Skeleton className="mx-auto size-16 rounded-full" />
+            <Skeleton className="mx-auto h-6 w-72" />
+            <Skeleton className="mx-auto h-12 w-32" />
           </div>
         ) : status === "authenticated" && user ? (
-          <div className="text-center space-y-6">
+          <div className="space-y-6 text-center">
             {user.avatar && (
-              <picture className="shadow-foreground/50 dark:shadow-background rounded-full shadow-xl mx-auto block">
+              <picture className="shadow-foreground/50 dark:shadow-background mx-auto block rounded-full shadow-xl">
                 <img
                   src={getUserPictureUrl(user.id, user.avatar)}
                   className="size-16 select-none rounded-full"
@@ -55,8 +54,8 @@ export function Home() {
               </picture>
             )}
             <div className="space-y-2">
-              <div className="text-lg text-muted-foreground">Welcome back,</div>
-              <div className="text-2xl font-bold text-foreground">@{user.username}</div>
+              <div className="text-muted-foreground text-lg">Welcome back,</div>
+              <div className="text-foreground text-2xl font-bold">@{user.username}</div>
             </div>
 
             <Link to="/dashboard" tabIndex={-1}>
@@ -66,9 +65,9 @@ export function Home() {
             </Link>
           </div>
         ) : (
-          <div className="text-center space-y-6">
+          <div className="space-y-6 text-center">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-foreground">Get Started</h2>
+              <h2 className="text-foreground text-2xl font-bold">Get Started</h2>
               <p className="text-muted-foreground text-lg">
                 Sign in with Discord to access your raid management dashboard
               </p>
@@ -80,7 +79,7 @@ export function Home() {
             </Button>
           </div>
         )}
-      </Container>
+      </div>
     </div>
   );
 }

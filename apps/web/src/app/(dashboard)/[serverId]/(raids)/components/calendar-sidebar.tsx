@@ -1,36 +1,19 @@
-import type { Raid } from "@albion-raid-manager/core/types";
-
-import { useState } from "react";
-
-import { faCalendar, faFilter, faUsers } from "@fortawesome/free-solid-svg-icons";
+import { faFilter, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/datetime-picker";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { raidStatuses } from "@/lib/constants";
 
-interface CalendarSidebarProps {
-  raids: Raid[];
-  currentDate: Date;
-  onDateChange: (date: Date) => void;
-  onFilterChange: (filters: RaidFilters) => void;
-  filters: RaidFilters;
-}
+import { useCalendar } from "../contexts/calendar-context";
 
-interface RaidFilters {
-  status: string[];
-  type: string[];
-  search: string;
-}
-
-export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChange, filters }: CalendarSidebarProps) {
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+export function CalendarSidebar() {
+  const { raids, currentDate, filters, setCurrentDate, setFilters } = useCalendar();
 
   const getRaidStats = () => {
     const total = raids.length;
@@ -47,67 +30,45 @@ export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChan
   const handleStatusFilter = (status: string, checked: boolean) => {
     const newStatuses = checked ? [...filters.status, status] : filters.status.filter((s) => s !== status);
 
-    onFilterChange({ ...filters, status: newStatuses });
+    setFilters({ ...filters, status: newStatuses });
   };
 
   const handleSearchChange = (search: string) => {
-    onFilterChange({ ...filters, search });
+    setFilters({ ...filters, search });
   };
 
   const clearFilters = () => {
-    onFilterChange({ status: [], type: [], search: "" });
+    setFilters({ status: [], type: [], search: "" });
   };
 
   const hasActiveFilters = filters.status.length > 0 || filters.type.length > 0 || filters.search.length > 0;
 
   return (
-    <div className="space-y-6 p-6 pb-8">
-      {/* Mini Calendar */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <FontAwesomeIcon icon={faCalendar} className="h-4 w-4" />
-            Calendar
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start rounded-none border-0 text-left font-normal">
-                {currentDate.toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={currentDate}
-                onSelect={(date) => {
-                  if (date) {
-                    onDateChange(date);
-                    setIsCalendarOpen(false);
-                  }
-                }}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </CardContent>
+    <div className="space-y-4 p-4 pb-6">
+      {/* Calendar */}
+      <Card className="p-2">
+        <Calendar
+          mode="single"
+          selected={currentDate}
+          onSelect={(date) => {
+            if (date) {
+              setCurrentDate(date);
+            }
+          }}
+          className="rounded-md border-0 p-2"
+          footer={false}
+        />
       </Card>
 
       {/* Raid Statistics */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
             Raid Statistics
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-1">
           <div className="flex justify-between text-sm">
             <span>Total Raids</span>
             <span className="font-medium">{stats.total}</span>
@@ -133,7 +94,7 @@ export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChan
 
       {/* Filters */}
       <Card>
-        <CardHeader className="pb-3">
+        <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
@@ -146,7 +107,7 @@ export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChan
             )}
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3">
           {/* Search */}
           <div className="space-y-2">
             <Label htmlFor="search" className="text-xs">
@@ -197,7 +158,7 @@ export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChan
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => onFilterChange({ ...filters, status: ["SCHEDULED", "OPEN"] })}
+                onClick={() => setFilters({ ...filters, status: ["SCHEDULED", "OPEN"] })}
               >
                 Upcoming
               </Button>
@@ -205,7 +166,7 @@ export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChan
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => onFilterChange({ ...filters, status: ["ONGOING"] })}
+                onClick={() => setFilters({ ...filters, status: ["ONGOING"] })}
               >
                 Active
               </Button>
@@ -213,7 +174,7 @@ export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChan
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => onFilterChange({ ...filters, status: ["FINISHED"] })}
+                onClick={() => setFilters({ ...filters, status: ["FINISHED"] })}
               >
                 Completed
               </Button>
@@ -221,7 +182,7 @@ export function CalendarSidebar({ raids, currentDate, onDateChange, onFilterChan
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => onFilterChange({ ...filters, status: ["CLOSED"] })}
+                onClick={() => setFilters({ ...filters, status: ["CLOSED"] })}
               >
                 Closed
               </Button>

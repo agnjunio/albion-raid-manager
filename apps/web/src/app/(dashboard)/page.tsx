@@ -5,7 +5,7 @@ import { ServerList } from "./components/server-list";
 
 export function DashboardPage() {
   return (
-    <Page className="flex size-full flex-col items-center justify-start gap-8 py-8">
+    <Page className="flex flex-col items-center justify-start gap-8 py-8">
       <Card className="max-w-md text-center">
         <CardHeader>
           <div className="bg-primary/10 mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full">

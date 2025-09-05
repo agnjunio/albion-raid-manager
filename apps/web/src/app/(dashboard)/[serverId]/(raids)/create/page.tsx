@@ -29,7 +29,14 @@ export function CreateRaidPage() {
     resolver: zodResolver(raidFormSchema),
     defaultValues: {
       description: "",
-      date: new Date(),
+      date: (() => {
+        const now = new Date();
+        now.setMinutes(0, 0, 0);
+        if (new Date() > now) {
+          now.setHours(now.getHours() + 1);
+        }
+        return now;
+      })(),
     },
   });
 
@@ -96,8 +103,8 @@ export function CreateRaidPage() {
                       <FormControl>
                         <DateTimePicker
                           hourCycle={24}
-                          granularity="hour"
-                          displayFormat={{ hour24: "dd/MM/yyyy HH:00" }}
+                          granularity="minute"
+                          displayFormat={{ hour24: "dd/MM/yyyy HH:MM" }}
                           className="h-12 text-base"
                           {...field}
                         />

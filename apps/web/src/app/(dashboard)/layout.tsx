@@ -1,7 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-import { Container } from "@/components/ui/container";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth";
 
 import { DashboardSidebar } from "./components/dashboard-sidebar";
@@ -24,18 +22,16 @@ export function DashboardLayout() {
 
   return (
     <DashboardProvider>
-      <SidebarProvider>
-        <div className="flex h-screen w-full">
-          {isServerRoute && <DashboardSidebar />}
+      <div className="flex h-full w-full bg-gray-500/10 dark:bg-gray-200/5">
+        {isServerRoute && <DashboardSidebar />}
 
-          <Container className="w-full flex-1">
-            <DashboardHeader hasSidebar={isServerRoute} />
-            <div className="flex min-h-0 flex-1">
-              <Outlet />
-            </div>
-          </Container>
+        <div className="flex min-h-0 flex-1 flex-col">
+          <DashboardHeader hasSidebar={isServerRoute} />
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <Outlet />
+          </div>
         </div>
-      </SidebarProvider>
+      </div>
     </DashboardProvider>
   );
 }
