@@ -158,9 +158,9 @@ export function CalendarGrid({ raids, currentDate, view }: CalendarGridProps) {
       </div>
 
       {/* Calendar grid */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-y-auto">
         <div
-          className="bg-border/30 grid min-h-full gap-px"
+          className="bg-border/30 grid min-h-full"
           style={{
             gridTemplateColumns: `repeat(${days.length}, 1fr)`,
             gridTemplateRows: `repeat(${timeSlots.length + 1}, 48px)`,
