@@ -85,4 +85,23 @@ export namespace ServersService {
       },
     );
   }
+
+  export async function createServerForUser(
+    userId: string,
+    server: Pick<Server, "id" | "name" | "icon">,
+  ): Promise<Server> {
+    const newServer = await prisma.server.create({
+      data: {
+        ...server,
+        members: {
+          create: {
+            userId,
+            adminPermission: true,
+          },
+        },
+      },
+    });
+
+    return newServer;
+  }
 }

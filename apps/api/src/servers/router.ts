@@ -79,13 +79,8 @@ serverRouter.post(
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
-      const existingServer = await prisma.server.findUnique({
-        where: {
-          id: serverId,
-        },
-      });
+      const existingServer = await ServersService.getServerById(serverId);
       if (existingServer) {
-        // TODO: If user is a server admin, join the guild automatically instead
         return res.json(APIResponse.Success({ server: existingServer }));
       }
 
@@ -93,18 +88,10 @@ serverRouter.post(
         return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
       }
 
-      const server = await prisma.server.create({
-        data: {
-          id: serverId,
-          name: discordServer.name,
-          icon: discordServer.icon,
-          members: {
-            create: {
-              userId: req.session.user.id,
-              adminPermission: true,
-            },
-          },
-        },
+      const server = await ServersService.createServerForUser(req.session.user.id, {
+        id: serverId,
+        name: discordServer.name,
+        icon: discordServer.icon,
       });
 
       res.json(APIResponse.Success({ server }));
