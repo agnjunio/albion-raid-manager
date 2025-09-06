@@ -1,4 +1,4 @@
-import { prisma, RaidStatus } from "@albion-raid-manager/database";
+import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { RaidEvent } from "@albion-raid-manager/redis";
 import { Client } from "discord.js";
@@ -14,13 +14,13 @@ export async function handleRaidCreated({ discord, event }: HandleRaidEventProps
   const { raid } = event.data;
   logger.info(`Raid created: ${raid.id}`, { raid });
 
-  if (raid.status === RaidStatus.SCHEDULED) {
+  if (raid.status === "SCHEDULED") {
     logger.debug("Raid is scheduled, will be announced later", { raidId: raid.id });
     return;
   }
 
   // If the raid is open, announce it immediately
-  if (raid.status === RaidStatus.OPEN) {
+  if (raid.status === "OPEN") {
     await handleAnnounceRaid({ discord, raidId: event.entityId, serverId: event.serverId });
   }
 }
@@ -41,7 +41,7 @@ export async function handleRaidStatusChanged({ discord, event }: HandleRaidEven
   });
 
   // If status changed to OPEN, announce the raid
-  if (raid.status === RaidStatus.OPEN && previousStatus === RaidStatus.SCHEDULED) {
+  if (raid.status === "OPEN" && previousStatus === "SCHEDULED") {
     await handleAnnounceRaid({ discord, raidId: event.entityId, serverId: event.serverId });
   }
 

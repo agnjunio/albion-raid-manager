@@ -1,18 +1,28 @@
-import { prisma, Prisma, RaidRole, RaidStatus, RaidType } from "@albion-raid-manager/database";
+import type { Cache } from "@albion-raid-manager/redis";
+
+import { prisma, Prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 
-import { Raid } from "@albion-raid-manager/core/types";
+import { Raid, RaidType } from "@albion-raid-manager/core/types";
 
+import { CacheKeys, withCache } from "../cache";
 import { CreateRaidInput, RaidFilters, RaidWithSlots, UpdateRaidInput } from "../types/services";
 
+import { ServersService } from "./servers";
+
+export interface RaidServiceOptions {
+  cache?: Cache;
+  cacheTtl?: number;
+}
+
 export namespace RaidService {
+  const DEFAULT_CACHE_TTL = 60;
+
   export async function createRaid(input: CreateRaidInput): Promise<Raid> {
-    const { title, description, date, type = RaidType.FIXED, contentType, location, serverId, slotCount = 8 } = input;
+    const { title, description, date, type = "FIXED" as RaidType, contentType, location, serverId } = input;
 
-    // Ensure server exists
-    await ensureServerExists(serverId);
+    await ServersService.ensureServerExists(serverId);
 
-    // Create raid with default slots
     const raid = await prisma.raid.create({
       data: {
         title,
@@ -22,10 +32,7 @@ export namespace RaidService {
         contentType,
         location,
         serverId,
-        status: RaidStatus.SCHEDULED,
-        slots: {
-          create: generateDefaultSlots(slotCount),
-        },
+        status: "SCHEDULED",
       },
       include: {
         slots: true,
@@ -34,30 +41,58 @@ export namespace RaidService {
 
     logger.info(`Raid created: ${raid.id}`, { raidId: raid.id, serverId, title });
 
+    // Invalidate server raid caches after creating a new raid
+    // Note: We can't invalidate here because we don't have access to cache instance
+    // This should be handled by the calling code
+
     return raid;
   }
 
-  export async function findRaidById(id: string, include: { slots?: boolean } = {}): Promise<Raid | null> {
-    let slots;
-    if (include.slots) {
-      slots = {
-        include: {
-          user: true,
-        },
-      };
+  export async function findRaidById(
+    id: string,
+    include: { slots?: boolean } = {},
+    options: RaidServiceOptions = {},
+  ): Promise<Raid | null> {
+    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+    const cacheKey = CacheKeys.raid(id);
+
+    return withCache(
+      async () => {
+        let slots;
+        if (include.slots) {
+          slots = {
+            include: {
+              user: true,
+            },
+          };
+        }
+
+        return prisma.raid.findUnique({
+          where: { id },
+          include: { slots },
+        });
+      },
+      {
+        cache,
+        key: cacheKey,
+        ttl: cacheTtl,
+      },
+    );
+  }
+
+  export async function findRaids(
+    filters: RaidFilters = {},
+    include: { slots?: boolean } = {},
+    options: RaidServiceOptions = {},
+  ): Promise<Raid[]> {
+    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+    const cacheKey = CacheKeys.raids(JSON.stringify(filters), JSON.stringify(include));
+
+    if (cache) {
+      const cached = await cache.get<Raid[]>(cacheKey);
+      if (cached) return cached;
     }
 
-    const raid = await prisma.raid.findUnique({
-      where: { id },
-      include: {
-        slots,
-      },
-    });
-
-    return raid;
-  }
-
-  export async function findRaids(filters: RaidFilters = {}, include: { slots?: boolean } = {}): Promise<Raid[]> {
     const where: Prisma.RaidWhereInput = {};
 
     if (filters.serverId) {
@@ -103,6 +138,10 @@ export namespace RaidService {
       orderBy: { date: "asc" },
     });
 
+    if (cache) {
+      await cache.set(cacheKey, raids, cacheTtl);
+    }
+
     return raids;
   }
 
@@ -128,7 +167,7 @@ export namespace RaidService {
   export async function openRaidForSignups(id: string): Promise<Raid> {
     const raid = await prisma.raid.update({
       where: { id },
-      data: { status: RaidStatus.OPEN },
+      data: { status: "OPEN" },
     });
 
     logger.info(`Raid opened for signups: ${id}`, { raidId: id });
@@ -139,7 +178,7 @@ export namespace RaidService {
   export async function closeRaidForSignups(id: string): Promise<Raid> {
     const raid = await prisma.raid.update({
       where: { id },
-      data: { status: RaidStatus.CLOSED },
+      data: { status: "CLOSED" },
     });
 
     logger.info(`Raid closed for signups: ${id}`, { raidId: id });
@@ -151,7 +190,7 @@ export namespace RaidService {
     const raid = await prisma.raid.update({
       where: { id },
       data: {
-        status: RaidStatus.OPEN,
+        status: "OPEN",
         announcementMessageId: messageId,
       },
     });
@@ -161,7 +200,19 @@ export namespace RaidService {
     return raid;
   }
 
-  export async function getUpcomingRaids(serverId: string, limit = 10): Promise<RaidWithSlots[]> {
+  export async function getUpcomingRaids(
+    serverId: string,
+    limit = 10,
+    options: RaidServiceOptions = {},
+  ): Promise<RaidWithSlots[]> {
+    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+    const cacheKey = CacheKeys.upcomingRaids(serverId);
+
+    if (cache) {
+      const cached = await cache.get<RaidWithSlots[]>(cacheKey);
+      if (cached) return cached;
+    }
+
     const raids = await prisma.raid.findMany({
       where: {
         serverId,
@@ -169,7 +220,7 @@ export namespace RaidService {
           gte: new Date(),
         },
         status: {
-          in: [RaidStatus.SCHEDULED, RaidStatus.OPEN, RaidStatus.CLOSED],
+          in: ["SCHEDULED", "OPEN", "CLOSED"],
         },
       },
       include: {
@@ -179,15 +230,29 @@ export namespace RaidService {
       take: limit,
     });
 
-    return raids as RaidWithSlots[];
+    const result = raids as RaidWithSlots[];
+
+    if (cache) {
+      await cache.set(cacheKey, result, cacheTtl);
+    }
+
+    return result;
   }
 
-  export async function getActiveRaids(serverId: string): Promise<RaidWithSlots[]> {
+  export async function getActiveRaids(serverId: string, options: RaidServiceOptions = {}): Promise<RaidWithSlots[]> {
+    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+    const cacheKey = `raids:active:${serverId}`;
+
+    if (cache) {
+      const cached = await cache.get<RaidWithSlots[]>(cacheKey);
+      if (cached) return cached;
+    }
+
     const raids = await prisma.raid.findMany({
       where: {
         serverId,
         status: {
-          in: [RaidStatus.OPEN, RaidStatus.CLOSED],
+          in: ["OPEN", "CLOSED"],
         },
       },
       include: {
@@ -196,39 +261,12 @@ export namespace RaidService {
       orderBy: { date: "asc" },
     });
 
-    return raids as RaidWithSlots[];
-  }
+    const result = raids as RaidWithSlots[];
 
-  async function ensureServerExists(serverId: string): Promise<void> {
-    const server = await prisma.server.findUnique({
-      where: { id: serverId },
-    });
-
-    if (!server) {
-      throw new Error(`Server ${serverId} not found. Please ensure the server is registered.`);
+    if (cache) {
+      await cache.set(cacheKey, result, cacheTtl);
     }
-  }
 
-  function generateDefaultSlots(count: number): Array<{ name: string; role: RaidRole }> {
-    const defaultRoles = [
-      RaidRole.CALLER,
-      RaidRole.TANK,
-      RaidRole.HEALER,
-      RaidRole.SUPPORT,
-      RaidRole.MELEE_DPS,
-      RaidRole.RANGED_DPS,
-      RaidRole.RANGED_DPS,
-      RaidRole.MELEE_DPS,
-    ];
-
-    const slots: Array<{ name: string; role: RaidRole }> = [];
-    for (let i = 0; i < count; i++) {
-      const role = defaultRoles[i] || RaidRole.MELEE_DPS;
-      slots.push({
-        name: `${role.replace(/_/g, " ")} ${Math.floor(i / 8) + 1}`,
-        role: role,
-      });
-    }
-    return slots;
+    return result;
   }
 }

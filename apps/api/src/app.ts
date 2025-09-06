@@ -3,7 +3,7 @@ import { Server } from "http";
 import config from "@albion-raid-manager/config";
 import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
-import { RedisClient } from "@albion-raid-manager/redis";
+import { Redis } from "@albion-raid-manager/redis";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import cors from "cors";
 import express from "express";
@@ -13,9 +13,6 @@ import morgan from "morgan";
 import { context } from "./context";
 import { errors } from "./errors";
 import { router } from "./router";
-
-// Redis client for session storage and other Redis functionality
-let redisClient: RedisClient | null = null;
 
 export function createApp(): express.Application {
   const app = express();
@@ -64,18 +61,13 @@ export function createApp(): express.Application {
   return app;
 }
 
-export function getRedisClient(): RedisClient | null {
-  return redisClient;
-}
-
 export async function run(): Promise<Server> {
   if (!config.api.port) {
     throw new Error("Please define the API_PORT environment variable.");
   }
 
   try {
-    redisClient = new RedisClient();
-    await redisClient.connect();
+    await Redis.initClient();
   } catch (error) {
     logger.error("Failed to initialize Redis client", { error });
   }
@@ -93,15 +85,7 @@ export async function run(): Promise<Server> {
 export async function cleanup(server: Server): Promise<void> {
   logger.info("Shutting down API Server.");
 
-  if (redisClient) {
-    try {
-      await redisClient.disconnect();
-      redisClient = null;
-      logger.info("Redis client disconnected");
-    } catch (error) {
-      logger.error("Error during Redis client shutdown", { error });
-    }
-  }
+  await Redis.disconnect();
 
   return new Promise<void>((resolve) => {
     server.close(() => {

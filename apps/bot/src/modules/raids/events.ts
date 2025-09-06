@@ -1,8 +1,6 @@
 import { logger } from "@albion-raid-manager/logger";
-import { isRaidEvent, RaidEventSubscriber } from "@albion-raid-manager/redis";
+import { isRaidEvent, RaidEventSubscriber, Redis } from "@albion-raid-manager/redis";
 import { Client } from "discord.js";
-
-import { Redis } from "@/redis";
 
 import { handleRaidCreated, handleRaidDeleted, handleRaidStatusChanged, handleRaidUpdated } from "./handlers";
 

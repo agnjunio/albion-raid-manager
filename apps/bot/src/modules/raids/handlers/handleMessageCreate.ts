@@ -1,9 +1,9 @@
 import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
-import { memoize } from "@albion-raid-manager/core/cache";
 import { getContentTypeInfo } from "@albion-raid-manager/core/entities";
-import { Raid, RaidRole, RaidSlot, Server } from "@albion-raid-manager/core/types";
+import { ServersService } from "@albion-raid-manager/core/services";
+import { Raid, RaidRole, RaidSlot, RaidStatus, Server } from "@albion-raid-manager/core/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { prisma, RaidStatus } from "@albion-raid-manager/database";
+import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, Message } from "discord.js";
 
@@ -15,22 +15,8 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
     if (message.author.bot || !message.guild) return;
 
     // Check if the guild is enabled for raid parsing
-    const guild = await memoize(
-      `guild-${message.guild.id}`,
-      async () => {
-        if (!message.guild) return;
-        return await prisma.server.findUnique({
-          where: {
-            id: message.guild.id,
-          },
-        });
-      },
-      {
-        timeout: 1000 * 60 * 5, // 5 minutes
-        ignoreCache: () => !message.guild,
-      },
-    );
-    if (!guild || message.channel.id !== guild.raidAnnouncementChannelId) return;
+    const server = await ServersService.getServerById(message.guild.id);
+    if (!server || message.channel.id !== server.raidAnnouncementChannelId) return;
 
     // Log the message for debugging
     logger.debug(`Message received in raid channel: #${message.guild.channels.cache.get(message.channel.id)?.name}`, {
@@ -63,7 +49,7 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
     }
 
     // Create the raid and get raid data for message building
-    const { raid } = await createRaidFromParsedData(guild, parsedData);
+    const { raid } = await createRaidFromParsedData(server, parsedData);
 
     // Create confirmation message using the messages module
     const replyMessage = buildRaidCreationConfirmationMessage(raid, raid.slots || [], parsedData);

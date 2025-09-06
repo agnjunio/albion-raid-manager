@@ -1,10 +1,10 @@
 import config from "@albion-raid-manager/config";
 import { logger } from "@albion-raid-manager/logger";
+import { Redis } from "@albion-raid-manager/redis";
 import { Client, Events, IntentsBitField, Partials } from "discord.js";
 
 import { deployCommands, handleCommand } from "./commands";
 import { initModules } from "./modules";
-import { Redis } from "./redis";
 
 export const discord = new Client({
   intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent],
@@ -28,6 +28,7 @@ async function cleanup() {
   logger.info("Shutting down Bot Client.");
 
   discord.removeAllListeners();
+  await Redis.disconnect();
   await discord.destroy();
 }
 

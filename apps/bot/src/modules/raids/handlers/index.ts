@@ -1,4 +1,4 @@
-export * from "./handleAnnounceRaids";
+export * from "./handleAnnounceRaid";
 export * from "./handleMessageCreate";
 export * from "./handleRaidEvents";
 export * from "./handleSelectRole";
