@@ -1,6 +1,6 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { RaidEventType } from "./events/raids";
+import { RaidEventType } from "./raids";
 import { RedisSubscriber, type GenericEventHandler } from "./subscriber";
 
 describe("RedisSubscriber", () => {

@@ -1,10 +1,11 @@
 import { logger } from "@albion-raid-manager/logger";
+import { Raid } from "@albion-raid-manager/types";
 import { RedisClientType } from "redis";
 
 import { RedisEventMessageBuilder } from "../builder";
 import { RedisEventMessage } from "../events";
 
-import { RaidData, RaidEventType, RaidEventData } from "./types";
+import { RaidEventData, RaidEventType } from "./types";
 
 export class RaidEventPublisher {
   private client: RedisClientType;
@@ -40,46 +41,35 @@ export class RaidEventPublisher {
   }
 
   // Raid event methods
-  async publishRaidCreated(raid: RaidData, serverId: string): Promise<void> {
+  async publishRaidCreated(raid: Raid): Promise<void> {
     const event = RedisEventMessageBuilder.create<RaidEventData>()
       .withEventType(RaidEventType.CREATED)
       .withEntityId(raid.id)
-      .withServerId(serverId)
+      .withServerId(raid.serverId)
       .withData({ raid })
       .build();
 
     await this.publishEvent("raid.events", event);
   }
 
-  async publishRaidUpdated(raid: RaidData, serverId: string, changes?: Record<string, unknown>): Promise<void> {
+  async publishRaidUpdated(raid: Raid, previousRaid?: Partial<Raid>): Promise<void> {
     const event = RedisEventMessageBuilder.create<RaidEventData>()
       .withEventType(RaidEventType.UPDATED)
       .withEntityId(raid.id)
-      .withServerId(serverId)
-      .withData({ raid, changes })
+      .withServerId(raid.serverId)
+      .withData({ raid, previousRaid })
       .withSource(this.source)
       .build();
 
     await this.publishEvent("raid.events", event);
   }
 
-  async publishRaidStatusChanged(raid: RaidData, serverId: string, previousStatus: string): Promise<void> {
-    const event = RedisEventMessageBuilder.create<RaidEventData>()
-      .withEventType(RaidEventType.STATUS_CHANGED)
-      .withEntityId(raid.id)
-      .withServerId(serverId)
-      .withData({ raid, previousStatus })
-      .build();
-
-    await this.publishEvent("raid.events", event);
-  }
-
-  async publishRaidDeleted(raidId: string, serverId: string): Promise<void> {
+  async publishRaidDeleted(raid: Raid): Promise<void> {
     const event = RedisEventMessageBuilder.create<RaidEventData>()
       .withEventType(RaidEventType.DELETED)
-      .withEntityId(raidId)
-      .withServerId(serverId)
-      .withData({ raid: { id: raidId } })
+      .withEntityId(raid.id)
+      .withServerId(raid.serverId)
+      .withData({ raid })
       .build();
 
     await this.publishEvent("raid.events", event);

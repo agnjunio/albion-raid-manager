@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { RedisEventMessageBuilder } from "./builder";
-import { RaidEventType, RaidEventData } from "./events/raids";
+import { RaidEventData, RaidEventType } from "./raids";
 
 describe("RedisEventMessageBuilder", () => {
   describe("create", () => {

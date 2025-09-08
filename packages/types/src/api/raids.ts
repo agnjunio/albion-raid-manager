@@ -1,4 +1,4 @@
-import { ContentType, Raid, RaidRole, RaidSlot, RaidStatus } from "../../generated/index";
+import { ContentType, Raid, RaidRole, RaidStatus } from "../../generated/index";
 
 export namespace CreateRaid {
   export type Params = { serverId: string };
@@ -37,5 +37,16 @@ export namespace UpdateGuildRaid {
 export namespace CreateRaidSlot {
   export type Params = { serverId: string; raidId: string };
   export type Body = { name: string; role?: RaidRole; comment?: string };
-  export type Response = { slot: RaidSlot };
+  export type Response = { raid: Raid };
+}
+
+export namespace UpdateRaidSlot {
+  export type Params = { slotId: string };
+  export type Body = { name?: string; role?: RaidRole; comment?: string };
+  export type Response = { raid: Raid };
+}
+
+export namespace DeleteRaidSlot {
+  export type Params = { slotId: string };
+  export type Response = { message: string };
 }

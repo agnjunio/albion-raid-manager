@@ -10,16 +10,12 @@ export interface RaidEvent extends BaseEvent<RaidEventData> {
 export enum RaidEventType {
   CREATED = "raid.created",
   UPDATED = "raid.updated",
-  STATUS_CHANGED = "raid.status_changed",
   DELETED = "raid.deleted",
 }
 
-export type RaidData = Partial<Raid> & { id: string };
-
 export interface RaidEventData {
-  raid: RaidData;
-  previousStatus?: string;
-  changes?: Record<string, unknown>;
+  raid: Raid;
+  previousRaid?: Partial<Raid>;
 }
 
 // Handler type for raid events
@@ -30,9 +26,6 @@ export type RaidEventHandler = (event: {
 
 export function isRaidEvent(event: BaseEvent<RaidEventData>): event is RaidEvent {
   return (
-    event.type === RaidEventType.CREATED ||
-    event.type === RaidEventType.UPDATED ||
-    event.type === RaidEventType.STATUS_CHANGED ||
-    event.type === RaidEventType.DELETED
+    event.type === RaidEventType.CREATED || event.type === RaidEventType.UPDATED || event.type === RaidEventType.DELETED
   );
 }

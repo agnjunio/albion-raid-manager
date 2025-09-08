@@ -11,9 +11,10 @@ generator client {
 }
 
 generator typescriptInterfaces {
-  provider = "prisma-generator-typescript-interfaces"
-  output   = "../../types/generated/index.ts"
-  prettier = true
+  provider          = "prisma-generator-typescript-interfaces"
+  output            = "../../types/generated/index.ts"
+  prettier          = true
+  optionalNullables = true
 }
 
 datasource db {

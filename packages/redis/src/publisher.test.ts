@@ -1,8 +1,7 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { RedisPublisher } from "./publisher";
-import { RaidEventPublisher } from "./events/raids";
-import { RaidEventType } from "./events/raids";
+import { RaidEventPublisher } from "./raids";
 
 describe("RedisPublisher", () => {
   let mockClient: any;
@@ -89,21 +88,6 @@ describe("RedisPublisher", () => {
         expect(mockClient.publish).toHaveBeenCalledWith(
           "raid.events",
           expect.stringMatching(/.*"type":"raid\.updated".*"entityId":"raid123".*"serverId":"server123".*/),
-        );
-      });
-    });
-
-    describe("publishRaidStatusChanged", () => {
-      it("should publish a raid status changed event", async () => {
-        const raid = { id: "raid123", status: "OPEN" as const };
-        const serverId = "server123";
-        const previousStatus = "SCHEDULED";
-
-        await raidPublisher.publishRaidStatusChanged(raid, serverId, previousStatus);
-
-        expect(mockClient.publish).toHaveBeenCalledWith(
-          "raid.events",
-          expect.stringMatching(/.*"type":"raid\.status_changed".*"entityId":"raid123".*"serverId":"server123".*/),
         );
       });
     });

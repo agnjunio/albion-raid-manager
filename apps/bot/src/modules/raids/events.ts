@@ -2,7 +2,7 @@ import { logger } from "@albion-raid-manager/logger";
 import { isRaidEvent, RaidEventSubscriber, Redis } from "@albion-raid-manager/redis";
 import { Client } from "discord.js";
 
-import { handleRaidCreated, handleRaidDeleted, handleRaidStatusChanged, handleRaidUpdated } from "./handlers";
+import { handleRaidCreated, handleRaidDeleted, handleRaidUpdated } from "./handlers";
 
 interface HandleRaidEventsProps {
   discord: Client;
@@ -30,9 +30,6 @@ export async function initRaidEvents({ discord }: HandleRaidEventsProps) {
             break;
           case "raid.updated":
             await handleRaidUpdated({ discord, event });
-            break;
-          case "raid.status_changed":
-            await handleRaidStatusChanged({ discord, event });
             break;
           case "raid.deleted":
             await handleRaidDeleted({ discord, event });

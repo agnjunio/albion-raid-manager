@@ -5,9 +5,11 @@ import {
   APIResponse,
   CreateRaid,
   CreateRaidSlot,
+  DeleteRaidSlot,
   GetRaid,
   GetRaids,
   UpdateGuildRaid,
+  UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
 import { Request, Response, Router } from "express";
 
@@ -31,24 +33,20 @@ serverRaidsRouter.post(
     const { serverId } = req.params;
     const { title, contentType, date, location, description, maxPlayers } = req.body;
 
-    const raid = await RaidService.createRaid({
-      serverId,
-      title,
-      contentType,
-      date: new Date(date),
-      location,
-      description,
-      maxPlayers,
-    });
-
-    try {
-      const publisher = await getRaidEventPublisher();
-      if (publisher) {
-        await publisher.publishRaidCreated(raid, serverId);
-      }
-    } catch (error) {
-      logger.error("Failed to publish raid created event:", error);
-    }
+    const raid = await RaidService.createRaid(
+      {
+        serverId,
+        title,
+        contentType,
+        date: new Date(date),
+        location,
+        description,
+        maxPlayers,
+      },
+      {
+        publisher: await getRaidEventPublisher(),
+      },
+    );
 
     res.json(APIResponse.Success({ raid }));
   },
@@ -105,32 +103,23 @@ serverRaidsRouter.put(
 
     const { status } = req.body;
 
-    // Get the current raid to check for status changes
-    const currentRaid = await RaidService.findRaidById(raidId);
-    const previousStatus = currentRaid?.status;
-
-    const raid = await RaidService.updateRaid(raidId, { status });
-
-    // Publish raid updated event
-    try {
-      const publisher = await getRaidEventPublisher();
-      if (publisher) {
-        if (previousStatus && previousStatus !== status) {
-          // Status changed - publish status change event
-          await publisher.publishRaidStatusChanged(raid, serverId, previousStatus);
-        } else {
-          // General update - publish updated event
-          await publisher.publishRaidUpdated(raid, serverId);
-        }
-      }
-    } catch (error) {
-      // Log error but don't fail the request
-      logger.error("Failed to publish raid updated event:", error);
-    }
+    const raid = await RaidService.updateRaid(raidId, { status }, { publisher: await getRaidEventPublisher() });
 
     res.json(APIResponse.Success({ raid }));
   },
 );
+
+serverRaidsRouter.delete("/:raidId", async (req: Request<{ serverId: string; raidId: string }>, res: Response) => {
+  const { serverId, raidId } = req.params;
+
+  if (!serverId || !raidId) {
+    throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
+  }
+
+  await RaidService.deleteRaid(raidId, { publisher: await getRaidEventPublisher() });
+
+  res.json(APIResponse.Success({ message: "Raid deleted successfully" }));
+});
 
 serverRaidsRouter.post(
   "/:raidId/slots",
@@ -143,14 +132,17 @@ serverRaidsRouter.post(
     const { name, role, comment } = req.body;
 
     try {
-      const slot = await RaidService.createRaidSlot({
-        raidId,
-        name,
-        role,
-        comment,
-      });
+      const raid = await RaidService.createRaidSlot(
+        {
+          raidId,
+          name,
+          role,
+          comment,
+        },
+        { publisher: await getRaidEventPublisher() },
+      );
 
-      res.json(APIResponse.Success({ slot }));
+      res.json(APIResponse.Success({ raid }));
     } catch (error) {
       logger.error("Failed to create raid slot:", error);
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to create raid slot"));
@@ -161,37 +153,33 @@ serverRaidsRouter.post(
 serverRaidsRouter.put(
   "/:raidId/slots/:slotId",
   async (
-    req: Request<
-      { serverId: string; raidId: string; slotId: string },
-      {},
-      { name?: string; role?: string; comment?: string }
-    >,
-    res: Response,
+    req: Request<UpdateRaidSlot.Params, {}, UpdateRaidSlot.Body>,
+    res: Response<APIResponse.Type<UpdateRaidSlot.Response>>,
   ) => {
-    const { serverId, raidId, slotId } = req.params;
+    const { slotId } = req.params;
     const updates = req.body;
 
     try {
-      const slot = await RaidService.updateRaidSlot(slotId, updates);
-      res.json(APIResponse.Success({ slot }));
+      const raid = await RaidService.updateRaidSlot(slotId, updates, { publisher: await getRaidEventPublisher() });
+      res.json(APIResponse.Success({ raid }));
     } catch (error) {
       logger.error("Failed to update raid slot:", error);
-      res.status(500).json(APIResponse.Error("Failed to update raid slot"));
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to update raid slot"));
     }
   },
 );
 
 serverRaidsRouter.delete(
   "/:raidId/slots/:slotId",
-  async (req: Request<{ serverId: string; raidId: string; slotId: string }>, res: Response) => {
-    const { serverId, raidId, slotId } = req.params;
+  async (req: Request<DeleteRaidSlot.Params>, res: Response<APIResponse.Type<DeleteRaidSlot.Response>>) => {
+    const { slotId } = req.params;
 
     try {
-      await RaidService.deleteRaidSlot(slotId);
+      await RaidService.deleteRaidSlot(slotId, { publisher: await getRaidEventPublisher() });
       res.json(APIResponse.Success({ message: "Slot deleted successfully" }));
     } catch (error) {
       logger.error("Failed to delete raid slot:", error);
-      res.status(500).json(APIResponse.Error("Failed to delete raid slot"));
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to delete raid slot"));
     }
   },
 );

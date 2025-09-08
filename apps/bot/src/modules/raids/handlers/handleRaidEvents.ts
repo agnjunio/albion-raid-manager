@@ -26,56 +26,68 @@ export async function handleRaidCreated({ discord, event }: HandleRaidEventProps
 }
 
 export async function handleRaidUpdated({ discord, event }: HandleRaidEventProps) {
-  const { raid } = event.data;
-  logger.info(`Raid updated: ${raid.id}`, { raid });
-
-  // Update the announcement if it exists
-  await handleAnnounceRaid({ discord, raidId: event.entityId, serverId: event.serverId });
-}
-
-export async function handleRaidStatusChanged({ discord, event }: HandleRaidEventProps) {
-  const { raid, previousStatus } = event.data;
-  logger.info(`Raid status changed: ${raid.id} from ${previousStatus} to ${raid.status}`, {
+  const { raid, previousRaid } = event.data;
+  logger.info(`Raid updated: ${raid.id}`, {
     raid,
-    previousStatus,
+    previousRaid,
+    statusChanged: previousRaid?.status !== raid.status,
   });
 
-  // If status changed to OPEN, announce the raid
-  if (raid.status === "OPEN" && previousStatus === "SCHEDULED") {
-    await handleAnnounceRaid({ discord, raidId: event.entityId, serverId: event.serverId });
-  }
+  // Dont publish updated when the raid is in the scheduler state
+  if (raid.status === "SCHEDULED") return;
 
-  // Update the announcement regardless of status change
   await handleAnnounceRaid({ discord, raidId: event.entityId, serverId: event.serverId });
 }
 
 export async function handleRaidDeleted({ discord, event }: HandleRaidEventProps) {
-  const { entityId } = event;
-  logger.info(`Raid deleted: ${entityId}`, { raidId: entityId, serverId: event.serverId });
+  const { entityId, serverId, data } = event;
+  const announcementMessageId = data.raid.announcementMessageId;
 
-  // Try to find and delete the announcement message
+  logger.info(`Raid deleted: ${entityId}`, {
+    raidId: entityId,
+    serverId,
+    hasMessageId: !!announcementMessageId,
+  });
+
+  // Only proceed if we have the message ID
+  if (!announcementMessageId) {
+    logger.debug(`No announcement message ID available for deleted raid: ${entityId}`);
+    return;
+  }
+
+  // Try to delete the announcement message
   try {
-    const raid = await prisma.raid.findUnique({
-      where: { id: event.entityId },
-      include: { server: true },
+    // Get server information to find the announcement channel
+    const server = await prisma.server.findUnique({
+      where: { id: serverId },
+      select: { raidAnnouncementChannelId: true },
     });
 
-    if (raid?.announcementMessageId && raid.server) {
-      const guild = discord.guilds.cache.get(raid.server.id);
-      if (guild) {
-        const channel = await guild.channels.fetch(raid.server.raidAnnouncementChannelId || "");
-        if (channel?.isTextBased()) {
-          try {
-            const message = await channel.messages.fetch(raid.announcementMessageId);
-            await message.delete();
-            logger.info(`Deleted announcement message for raid: ${raid.id}`);
-          } catch (error) {
-            logger.warn(`Failed to delete announcement message for raid: ${raid.id}`, { error });
-          }
-        }
-      }
+    if (!server?.raidAnnouncementChannelId) {
+      logger.debug(`No announcement channel configured for server: ${serverId}`);
+      return;
     }
+
+    const guild = discord.guilds.cache.get(serverId);
+    if (!guild) {
+      logger.warn(`Guild not found: ${serverId}`);
+      return;
+    }
+
+    const channel = await guild.channels.fetch(server.raidAnnouncementChannelId);
+    if (!channel?.isTextBased()) {
+      logger.warn(`Announcement channel not found or not a text channel: ${server.raidAnnouncementChannelId}`);
+      return;
+    }
+
+    // Delete the message using the message ID
+    const message = await channel.messages.fetch(announcementMessageId);
+    await message.delete();
+    logger.info(`Deleted announcement message for cancelled raid: ${entityId} (message ID: ${announcementMessageId})`);
   } catch (error) {
-    logger.error(`Error handling raid deletion: ${event.entityId}`, { error });
+    logger.warn(`Failed to delete announcement message for cancelled raid: ${entityId}`, {
+      error,
+      messageId: announcementMessageId,
+    });
   }
 }

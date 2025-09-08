@@ -48,6 +48,7 @@
     "@albion-raid-manager/database": "workspace:*",
     "@albion-raid-manager/logger": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
+    "@albion-raid-manager/redis": "workspace:*",
     "cron": "^3.1.7"
   },
   "devDependencies": {
