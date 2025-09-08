@@ -21,11 +21,6 @@
       "import": "./src/scheduler.ts",
       "require": "./src/scheduler.ts"
     },
-    "./helpers": {
-      "types": "./src/helpers/index.ts",
-      "import": "./src/helpers/index.ts",
-      "require": "./src/helpers/index.ts"
-    },
     "./utils": {
       "types": "./src/utils/index.ts",
       "import": "./src/utils/index.ts",
@@ -53,9 +48,7 @@
     "@albion-raid-manager/database": "workspace:*",
     "@albion-raid-manager/logger": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
-    "clsx": "^2.1.1",
-    "cron": "^3.1.7",
-    "tailwind-merge": "^3.0.2"
+    "cron": "^3.1.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

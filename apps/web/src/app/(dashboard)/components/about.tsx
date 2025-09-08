@@ -1,6 +1,5 @@
 import type { VariantProps } from "class-variance-authority";
 
-import { cn } from "@/lib/utils";
 import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,6 +7,7 @@ import { Link } from "react-router-dom";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 interface Props extends VariantProps<typeof buttonVariants> {
   className?: string;
