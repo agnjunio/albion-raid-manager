@@ -79,6 +79,7 @@ model Raid {
   id                    String       @id @default(uuid())
   type                  RaidType     @default(FIXED)
   contentType           ContentType?
+  maxPlayers            Int?
   location              String?
   serverId              String
   server                Server       @relation(fields: [serverId], references: [id])
@@ -102,18 +103,15 @@ enum ContentType {
   SOLO_DUNGEON
   OPEN_WORLD_FARMING
   GROUP_DUNGEON
-  AVALONIAN_DUNGEON_FULL_CLEAR
-  AVALONIAN_DUNGEON_BUFF_ONLY
-  ROADS_OF_AVALON_PVE
-  ROADS_OF_AVALON_PVP
+  AVALONIAN_DUNGEON
+  ROADS_OF_AVALON
   DEPTHS_DUO
   DEPTHS_TRIO
-  GANKING_SQUAD
-  FIGHTING_SQUAD
-  ZVZ_CALL_TO_ARMS
+  OPEN_WORLD_GANKING
+  OPEN_WORLD_SMALL_SCALE
+  OPEN_WORLD_ZVZ
   HELLGATE_2V2
   HELLGATE_5V5
-  HELLGATE_10V10
   MISTS_SOLO
   MISTS_DUO
   OTHER
@@ -125,7 +123,7 @@ model RaidSlot {
   comment   String?
   raid      Raid?     @relation(fields: [raidId], references: [id])
   raidId    String?
-  role      RaidRole
+  role      RaidRole?
   user      User?     @relation(fields: [userId], references: [id])
   userId    String?
   createdAt DateTime  @default(now())

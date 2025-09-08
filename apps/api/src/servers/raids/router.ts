@@ -4,6 +4,7 @@ import {
   APIErrorType,
   APIResponse,
   CreateRaid,
+  CreateRaidSlot,
   GetRaid,
   GetRaids,
   UpdateGuildRaid,
@@ -14,7 +15,7 @@ import { validateRequest } from "@/request";
 
 import { raidPermission } from "./middleware";
 import { getRaidEventPublisher } from "./redis";
-import { createGuildRaidSchema } from "./schemas";
+import { createRaidSchema, createRaidSlotSchema } from "./schemas";
 
 export const serverRaidsRouter: Router = Router({ mergeParams: true });
 
@@ -22,13 +23,13 @@ serverRaidsRouter.use(raidPermission);
 
 serverRaidsRouter.post(
   "/",
-  validateRequest({ body: createGuildRaidSchema }),
+  validateRequest({ body: createRaidSchema }),
   async (
     req: Request<CreateRaid.Params, {}, CreateRaid.Body>,
     res: Response<APIResponse.Type<CreateRaid.Response>>,
   ) => {
     const { serverId } = req.params;
-    const { title, contentType, date, location, description } = req.body;
+    const { title, contentType, date, location, description, maxPlayers } = req.body;
 
     const raid = await RaidService.createRaid({
       serverId,
@@ -37,6 +38,7 @@ serverRaidsRouter.post(
       date: new Date(date),
       location,
       description,
+      maxPlayers,
     });
 
     try {
@@ -127,5 +129,69 @@ serverRaidsRouter.put(
     }
 
     res.json(APIResponse.Success({ raid }));
+  },
+);
+
+serverRaidsRouter.post(
+  "/:raidId/slots",
+  validateRequest({ body: createRaidSlotSchema }),
+  async (
+    req: Request<CreateRaidSlot.Params, {}, CreateRaidSlot.Body>,
+    res: Response<APIResponse.Type<CreateRaidSlot.Response>>,
+  ) => {
+    const { raidId } = req.params;
+    const { name, role, comment } = req.body;
+
+    try {
+      const slot = await RaidService.createRaidSlot({
+        raidId,
+        name,
+        role,
+        comment,
+      });
+
+      res.json(APIResponse.Success({ slot }));
+    } catch (error) {
+      logger.error("Failed to create raid slot:", error);
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to create raid slot"));
+    }
+  },
+);
+
+serverRaidsRouter.put(
+  "/:raidId/slots/:slotId",
+  async (
+    req: Request<
+      { serverId: string; raidId: string; slotId: string },
+      {},
+      { name?: string; role?: string; comment?: string }
+    >,
+    res: Response,
+  ) => {
+    const { serverId, raidId, slotId } = req.params;
+    const updates = req.body;
+
+    try {
+      const slot = await RaidService.updateRaidSlot(slotId, updates);
+      res.json(APIResponse.Success({ slot }));
+    } catch (error) {
+      logger.error("Failed to update raid slot:", error);
+      res.status(500).json(APIResponse.Error("Failed to update raid slot"));
+    }
+  },
+);
+
+serverRaidsRouter.delete(
+  "/:raidId/slots/:slotId",
+  async (req: Request<{ serverId: string; raidId: string; slotId: string }>, res: Response) => {
+    const { serverId, raidId, slotId } = req.params;
+
+    try {
+      await RaidService.deleteRaidSlot(slotId);
+      res.json(APIResponse.Success({ message: "Slot deleted successfully" }));
+    } catch (error) {
+      logger.error("Failed to delete raid slot:", error);
+      res.status(500).json(APIResponse.Error("Failed to delete raid slot"));
+    }
   },
 );

@@ -1,32 +1,14 @@
-import { Raid, RaidStatus } from "../../generated/index";
+import { ContentType, Raid, RaidRole, RaidSlot, RaidStatus } from "../../generated/index";
 
 export namespace CreateRaid {
   export type Params = { serverId: string };
   export type Body = {
     title: string;
-    contentType?:
-      | "SOLO_DUNGEON"
-      | "OPEN_WORLD_FARMING"
-      | "GROUP_DUNGEON"
-      | "AVALONIAN_DUNGEON_FULL_CLEAR"
-      | "AVALONIAN_DUNGEON_BUFF_ONLY"
-      | "ROADS_OF_AVALON_PVE"
-      | "ROADS_OF_AVALON_PVP"
-      | "DEPTHS_DUO"
-      | "DEPTHS_TRIO"
-      | "GANKING_SQUAD"
-      | "FIGHTING_SQUAD"
-      | "ZVZ_CALL_TO_ARMS"
-      | "HELLGATE_2V2"
-      | "HELLGATE_5V5"
-      | "HELLGATE_10V10"
-      | "MISTS_SOLO"
-      | "MISTS_DUO"
-      | "OTHER";
+    contentType?: ContentType;
     description: string;
     date: string;
     location?: string;
-    compositionId?: string;
+    maxPlayers?: number;
   };
   export type Response = { raid: Raid };
 }
@@ -50,4 +32,10 @@ export namespace UpdateGuildRaid {
   export type Params = { serverId: string; raidId: string };
   export type Body = { status: RaidStatus };
   export type Response = { raid: Raid };
+}
+
+export namespace CreateRaidSlot {
+  export type Params = { serverId: string; raidId: string };
+  export type Body = { name: string; role?: RaidRole; comment?: string };
+  export type Response = { slot: RaidSlot };
 }

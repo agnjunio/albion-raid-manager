@@ -1,10 +1,10 @@
 import type { z } from "zod";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { ContentType } from "@albion-raid-manager/types";
 import { APIErrorType, CreateRaid } from "@albion-raid-manager/types/api";
-import { CONTENT_TYPE_LIST, CONTENT_TYPE_MAPPING, getDefaultLocation } from "@albion-raid-manager/types/entities";
+import { CONTENT_TYPE_INFO, getContentTypeInfo } from "@albion-raid-manager/types/entities";
 import {
   faCalendar,
   faShieldAlt,
@@ -32,7 +32,7 @@ import { useCreateRaidMutation } from "@/store/raids";
 
 import { raidFormSchema } from "../schemas";
 
-const CONTENT_TYPE_DISPLAY_NAMES: Record<ContentType, string> = CONTENT_TYPE_MAPPING.reduce(
+const CONTENT_TYPE_DISPLAY_NAMES: Record<ContentType, string> = CONTENT_TYPE_INFO.reduce(
   (acc, contentInfo) => {
     acc[contentInfo.type] = contentInfo.displayName;
     return acc;
@@ -55,9 +55,9 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
     resolver: zodResolver(raidFormSchema),
     defaultValues: {
       title: "",
-      contentType: CONTENT_TYPE_LIST[0],
+      contentType: CONTENT_TYPE_INFO[0].type,
       description: "",
-      location: getDefaultLocation(CONTENT_TYPE_LIST[0]),
+      location: "",
       date:
         selectedDateTime ||
         (() => {
@@ -70,6 +70,9 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
         })(),
     },
   });
+
+  const contentTypeInfo = useMemo(() => getContentTypeInfo(form.watch("contentType")), [form]);
+  console.log(contentTypeInfo);
 
   React.useEffect(() => {
     if (selectedDateTime) {
@@ -181,7 +184,7 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
                           onValueChange={(value) => {
                             field.onChange(value);
                             // Set default location based on content type
-                            const defaultLocation = getDefaultLocation(value as ContentType);
+                            const defaultLocation = contentTypeInfo.defaultLocation;
                             if (defaultLocation) {
                               form.setValue("location", defaultLocation);
                             }
@@ -194,9 +197,9 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {CONTENT_TYPE_LIST.map((contentType) => (
-                              <SelectItem key={contentType} value={contentType}>
-                                {CONTENT_TYPE_DISPLAY_NAMES[contentType]}
+                            {CONTENT_TYPE_INFO.map((contentTypeInfo) => (
+                              <SelectItem key={contentTypeInfo.type} value={contentTypeInfo.type}>
+                                {contentTypeInfo.displayName}
                               </SelectItem>
                             ))}
                           </SelectContent>

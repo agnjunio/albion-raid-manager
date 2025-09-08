@@ -2,6 +2,9 @@ import { useState } from "react";
 
 import { getServerInviteUrl } from "@albion-raid-manager/discord/helpers";
 import { DiscordServer } from "@albion-raid-manager/types/api";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 
 import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -43,10 +46,11 @@ export function DiscordInvite({ server, onStartVerification }: DiscordInviteProp
       </div>
 
       <div className="flex flex-col gap-2">
-        <Button asChild className="w-full" variant="secondary">
-          <a href={inviteUrl} target="_blank" rel="noopener noreferrer">
+        <Button asChild className="h-14 w-full" variant="secondary">
+          <Link to={inviteUrl} target="_blank" rel="noopener noreferrer">
+            <FontAwesomeIcon icon={faDiscord} size="lg" />
             Open Discord Invitation
-          </a>
+          </Link>
         </Button>
 
         <div className="flex gap-2">

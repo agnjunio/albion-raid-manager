@@ -1,6 +1,5 @@
 import { ContentType, RaidRole, RaidStatus, RaidType } from "../../generated/index";
 
-// Base raid data structure
 export interface RaidData {
   id: string;
   title: string;
@@ -9,6 +8,7 @@ export interface RaidData {
   date: Date;
   type: RaidType;
   contentType?: ContentType;
+  maxPlayers?: number;
   location?: string;
   serverId: string;
   status: RaidStatus;
@@ -17,24 +17,21 @@ export interface RaidData {
   updatedAt: Date;
 }
 
-// Raid slot data structure
 export interface RaidSlotData {
   id: string;
   name: string;
   comment?: string;
-  role: RaidRole;
+  role?: RaidRole;
   userId?: string;
   raidId?: string;
   createdAt: Date;
   joinedAt?: Date;
 }
 
-// Raid with slots included
 export interface RaidWithSlots extends RaidData {
   slots: RaidSlotData[];
 }
 
-// Create raid input
 export interface CreateRaidInput {
   title: string;
   description?: string;
@@ -45,9 +42,9 @@ export interface CreateRaidInput {
   location?: string;
   serverId: string;
   slotCount?: number;
+  maxPlayers?: number;
 }
 
-// Update raid input
 export interface UpdateRaidInput {
   title?: string;
   description?: string;
@@ -60,7 +57,6 @@ export interface UpdateRaidInput {
   announcementMessageId?: string;
 }
 
-// Raid query filters
 export interface RaidFilters {
   serverId?: string;
   status?: RaidStatus;

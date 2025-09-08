@@ -3,8 +3,8 @@ import type { Raid, RaidSlot } from "@albion-raid-manager/types";
 import { faUsers, faClock, faMapMarkerAlt, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
 interface RaidStatsProps {
@@ -114,7 +114,11 @@ export function RaidStats({ raid }: RaidStatsProps) {
         <CardContent>
           <div className="text-lg font-semibold">{raid.type === "FIXED" ? "Fixed" : "Flexible"}</div>
           <p className="text-muted-foreground mt-1 text-xs">
-            {raid.type === "FIXED" ? "Structured composition" : "Open registration"}
+            {raid.type === "FIXED"
+              ? "Structured composition"
+              : raid.maxPlayers
+                ? `Up to ${raid.maxPlayers} players`
+                : "Unlimited players"}
           </p>
         </CardContent>
       </Card>

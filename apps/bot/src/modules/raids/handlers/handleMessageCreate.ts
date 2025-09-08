@@ -1,10 +1,10 @@
 import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { getContentTypeInfo } from "@albion-raid-manager/core/entities";
 import { ServersService } from "@albion-raid-manager/core/services";
-import { Raid, RaidRole, RaidSlot, RaidStatus, Server } from "@albion-raid-manager/types";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
+import { Raid, RaidRole, RaidSlot, RaidStatus, RaidType, Server } from "@albion-raid-manager/types";
 import { Client, Message } from "discord.js";
 
 import { buildRaidCreationConfirmationMessage } from "../messages";
@@ -76,12 +76,21 @@ async function createRaidFromParsedData(
   });
 
   try {
-    // Get content type info to determine raid type
+    // Get content type info to determine raid configuration
     const contentTypeInfo = parsedData.contentType ? getContentTypeInfo(parsedData.contentType) : null;
-    const raidType = contentTypeInfo?.raidType || "FLEX";
+    let raidType = "FLEX";
+    let maxPlayers: number | null = null;
+    let shouldCreateSlots = false;
+
+    if (contentTypeInfo) {
+      raidType = contentTypeInfo.raidType;
+      maxPlayers = contentTypeInfo.partySize.max;
+      shouldCreateSlots = contentTypeInfo.partySize.min === contentTypeInfo.partySize.max;
+    }
 
     const slots = [];
-    if (parsedData.roles && parsedData.roles.length > 0) {
+    // Only create slots for FIXED raids or if roles are explicitly provided
+    if (shouldCreateSlots && parsedData.roles && parsedData.roles.length > 0) {
       for (const role of parsedData.roles) {
         // Validate and map the role to a valid RaidRole enum value
         const validRole = mapToValidRaidRole(role.role);
@@ -114,7 +123,8 @@ async function createRaidFromParsedData(
         status: "SCHEDULED" as RaidStatus,
         note: parsedData.notes,
         contentType: parsedData.contentType,
-        type: raidType,
+        type: raidType as RaidType,
+        maxPlayers,
         slots: {
           create: slots,
         },

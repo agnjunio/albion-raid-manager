@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 
-import { cn } from "@/lib/utils";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useCalendar, CalendarView } from "@/app/(dashboard)/[serverId]/(raids)/contexts/calendar-context";
+import { cn } from "@/lib/utils";
 
 import { RaidEventCard } from "./raid-event-card";
 

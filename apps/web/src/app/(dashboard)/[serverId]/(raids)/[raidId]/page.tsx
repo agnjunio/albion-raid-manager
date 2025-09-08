@@ -1,6 +1,9 @@
-import type { RaidSlot, RaidStatus, ContentType } from "@albion-raid-manager/types";
+import type { RaidStatus } from "@albion-raid-manager/types";
 
-import { faUsers, faCopy, faShare, faPlay, faStop, faLock, faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { useMemo } from "react";
+
+import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
+import { faCopy, faLock, faPlay, faShare, faStop, faUnlock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -12,35 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { Page, PageError } from "@/components/ui/page";
-import { Separator } from "@/components/ui/separator";
 import { isAPIError } from "@/lib/api";
 import { useGetRaidQuery, useUpdateRaidMutation } from "@/store/raids";
 
+import { RaidCompositionManager } from "./components/raid-composition-manager";
 import { RaidNotes } from "./components/raid-notes";
-import { RaidSlotCard } from "./components/raid-slot";
 import { RaidStats } from "./components/raid-stats";
-
-// Content type display names
-const contentTypeNames: Record<ContentType, string> = {
-  SOLO_DUNGEON: "Solo Dungeon",
-  OPEN_WORLD_FARMING: "Open World Farming",
-  GROUP_DUNGEON: "Group Dungeon",
-  AVALONIAN_DUNGEON_FULL_CLEAR: "Avalonian Dungeon (Full Clear)",
-  AVALONIAN_DUNGEON_BUFF_ONLY: "Avalonian Dungeon (Buff Only)",
-  ROADS_OF_AVALON_PVE: "Roads of Avalon (PvE)",
-  ROADS_OF_AVALON_PVP: "Roads of Avalon (PvP)",
-  DEPTHS_DUO: "Depths (Duo)",
-  DEPTHS_TRIO: "Depths (Trio)",
-  GANKING_SQUAD: "Ganking Squad",
-  FIGHTING_SQUAD: "Fighting Squad",
-  ZVZ_CALL_TO_ARMS: "ZvZ Call to Arms",
-  HELLGATE_2V2: "Hellgate 2v2",
-  HELLGATE_5V5: "Hellgate 5v5",
-  HELLGATE_10V10: "Hellgate 10v10",
-  MISTS_SOLO: "Mists (Solo)",
-  MISTS_DUO: "Mists (Duo)",
-  OTHER: "Other",
-};
 
 export function RaidPage() {
   const { serverId, raidId } = useParams();
@@ -55,6 +35,7 @@ export function RaidPage() {
     },
   });
   const [updateRaidStatus, updateRaidStatusResult] = useUpdateRaidMutation();
+  const contentTypeInfo = useMemo(() => getContentTypeInfo(data?.raid.contentType ?? "OTHER"), [data]);
 
   if (isLoading || updateRaidStatusResult.isLoading) {
     return <Loading />;
@@ -105,24 +86,6 @@ export function RaidPage() {
     }
   };
 
-  // Calculate raid statistics for display
-  const totalSlots = raid.slots?.length || 0;
-  const filledSlots = raid.slots?.filter((slot) => slot.user).length || 0;
-
-  // Group slots by role
-  const slotsByRole =
-    raid.slots?.reduce(
-      (acc, slot) => {
-        const role = slot.role || "UNASSIGNED";
-        if (!acc[role]) acc[role] = [];
-        acc[role].push(slot);
-        return acc;
-      },
-      {} as Record<string, RaidSlot[]>,
-    ) || {};
-
-  const roleOrder = ["CALLER", "TANK", "HEALER", "SUPPORT", "RANGED_DPS", "MELEE_DPS", "BATTLEMOUNT", "UNASSIGNED"];
-
   return (
     <Page>
       <div className="mx-auto w-full max-w-7xl space-y-6 pb-8">
@@ -169,7 +132,7 @@ export function RaidPage() {
                 <RaidStatusBadge status={raid.status} />
                 {raid.contentType && (
                   <Badge variant="secondary" className="text-sm">
-                    {contentTypeNames[raid.contentType]}
+                    {contentTypeInfo.displayName}
                   </Badge>
                 )}
               </div>
@@ -239,54 +202,21 @@ export function RaidPage() {
         {raid.note && <RaidNotes raid={raid} />}
 
         {/* Raid Composition */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faUsers} className="h-5 w-5" />
-              Raid Composition
-              <Badge variant="outline" className="ml-2">
-                {filledSlots} / {totalSlots}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {raid.slots && raid.slots.length > 0 ? (
-              <div className="space-y-6">
-                {roleOrder.map((role) => {
-                  const roleSlots = slotsByRole[role];
-                  if (!roleSlots || roleSlots.length === 0) return null;
-
-                  return (
-                    <div key={role} className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-lg font-semibold capitalize">
-                          {role === "UNASSIGNED" ? "Unassigned" : role.replace("_", " ").toLowerCase()}
-                        </h4>
-                        <Badge variant="secondary" className="text-xs">
-                          {roleSlots.length} slot{roleSlots.length !== 1 ? "s" : ""}
-                        </Badge>
-                      </div>
-
-                      <div className="grid gap-2">
-                        {roleSlots.map((slot) => (
-                          <RaidSlotCard key={slot.id} slot={slot} />
-                        ))}
-                      </div>
-
-                      {role !== roleOrder[roleOrder.length - 1] && <Separator className="my-4" />}
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="py-12 text-center">
-                <FontAwesomeIcon icon={faUsers} className="text-muted-foreground mb-4 h-12 w-12" />
-                <h3 className="mb-2 text-lg font-semibold">No Raid Slots</h3>
-                <p className="text-muted-foreground">This raid doesn&apos;t have any slots defined yet.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <RaidCompositionManager
+          raid={raid}
+          onSlotUpdate={(slotId, updates) => {
+            // TODO: Implement slot update API call
+            console.log("Update slot:", slotId, updates);
+          }}
+          onSlotDelete={(slotId) => {
+            // TODO: Implement slot delete API call
+            console.log("Delete slot:", slotId);
+          }}
+          onSlotCreate={(slot) => {
+            // TODO: Implement slot create API call
+            console.log("Create slot:", slot);
+          }}
+        />
       </div>
     </Page>
   );

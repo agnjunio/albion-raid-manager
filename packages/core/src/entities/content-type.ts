@@ -232,6 +232,18 @@ export class ContentTypeEntity {
     return this.info.partySize.min === this.info.partySize.max;
   }
 
+  get isFlexSize(): boolean {
+    return this.info.partySize.min !== this.info.partySize.max;
+  }
+
+  get maxPlayers(): number {
+    return this.info.partySize.max;
+  }
+
+  get minPlayers(): number {
+    return this.info.partySize.min;
+  }
+
   get defaultLocation(): string {
     switch (this.info.type) {
       case "ROADS_OF_AVALON_PVE":
@@ -268,6 +280,20 @@ export class ContentTypeEntity {
 
   static getActiveTypes(): ContentType[] {
     return CONTENT_TYPE_MAPPING.filter((info) => info.isActive).map((info) => info.type);
+  }
+
+  static getRaidConfiguration(contentType: ContentType): {
+    type: RaidType;
+    maxPlayers: number;
+    shouldCreateSlots: boolean;
+  } {
+    const entity = new ContentTypeEntity(contentType);
+
+    return {
+      type: entity.raidType,
+      maxPlayers: entity.maxPlayers,
+      shouldCreateSlots: entity.isFixedSize,
+    };
   }
 
   static normalizeFromString(contentType: string): ContentType {
