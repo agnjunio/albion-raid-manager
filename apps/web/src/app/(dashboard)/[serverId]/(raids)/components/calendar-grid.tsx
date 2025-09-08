@@ -1,9 +1,9 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useCalendar, CalendarView } from "@/app/(dashboard)/[serverId]/(raids)/contexts/calendar-context";
+import { CalendarView, useCalendar } from "@/app/(dashboard)/[serverId]/(raids)/contexts/calendar-context";
 import { cn } from "@/lib/utils";
 
 import { RaidEventCard } from "./raid-event-card";
@@ -14,6 +14,8 @@ interface CalendarGridProps {
 
 export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
   const { filteredRaids: raids, currentDate, view, setCurrentDate, setView } = useCalendar();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
   const timeSlots = useMemo(() => {
     const slots = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -90,18 +92,82 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
 
   const days = getDaysForView();
 
+  const currentTime = useMemo(() => {
+    const currentTime = new Date();
+    const currentHour = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
+    const currentSeconds = currentTime.getSeconds();
+    const today = new Date();
+    const todayString = today.toDateString();
+
+    // Check if current time should be visible in this view
+    const shouldShow = (() => {
+      if (view === CalendarView.DAY) {
+        return currentDate.toDateString() === todayString;
+      } else if (view === CalendarView.WEEK) {
+        return days.some((day) => day.toDateString() === todayString);
+      }
+      return false;
+    })();
+
+    // Calculate position within the current hour (0-100%)
+    const positionTop = ((currentMinutes + currentSeconds / 60) / 60) * 100;
+
+    return {
+      shouldShow,
+      currentHour,
+      positionTop,
+    };
+  }, [view, currentDate, days]);
+
+  // Auto-scroll to current time on mount for non-month views
+  useEffect(() => {
+    if (view === CalendarView.MONTH || !scrollContainerRef.current || !currentTime.shouldShow) return;
+
+    const scrollToCurrentTime = () => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+
+      const { currentHour, positionTop } = currentTime;
+
+      // Get the time slot element for the current hour
+      const timeSlotElement = container.querySelector(`[data-hour="${currentHour}"]`) as HTMLElement;
+      if (!timeSlotElement) return;
+
+      // Calculate the scroll position
+      const timeSlotRect = timeSlotElement.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const timeSlotHeight = timeSlotRect.height;
+
+      // Calculate offset from top of the time slot based on position within the hour
+      const offsetInSlot = (positionTop / 100) * timeSlotHeight;
+      const scrollTop = timeSlotElement.offsetTop + offsetInSlot - containerRect.top - 100; // 100px offset from top
+
+      // Smooth scroll to the calculated position
+      container.scrollTo({
+        top: Math.max(0, scrollTop),
+        behavior: "auto",
+      });
+    };
+
+    // Small delay to ensure DOM is fully rendered
+    const timeoutId = setTimeout(scrollToCurrentTime, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [view, currentTime]);
+
   if (view === CalendarView.MONTH) {
     return (
       <div className="primary-scrollbar h-full overflow-y-auto">
         <div className="bg-border grid min-h-full grid-cols-7 gap-px">
           {/* Month view header */}
-          <div className="bg-muted p-2 text-center text-sm font-medium">Sun</div>
-          <div className="bg-muted p-2 text-center text-sm font-medium">Mon</div>
-          <div className="bg-muted p-2 text-center text-sm font-medium">Tue</div>
-          <div className="bg-muted p-2 text-center text-sm font-medium">Wed</div>
-          <div className="bg-muted p-2 text-center text-sm font-medium">Thu</div>
-          <div className="bg-muted p-2 text-center text-sm font-medium">Fri</div>
-          <div className="bg-muted p-2 text-center text-sm font-medium">Sat</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Sun</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Mon</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Tue</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Wed</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Thu</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Fri</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Sat</div>
 
           {days.map((day, index) => {
             const dayRaids = getRaidsForDay(day);
@@ -114,7 +180,7 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                 className={cn(
                   "bg-background hover:bg-primary/25 min-h-31 cursor-pointer p-2 transition-colors",
                   !isCurrentMonth && "text-muted-foreground",
-                  isToday && "bg-primary/5 ring-primary ring-1",
+                  isToday && "bg-foreground/5 ring-primary ring-1",
                 )}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -146,7 +212,10 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
   }
 
   return (
-    <div className="bg-background primary-scrollbar relative flex h-full flex-col overflow-y-auto overflow-x-hidden">
+    <div
+      ref={scrollContainerRef}
+      className="bg-background primary-scrollbar relative flex h-full flex-col overflow-y-auto overflow-x-hidden"
+    >
       {/* Header */}
       <div className="sticky top-0 z-30 w-full">
         <div
@@ -167,7 +236,7 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                 key={`header-${index}`}
                 className={cn(
                   "bg-background border-border/50 flex h-12 flex-col justify-center border-b-2 text-center",
-                  isToday && "bg-primary/5 border-primary/20",
+                  isToday && "bg-primary/35 border-primary/20",
                 )}
               >
                 <div className="text-sm font-semibold">{day.toLocaleDateString("en-US", { weekday: "short" })}</div>
@@ -183,37 +252,22 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
       {/* Calendar content */}
       <div className="relative w-full">
         {timeSlots.map((slot) => {
-          const currentTime = new Date();
-          const isCurrentHour = slot.hour === currentTime.getHours();
-          const currentMinutes = currentTime.getMinutes();
-          const currentSeconds = currentTime.getSeconds();
-          const positionInSlot = ((currentMinutes + currentSeconds / 60) / 60) * 100;
-
-          const shouldShowCurrentTime = (() => {
-            const today = new Date();
-            const todayString = today.toDateString();
-
-            if (view === CalendarView.DAY) {
-              return currentDate.toDateString() === todayString;
-            } else if (view === CalendarView.WEEK) {
-              return days.some((day) => day.toDateString() === todayString);
-            }
-
-            return false;
-          })();
+          const isCurrentHour = slot.hour === currentTime.currentHour;
+          const shouldShowCurrentTime = currentTime.shouldShow && isCurrentHour;
 
           return (
             <div
               key={slot.hour}
+              data-hour={slot.hour}
               className="bg-background hover:bg-muted/5 relative grid"
               style={{ gridTemplateColumns: `80px repeat(${days.length}, 1fr)` }}
             >
               {/* Current time line for this hour */}
-              {isCurrentHour && shouldShowCurrentTime && (
+              {shouldShowCurrentTime && (
                 <div
                   className="pointer-events-none absolute left-0 right-0 z-10"
                   style={{
-                    top: `${positionInSlot}%`,
+                    top: `${currentTime.positionTop}%`,
                   }}
                 >
                   <div className="flex h-0">
@@ -250,7 +304,7 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                     key={`${slot.hour}-${dayIndex}`}
                     className={cn(
                       "border-border/20 hover:bg-primary/20 border-b p-1 transition-colors",
-                      isToday && "bg-primary/5 border-primary/10",
+                      isToday && "bg-foreground/5 border-primary/10",
                       onTimeSlotClick && "hover:bg-primary/10 group cursor-pointer",
                     )}
                     onClick={() => onTimeSlotClick?.(day, slot.hour)}
