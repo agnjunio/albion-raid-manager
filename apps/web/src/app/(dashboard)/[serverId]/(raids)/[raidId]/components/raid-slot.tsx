@@ -1,6 +1,6 @@
-import type { RaidSlot } from "@albion-raid-manager/core/types";
+import type { RaidSlot } from "@albion-raid-manager/types";
 
-import { cn } from "@albion-raid-manager/core/helpers/classNames";
+import { cn } from "@/lib/utils";
 import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
 
 interface Props {

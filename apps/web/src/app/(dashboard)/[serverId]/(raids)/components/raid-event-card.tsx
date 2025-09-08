@@ -1,6 +1,6 @@
-import type { Raid } from "@albion-raid-manager/core/types";
+import type { Raid } from "@albion-raid-manager/types";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";

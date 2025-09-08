@@ -1,5 +1,5 @@
-import { CONTENT_TYPE_LIST } from "@albion-raid-manager/core/entities/content-type";
-import { ContentType } from "@albion-raid-manager/core/types";
+import { ContentType } from "@albion-raid-manager/types";
+import { CONTENT_TYPE_LIST } from "@albion-raid-manager/types/entities";
 import { addMonths, startOfDay } from "date-fns";
 import { z } from "zod";
 

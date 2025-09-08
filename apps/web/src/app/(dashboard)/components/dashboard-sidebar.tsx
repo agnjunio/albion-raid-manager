@@ -1,8 +1,7 @@
 import { useMemo } from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers";
-import { DiscordServer } from "@albion-raid-manager/core/types/api";
 import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { DiscordServer } from "@albion-raid-manager/types/api";
 import {
   faArrowRightFromBracket,
   faCheck,
@@ -40,6 +39,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
 import { useGetServersQuery } from "@/store/servers";
 
 const navigation = [

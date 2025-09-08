@@ -1,4 +1,4 @@
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { faFileCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { Navigate, Route, Routes } from "react-router-dom";
 

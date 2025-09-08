@@ -1,5 +1,5 @@
 import { getLocation } from "@albion-raid-manager/core/entities";
-import { RaidRole, type ContentType, type Raid, type RaidSlot } from "@albion-raid-manager/core/types";
+import { RaidRole, type ContentType, type Raid, type RaidSlot } from "@albion-raid-manager/types";
 import { createDiscordTimestamp } from "@albion-raid-manager/discord";
 import {
   ActionRowBuilder,

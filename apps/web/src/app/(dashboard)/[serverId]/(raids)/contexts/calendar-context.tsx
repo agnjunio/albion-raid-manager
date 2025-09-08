@@ -1,4 +1,4 @@
-import type { Raid } from "@albion-raid-manager/core/types";
+import type { Raid } from "@albion-raid-manager/types";
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 

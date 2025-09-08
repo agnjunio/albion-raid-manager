@@ -1,4 +1,4 @@
-import type { CreateRaid, GetRaid, GetRaids, UpdateGuildRaid } from "@albion-raid-manager/core/types/api/raids";
+import type { CreateRaid, GetRaid, GetRaids, UpdateGuildRaid } from "@albion-raid-manager/types/api";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 

@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { APIErrorType } from "@albion-raid-manager/core/types/api/index";
-import { DiscordServer, SetupServer } from "@albion-raid-manager/core/types/api/servers";
+import { APIErrorType, DiscordServer, SetupServer } from "@albion-raid-manager/types/api";
 
 import Alert from "@/components/ui/alert";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";

@@ -1,4 +1,4 @@
-import { type Server, type ServerMember } from "@albion-raid-manager/core/types";
+import { type Server, type ServerMember } from "@albion-raid-manager/types";
 import { Link } from "react-router-dom";
 
 interface GuildCardProps {

@@ -1,4 +1,4 @@
-import { User } from "@albion-raid-manager/core/types";
+import { User } from "../../generated/index";
 
 // Request types
 export interface DiscordCallbackRequest {

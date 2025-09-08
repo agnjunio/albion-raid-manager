@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { type VariantProps, cva } from "class-variance-authority";
 
 const badgeVariants = cva("ring-current/10 inline-flex items-center rounded-full font-medium ring-1 ring-inset", {

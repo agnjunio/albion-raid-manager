@@ -1,8 +1,8 @@
-import type { Raid } from "@albion-raid-manager/core/types";
+import type { Raid } from "@albion-raid-manager/types";
 
 import { useMemo, useState } from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";

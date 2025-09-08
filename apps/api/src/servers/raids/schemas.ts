@@ -1,4 +1,4 @@
-import { ContentType } from "@albion-raid-manager/core/types";
+import { ContentType } from "@albion-raid-manager/types";
 import { z } from "zod";
 
 export const createGuildRaidSchema = z.object({

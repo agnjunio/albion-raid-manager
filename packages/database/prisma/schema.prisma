@@ -12,7 +12,7 @@ generator client {
 
 generator typescriptInterfaces {
   provider = "prisma-generator-typescript-interfaces"
-  output   = "../../core/generated/types/index.ts"
+  output   = "../../types/generated/index.ts"
   prettier = true
 }
 

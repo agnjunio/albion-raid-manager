@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 
 function TooltipProvider({ delayDuration = 0, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {

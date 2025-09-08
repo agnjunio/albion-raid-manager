@@ -1,4 +1,4 @@
-import { User } from "@albion-raid-manager/core/types";
+import { User } from "@albion-raid-manager/types";
 
 declare module "express-session" {
   interface SessionData {

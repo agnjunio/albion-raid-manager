@@ -2,7 +2,7 @@ import type { SizeProp } from "@fortawesome/fontawesome-svg-core";
 
 import { useMemo, type PropsWithChildren } from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { faArrowLeft, faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

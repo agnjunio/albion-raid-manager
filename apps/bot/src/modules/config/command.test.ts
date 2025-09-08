@@ -1,4 +1,4 @@
-import { Server } from "@albion-raid-manager/core/types";
+import { Server } from "@albion-raid-manager/types";
 import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { ChatInputCommandInteraction } from "discord.js";

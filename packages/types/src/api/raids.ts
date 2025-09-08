@@ -1,4 +1,4 @@
-import { Raid, RaidStatus } from "@albion-raid-manager/core/types";
+import { Raid, RaidStatus } from "../../generated/index";
 
 export namespace CreateRaid {
   export type Params = { serverId: string };

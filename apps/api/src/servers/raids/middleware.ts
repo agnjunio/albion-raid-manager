@@ -1,5 +1,5 @@
 import { ServersService } from "@albion-raid-manager/core/services/servers";
-import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
+import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
 import { NextFunction, Request, Response } from "express";
 
 export const raidPermission = async (req: Request, res: Response, next: NextFunction) => {

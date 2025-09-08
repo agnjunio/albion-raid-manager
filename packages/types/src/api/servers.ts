@@ -1,4 +1,4 @@
-import { Server } from "@albion-raid-manager/core/types";
+import { Server } from "../../generated/index";
 
 export type DiscordServer = {
   id: string;

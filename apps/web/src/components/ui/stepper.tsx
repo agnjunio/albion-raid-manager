@@ -1,4 +1,4 @@
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 
 interface StepperProps {
   currentStep: number;

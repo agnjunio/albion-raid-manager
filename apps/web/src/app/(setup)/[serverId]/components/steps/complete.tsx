@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 
-import { SetupServer } from "@albion-raid-manager/core/types/api/servers";
+import { SetupServer } from "@albion-raid-manager/types/api";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useNavigate } from "react-router-dom";

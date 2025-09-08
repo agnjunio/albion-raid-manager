@@ -1,4 +1,4 @@
-import type { User } from "@albion-raid-manager/core/types";
+import type { User } from "@albion-raid-manager/types";
 
 import { useGetMeQuery, useLogoutMutation } from "@/store/auth";
 

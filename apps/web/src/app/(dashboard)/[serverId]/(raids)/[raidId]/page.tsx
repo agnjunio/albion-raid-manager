@@ -1,4 +1,4 @@
-import type { RaidSlot, RaidStatus } from "@albion-raid-manager/core/types";
+import type { RaidSlot, RaidStatus } from "@albion-raid-manager/types";
 
 import { useParams } from "react-router-dom";
 

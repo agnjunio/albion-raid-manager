@@ -1,4 +1,4 @@
-import type { RaidStatus } from "@albion-raid-manager/core/types";
+import type { RaidStatus } from "@albion-raid-manager/types";
 
 import {
   faFileContract,

@@ -1,9 +1,8 @@
-import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
-import { GetMeResponse } from "@albion-raid-manager/core/types/api/auth";
 import { ensureUser } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
 import { logger } from "@albion-raid-manager/logger";
+import { APIErrorType, APIResponse, GetMeResponse } from "@albion-raid-manager/types/api";
 import { Request, Response, Router } from "express";
 
 import { auth } from "./middleware";

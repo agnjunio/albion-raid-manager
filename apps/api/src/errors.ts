@@ -1,5 +1,5 @@
-import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
 import { logger } from "@albion-raid-manager/logger";
+import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
 import { NextFunction, Request, Response } from "express";
 
 export const errors = (error: Error, req: Request, res: Response, _next: NextFunction) => {

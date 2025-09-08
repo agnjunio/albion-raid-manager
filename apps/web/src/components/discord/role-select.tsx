@@ -1,4 +1,4 @@
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { type APIRole } from "@albion-raid-manager/discord";
 import { faCheck, faChevronDown, faClose, faPeopleCarryBox } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,5 +1,5 @@
 import { ContentTypeInfo } from "@albion-raid-manager/core/entities";
-import { ContentType } from "@albion-raid-manager/core/types";
+import { ContentType } from "@albion-raid-manager/types";
 
 import { detectLanguages, type MultiLanguageDictionary } from "./index";
 

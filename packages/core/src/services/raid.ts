@@ -2,11 +2,10 @@ import type { Cache } from "@albion-raid-manager/redis";
 
 import { prisma, Prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
-
-import { Raid, RaidType } from "@albion-raid-manager/core/types";
+import { Raid, RaidType } from "@albion-raid-manager/types";
+import { CreateRaidInput, RaidFilters, RaidWithSlots, UpdateRaidInput } from "@albion-raid-manager/types/services";
 
 import { CacheKeys, withCache } from "../cache";
-import { CreateRaidInput, RaidFilters, RaidWithSlots, UpdateRaidInput } from "../types/services";
 
 import { ServersService } from "./servers";
 

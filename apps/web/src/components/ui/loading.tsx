@@ -1,4 +1,4 @@
-import { cn } from "@albion-raid-manager/core/helpers/classNames";
+import { cn } from "@/lib/utils";
 
 interface Props {
   label?: string;

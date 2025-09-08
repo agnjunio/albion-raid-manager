@@ -1,6 +1,6 @@
 import React from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 
 interface Props {
   children: React.ReactNode;

@@ -1,4 +1,4 @@
-import { Server, ServerMember } from "@albion-raid-manager/core/types";
+import { Server, ServerMember } from "@albion-raid-manager/types";
 
 declare global {
   namespace Express {

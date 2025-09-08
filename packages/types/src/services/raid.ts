@@ -1,4 +1,4 @@
-import { ContentType, RaidRole, RaidStatus, RaidType } from "@albion-raid-manager/database";
+import { ContentType, RaidRole, RaidStatus, RaidType } from "../../generated/index";
 
 // Base raid data structure
 export interface RaidData {

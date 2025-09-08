@@ -1,4 +1,4 @@
-import { RaidRole } from "@albion-raid-manager/core/types";
+import { RaidRole } from "@albion-raid-manager/types";
 
 import { detectLanguages, type MultiLanguageDictionary } from "./index";
 

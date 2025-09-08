@@ -1,4 +1,4 @@
-import { Raid } from "@albion-raid-manager/database";
+import { Raid } from "@albion-raid-manager/types";
 
 import { BaseEvent } from "../events";
 

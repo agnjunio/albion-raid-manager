@@ -1,4 +1,4 @@
-import { GetServer, GetServers, SetupServer } from "@albion-raid-manager/core/types/api/servers";
+import { GetServer, GetServers, SetupServer } from "@albion-raid-manager/types/api";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { apiRTKRequest } from "@/lib/api";

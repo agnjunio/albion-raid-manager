@@ -1,5 +1,5 @@
 import { getLocation } from "@albion-raid-manager/core/entities";
-import { ContentType } from "@albion-raid-manager/core/types";
+import { ContentType } from "@albion-raid-manager/types";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { locationPostprocessor } from "./location-postprocessor";

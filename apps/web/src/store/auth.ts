@@ -1,4 +1,4 @@
-import type { DiscordCallbackRequest, GetMeResponse } from "@albion-raid-manager/core/types/api/auth";
+import type { DiscordCallbackRequest, GetMeResponse } from "@albion-raid-manager/types/api";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 

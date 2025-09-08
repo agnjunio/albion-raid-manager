@@ -1,4 +1,4 @@
-import { DiscordServer } from "@albion-raid-manager/core/types/api/servers";
+import { DiscordServer } from "@albion-raid-manager/types/api";
 
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { type Channel, ChannelType } from "@albion-raid-manager/discord";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -12,8 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/discord": "workspace:*",
+    "@albion-raid-manager/types": "workspace:*",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",

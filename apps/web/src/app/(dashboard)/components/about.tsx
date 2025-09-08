@@ -1,6 +1,6 @@
 import type { VariantProps } from "class-variance-authority";
 
-import { cn } from "@albion-raid-manager/core/helpers";
+import { cn } from "@/lib/utils";
 import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -1,4 +1,4 @@
-import { ContentType } from "@albion-raid-manager/core/types";
+import { ContentType } from "@albion-raid-manager/types";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { AiRaid } from "../../types";

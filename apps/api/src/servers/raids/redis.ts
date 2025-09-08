@@ -1,7 +1,5 @@
 import { logger } from "@albion-raid-manager/logger";
-import { RaidEventPublisher } from "@albion-raid-manager/redis";
-
-import { getRedisClient } from "@/app";
+import { RaidEventPublisher, Redis } from "@albion-raid-manager/redis";
 
 let raidEventPublisher: RaidEventPublisher | null = null;
 
@@ -11,13 +9,13 @@ export async function getRaidEventPublisher(): Promise<RaidEventPublisher | null
   }
 
   try {
-    const redisClient = getRedisClient();
+    const redisClient = Redis.getClient();
     if (!redisClient) {
       logger.warn("Redis client not available for raid event publisher");
       return null;
     }
 
-    raidEventPublisher = new RaidEventPublisher(redisClient.getClient(), "api");
+    raidEventPublisher = new RaidEventPublisher(redisClient, "api");
     return raidEventPublisher;
   } catch (error) {
     logger.error(`Failed to initialize raid event publisher: ${error}`, { error });

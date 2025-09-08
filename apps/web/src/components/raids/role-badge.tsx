@@ -1,4 +1,4 @@
-import { RaidRole } from "@albion-raid-manager/core/types";
+import { RaidRole } from "@albion-raid-manager/types";
 
 export function RoleBadge({ role }: { role: RaidRole }) {
   const roleClassName: { [key in RaidRole]: string } = {

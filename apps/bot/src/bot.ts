@@ -27,8 +27,8 @@ async function run() {
 async function cleanup() {
   logger.info("Shutting down Bot Client.");
 
-  discord.removeAllListeners();
   await Redis.disconnect();
+  discord.removeAllListeners();
   await discord.destroy();
 }
 

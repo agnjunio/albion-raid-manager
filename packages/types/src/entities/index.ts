@@ -1,4 +1,4 @@
-import { ContentType, RaidType } from "@albion-raid-manager/types";
+import { ContentType, RaidType } from "../../generated/index";
 
 export interface ContentTypeInfo {
   type: ContentType;
@@ -197,134 +197,32 @@ export const CONTENT_TYPE_MAPPING: ContentTypeInfo[] = [
   },
 ];
 
-export class ContentTypeEntity {
-  private info: ContentTypeInfo;
+export const getDefaultLocation = (contentType: ContentType): string => {
+  const info = CONTENT_TYPE_MAPPING.find((ct) => ct.type === contentType);
+  if (!info) return "";
 
-  constructor(contentType: ContentType) {
-    const info = CONTENT_TYPE_MAPPING.find((ct) => ct.type === contentType);
-    if (!info) {
-      throw new Error(`Unknown content type: ${contentType}`);
-    }
-    this.info = info;
+  switch (info.type) {
+    case "ROADS_OF_AVALON_PVE":
+    case "ROADS_OF_AVALON_PVP":
+    case "HELLGATE_5V5":
+    case "HELLGATE_10V10":
+      return "Brecilien";
+    case "DEPTHS_DUO":
+    case "DEPTHS_TRIO":
+      return "Brecilien";
+    case "SOLO_DUNGEON":
+    case "MISTS_SOLO":
+      return "";
+    case "GROUP_DUNGEON":
+      return "";
+    case "OPEN_WORLD_FARMING":
+      return "";
+    default:
+      return "";
   }
-
-  get type(): ContentType {
-    return this.info.type;
-  }
-
-  get raidType(): RaidType {
-    return this.info.raidType;
-  }
-
-  get partySize(): { min: number; max: number } {
-    return this.info.partySize;
-  }
-
-  get description(): string {
-    return this.info.description;
-  }
-
-  get aliases(): string[] {
-    return this.info.aliases;
-  }
-
-  get isFixedSize(): boolean {
-    return this.info.partySize.min === this.info.partySize.max;
-  }
-
-  get defaultLocation(): string {
-    switch (this.info.type) {
-      case "ROADS_OF_AVALON_PVE":
-      case "ROADS_OF_AVALON_PVP":
-      case "HELLGATE_5V5":
-      case "HELLGATE_10V10":
-        return "Brecilien";
-      case "DEPTHS_DUO":
-      case "DEPTHS_TRIO":
-        return "Brecilien";
-      case "SOLO_DUNGEON":
-      case "MISTS_SOLO":
-        return "";
-      case "GROUP_DUNGEON":
-        return "";
-      case "OPEN_WORLD_FARMING":
-        return "";
-      default:
-        return "";
-    }
-  }
-
-  getInfo(): ContentTypeInfo {
-    return { ...this.info };
-  }
-
-  static getInfo(contentType: ContentType): ContentTypeInfo | null {
-    return CONTENT_TYPE_MAPPING.find((info) => info.type === contentType) || null;
-  }
-
-  static getAllTypes(): ContentType[] {
-    return CONTENT_TYPE_MAPPING.map((info) => info.type);
-  }
-
-  static getActiveTypes(): ContentType[] {
-    return CONTENT_TYPE_MAPPING.filter((info) => info.isActive).map((info) => info.type);
-  }
-
-  static normalizeFromString(contentType: string): ContentType {
-    const normalized = contentType.toUpperCase().replace(/[^A-Z_]/g, "");
-
-    switch (normalized) {
-      case "ROADS_OF_AVALON_PVE":
-      case "AVALON_ROADS":
-      case "ROADS":
-        return "ROADS_OF_AVALON_PVE";
-      case "HELLGATE_2V2":
-      case "HG_2V2":
-      case "HG_2X2":
-      case "HELLGATE":
-        return "HELLGATE_2V2";
-      case "HELLGATE_5V5":
-      case "HG_5V5":
-      case "HG_5X5":
-        return "HELLGATE_5V5";
-      case "HELLGATE_10V10":
-      case "HG_10V10":
-      case "HG_10X10":
-        return "HELLGATE_10V10";
-      case "DEPTHS_DUO":
-      case "DUO":
-        return "DEPTHS_DUO";
-      case "DEPTHS_TRIO":
-      case "TRIO":
-        return "DEPTHS_TRIO";
-      case "SOLO_DUNGEON":
-      case "SOLO":
-        return "SOLO_DUNGEON";
-      case "MISTS_SOLO":
-      case "MISTS":
-        return "MISTS_SOLO";
-      case "GROUP_DUNGEON":
-      case "DUNGEON":
-        return "GROUP_DUNGEON";
-      case "OPEN_WORLD_FARMING":
-      case "OPEN_WORLD":
-      case "FARMING":
-        return "OPEN_WORLD_FARMING";
-      default:
-        return "GROUP_DUNGEON";
-    }
-  }
-}
-
-// Export utility functions for backward compatibility
-export const getContentTypeInfo = (contentType: ContentType): ContentTypeInfo | null =>
-  ContentTypeEntity.getInfo(contentType);
-
-export const getDefaultLocation = (contentType: ContentType): string =>
-  new ContentTypeEntity(contentType).defaultLocation;
-
-export const normalizeContentType = (contentType: string): ContentType =>
-  ContentTypeEntity.normalizeFromString(contentType);
+};
 
 // Export active content types list
-export const CONTENT_TYPE_LIST: ContentType[] = ContentTypeEntity.getActiveTypes();
+export const CONTENT_TYPE_LIST: ContentType[] = CONTENT_TYPE_MAPPING.filter((info) => info.isActive).map(
+  (info) => info.type,
+);

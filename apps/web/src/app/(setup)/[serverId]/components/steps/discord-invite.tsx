@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { DiscordServer } from "@albion-raid-manager/core/types/api/servers";
 import { getServerInviteUrl } from "@albion-raid-manager/discord/helpers";
+import { DiscordServer } from "@albion-raid-manager/types/api";
 
 import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";

@@ -1,0 +1,24 @@
+{
+  "name": "@albion-raid-manager/types",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./generated/index.ts",
+  "module": "./generated/index.ts",
+  "types": "./generated/index.ts",
+  "exports": {
+    ".": "./generated/index.ts",
+    "./api": "./src/api/index.ts",
+    "./entities": "./src/entities/index.ts",
+    "./services": "./src/services/index.ts"
+  },
+  "scripts": {
+    "dev": "echo 'JIT compilation - no build needed'",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
+  }
+}

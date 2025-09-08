@@ -1,6 +1,6 @@
 import type { BaseQueryFn } from "@reduxjs/toolkit/query";
 
-import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
+import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
 import axios, { isAxiosError, type AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
 
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";

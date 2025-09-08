@@ -1,4 +1,4 @@
-import { APIErrorType, APIResponse } from "@albion-raid-manager/core/types/api";
+import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
 import { Request, Response } from "express";
 import { z } from "zod";
 

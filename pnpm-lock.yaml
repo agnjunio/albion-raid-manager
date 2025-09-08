@@ -89,6 +89,9 @@ importers:
       '@albion-raid-manager/redis':
         specifier: workspace:*
         version: link:../../packages/redis
+      '@albion-raid-manager/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@quixo3/prisma-session-store':
         specifier: ^3.1.13
         version: 3.1.13(@prisma/client@6.13.0(prisma@6.13.0(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(express-session@1.18.2)
@@ -162,18 +165,21 @@ importers:
       '@albion-raid-manager/redis':
         specifier: workspace:*
         version: link:../../packages/redis
+      '@albion-raid-manager/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       discord.js:
         specifier: ^14.19.3
         version: 14.21.0
 
   apps/web:
     dependencies:
-      '@albion-raid-manager/core':
-        specifier: workspace:*
-        version: link:../../packages/core
       '@albion-raid-manager/discord':
         specifier: workspace:*
         version: link:../../packages/discord
+      '@albion-raid-manager/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       '@fortawesome/fontawesome-svg-core':
         specifier: ^6.7.2
         version: 6.7.2
@@ -337,6 +343,9 @@ importers:
       '@albion-raid-manager/logger':
         specifier: workspace:*
         version: link:../logger
+      '@albion-raid-manager/types':
+        specifier: workspace:*
+        version: link:../types
       '@anthropic-ai/sdk':
         specifier: ^0.56.0
         version: 0.56.0
@@ -411,6 +420,9 @@ importers:
       '@albion-raid-manager/logger':
         specifier: workspace:*
         version: link:../logger
+      '@albion-raid-manager/types':
+        specifier: workspace:*
+        version: link:../types
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -458,6 +470,9 @@ importers:
       '@albion-raid-manager/logger':
         specifier: workspace:^
         version: link:../logger
+      '@albion-raid-manager/types':
+        specifier: workspace:*
+        version: link:../types
       axios:
         specifier: ^1.8.4
         version: 1.11.0
@@ -485,6 +500,9 @@ importers:
       '@albion-raid-manager/logger':
         specifier: workspace:*
         version: link:../logger
+      '@albion-raid-manager/types':
+        specifier: workspace:*
+        version: link:../types
       redis:
         specifier: ^4.7.1
         version: 4.7.1
@@ -497,7 +515,16 @@ importers:
         version: 5.9.2
       vitest:
         specifier: ^1.0.0
-        version: 1.6.1(@types/node@20.19.9)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)
+        version: 1.6.1(@types/node@20.19.9)(@vitest/ui@3.2.4(vitest@3.2.4))(jsdom@26.1.0)(lightningcss@1.30.1)
+
+  packages/types:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.24
+        version: 20.19.9
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.2
 
 packages:
 
@@ -9259,7 +9286,7 @@ snapshots:
       lightningcss: 1.30.1
       tsx: 4.20.3
 
-  vitest@1.6.1(@types/node@20.19.9)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1):
+  vitest@1.6.1(@types/node@20.19.9)(@vitest/ui@3.2.4(vitest@3.2.4))(jsdom@26.1.0)(lightningcss@1.30.1):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1

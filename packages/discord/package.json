@@ -27,6 +27,7 @@
     "@albion-raid-manager/core": "workspace:^",
     "@albion-raid-manager/config": "workspace:^",
     "@albion-raid-manager/logger": "workspace:^",
+    "@albion-raid-manager/types": "workspace:*",
     "axios": "^1.8.4",
     "discord-api-types": "^0.37.119"
   }

@@ -1,8 +1,7 @@
 import type { Cache } from "@albion-raid-manager/redis";
 
 import { prisma } from "@albion-raid-manager/database";
-
-import { Server } from "@albion-raid-manager/core/types";
+import { Server } from "@albion-raid-manager/types";
 
 import { CacheKeys, withCache } from "../cache";
 

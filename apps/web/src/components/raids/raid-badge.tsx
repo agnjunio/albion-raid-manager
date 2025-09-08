@@ -1,6 +1,6 @@
-import type { RaidStatus } from "@albion-raid-manager/core/types";
+import type { RaidStatus } from "@albion-raid-manager/types";
 
-import { cn } from "@albion-raid-manager/core/helpers/classNames";
+import { cn } from "@/lib/utils";
 
 import { raidStatuses } from "@/lib/constants";
 

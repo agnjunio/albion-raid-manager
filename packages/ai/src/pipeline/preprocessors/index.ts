@@ -1,4 +1,4 @@
-import { ContentType, RaidType } from "@albion-raid-manager/core/types";
+import { ContentType, RaidType } from "@albion-raid-manager/types";
 
 export interface PreAssignedRole {
   name: string;
