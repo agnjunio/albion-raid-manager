@@ -1,7 +1,11 @@
-import type { Raid, RaidSlot } from "@albion-raid-manager/types";
+import type { Raid } from "@albion-raid-manager/types";
 
-import { faUsers, faClock, faMapMarkerAlt, faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
+import { useMemo } from "react";
+
+import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
+import { faCalendarAlt, faClock, faGamepad, faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,33 +20,23 @@ export function RaidStats({ raid }: RaidStatsProps) {
   const filledSlots = raid.slots?.filter((slot) => slot.user).length || 0;
   const fillPercentage = totalSlots > 0 ? (filledSlots / totalSlots) * 100 : 0;
 
-  // Calculate role distribution
-  const roleDistribution =
-    raid.slots?.reduce(
-      (acc, slot) => {
-        const role = slot.role || "UNASSIGNED";
-        acc[role] = (acc[role] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    ) || {};
+  const timeStatus = useMemo(() => {
+    const now = new Date();
+    const raidDate = new Date(raid.date);
+    const daysUntilRaid = differenceInDays(raidDate, now);
+    const hoursUntilRaid = differenceInHours(raidDate, now);
+    const minutesUntilRaid = differenceInMinutes(raidDate, now);
 
-  // Calculate time until raid
-  const now = new Date();
-  const raidDate = new Date(raid.date);
-  const timeUntilRaid = raidDate.getTime() - now.getTime();
-  const daysUntilRaid = Math.ceil(timeUntilRaid / (1000 * 60 * 60 * 24));
-  const hoursUntilRaid = Math.ceil(timeUntilRaid / (1000 * 60 * 60));
-
-  const getTimeStatus = () => {
-    if (timeUntilRaid < 0) return { text: "Past", color: "bg-gray-500" };
+    if (minutesUntilRaid < -30) return { text: "Past", color: "bg-gray-500" };
+    if (minutesUntilRaid <= 0) return { text: "Starting soon", color: "bg-green-500" };
+    if (minutesUntilRaid <= 30) return { text: `Starting in ${minutesUntilRaid} minutes`, color: "bg-green-600" };
     if (daysUntilRaid > 7) return { text: `${daysUntilRaid} days`, color: "bg-blue-500" };
     if (daysUntilRaid > 1) return { text: `${daysUntilRaid} days`, color: "bg-yellow-500" };
     if (hoursUntilRaid > 1) return { text: `${hoursUntilRaid} hours`, color: "bg-orange-500" };
     return { text: "Starting soon", color: "bg-red-500" };
-  };
+  }, [raid.date]);
 
-  const timeStatus = getTimeStatus();
+  const contentTypeInfo = getContentTypeInfo(raid.contentType ?? undefined);
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -84,6 +78,20 @@ export function RaidStats({ raid }: RaidStatsProps) {
               minute: "2-digit",
             })}
           </p>
+        </CardContent>
+      </Card>
+
+      {/* Content Type */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-muted-foreground flex items-center gap-2 text-sm font-medium">
+            <FontAwesomeIcon icon={faGamepad} className="h-4 w-4" />
+            Content Type
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-lg font-semibold">{contentTypeInfo.displayName}</div>
+          <p className="text-muted-foreground mt-1 text-xs">{contentTypeInfo.description}</p>
         </CardContent>
       </Card>
 

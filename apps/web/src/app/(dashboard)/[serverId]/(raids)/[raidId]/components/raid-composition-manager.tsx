@@ -1,8 +1,8 @@
-import type { Raid, RaidSlot, RaidRole } from "@albion-raid-manager/types";
+import type { Raid, RaidRole, RaidSlot } from "@albion-raid-manager/types";
 
 import { useState } from "react";
 
-import { faPlus, faTrash, faEdit, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faPlus, faSave, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "sonner";
 
