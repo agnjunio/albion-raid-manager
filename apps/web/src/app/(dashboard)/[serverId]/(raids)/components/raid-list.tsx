@@ -22,7 +22,7 @@ import {
 import { raidStatuses } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-const statusOrder: (keyof typeof raidStatuses)[] = ["ALL", "SCHEDULED", "OPEN", "CLOSED", "ONGOING", "FINISHED"];
+const statusOrder: (keyof typeof raidStatuses)[] = ["ALL", "SCHEDULED", "OPEN", "CANCELLED", "ONGOING", "FINISHED"];
 
 interface RaidListProps {
   raids?: Raid[];

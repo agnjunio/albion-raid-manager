@@ -21,8 +21,9 @@ export function CalendarSidebar() {
     const open = raids.filter((r) => r.status === "OPEN").length;
     const ongoing = raids.filter((r) => r.status === "ONGOING").length;
     const finished = raids.filter((r) => r.status === "FINISHED").length;
+    const cancelled = raids.filter((r) => r.status === "CANCELLED").length;
 
-    return { total, scheduled, open, ongoing, finished };
+    return { total, scheduled, open, ongoing, finished, cancelled };
   };
 
   const stats = getRaidStats();
@@ -70,7 +71,7 @@ export function CalendarSidebar() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1">
-          <div className="flex justify-between text-sm">
+          <div className="mb-4 flex justify-between text-sm font-semibold">
             <span>Total Raids</span>
             <span className="font-medium">{stats.total}</span>
           </div>
@@ -89,6 +90,10 @@ export function CalendarSidebar() {
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Finished</span>
             <span className="font-medium">{stats.finished}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-red-600">Cancelled</span>
+            <span className="font-medium">{stats.cancelled}</span>
           </div>
         </CardContent>
       </Card>
@@ -183,9 +188,9 @@ export function CalendarSidebar() {
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => setFilters({ ...filters, status: ["CLOSED"] })}
+                onClick={() => setFilters({ ...filters, status: ["CANCELLED"] })}
               >
-                Closed
+                Cancelled
               </Button>
             </div>
           </div>

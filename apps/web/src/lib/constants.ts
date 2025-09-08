@@ -7,6 +7,7 @@ import {
   faPlay,
   faStop,
   faTriangleExclamation,
+  faXmark,
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -38,5 +39,9 @@ export const raidStatuses: {
   FINISHED: {
     icon: faStop,
     color: "bg-gray-500 text-gray-100 dark:bg-gray-800 dark:text-gray-100",
+  },
+  CANCELLED: {
+    icon: faXmark,
+    color: "bg-red-500 text-red-100 dark:bg-red-800 dark:text-red-100",
   },
 };

@@ -1,11 +1,11 @@
 import type { Raid } from "@albion-raid-manager/types";
 
-import { cn } from "@/lib/utils";
 import { faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
 import { RaidStatusBadge } from "@/components/raids/raid-badge";
+import { cn } from "@/lib/utils";
 
 interface RaidEventCardProps {
   raid: Raid;
@@ -34,6 +34,8 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
         return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800";
       case "FINISHED":
         return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800";
+      case "CANCELLED":
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800";
     }

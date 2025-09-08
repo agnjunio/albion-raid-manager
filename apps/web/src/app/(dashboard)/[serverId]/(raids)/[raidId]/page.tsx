@@ -3,7 +3,7 @@ import type { RaidStatus } from "@albion-raid-manager/types";
 import { useMemo } from "react";
 
 import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
-import { faCopy, faLock, faPlay, faShare, faStop, faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faLock, faPlay, faShare, faStop, faUnlock, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -192,6 +192,15 @@ export function RaidPage() {
                 >
                   <FontAwesomeIcon icon={faStop} className="mr-2 h-4 w-4" />
                   Finish Raid
+                </Button>
+              )}
+              {hasStatus("SCHEDULED", "OPEN", "CLOSED", "ONGOING") && (
+                <Button
+                  onClick={() => handleUpdateRaidStatus("CANCELLED")}
+                  className="bg-red-600 text-white hover:bg-red-700"
+                >
+                  <FontAwesomeIcon icon={faXmark} className="mr-2 h-4 w-4" />
+                  Cancel Raid
                 </Button>
               )}
             </div>

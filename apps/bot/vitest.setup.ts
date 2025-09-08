@@ -160,6 +160,7 @@ vi.mock("@albion-raid-manager/database", () => ({
     CLOSED: "CLOSED",
     ONGOING: "ONGOING",
     FINISHED: "FINISHED",
+    CANCELLED: "CANCELLED",
   },
   RaidType: {
     FIXED: "FIXED",
