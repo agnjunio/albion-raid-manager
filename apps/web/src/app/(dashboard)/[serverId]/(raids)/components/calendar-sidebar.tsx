@@ -56,6 +56,7 @@ export function CalendarSidebar() {
             }
           }}
           className="rounded-md border-0 p-2"
+          hideNavigation
           footer={false}
         />
       </Card>

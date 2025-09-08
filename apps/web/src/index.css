@@ -51,6 +51,15 @@
 
   /* Input */
   --input: #e5e7eb;
+
+  /* Role colors */
+  --role-tank: #3b82f6;
+  --role-caller: #8b5cf6;
+  --role-support: #f97316;
+  --role-healer: #10b981;
+  --role-ranged: #ef4444;
+  --role-melee: #eab308;
+  --role-battlemount: #6366f1;
 }
 
 .dark {
@@ -101,6 +110,15 @@
 
   /* Input */
   --input: #2a2a2a;
+
+  /* Role colors */
+  --role-tank: #3b82f6;
+  --role-caller: #8b5cf6;
+  --role-support: #f97316;
+  --role-healer: #10b981;
+  --role-ranged: #ef4444;
+  --role-melee: #eab308;
+  --role-battlemount: #6366f1;
 }
 
 @theme inline {
@@ -144,6 +162,14 @@
   --color-button-shadow: var(--button-shadow);
 
   --color-input: var(--input);
+
+  --color-role-tank: var(--role-tank);
+  --color-role-caller: var(--role-caller);
+  --color-role-support: var(--role-support);
+  --color-role-healer: var(--role-healer);
+  --color-role-ranged: var(--role-ranged);
+  --color-role-melee: var(--role-melee);
+  --color-role-battlemount: var(--role-battlemount);
 
   --font-mono: var(--font-dm-mono);
   --font-sans: var(--font-dm-sans);

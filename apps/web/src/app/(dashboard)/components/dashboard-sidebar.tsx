@@ -154,12 +154,12 @@ export function ServerInfo({ server, icon, isLoading }: ServerInfoProps) {
     <div className="flex w-full items-center gap-2">
       <div
         className={cn(
-          "text-sidebar-primary-foreground relative flex aspect-square size-8 items-center justify-center",
+          "text-sidebar-primary-foreground relative flex aspect-square size-8 items-center justify-center group-data-[collapsible=icon]:size-4",
           { "bg-sidebar-primary rounded-lg": !server },
         )}
       >
         {isLoading ? (
-          <Skeleton className="size-8" />
+          <Skeleton className="size-8 group-data-[collapsible=icon]:size-4" />
         ) : server ? (
           <Avatar>
             <AvatarImage src={server.icon ? getServerPictureUrl(server.id, server.icon) : undefined} />
@@ -170,19 +170,21 @@ export function ServerInfo({ server, icon, isLoading }: ServerInfoProps) {
         )}
       </div>
 
-      {isLoading ? (
-        <div className={cn("flex min-w-0 grow flex-col gap-1")}>
-          <Skeleton className="bg-muted h-3 w-24" />
-          <Skeleton className="bg-muted-foreground h-3 w-24" />
-        </div>
-      ) : (
-        <div className={cn("flex min-w-0 grow flex-col whitespace-nowrap leading-tight")}>
-          <span className="truncate font-semibold">{server?.name || "Unknown server"}</span>
-          {badge && <div>{badge}</div>}
-        </div>
-      )}
+      <div className="group-data-[collapsible=icon]:hidden">
+        {isLoading ? (
+          <div className={cn("flex min-w-0 grow flex-col gap-1")}>
+            <Skeleton className="bg-muted h-3 w-24" />
+            <Skeleton className="bg-muted-foreground h-3 w-24" />
+          </div>
+        ) : (
+          <div className={cn("flex min-w-0 grow flex-col whitespace-nowrap leading-tight")}>
+            <span className="truncate font-semibold">{server?.name || "Unknown server"}</span>
+            {badge && <div>{badge}</div>}
+          </div>
+        )}
+      </div>
 
-      {icon && <FontAwesomeIcon icon={icon} className="ml-auto size-4 data-[state=collapsed]:hidden" />}
+      {icon && <FontAwesomeIcon icon={icon} className="ml-auto size-4 group-data-[collapsible=icon]:hidden" />}
     </div>
   );
 }
