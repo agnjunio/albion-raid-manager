@@ -1,116 +1,24 @@
-import type { RaidSlot, RaidStatus } from "@albion-raid-manager/types";
-
-import { faCopy, faLock, faPlay, faShare, faStop, faTrash, faUnlock, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faShare, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useParams } from "react-router-dom";
-import { toast } from "sonner";
 
 import { RaidStatusBadge } from "@/components/raids/raid-badge";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Loading from "@/components/ui/loading";
-import { Page, PageError } from "@/components/ui/page";
-import { isAPIError } from "@/lib/api";
-import { useDeleteRaidMutation, useGetRaidQuery, useUpdateRaidMutation } from "@/store/raids";
+import { Page } from "@/components/ui/page";
 
+import { RaidActions } from "./components/raid-actions";
 import { RaidComposition } from "./components/raid-composition";
 import { RaidNotes } from "./components/raid-notes";
 import { RaidStats } from "./components/raid-stats";
+import { useRaidContext } from "./contexts/raid-context";
 
 export function RaidPage() {
-  const { serverId, raidId } = useParams();
-
-  const { isLoading, data, error } = useGetRaidQuery({
-    params: {
-      serverId: serverId as string,
-      raidId: raidId as string,
-    },
-    query: {
-      slots: true,
-    },
-  });
-  const [updateRaidStatus, updateRaidStatusResult] = useUpdateRaidMutation();
-  const [deleteRaid, deleteRaidResult] = useDeleteRaidMutation();
-
-  if (isLoading || updateRaidStatusResult.isLoading || deleteRaidResult.isLoading) {
-    return <Loading />;
-  }
-
-  if (error || !data) {
-    return <PageError variant="error" error={isAPIError(error) ? error.data : "Failed to get raid"} />;
-  }
-
-  const { raid } = data;
-  const hasStatus = (...statuses: RaidStatus[]) => statuses.includes(raid.status);
-
-  const handleUpdateRaidStatus = async (status: RaidStatus) => {
-    try {
-      await updateRaidStatus({
-        params: {
-          serverId: serverId as string,
-          raidId: raidId as string,
-        },
-        body: { status },
-      }).unwrap();
-
-      toast.success("Raid status updated successfully", {
-        description: `Raid status changed to ${status}`,
-      });
-    } catch {
-      toast.error("Failed to update raid status", {
-        description: "There was an error updating the raid status. Please try again.",
-      });
-    }
-  };
-
-  const handleCopyRaidLink = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url);
-    toast.success("Raid link copied to clipboard");
-  };
-
-  const handleShareRaid = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: raid.title,
-        text: `Join ${raid.title} - ${new Date(raid.date).toLocaleString()}`,
-        url: window.location.href,
-      });
-    } else {
-      handleCopyRaidLink();
-    }
-  };
-
-  const handleDeleteRaid = async () => {
-    if (!window.confirm(`Are you sure you want to delete "${raid.title}"? This action cannot be undone.`)) {
-      return;
-    }
-
-    try {
-      await deleteRaid({
-        params: {
-          serverId: serverId as string,
-          raidId: raidId as string,
-        },
-      }).unwrap();
-
-      toast.success("Raid deleted successfully", {
-        description: `"${raid.title}" has been permanently deleted.`,
-      });
-
-      // Navigate back to raids list
-      window.location.href = `/dashboard/${serverId}/raids`;
-    } catch {
-      toast.error("Failed to delete raid", {
-        description: "There was an error deleting the raid. Please try again.",
-      });
-    }
-  };
+  const { raid, handleCopyRaidLink, handleShareRaid, handleDeleteRaid } = useRaidContext();
 
   return (
-    <Page>
-      <div className="mx-auto w-full max-w-7xl space-y-6 pb-8">
+    <Page className="items-center">
+      <div className="flex max-w-7xl flex-col gap-6">
         {/* Raid Header with integrated back button */}
         <Card>
           <CardHeader className="pb-4">
@@ -168,110 +76,15 @@ export function RaidPage() {
           </CardHeader>
 
           <CardContent>
-            <RaidStats raid={raid} />
+            <RaidStats />
           </CardContent>
         </Card>
-
         {/* Raid Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faPlay} className="h-5 w-5" />
-              Raid Management
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {hasStatus("CANCELLED") ? (
-              <div className="py-8 text-center">
-                <div className="text-muted-foreground mb-4">
-                  <FontAwesomeIcon icon={faXmark} className="mx-auto mb-3 h-12 w-12 text-red-500" />
-                  <h3 className="mb-2 text-lg font-semibold">Raid Cancelled</h3>
-                  <p className="text-sm">This raid has been cancelled and is no longer available for management.</p>
-                </div>
-                <div className="text-muted-foreground text-xs">Cancelled raids cannot be reopened or modified.</div>
-              </div>
-            ) : hasStatus("FINISHED") ? (
-              <div className="py-8 text-center">
-                <div className="text-muted-foreground mb-4">
-                  <FontAwesomeIcon icon={faStop} className="mx-auto mb-3 h-12 w-12 text-green-500" />
-                  <h3 className="mb-2 text-lg font-semibold">Raid Completed</h3>
-                  <p className="text-sm">This raid has been finished successfully.</p>
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Completed raids are read-only and cannot be modified.
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                {hasStatus("SCHEDULED", "CLOSED") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("OPEN")}
-                    className="bg-green-600 text-white hover:bg-green-700"
-                  >
-                    <FontAwesomeIcon icon={faUnlock} className="mr-2 h-4 w-4" />
-                    Open Registration
-                  </Button>
-                )}
-                {hasStatus("OPEN") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("CLOSED")}
-                    className="bg-red-600 text-white hover:bg-red-700"
-                  >
-                    <FontAwesomeIcon icon={faLock} className="mr-2 h-4 w-4" />
-                    Close Registration
-                  </Button>
-                )}
-                {hasStatus("OPEN", "CLOSED", "FINISHED") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("ONGOING")}
-                    className="bg-blue-600 text-white hover:bg-blue-700"
-                  >
-                    <FontAwesomeIcon icon={faPlay} className="mr-2 h-4 w-4" />
-                    Start Raid
-                  </Button>
-                )}
-                {hasStatus("ONGOING") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("FINISHED")}
-                    className="bg-gray-600 text-white hover:bg-gray-700"
-                  >
-                    <FontAwesomeIcon icon={faStop} className="mr-2 h-4 w-4" />
-                    Finish Raid
-                  </Button>
-                )}
-                {hasStatus("SCHEDULED", "OPEN", "CLOSED", "ONGOING") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("CANCELLED")}
-                    className="bg-red-600 text-white hover:bg-red-700"
-                  >
-                    <FontAwesomeIcon icon={faXmark} className="mr-2 h-4 w-4" />
-                    Cancel Raid
-                  </Button>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
+        <RaidActions />
         {/* Raid Notes */}
-        {raid.note && <RaidNotes raid={raid} />}
-
+        {raid.note && <RaidNotes />}
         {/* Raid Composition */}
-        <RaidComposition
-          raid={raid}
-          onSlotUpdate={(_slotId: string, _updates: Partial<RaidSlot>) => {
-            // TODO: Implement slot update API call
-            // Update slot: _slotId, _updates
-          }}
-          onSlotDelete={(_slotId: string) => {
-            // TODO: Implement slot delete API call
-            // Delete slot: _slotId
-          }}
-          onSlotCreate={(_slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => {
-            // TODO: Implement slot create API call
-            // Create slot: _slot
-          }}
-        />
+        <RaidComposition />{" "}
       </div>
     </Page>
   );

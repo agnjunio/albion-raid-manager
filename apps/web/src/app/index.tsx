@@ -1,12 +1,13 @@
-import { cn } from "@/lib/utils";
 import { faFileCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { PageError } from "@/components/ui/page";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { cn } from "@/lib/utils";
 
 import { AuthCallback } from "./(auth)/callback/page";
+import { RaidLayout } from "./(dashboard)/[serverId]/(raids)/[raidId]/layout";
 import { RaidPage } from "./(dashboard)/[serverId]/(raids)/[raidId]/page";
 import { RaidsPage } from "./(dashboard)/[serverId]/(raids)/page";
 import { ServerLayout } from "./(dashboard)/[serverId]/layout";
@@ -28,7 +29,9 @@ export default function App() {
               <Route index element={<Navigate to="raids" replace />} />
               <Route path="raids">
                 <Route index element={<RaidsPage />} />
-                <Route path=":raidId" element={<RaidPage />} />
+                <Route path=":raidId" element={<RaidLayout />}>
+                  <Route index element={<RaidPage />} />
+                </Route>
               </Route>
               <Route
                 path="*"

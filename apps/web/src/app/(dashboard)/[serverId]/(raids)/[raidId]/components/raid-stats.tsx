@@ -1,5 +1,3 @@
-import type { Raid } from "@albion-raid-manager/types";
-
 import { useMemo } from "react";
 
 import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
@@ -11,11 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
-interface RaidStatsProps {
-  raid: Raid;
-}
+import { useRaidContext } from "../contexts/raid-context";
 
-export function RaidStats({ raid }: RaidStatsProps) {
+export function RaidStats() {
+  const { raid } = useRaidContext();
   const totalSlots = raid.slots?.length || 0;
   const filledSlots = raid.slots?.filter((slot) => slot.user).length || 0;
   const fillPercentage = totalSlots > 0 ? (filledSlots / totalSlots) * 100 : 0;

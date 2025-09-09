@@ -36,6 +36,9 @@ alwaysApply: true
 - Use index files for clean imports
 - Separate business logic from UI components
 - Use custom hooks for reusable logic
+- **Contexts should go into a `contexts` folder** near the page they are used
+- **Create context providers** for shared state that needs to be accessed by multiple components
+- **Avoid prop drilling** by using React Context for deeply nested component data
 
 ## Performance
 

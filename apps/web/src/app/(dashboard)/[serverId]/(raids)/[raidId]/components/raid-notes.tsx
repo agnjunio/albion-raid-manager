@@ -1,28 +1,25 @@
-import type { Raid } from "@albion-raid-manager/types";
-
-import { faStickyNote, faEdit, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { faEdit, faSave, faStickyNote, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+
+import { useRaidContext } from "../contexts/raid-context";
 
 interface RaidNotesProps {
-  raid: Raid;
-  onUpdateNotes?: (notes: string) => void;
   className?: string;
 }
 
-export function RaidNotes({ raid, onUpdateNotes, className }: RaidNotesProps) {
+export function RaidNotes({ className }: RaidNotesProps) {
+  const { raid, handleUpdateRaidNotes } = useRaidContext();
   const [isEditing, setIsEditing] = useState(false);
   const [notes, setNotes] = useState(raid.note || "");
 
   const handleSave = () => {
-    if (onUpdateNotes) {
-      onUpdateNotes(notes);
-    }
+    handleUpdateRaidNotes(notes);
     setIsEditing(false);
   };
 
@@ -30,10 +27,6 @@ export function RaidNotes({ raid, onUpdateNotes, className }: RaidNotesProps) {
     setNotes(raid.note || "");
     setIsEditing(false);
   };
-
-  if (!raid.note && !isEditing) {
-    return null;
-  }
 
   return (
     <Card className={className}>
@@ -71,9 +64,23 @@ export function RaidNotes({ raid, onUpdateNotes, className }: RaidNotesProps) {
               </Button>
             </div>
           </div>
-        ) : (
+        ) : raid.note ? (
           <div className="prose prose-sm max-w-none">
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{raid.note}</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <div className="bg-muted mb-4 rounded-full p-4">
+              <FontAwesomeIcon icon={faStickyNote} className="text-muted-foreground h-8 w-8" />
+            </div>
+            <h3 className="text-muted-foreground mb-2 text-lg font-semibold">No notes yet</h3>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Add notes to keep track of important information about this raid.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+              <FontAwesomeIcon icon={faEdit} className="mr-2 h-4 w-4" />
+              Add Notes
+            </Button>
           </div>
         )}
       </CardContent>

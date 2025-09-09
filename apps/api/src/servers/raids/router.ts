@@ -101,9 +101,8 @@ serverRaidsRouter.put(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
     }
 
-    const { status } = req.body;
-
-    const raid = await RaidService.updateRaid(raidId, { status }, { publisher: await getRaidEventPublisher() });
+    const updates = Object.fromEntries(Object.entries(req.body).filter(([_, value]) => value !== null));
+    const raid = await RaidService.updateRaid(raidId, updates, { publisher: await getRaidEventPublisher() });
 
     res.json(APIResponse.Success({ raid }));
   },
