@@ -1,4 +1,4 @@
-import type { RaidStatus } from "@albion-raid-manager/types";
+import type { RaidSlot, RaidStatus } from "@albion-raid-manager/types";
 
 import { faCopy, faLock, faPlay, faShare, faStop, faTrash, faUnlock, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,7 +14,7 @@ import { Page, PageError } from "@/components/ui/page";
 import { isAPIError } from "@/lib/api";
 import { useDeleteRaidMutation, useGetRaidQuery, useUpdateRaidMutation } from "@/store/raids";
 
-import { RaidCompositionManager } from "./components/raid-composition-manager";
+import { RaidComposition } from "./components/raid-composition";
 import { RaidNotes } from "./components/raid-notes";
 import { RaidStats } from "./components/raid-stats";
 
@@ -257,17 +257,17 @@ export function RaidPage() {
         {raid.note && <RaidNotes raid={raid} />}
 
         {/* Raid Composition */}
-        <RaidCompositionManager
+        <RaidComposition
           raid={raid}
-          onSlotUpdate={(_slotId, _updates) => {
+          onSlotUpdate={(_slotId: string, _updates: Partial<RaidSlot>) => {
             // TODO: Implement slot update API call
             // Update slot: _slotId, _updates
           }}
-          onSlotDelete={(_slotId) => {
+          onSlotDelete={(_slotId: string) => {
             // TODO: Implement slot delete API call
             // Delete slot: _slotId
           }}
-          onSlotCreate={(_slot) => {
+          onSlotCreate={(_slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => {
             // TODO: Implement slot create API call
             // Create slot: _slot
           }}
