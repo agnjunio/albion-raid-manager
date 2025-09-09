@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useImperativeHandle, useRef } from "react";
 
-import { cn } from "@/lib/utils";
 import { faCalendar, faCalendarDay, faChevronLeft, faChevronRight, faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { add, format } from "date-fns";
@@ -12,6 +11,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 // ---------- utils start ----------
 /**
@@ -432,6 +432,7 @@ interface TimePickerInputProps extends React.InputHTMLAttributes<HTMLInputElemen
   period?: Period;
   onRightFocus?: () => void;
   onLeftFocus?: () => void;
+  minuteIncrement?: number;
 }
 
 const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>(
@@ -450,6 +451,7 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
       period,
       onLeftFocus,
       onRightFocus,
+      minuteIncrement = 30,
       ...props
     },
     ref,
@@ -494,7 +496,26 @@ const TimePickerInput = React.forwardRef<HTMLInputElement, TimePickerInputProps>
       if (e.key === "ArrowLeft") onLeftFocus?.();
       if (["ArrowUp", "ArrowDown"].includes(e.key)) {
         const step = e.key === "ArrowUp" ? 1 : -1;
-        const newValue = getArrowByType(calculatedValue, step, picker);
+        let newValue: string;
+
+        // For minutes picker, use custom minute increments
+        if (picker === "minutes") {
+          const currentMinutes = parseInt(calculatedValue, 10);
+          const increment = step > 0 ? minuteIncrement : -minuteIncrement;
+          let newMinutes = currentMinutes + increment;
+
+          // Handle wrapping around 60 minutes
+          if (newMinutes >= 60) {
+            newMinutes = newMinutes - 60;
+          } else if (newMinutes < 0) {
+            newMinutes = newMinutes + 60;
+          }
+
+          newValue = newMinutes.toString().padStart(2, "0");
+        } else {
+          newValue = getArrowByType(calculatedValue, step, picker);
+        }
+
         if (flag) setFlag(false);
         const tempDate = date ? new Date(date) : new Date();
         onDateChange?.(setDateByType(tempDate, newValue, picker, period));
@@ -547,6 +568,11 @@ interface TimePickerProps {
    * Default is 'second'.
    * */
   granularity?: Granularity;
+  /**
+   * The increment value for minutes when using arrow keys.
+   * Default is 30 minutes.
+   * */
+  minuteIncrement?: number;
 }
 
 interface TimePickerRef {
@@ -556,7 +582,7 @@ interface TimePickerRef {
 }
 
 const TimePicker = React.forwardRef<TimePickerRef, TimePickerProps>(
-  ({ date, onChange, hourCycle = 24, granularity = "second" }, ref) => {
+  ({ date, onChange, hourCycle = 24, granularity = "second", minuteIncrement = 30 }, ref) => {
     const minuteRef = React.useRef<HTMLInputElement>(null);
     const hourRef = React.useRef<HTMLInputElement>(null);
     const secondRef = React.useRef<HTMLInputElement>(null);
@@ -597,6 +623,7 @@ const TimePicker = React.forwardRef<TimePickerRef, TimePickerProps>(
               ref={minuteRef}
               onLeftFocus={() => hourRef?.current?.focus()}
               onRightFocus={() => secondRef?.current?.focus()}
+              minuteIncrement={minuteIncrement}
             />
           </>
         )}
@@ -670,6 +697,11 @@ type DateTimePickerProps = {
    * Show the default month and time when popup the calendar. Default is the current Date().
    **/
   defaultPopupValue?: Date;
+  /**
+   * The increment value for minutes when using arrow keys.
+   * Default is 30 minutes.
+   * */
+  minuteIncrement?: number;
 } & Pick<React.ComponentProps<typeof DayPicker>, "locale" | "weekStartsOn" | "showWeekNumber" | "showOutsideDays">;
 
 type DateTimePickerRef = {
@@ -691,6 +723,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
       granularity = "second",
       placeholder = "Pick a date",
       className,
+      minuteIncrement = 30,
       ...props
     },
     ref,
@@ -807,6 +840,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
                 date={month}
                 hourCycle={hourCycle}
                 granularity={granularity}
+                minuteIncrement={minuteIncrement}
               />
             </div>
           )}

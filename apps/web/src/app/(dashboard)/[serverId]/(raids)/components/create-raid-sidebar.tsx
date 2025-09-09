@@ -219,6 +219,7 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
                           <DateTimePicker
                             hourCycle={24}
                             granularity="minute"
+                            minuteIncrement={30}
                             displayFormat={{ hour24: "dd/MM/yyyy HH:mm" }}
                             className="focus:border-primary/50 h-12 w-full border-2 text-base transition-colors"
                             {...field}
