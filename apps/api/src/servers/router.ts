@@ -1,5 +1,4 @@
 import { ServersService } from "@albion-raid-manager/core/services";
-import { prisma } from "@albion-raid-manager/database";
 import { discordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
 import {
@@ -7,7 +6,9 @@ import {
   APIResponse,
   DiscordServer,
   GetServer,
+  GetServerMembers,
   GetServers,
+  ServerMemberWithRegistration,
   SetupServer,
 } from "@albion-raid-manager/types/api";
 import { Request, Response, Router } from "express";
@@ -111,9 +112,7 @@ serverRouter.post(
 serverRouter.get("/:serverId", async (req: Request, res: Response<APIResponse.Type<GetServer.Response>>) => {
   const { serverId } = req.params;
 
-  const server = await prisma.server.findUnique({
-    where: { id: serverId },
-  });
+  const server = await ServersService.getServerById(serverId);
 
   if (!server) {
     return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
@@ -121,3 +120,62 @@ serverRouter.get("/:serverId", async (req: Request, res: Response<APIResponse.Ty
 
   res.json(APIResponse.Success({ server }));
 });
+
+serverRouter.get(
+  "/:serverId/members",
+  async (req: Request, res: Response<APIResponse.Type<GetServerMembers.Response>>) => {
+    try {
+      const { serverId } = req.params;
+
+      if (!req.session.user) {
+        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      }
+
+      // Check if user has access to this server
+      const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
+      if (!server) {
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
+      }
+
+      const member = server.members[0];
+      if (!member || (!member.adminPermission && !member.raidPermission && !member.compositionPermission)) {
+        return res
+          .status(403)
+          .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You don't have permission to view server members"));
+      }
+
+      // Get Discord server members
+      const discordMembers = await discordService.servers.getServerMembers(serverId);
+
+      // Get registered members from database
+      const registeredMembers = await ServersService.getServerMembers(serverId);
+
+      // Create a map of registered members for quick lookup
+      const registeredMembersMap = new Map(registeredMembers.map((member) => [member.userId, member]));
+
+      // Combine Discord members with registration data
+      const membersWithRegistration: ServerMemberWithRegistration[] = discordMembers.map((discordMember) => {
+        const registeredMember = registeredMembersMap.get(discordMember.user.id);
+
+        return {
+          ...discordMember,
+          isRegistered: !!registeredMember,
+          albionPlayerId: registeredMember?.albionPlayerId || null,
+          albionGuildId: registeredMember?.albionGuildId || null,
+          killFame: registeredMember?.killFame || 0,
+          deathFame: registeredMember?.deathFame || 0,
+          lastUpdated: registeredMember?.lastUpdated || null,
+        };
+      });
+
+      res.json(APIResponse.Success({ members: membersWithRegistration }));
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 401) {
+        res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      } else {
+        logger.warn("Failed to get server members", error);
+        res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server members"));
+      }
+    }
+  },
+);

@@ -113,4 +113,22 @@ export namespace ServersService {
 
     return newServer;
   }
+
+  export async function getServerMembers(serverId: string, options: ServersServiceOptions = {}) {
+    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+    const cacheKey = CacheKeys.serverMembers(serverId);
+
+    return withCache(
+      () =>
+        prisma.serverMember.findMany({
+          where: { serverId },
+          include: { user: true },
+        }),
+      {
+        cache,
+        key: cacheKey,
+        ttl: cacheTtl,
+      },
+    );
+  }
 }

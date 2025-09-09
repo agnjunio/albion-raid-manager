@@ -16,8 +16,11 @@ alwaysApply: true
 
 ## Database Operations
 
+- **NEVER call database methods directly** from API endpoints
+- **Always use core services** as intermediaries for database access
 - Use the service layer for all transactions
 - Implement proper transaction handling
+- Core services provide caching, validation, and business logic
 
 ## Authentication & Sessions
 
