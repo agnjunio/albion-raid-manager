@@ -1,4 +1,4 @@
-import type { CreateRaid, GetRaid, GetRaids, UpdateGuildRaid } from "@albion-raid-manager/types/api";
+import type { CreateRaid, DeleteRaid, GetRaid, GetRaids, UpdateRaid } from "@albion-raid-manager/types/api";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -34,10 +34,7 @@ export const raidsApi = createApi({
         }),
         invalidatesTags: tagHelper.list("raids"),
       }),
-      updateRaid: builder.mutation<
-        UpdateGuildRaid.Response,
-        { params: UpdateGuildRaid.Params; body: UpdateGuildRaid.Body }
-      >({
+      updateRaid: builder.mutation<UpdateRaid.Response, { params: UpdateRaid.Params; body: UpdateRaid.Body }>({
         query: ({ params, body }) => ({
           url: `/servers/${params.serverId}/raids/${params.raidId}`,
           method: "PUT",
@@ -45,8 +42,21 @@ export const raidsApi = createApi({
         }),
         invalidatesTags: tagHelper.single("raid"),
       }),
+      deleteRaid: builder.mutation<DeleteRaid.Response, { params: DeleteRaid.Params }>({
+        query: ({ params }) => ({
+          url: `/servers/${params.serverId}/raids/${params.raidId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: tagHelper.list("raids"),
+      }),
     };
   },
 });
 
-export const { useGetRaidsQuery, useGetRaidQuery, useCreateRaidMutation, useUpdateRaidMutation } = raidsApi;
+export const {
+  useGetRaidsQuery,
+  useGetRaidQuery,
+  useCreateRaidMutation,
+  useUpdateRaidMutation,
+  useDeleteRaidMutation,
+} = raidsApi;

@@ -28,10 +28,15 @@ export namespace GetRaid {
   export type Response = { raid: Raid };
 }
 
-export namespace UpdateGuildRaid {
+export namespace UpdateRaid {
   export type Params = { serverId: string; raidId: string };
   export type Body = { status: RaidStatus };
   export type Response = { raid: Raid };
+}
+
+export namespace DeleteRaid {
+  export type Params = { serverId: string; raidId: string };
+  export type Response = { message: string };
 }
 
 export namespace CreateRaidSlot {

@@ -1,6 +1,6 @@
 import type { RaidStatus } from "@albion-raid-manager/types";
 
-import { faCopy, faLock, faPlay, faShare, faStop, faUnlock, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faLock, faPlay, faShare, faStop, faTrash, faUnlock, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { Page, PageError } from "@/components/ui/page";
 import { isAPIError } from "@/lib/api";
-import { useGetRaidQuery, useUpdateRaidMutation } from "@/store/raids";
+import { useDeleteRaidMutation, useGetRaidQuery, useUpdateRaidMutation } from "@/store/raids";
 
 import { RaidCompositionManager } from "./components/raid-composition-manager";
 import { RaidNotes } from "./components/raid-notes";
@@ -31,8 +31,9 @@ export function RaidPage() {
     },
   });
   const [updateRaidStatus, updateRaidStatusResult] = useUpdateRaidMutation();
+  const [deleteRaid, deleteRaidResult] = useDeleteRaidMutation();
 
-  if (isLoading || updateRaidStatusResult.isLoading) {
+  if (isLoading || updateRaidStatusResult.isLoading || deleteRaidResult.isLoading) {
     return <Loading />;
   }
 
@@ -81,6 +82,32 @@ export function RaidPage() {
     }
   };
 
+  const handleDeleteRaid = async () => {
+    if (!window.confirm(`Are you sure you want to delete "${raid.title}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await deleteRaid({
+        params: {
+          serverId: serverId as string,
+          raidId: raidId as string,
+        },
+      }).unwrap();
+
+      toast.success("Raid deleted successfully", {
+        description: `"${raid.title}" has been permanently deleted.`,
+      });
+
+      // Navigate back to raids list
+      window.location.href = `/dashboard/${serverId}/raids`;
+    } catch {
+      toast.error("Failed to delete raid", {
+        description: "There was an error deleting the raid. Please try again.",
+      });
+    }
+  };
+
   return (
     <Page>
       <div className="mx-auto w-full max-w-7xl space-y-6 pb-8">
@@ -111,6 +138,15 @@ export function RaidPage() {
                 >
                   <FontAwesomeIcon icon={faShare} className="mr-2 h-4 w-4" />
                   Share
+                </Button>
+                <Button
+                  onClick={handleDeleteRaid}
+                  variant="destructive"
+                  size="sm"
+                  className="bg-red-800 text-white hover:bg-red-900"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
+                  Delete
                 </Button>
               </div>
             </div>

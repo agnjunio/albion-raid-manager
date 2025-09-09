@@ -8,7 +8,7 @@ import {
   DeleteRaidSlot,
   GetRaid,
   GetRaids,
-  UpdateGuildRaid,
+  UpdateRaid,
   UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
 import { Request, Response, Router } from "express";
@@ -92,8 +92,8 @@ serverRaidsRouter.get(
 serverRaidsRouter.put(
   "/:raidId",
   async (
-    req: Request<UpdateGuildRaid.Params, {}, UpdateGuildRaid.Body>,
-    res: Response<APIResponse.Type<UpdateGuildRaid.Response>>,
+    req: Request<UpdateRaid.Params, {}, UpdateRaid.Body>,
+    res: Response<APIResponse.Type<UpdateRaid.Response>>,
   ) => {
     const { serverId, raidId } = req.params;
 

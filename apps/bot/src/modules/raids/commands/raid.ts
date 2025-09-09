@@ -1,0 +1,102 @@
+import { RaidService } from "@albion-raid-manager/core/services";
+import { logger } from "@albion-raid-manager/logger";
+import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
+
+import { Command } from "@/commands";
+
+export const raidCommand: Command = {
+  data: new SlashCommandBuilder()
+    .setName("raid")
+    .setDescription("Manage raids")
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("delete")
+        .setDescription("Delete a raid")
+        .addStringOption((option: SlashCommandStringOption) =>
+          option
+            .setName("raid-id")
+            .setDescription("The ID of the raid to delete")
+            .setRequired(true)
+            .setMinLength(1)
+            .setMaxLength(50),
+        ),
+    ) as SlashCommandBuilder,
+
+  execute: async (interaction: Interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    const guild = interaction.guild;
+    if (!guild) {
+      await interaction.reply({
+        content: "❌ This command can only be used in a Discord server.",
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    // Check if user has admin permissions
+    const member = await guild.members.fetch(interaction.user.id);
+    if (!member.permissions.has("Administrator")) {
+      await interaction.reply({
+        content: "❌ You need Administrator permissions to manage raids.",
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    const subcommand = interaction.options.getSubcommand();
+
+    try {
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
+      switch (subcommand) {
+        case "delete": {
+          const raidId = interaction.options.getString("raid-id", true);
+
+          try {
+            await RaidService.deleteRaid(raidId, { publisher: await getRaidEventPublisher() });
+
+            await interaction.editReply({
+              content: `✅ Raid \`${raidId}\` has been deleted successfully.`,
+            });
+
+            logger.info(`Raid deleted: ${raidId}`, {
+              raidId,
+              guildId: guild.id,
+              userId: interaction.user.id,
+            });
+          } catch (error: any) {
+            logger.error("Failed to delete raid:", error);
+
+            let errorMessage = "❌ Failed to delete raid. Please try again later.";
+
+            if (error.response?.status === 404) {
+              errorMessage = `❌ Raid \`${raidId}\` not found. Please check the raid ID and try again.`;
+            } else if (error.response?.status === 403) {
+              errorMessage = "❌ You don't have permission to delete this raid.";
+            } else if (error.response?.status >= 500) {
+              errorMessage = "❌ Server error occurred while deleting the raid. Please try again later.";
+            }
+
+            await interaction.editReply({
+              content: errorMessage,
+            });
+          }
+          break;
+        }
+
+        default: {
+          await interaction.editReply({
+            content: "❌ Unknown subcommand.",
+          });
+          break;
+        }
+      }
+    } catch (error) {
+      logger.error("Error in raid command:", error);
+      await interaction.editReply({
+        content: "❌ An error occurred while processing the command.",
+      });
+    }
+  },
+};
