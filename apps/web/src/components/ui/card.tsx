@@ -25,11 +25,12 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 interface CardTitleProps extends React.ComponentProps<"div"> {
-  size?: "default" | "small";
+  size?: "default" | "small" | "large";
 }
 
 function CardTitle({ size = "default", className, ...props }: CardTitleProps) {
   const sizeClass = {
+    large: "text-3xl font-bold",
     default: "text-2xl font-semibold leading-none",
     small: "text-xl font-semibold leading-tight",
   }[size];

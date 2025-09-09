@@ -153,9 +153,12 @@ export function RaidPage() {
 
             {/* Main content */}
             <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <CardTitle className="text-3xl font-bold">{raid.title}</CardTitle>
-                <RaidStatusBadge status={raid.status} />
+              <div>
+                <div className="flex items-center gap-4">
+                  <CardTitle size="large">{raid.title}</CardTitle>
+                  <RaidStatusBadge status={raid.status} />
+                </div>
+                <div className="text-muted-foreground font-mono text-sm">Raid ID: {raid.id}</div>
               </div>
 
               {raid.description && (
