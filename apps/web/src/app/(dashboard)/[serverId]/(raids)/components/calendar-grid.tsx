@@ -13,7 +13,7 @@ interface CalendarGridProps {
 }
 
 export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
-  const { filteredRaids: raids, currentDate, view, setCurrentDate, setView } = useCalendar();
+  const { raids, isRaidFiltered, currentDate, view, setCurrentDate, setView } = useCalendar();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const hasScrolledToCurrentTimeRef = useRef(false);
 
@@ -208,7 +208,12 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                 </div>
                 <div className="mt-1 space-y-1">
                   {dayRaids.slice(0, 3).map((raid) => (
-                    <RaidEventCard key={raid.id} raid={raid} variant="compact" className="text-xs" />
+                    <RaidEventCard
+                      key={raid.id}
+                      raid={raid}
+                      variant="compact"
+                      className={`text-xs ${isRaidFiltered(raid) ? "opacity-30" : ""}`}
+                    />
                   ))}
                   {dayRaids.length > 3 && (
                     <div className="text-muted-foreground text-xs">+{dayRaids.length - 3} more</div>
@@ -322,7 +327,12 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                   >
                     <div className="space-y-1">
                       {timeSlotRaids.map((raid) => (
-                        <RaidEventCard key={raid.id} raid={raid} variant="time-slot" />
+                        <RaidEventCard
+                          key={raid.id}
+                          raid={raid}
+                          variant="time-slot"
+                          className={isRaidFiltered(raid) ? "opacity-30" : ""}
+                        />
                       ))}
                       {timeSlotRaids.length === 0 && onTimeSlotClick && (
                         <div className="text-muted-foreground/50 text-xs opacity-0 transition-opacity group-hover:opacity-100">

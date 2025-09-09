@@ -33,17 +33,19 @@ interface RaidListProps {
 export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
   const [filter, setFilter] = useState<keyof typeof raidStatuses>("ALL");
 
-  const filteredRaids = useMemo(
+  const isRaidFiltered = (raid: Raid) => {
+    return filter !== "ALL" && raid.status !== filter;
+  };
+
+  const sortedRaids = useMemo(
     () =>
-      raids
-        .filter((raid) => filter === "ALL" || raid.status === filter)
-        .sort((a, b) => {
-          const statusDiff = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
-          if (statusDiff !== 0) return statusDiff;
-          // Sort by date ascending if status is the same
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        }),
-    [raids, filter],
+      raids.sort((a, b) => {
+        const statusDiff = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
+        if (statusDiff !== 0) return statusDiff;
+        // Sort by date ascending if status is the same
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }),
+    [raids],
   );
 
   return (
@@ -90,8 +92,11 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
         </div>
 
         <div className="flex grow flex-col gap-2 px-2">
-          {filteredRaids.map((raid) => (
-            <div key={raid.id} className="border-border gap-2 rounded-lg border">
+          {sortedRaids.map((raid) => (
+            <div
+              key={raid.id}
+              className={`border-border gap-2 rounded-lg border ${isRaidFiltered(raid) ? "opacity-30" : ""}`}
+            >
               <Link
                 to={raid.id}
                 className="hover:bg-secondary/20 active:bg-primary flex cursor-pointer items-center justify-between gap-4 rounded-lg p-4"
@@ -109,7 +114,7 @@ export function RaidList({ raids = [], status, onRefresh }: RaidListProps) {
               </Link>
             </div>
           ))}
-          {filteredRaids.length === 0 && <p className="flex grow items-center justify-center">No raids.</p>}
+          {sortedRaids.length === 0 && <p className="flex grow items-center justify-center">No raids.</p>}
         </div>
       </SidebarInset>
     </SidebarProvider>

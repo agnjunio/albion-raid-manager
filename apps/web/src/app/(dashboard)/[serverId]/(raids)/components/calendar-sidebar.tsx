@@ -34,6 +34,18 @@ export function CalendarSidebar() {
     setFilters({ ...filters, status: newStatuses });
   };
 
+  const isQuickFilterActive = (statuses: string[]) => {
+    return statuses.length === filters.status.length && statuses.every((status) => filters.status.includes(status));
+  };
+
+  const handleQuickFilter = (statuses: string[]) => {
+    if (isQuickFilterActive(statuses)) {
+      setFilters({ ...filters, status: [] });
+    } else {
+      setFilters({ ...filters, status: statuses });
+    }
+  };
+
   const handleSearchChange = (search: string) => {
     setFilters({ ...filters, search });
   };
@@ -161,34 +173,34 @@ export function CalendarSidebar() {
             <Label className="text-xs">Quick Filters</Label>
             <div className="grid grid-cols-2 gap-2">
               <Button
-                variant="outline"
+                variant={isQuickFilterActive(["SCHEDULED", "OPEN"]) ? "primary" : "outline"}
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => setFilters({ ...filters, status: ["SCHEDULED", "OPEN"] })}
+                onClick={() => handleQuickFilter(["SCHEDULED", "OPEN"])}
               >
                 Upcoming
               </Button>
               <Button
-                variant="outline"
+                variant={isQuickFilterActive(["ONGOING"]) ? "primary" : "outline"}
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => setFilters({ ...filters, status: ["ONGOING"] })}
+                onClick={() => handleQuickFilter(["ONGOING"])}
               >
                 Active
               </Button>
               <Button
-                variant="outline"
+                variant={isQuickFilterActive(["FINISHED"]) ? "primary" : "outline"}
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => setFilters({ ...filters, status: ["FINISHED"] })}
+                onClick={() => handleQuickFilter(["FINISHED"])}
               >
                 Completed
               </Button>
               <Button
-                variant="outline"
+                variant={isQuickFilterActive(["CANCELLED"]) ? "primary" : "outline"}
                 size="sm"
                 className="h-7 text-xs"
-                onClick={() => setFilters({ ...filters, status: ["CANCELLED"] })}
+                onClick={() => handleQuickFilter(["CANCELLED"])}
               >
                 Cancelled
               </Button>

@@ -22,7 +22,6 @@ interface CalendarContextValue {
   view: CalendarView;
   filters: RaidFilters;
   raids: Raid[];
-  filteredRaids: Raid[];
   isRefreshing: boolean;
 
   // Actions
@@ -30,6 +29,9 @@ interface CalendarContextValue {
   setView: (view: CalendarView) => void;
   setFilters: (filters: RaidFilters) => void;
   refresh: () => void;
+
+  // Helper functions
+  isRaidFiltered: (raid: Raid) => boolean;
 
   // Computed
   hotkeys: Array<{
@@ -65,17 +67,17 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
     search: "",
   });
 
-  // Computed values
-  const filteredRaids = useMemo(() => {
-    return raids.filter((raid) => {
+  // Helper function to check if a raid is filtered out
+  const isRaidFiltered = useMemo(() => {
+    return (raid: Raid) => {
       // Status filter
       if (filters.status.length > 0 && !filters.status.includes(raid.status)) {
-        return false;
+        return true;
       }
 
       // Type filter (if we add type filtering later)
       if (filters.type.length > 0 && raid.type && !filters.type.includes(raid.type)) {
-        return false;
+        return true;
       }
 
       // Search filter
@@ -86,13 +88,13 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
         const locationMatch = raid.location?.toLowerCase().includes(searchLower) || false;
 
         if (!titleMatch && !descriptionMatch && !locationMatch) {
-          return false;
+          return true;
         }
       }
 
-      return true;
-    });
-  }, [raids, filters]);
+      return false;
+    };
+  }, [filters]);
 
   // Actions
   const handleViewChange = (newView: CalendarView) => {
@@ -127,7 +129,6 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
     view,
     filters,
     raids,
-    filteredRaids,
     isRefreshing,
 
     // Actions
@@ -135,6 +136,9 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
     setView: handleViewChange,
     setFilters: handleFilterChange,
     refresh: onRefresh,
+
+    // Helper functions
+    isRaidFiltered,
 
     // Computed
     hotkeys,
