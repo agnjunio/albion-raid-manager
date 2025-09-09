@@ -10,10 +10,12 @@ import { CalendarPage } from "./components/calendar-page";
 
 export function RaidsPage() {
   const { serverId } = useParams();
+
   const { data, isLoading, refetch, status, error } = useGetRaidsQuery(
     { params: { serverId: serverId as string } },
     {
       skip: !serverId,
+      pollingInterval: 30000, // Poll every 30 seconds
     },
   );
 
