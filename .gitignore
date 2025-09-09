@@ -19,3 +19,6 @@ apps/*/logs/
 
 # Generated files
 generated/
+
+# Tests
+coverage/

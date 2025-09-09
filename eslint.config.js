@@ -17,7 +17,7 @@ const typescriptConfig = {
   languageOptions: {
     parser: tseslint.parser,
     parserOptions: {
-      project: ["./tsconfig.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json", "./apps/*/vite.config.ts"],
+      project: ["./tsconfig.json", "./apps/*/tsconfig.json", "./packages/*/tsconfig.json"],
       ecmaVersion: "latest",
       sourceType: "module",
       ecmaFeatures: {
@@ -152,6 +152,18 @@ const viteConfig = {
   },
 };
 
+const vitestConfig = {
+  files: ["**/vitest.config.ts", "**/vitest.setup.ts"],
+  languageOptions: {
+    parser: tseslint.parser,
+    parserOptions: {
+      project: false,
+      ecmaVersion: "latest",
+      sourceType: "module",
+    },
+  },
+};
+
 export default [
   ignoreConfig,
   js.configs.recommended,
@@ -160,6 +172,7 @@ export default [
   reactConfig,
   commonConfig,
   viteConfig,
+  vitestConfig,
   {
     files: ["**/*"],
     plugins: {

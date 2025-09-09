@@ -9,7 +9,11 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "@albion-raid-manager/discord": "workspace:*",
@@ -40,7 +44,6 @@
     "cmdk": "1.1.1",
     "date-fns": "^4.1.0",
     "express": "^5.1.0",
-    "fastest-levenshtein": "^1.0.16",
     "next-themes": "^0.4.6",
     "react": "^18.3.1",
     "react-day-picker": "^9.8.0",
@@ -66,6 +69,7 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.5",
     "typescript": "^5.8.3",
-    "vite": "^5.4.19"
+    "vite": "^5.4.19",
+    "vitest": "^3.2.4"
   }
 }
