@@ -1,5 +1,6 @@
 import type { Raid } from "@albion-raid-manager/types";
 
+import { RAID_STATUS_INFO } from "@albion-raid-manager/types/entities";
 import { faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
@@ -23,22 +24,20 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "SCHEDULED":
-        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800";
-      case "OPEN":
-        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800";
-      case "CLOSED":
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800";
-      case "ONGOING":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800";
-      case "FINISHED":
-        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800";
-      case "CANCELLED":
-        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800";
+    const statusInfo = RAID_STATUS_INFO[status as keyof typeof RAID_STATUS_INFO];
+    if (!statusInfo) {
+      return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800";
     }
+
+    // Use the centralized color configuration with light variants for cards
+    const baseColor = statusInfo.color.web.background.replace("bg-", "bg-").replace("-500", "-100");
+    const textColor = statusInfo.color.web.background.replace("bg-", "text-").replace("-500", "-800");
+    const borderColor = statusInfo.color.web.background.replace("bg-", "border-").replace("-500", "-200");
+    const darkBgColor = statusInfo.color.web.background.replace("bg-", "dark:bg-").replace("-500", "-900/20");
+    const darkTextColor = statusInfo.color.web.background.replace("bg-", "dark:text-").replace("-500", "-300");
+    const darkBorderColor = statusInfo.color.web.background.replace("bg-", "dark:border-").replace("-500", "-800");
+
+    return `${baseColor} ${textColor} ${borderColor} ${darkBgColor} ${darkTextColor} ${darkBorderColor}`;
   };
 
   const getVariantStyles = () => {

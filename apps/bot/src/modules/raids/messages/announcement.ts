@@ -1,6 +1,6 @@
 import { createDiscordTimestamp } from "@albion-raid-manager/discord";
 import { type Raid, type RaidSlot } from "@albion-raid-manager/types";
-import { getContentTypeInfo, getRaidRoleEmoji } from "@albion-raid-manager/types/entities";
+import { getContentTypeInfo, getRaidRoleEmoji, RAID_STATUS_INFO } from "@albion-raid-manager/types/entities";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -17,44 +17,15 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   raid: Raid,
   slots: RaidSlot[],
 ): T => {
-  // Determine embed color based on raid status
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "OPEN":
-        return "#00ff88"; // Bright green for open signups
-      case "SCHEDULED":
-        return "#ffbd59"; // Amber for scheduled
-      case "CLOSED":
-        return "#ff4757"; // Red for closed
-      case "ONGOING":
-        return "#ffbd59"; // Amber for ongoing
-      case "FINISHED":
-        return "#00ff88"; // Bright green for finished
-      case "CANCELLED":
-        return "#ff4757"; // Red for cancelled
-      default:
-        return "#ffbd59";
-    }
+    const statusInfo = RAID_STATUS_INFO[status as keyof typeof RAID_STATUS_INFO];
+    const hexColor = statusInfo?.color.discord || "#5865f2"; // Default Discord blue
+    return parseInt(hexColor.replace("#", ""), 16);
   };
 
-  // Get status emoji for title
   const getStatusEmoji = (status: string) => {
-    switch (status) {
-      case "OPEN":
-        return "🟢";
-      case "SCHEDULED":
-        return "🟡";
-      case "CLOSED":
-        return "🔴";
-      case "ONGOING":
-        return "▶️";
-      case "FINISHED":
-        return "👑";
-      case "CANCELLED":
-        return "❌";
-      default:
-        return "⚔️";
-    }
+    const statusInfo = RAID_STATUS_INFO[status as keyof typeof RAID_STATUS_INFO];
+    return statusInfo?.emoji || "⚔️";
   };
 
   const embed = new EmbedBuilder()
