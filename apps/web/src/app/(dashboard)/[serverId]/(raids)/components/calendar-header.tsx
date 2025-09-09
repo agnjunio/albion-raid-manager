@@ -1,12 +1,12 @@
-import { cn } from "@/lib/utils";
 import { faChevronLeft, faChevronRight, faCog, faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { HotkeysHelp } from "@/components/hotkeys-help";
 import { Button } from "@/components/ui/button";
+import { HotkeysHelp } from "@/components/ui/hotkeys-help";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
-import { useCalendar, CalendarView } from "../contexts/calendar-context";
+import { CalendarView, useCalendar } from "../contexts/calendar-context";
 
 import { CreateRaidSidebar } from "./create-raid-sidebar";
 
