@@ -20,12 +20,12 @@ interface RaidStatusMessageProps {
 
 function RaidStatusMessage({ icon, title, description, note, iconColor, bgColor }: RaidStatusMessageProps) {
   return (
-    <div className="py-12 text-center">
-      <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full ${bgColor}`}>
-        <FontAwesomeIcon icon={icon} className={`h-10 w-10 ${iconColor}`} />
+    <div className="flex flex-col items-center gap-2 text-center">
+      <div className={`mx-auto flex size-14 items-center justify-center rounded-full ${bgColor}`}>
+        <FontAwesomeIcon icon={icon} className={`text-2xl ${iconColor}`} />
       </div>
-      <h3 className="text-foreground mb-3 text-xl font-semibold">{title}</h3>
-      <p className="text-muted-foreground mb-4 max-w-md text-center text-sm leading-relaxed">{description}</p>
+      <h3 className="text-foreground text-lg font-semibold">{title}</h3>
+      <p className="text-muted-foreground max-w-md text-center text-sm leading-relaxed">{description}</p>
       <div className="text-muted-foreground bg-muted/50 rounded-lg px-4 py-2 text-xs">{note}</div>
     </div>
   );
