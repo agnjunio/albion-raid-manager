@@ -63,7 +63,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     .setDescription(raid.description || "Join this exciting raid adventure!")
     .setImage(getRaidBanner(raid.contentType ?? undefined))
     .setFooter({
-      text: "Albion Raid Manager • Click the buttons below to join or leave",
+      text: `Raid ID: ${raid.id}`,
     })
     .setTimestamp(new Date(raid.date));
 

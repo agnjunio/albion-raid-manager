@@ -1,4 +1,5 @@
 import type { Cache } from "@albion-raid-manager/redis";
+
 import { CacheKeys } from "./cache-keys";
 
 /**

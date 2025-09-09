@@ -88,7 +88,7 @@ vi.mock("@albion-raid-manager/core", () => ({
   }),
 }));
 
-vi.mock("@albion-raid-manager/core/cache", () => ({
+vi.mock("@albion-raid-manager/core/cache/file", () => ({
   runIfChanged: vi.fn((key: string, fn: () => any) => fn()),
 }));
 

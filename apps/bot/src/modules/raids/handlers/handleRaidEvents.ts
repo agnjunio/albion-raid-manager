@@ -3,7 +3,7 @@ import { logger } from "@albion-raid-manager/logger";
 import { RaidEvent } from "@albion-raid-manager/redis";
 import { Client } from "discord.js";
 
-import { handleAnnounceRaid } from "./handleAnnounceRaid";
+import { handleAnnouncementCreate } from "./handleAnnouncementCreate";
 
 interface HandleRaidEventProps {
   discord: Client;
@@ -21,7 +21,7 @@ export async function handleRaidCreated({ discord, event }: HandleRaidEventProps
 
   // If the raid is open, announce it immediately
   if (raid.status === "OPEN") {
-    await handleAnnounceRaid({ discord, raidId: event.entityId, serverId: event.serverId });
+    await handleAnnouncementCreate({ discord, raidId: event.entityId, serverId: event.serverId });
   }
 }
 
@@ -36,7 +36,7 @@ export async function handleRaidUpdated({ discord, event }: HandleRaidEventProps
   // Dont publish updated when the raid is in the scheduler state
   if (raid.status === "SCHEDULED") return;
 
-  await handleAnnounceRaid({ discord, raidId: event.entityId, serverId: event.serverId });
+  await handleAnnouncementCreate({ discord, raidId: event.entityId, serverId: event.serverId });
 }
 
 export async function handleRaidDeleted({ discord, event }: HandleRaidEventProps) {

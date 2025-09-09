@@ -1,5 +1,5 @@
 import config from "@albion-raid-manager/config";
-import { memoize } from "@albion-raid-manager/core/cache";
+import { memoize } from "@albion-raid-manager/core/cache/memory";
 import { sleep } from "@albion-raid-manager/core/scheduler";
 import { getMilliseconds } from "@albion-raid-manager/core/utils";
 import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";

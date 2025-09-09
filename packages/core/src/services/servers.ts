@@ -1,9 +1,10 @@
 import type { Cache } from "@albion-raid-manager/redis";
 
 import { prisma } from "@albion-raid-manager/database";
+import { logger } from "@albion-raid-manager/logger";
 import { Server } from "@albion-raid-manager/types";
 
-import { CacheKeys, withCache } from "../cache";
+import { CacheInvalidation, CacheKeys, withCache } from "@albion-raid-manager/core/cache/redis";
 
 export interface ServersServiceOptions {
   cache?: Cache;
@@ -88,7 +89,10 @@ export namespace ServersService {
   export async function createServerForUser(
     userId: string,
     server: Pick<Server, "id" | "name" | "icon">,
+    options: ServersServiceOptions = {},
   ): Promise<Server> {
+    const { cache } = options;
+
     const newServer = await prisma.server.create({
       data: {
         ...server,
@@ -100,6 +104,12 @@ export namespace ServersService {
         },
       },
     });
+
+    if (cache) {
+      CacheInvalidation.invalidateUser(cache, userId).catch((error) => {
+        logger.warn("Cache invalidation failed", { error, userId });
+      });
+    }
 
     return newServer;
   }

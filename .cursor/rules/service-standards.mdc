@@ -105,6 +105,57 @@ export async function createRaid(input: CreateRaidInput): Promise<RaidWithSlots>
 - **Handle database errors** gracefully
 - **Use proper includes** for related data
 
+### Caching Pattern
+
+**CRITICAL: Always execute operations first, then invalidate cache and publish changes non-blocking.**
+
+```typescript
+// ✅ Good - Execute operation first, then handle cache/events
+export async function updateRaid(id: string, input: UpdateRaidInput, options: RaidServiceOptions = {}): Promise<Raid> {
+  const { cache, publisher } = options;
+
+  // 1. Execute the main operation first
+  const raid = await prisma.raid.update({
+    where: { id },
+    data: input,
+  });
+
+  // 2. Handle cache invalidation (non-blocking)
+  if (cache) {
+    CacheInvalidation.invalidateRaid(cache, id, raid.serverId).catch((error) => {
+      logger.warn("Cache invalidation failed", { error, raidId: id });
+    });
+  }
+
+  // 3. Publish events (non-blocking)
+  if (publisher) {
+    publisher.publishRaidUpdated(raid).catch((error) => {
+      logger.warn("Event publishing failed", { error, raidId: id });
+    });
+  }
+
+  return raid;
+}
+
+// ❌ Bad - Blocking cache operations
+export async function updateRaid(id: string, input: UpdateRaidInput): Promise<Raid> {
+  const raid = await prisma.raid.update({ where: { id }, data: input });
+
+  // This blocks the response until cache is updated
+  await CacheInvalidation.invalidateRaid(cache, id, raid.serverId);
+  await publisher.publishRaidUpdated(raid);
+
+  return raid;
+}
+```
+
+**Key Principles:**
+
+- **Execute first**: Always perform the main database operation before cache/events
+- **Non-blocking**: Cache invalidation and event publishing should not block the response
+- **Error handling**: Log cache/event failures but don't fail the main operation
+- **Performance**: User gets immediate response while cache/events happen in background
+
 ### Validation
 
 - **Validate all inputs** before processing

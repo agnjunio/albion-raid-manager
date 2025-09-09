@@ -1,4 +1,4 @@
-import { RaidService } from "@albion-raid-manager/core/services";
+import { RaidService, ServersService } from "@albion-raid-manager/core/services";
 import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Client, MessageCreateOptions, MessageEditOptions } from "discord.js";
@@ -11,7 +11,7 @@ interface HandleRaidEventProps {
   serverId: string;
 }
 
-export async function handleAnnounceRaid({ discord, raidId, serverId }: HandleRaidEventProps) {
+export async function handleAnnouncementCreate({ discord, raidId, serverId }: HandleRaidEventProps) {
   const raid = await RaidService.findRaidById(raidId, { slots: true });
 
   if (!raid) {
@@ -19,9 +19,7 @@ export async function handleAnnounceRaid({ discord, raidId, serverId }: HandleRa
     return;
   }
 
-  const server = await prisma.server.findUnique({
-    where: { id: serverId },
-  });
+  const server = await ServersService.getServerById(serverId);
   if (!server || !server.raidAnnouncementChannelId) return;
 
   const channel = discord.channels.cache.get(server.raidAnnouncementChannelId);

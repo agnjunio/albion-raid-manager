@@ -1,4 +1,5 @@
 export enum ServiceErrorCode {
+  NOT_AUTHORIZED = "NOT_AUTHORIZED",
   NOT_FOUND = "NOT_FOUND",
   INVALID_STATE = "INVALID_STATE",
 }
@@ -11,6 +12,10 @@ export class ServiceError extends Error {
     super(message);
     this.code = code;
     this.message = message;
+  }
+
+  static isServiceError(error: unknown): error is ServiceError {
+    return error instanceof ServiceError;
   }
 }
 

@@ -1,8 +1,12 @@
 import { RaidService } from "@albion-raid-manager/core/services";
 import { logger } from "@albion-raid-manager/logger";
+import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
 import { Command } from "@/commands";
+
+import { handleAnnouncementDelete } from "../handlers";
+import { getRaidEventPublisher } from "../helpers/redis";
 
 export const raidCommand: Command = {
   data: new SlashCommandBuilder()
@@ -54,6 +58,10 @@ export const raidCommand: Command = {
           const raidId = interaction.options.getString("raid-id", true);
 
           try {
+            await handleAnnouncementDelete({
+              discord: interaction.client,
+              raidId,
+            });
             await RaidService.deleteRaid(raidId, { publisher: await getRaidEventPublisher() });
 
             await interaction.editReply({
@@ -65,17 +73,20 @@ export const raidCommand: Command = {
               guildId: guild.id,
               userId: interaction.user.id,
             });
-          } catch (error: any) {
+          } catch (error) {
             logger.error("Failed to delete raid:", error);
 
             let errorMessage = "❌ Failed to delete raid. Please try again later.";
 
-            if (error.response?.status === 404) {
-              errorMessage = `❌ Raid \`${raidId}\` not found. Please check the raid ID and try again.`;
-            } else if (error.response?.status === 403) {
-              errorMessage = "❌ You don't have permission to delete this raid.";
-            } else if (error.response?.status >= 500) {
-              errorMessage = "❌ Server error occurred while deleting the raid. Please try again later.";
+            if (ServiceError.isServiceError(error)) {
+              switch (error.code) {
+                case ServiceErrorCode.NOT_FOUND:
+                  errorMessage = `❌ Raid \`${raidId}\` not found. Please check the raid ID and try again.`;
+                  break;
+                case ServiceErrorCode.NOT_AUTHORIZED:
+                  errorMessage = "❌ You don't have permission to delete this raid.";
+                  break;
+              }
             }
 
             await interaction.editReply({

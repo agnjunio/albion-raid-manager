@@ -11,10 +11,10 @@
       "import": "./src/*.ts",
       "require": "./src/*.ts"
     },
-    "./cache": {
-      "types": "./src/cache/index.ts",
-      "import": "./src/cache/index.ts",
-      "require": "./src/cache/index.ts"
+    "./cache/*": {
+      "types": "./src/cache/*/index.ts",
+      "import": "./src/cache/*/index.ts",
+      "require": "./src/cache/*/index.ts"
     },
     "./scheduler": {
       "types": "./src/scheduler.ts",

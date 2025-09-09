@@ -2,6 +2,14 @@
  * Simple cache key generators for different entities
  */
 
+import crypto from "crypto";
+
+import { Prisma } from "@albion-raid-manager/database";
+
+function hashObject(obj: object) {
+  return crypto.createHash("sha256").update(JSON.stringify(obj)).digest("hex");
+}
+
 export const CacheKeys = {
   // User keys
   user: (id: string) => `user:${id}`,
@@ -16,7 +24,12 @@ export const CacheKeys = {
   serverConfig: (serverId: string) => `config:server:${serverId}`,
 
   // Raid keys
-  raid: (id: string) => `raid:${id}`,
+  raid: (id: string, include?: Prisma.RaidInclude) => {
+    if (include) {
+      return `raid:${id}:${hashObject(include)}`;
+    }
+    return `raid:${id}`;
+  },
   raids: (filters: string, include: string) => `raids:${filters}:${include}`,
   raidsByServer: (serverId: string, status?: string) => `raids:server:${serverId}${status ? `:${status}` : ""}`,
   raidsByUser: (userId: string) => `raids:user:${userId}`,
