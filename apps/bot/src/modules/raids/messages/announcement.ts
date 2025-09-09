@@ -55,13 +55,6 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     });
   }
 
-  // Add raid type
-  embed.addFields({
-    name: "⚙️ Raid Type",
-    value: raid.type === "FIXED" ? "🔒 Fixed Composition" : "🔄 Flexible",
-    inline: true,
-  });
-
   // Add location if available
   if (raid.location) {
     embed.addFields({

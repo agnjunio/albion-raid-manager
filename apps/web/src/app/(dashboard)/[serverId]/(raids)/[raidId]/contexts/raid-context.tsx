@@ -16,7 +16,9 @@ interface RaidContextValue {
   handleShareRaid: () => void;
   handleUpdateRaidNotes: (notes: string) => void;
   handleUpdateRaidStatus: (status: RaidStatus) => void;
+  handleUpdateRaid: (updates: { title?: string; description?: string; date?: Date; location?: string }) => void;
   canEditComposition: boolean;
+  canManageRaid: boolean;
   isFlexRaid: boolean;
   currentSlotCount: number;
   maxSlots: number;
@@ -39,7 +41,9 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   const [updateRaid] = useUpdateRaidMutation();
   const [deleteRaid] = useDeleteRaidMutation();
 
-  const canEditComposition = raid.status === "SCHEDULED" || raid.status === "OPEN" || raid.status === "CLOSED";
+  const canManageRaid = true; // TODO: Use the permission system to determine if the user has permission to edit raid
+  const canEditComposition =
+    canManageRaid && (raid.status === "SCHEDULED" || raid.status === "OPEN" || raid.status === "CLOSED");
   const isFlexRaid = raid.type === "FLEX";
   const currentSlotCount = raid.slots?.length || 0;
   const maxSlots = raid.maxPlayers || 0;
@@ -79,6 +83,31 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
     } catch {
       toast.error("Failed to update raid notes", {
         description: "There was an error updating the raid notes. Please try again.",
+      });
+    }
+  };
+
+  const handleUpdateRaid = async (updates: {
+    title?: string;
+    description?: string;
+    date?: Date;
+    location?: string;
+  }) => {
+    try {
+      await updateRaid({
+        params: {
+          serverId,
+          raidId,
+        },
+        body: updates,
+      }).unwrap();
+
+      toast.success("Raid updated successfully", {
+        description: "Your raid details have been updated.",
+      });
+    } catch {
+      toast.error("Failed to update raid", {
+        description: "There was an error updating the raid. Please try again.",
       });
     }
   };
@@ -149,7 +178,9 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
     handleShareRaid,
     handleUpdateRaidNotes,
     handleUpdateRaidStatus,
+    handleUpdateRaid,
     canEditComposition,
+    canManageRaid,
     isFlexRaid,
     currentSlotCount,
     maxSlots,
