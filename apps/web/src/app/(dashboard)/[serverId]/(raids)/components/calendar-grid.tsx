@@ -15,6 +15,7 @@ interface CalendarGridProps {
 export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
   const { filteredRaids: raids, currentDate, view, setCurrentDate, setView } = useCalendar();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const hasScrolledToCurrentTimeRef = useRef(false);
 
   const timeSlots = useMemo(() => {
     const slots = [];
@@ -122,7 +123,14 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
 
   // Auto-scroll to current time on mount for non-month views
   useEffect(() => {
-    if (view === CalendarView.MONTH || !scrollContainerRef.current || !currentTime.shouldShow) return;
+    if (view === CalendarView.MONTH || !scrollContainerRef.current || !currentTime.shouldShow) {
+      // Reset the scroll flag when view changes or when we shouldn't show current time
+      hasScrolledToCurrentTimeRef.current = false;
+      return;
+    }
+
+    // Only scroll if we haven't already scrolled to current time for this view
+    if (hasScrolledToCurrentTimeRef.current) return;
 
     const scrollToCurrentTime = () => {
       const container = scrollContainerRef.current;
@@ -146,8 +154,11 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
       // Smooth scroll to the calculated position
       container.scrollTo({
         top: Math.max(0, scrollTop),
-        behavior: "auto",
+        behavior: "smooth",
       });
+
+      // Mark that we've scrolled to current time for this view
+      hasScrolledToCurrentTimeRef.current = true;
     };
 
     // Small delay to ensure DOM is fully rendered
