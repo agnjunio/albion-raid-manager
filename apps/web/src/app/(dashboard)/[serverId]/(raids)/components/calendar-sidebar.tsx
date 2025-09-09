@@ -88,23 +88,23 @@ export function CalendarSidebar() {
             <span className="font-medium">{stats.total}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-blue-600">Scheduled</span>
+            <span className={raidStatuses.SCHEDULED.textColor}>Scheduled</span>
             <span className="font-medium">{stats.scheduled}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-green-600">Open</span>
+            <span className={raidStatuses.OPEN.textColor}>Open</span>
             <span className="font-medium">{stats.open}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-yellow-600">Ongoing</span>
+            <span className={raidStatuses.ONGOING.textColor}>Ongoing</span>
             <span className="font-medium">{stats.ongoing}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Finished</span>
+            <span className={raidStatuses.FINISHED.textColor}>Finished</span>
             <span className="font-medium">{stats.finished}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-red-600">Cancelled</span>
+            <span className={raidStatuses.CANCELLED.textColor}>Cancelled</span>
             <span className="font-medium">{stats.cancelled}</span>
           </div>
         </CardContent>

@@ -19,7 +19,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
 ): T => {
   const getStatusColor = (status: string) => {
     const statusInfo = RAID_STATUS_INFO[status as keyof typeof RAID_STATUS_INFO];
-    const hexColor = statusInfo?.color.discord || "#5865f2"; // Default Discord blue
+    const hexColor = statusInfo?.color || "#5865f2";
     return parseInt(hexColor.replace("#", ""), 16);
   };
 

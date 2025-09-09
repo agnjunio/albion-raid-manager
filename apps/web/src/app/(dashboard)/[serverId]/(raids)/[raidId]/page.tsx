@@ -79,12 +79,12 @@ export function RaidPage() {
             <RaidStats />
           </CardContent>
         </Card>
-        {/* Raid Actions */}
+
         <RaidActions />
-        {/* Raid Notes */}
+
         {raid.note && <RaidNotes />}
-        {/* Raid Composition */}
-        <RaidComposition />{" "}
+
+        <RaidComposition />
       </div>
     </Page>
   );

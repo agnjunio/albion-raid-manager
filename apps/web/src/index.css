@@ -60,6 +60,14 @@
   --role-ranged: #ef4444;
   --role-melee: #eab308;
   --role-battlemount: #6366f1;
+
+  /* Raid status colors */
+  --raid-status-scheduled: #3b82f6;
+  --raid-status-open: #10b981;
+  --raid-status-closed: #ef4444;
+  --raid-status-ongoing: #eab308;
+  --raid-status-finished: #6b7280;
+  --raid-status-cancelled: #ef4444;
 }
 
 .dark {
@@ -119,6 +127,14 @@
   --role-ranged: #ef4444;
   --role-melee: #eab308;
   --role-battlemount: #6366f1;
+
+  /* Raid status colors */
+  --raid-status-scheduled: #3b82f6;
+  --raid-status-open: #10b981;
+  --raid-status-closed: #ef4444;
+  --raid-status-ongoing: #eab308;
+  --raid-status-finished: #6b7280;
+  --raid-status-cancelled: #f44336;
 }
 
 @theme inline {
@@ -163,6 +179,7 @@
 
   --color-input: var(--input);
 
+  /* Role colors */
   --color-role-tank: var(--role-tank);
   --color-role-caller: var(--role-caller);
   --color-role-support: var(--role-support);
@@ -171,11 +188,86 @@
   --color-role-melee: var(--role-melee);
   --color-role-battlemount: var(--role-battlemount);
 
+  /* Raid status colors */
+  --color-raid-status-scheduled-50: color-mix(in oklch, var(--raid-status-scheduled), white 50%);
+  --color-raid-status-scheduled-100: color-mix(in oklch, var(--raid-status-scheduled), white 35%);
+  --color-raid-status-scheduled-200: color-mix(in oklch, var(--raid-status-scheduled), white 20%);
+  --color-raid-status-scheduled-300: color-mix(in oklch, var(--raid-status-scheduled), white 15%);
+  --color-raid-status-scheduled-400: color-mix(in oklch, var(--raid-status-scheduled), white 5%);
+  --color-raid-status-scheduled-500: var(--raid-status-scheduled);
+  --color-raid-status-scheduled-600: color-mix(in oklch, var(--raid-status-scheduled), black 5%);
+  --color-raid-status-scheduled-700: color-mix(in oklch, var(--raid-status-scheduled), black 15%);
+  --color-raid-status-scheduled-800: color-mix(in oklch, var(--raid-status-scheduled), black 20%);
+  --color-raid-status-scheduled-900: color-mix(in oklch, var(--raid-status-scheduled), black 35%);
+  --color-raid-status-scheduled-950: color-mix(in oklch, var(--raid-status-scheduled), black 50%);
+
+  --color-raid-status-open-50: color-mix(in oklch, var(--raid-status-open), white 50%);
+  --color-raid-status-open-100: color-mix(in oklch, var(--raid-status-open), white 35%);
+  --color-raid-status-open-200: color-mix(in oklch, var(--raid-status-open), white 20%);
+  --color-raid-status-open-300: color-mix(in oklch, var(--raid-status-open), white 15%);
+  --color-raid-status-open-400: color-mix(in oklch, var(--raid-status-open), white 5%);
+  --color-raid-status-open-500: var(--raid-status-open);
+  --color-raid-status-open-600: color-mix(in oklch, var(--raid-status-open), black 5%);
+  --color-raid-status-open-700: color-mix(in oklch, var(--raid-status-open), black 15%);
+  --color-raid-status-open-800: color-mix(in oklch, var(--raid-status-open), black 20%);
+  --color-raid-status-open-900: color-mix(in oklch, var(--raid-status-open), black 35%);
+  --color-raid-status-open-950: color-mix(in oklch, var(--raid-status-open), black 50%);
+
+  --color-raid-status-closed-50: color-mix(in oklch, var(--raid-status-closed), white 50%);
+  --color-raid-status-closed-100: color-mix(in oklch, var(--raid-status-closed), white 35%);
+  --color-raid-status-closed-200: color-mix(in oklch, var(--raid-status-closed), white 20%);
+  --color-raid-status-closed-300: color-mix(in oklch, var(--raid-status-closed), white 15%);
+  --color-raid-status-closed-400: color-mix(in oklch, var(--raid-status-closed), white 5%);
+  --color-raid-status-closed-500: var(--raid-status-closed);
+  --color-raid-status-closed-600: color-mix(in oklch, var(--raid-status-closed), black 5%);
+  --color-raid-status-closed-700: color-mix(in oklch, var(--raid-status-closed), black 15%);
+  --color-raid-status-closed-800: color-mix(in oklch, var(--raid-status-closed), black 20%);
+  --color-raid-status-closed-900: color-mix(in oklch, var(--raid-status-closed), black 35%);
+  --color-raid-status-closed-950: color-mix(in oklch, var(--raid-status-closed), black 50%);
+
+  --color-raid-status-ongoing-50: color-mix(in oklch, var(--raid-status-ongoing), white 50%);
+  --color-raid-status-ongoing-100: color-mix(in oklch, var(--raid-status-ongoing), white 35%);
+  --color-raid-status-ongoing-200: color-mix(in oklch, var(--raid-status-ongoing), white 20%);
+  --color-raid-status-ongoing-300: color-mix(in oklch, var(--raid-status-ongoing), white 15%);
+  --color-raid-status-ongoing-400: color-mix(in oklch, var(--raid-status-ongoing), white 5%);
+  --color-raid-status-ongoing-500: var(--raid-status-ongoing);
+  --color-raid-status-ongoing-600: color-mix(in oklch, var(--raid-status-ongoing), black 5%);
+  --color-raid-status-ongoing-700: color-mix(in oklch, var(--raid-status-ongoing), black 15%);
+  --color-raid-status-ongoing-800: color-mix(in oklch, var(--raid-status-ongoing), black 20%);
+  --color-raid-status-ongoing-900: color-mix(in oklch, var(--raid-status-ongoing), black 35%);
+  --color-raid-status-ongoing-950: color-mix(in oklch, var(--raid-status-ongoing), black 50%);
+
+  --color-raid-status-finished-50: color-mix(in oklch, var(--raid-status-finished), white 50%);
+  --color-raid-status-finished-100: color-mix(in oklch, var(--raid-status-finished), white 35%);
+  --color-raid-status-finished-200: color-mix(in oklch, var(--raid-status-finished), white 20%);
+  --color-raid-status-finished-300: color-mix(in oklch, var(--raid-status-finished), white 15%);
+  --color-raid-status-finished-400: color-mix(in oklch, var(--raid-status-finished), white 5%);
+  --color-raid-status-finished-500: var(--raid-status-finished);
+  --color-raid-status-finished-600: color-mix(in oklch, var(--raid-status-finished), black 5%);
+  --color-raid-status-finished-700: color-mix(in oklch, var(--raid-status-finished), black 15%);
+  --color-raid-status-finished-800: color-mix(in oklch, var(--raid-status-finished), black 20%);
+  --color-raid-status-finished-900: color-mix(in oklch, var(--raid-status-finished), black 35%);
+  --color-raid-status-finished-950: color-mix(in oklch, var(--raid-status-finished), black 50%);
+
+  --color-raid-status-cancelled-50: color-mix(in oklch, var(--raid-status-cancelled), white 50%);
+  --color-raid-status-cancelled-100: color-mix(in oklch, var(--raid-status-cancelled), white 6%);
+  --color-raid-status-cancelled-200: color-mix(in oklch, var(--raid-status-cancelled), white 20%);
+  --color-raid-status-cancelled-300: color-mix(in oklch, var(--raid-status-cancelled), white 15%);
+  --color-raid-status-cancelled-400: color-mix(in oklch, var(--raid-status-cancelled), white 5%);
+  --color-raid-status-cancelled-500: var(--raid-status-cancelled);
+  --color-raid-status-cancelled-600: color-mix(in oklch, var(--raid-status-cancelled), black 5%);
+  --color-raid-status-cancelled-700: color-mix(in oklch, var(--raid-status-cancelled), black 15%);
+  --color-raid-status-cancelled-800: color-mix(in oklch, var(--raid-status-cancelled), black 20%);
+  --color-raid-status-cancelled-900: color-mix(in oklch, var(--raid-status-cancelled), black 35%);
+  --color-raid-status-cancelled-950: color-mix(in oklch, var(--raid-status-cancelled), black 50%);
+
+  /* Font */
   --font-mono: var(--font-dm-mono);
   --font-sans: var(--font-dm-sans);
   --font-title: var(--font-pirata-one);
   --font-caption: var(--font-lora);
 
+  /* Radius */
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);

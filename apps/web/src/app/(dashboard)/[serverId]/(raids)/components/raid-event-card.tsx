@@ -1,11 +1,11 @@
 import type { Raid } from "@albion-raid-manager/types";
 
-import { RAID_STATUS_INFO } from "@albion-raid-manager/types/entities";
 import { faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 
 import { RaidStatusBadge } from "@/components/raids/raid-badge";
+import { raidStatuses } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 interface RaidEventCardProps {
@@ -21,23 +21,6 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
       minute: "2-digit",
       hour12: true,
     });
-  };
-
-  const getStatusColor = (status: string) => {
-    const statusInfo = RAID_STATUS_INFO[status as keyof typeof RAID_STATUS_INFO];
-    if (!statusInfo) {
-      return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800";
-    }
-
-    // Use the centralized color configuration with light variants for cards
-    const baseColor = statusInfo.color.web.background.replace("bg-", "bg-").replace("-500", "-100");
-    const textColor = statusInfo.color.web.background.replace("bg-", "text-").replace("-500", "-800");
-    const borderColor = statusInfo.color.web.background.replace("bg-", "border-").replace("-500", "-200");
-    const darkBgColor = statusInfo.color.web.background.replace("bg-", "dark:bg-").replace("-500", "-900/20");
-    const darkTextColor = statusInfo.color.web.background.replace("bg-", "dark:text-").replace("-500", "-300");
-    const darkBorderColor = statusInfo.color.web.background.replace("bg-", "dark:border-").replace("-500", "-800");
-
-    return `${baseColor} ${textColor} ${borderColor} ${darkBgColor} ${darkTextColor} ${darkBorderColor}`;
   };
 
   const getVariantStyles = () => {
@@ -56,8 +39,8 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
       <Link
         to={raid.id}
         className={cn(
-          "hover:bg-accent/50 block rounded border-l-2 transition-colors",
-          getStatusColor(raid.status),
+          "hover:bg-accent/50 block rounded border-l-4 transition-colors",
+          raidStatuses[raid.status]?.color,
           getVariantStyles(),
           className,
         )}
@@ -73,8 +56,8 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
       <Link
         to={raid.id}
         className={cn(
-          "hover:bg-accent/50 block rounded border-l-2 shadow-sm transition-colors",
-          getStatusColor(raid.status),
+          "bg-muted/50 hover:bg-accent/50 block rounded border-l-4 shadow-sm transition-colors",
+          raidStatuses[raid.status]?.color,
           getVariantStyles(),
           className,
         )}
@@ -98,7 +81,7 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
       to={raid.id}
       className={cn(
         "block rounded-lg border transition-all hover:shadow-md",
-        getStatusColor(raid.status),
+        raidStatuses[raid.status]?.color,
         getVariantStyles(),
         className,
       )}

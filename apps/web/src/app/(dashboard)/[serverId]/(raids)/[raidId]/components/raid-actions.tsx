@@ -1,90 +1,135 @@
 import type { RaidStatus } from "@albion-raid-manager/types";
 
-import { faLock, faPlay, faStop, faUnlock, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faLock, faUnlock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { raidStatuses } from "@/lib/constants";
 
 import { useRaidContext } from "../contexts/raid-context";
+
+interface RaidStatusMessageProps {
+  icon: IconDefinition;
+  title: string;
+  description: string;
+  note: string;
+  iconColor: string;
+  bgColor: string;
+}
+
+function RaidStatusMessage({ icon, title, description, note, iconColor, bgColor }: RaidStatusMessageProps) {
+  return (
+    <div className="py-12 text-center">
+      <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full ${bgColor}`}>
+        <FontAwesomeIcon icon={icon} className={`h-10 w-10 ${iconColor}`} />
+      </div>
+      <h3 className="text-foreground mb-3 text-xl font-semibold">{title}</h3>
+      <p className="text-muted-foreground mb-4 max-w-md text-center text-sm leading-relaxed">{description}</p>
+      <div className="text-muted-foreground bg-muted/50 rounded-lg px-4 py-2 text-xs">{note}</div>
+    </div>
+  );
+}
 
 export function RaidActions() {
   const { raid, handleUpdateRaidStatus } = useRaidContext();
   const hasStatus = (...statuses: RaidStatus[]) => statuses.includes(raid.status);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faPlay} className="h-5 w-5" />
+    <Card className="border-border/50 shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-3 text-xl font-semibold">
+          <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
+            <FontAwesomeIcon icon={raidStatuses[raid.status].icon} className="text-primary h-5 w-5" />
+          </div>
           Raid Management
         </CardTitle>
       </CardHeader>
       <CardContent>
         {hasStatus("CANCELLED") ? (
-          <div className="py-8 text-center">
-            <div className="text-muted-foreground mb-4">
-              <FontAwesomeIcon icon={faXmark} className="mx-auto mb-3 h-12 w-12 text-red-500" />
-              <h3 className="mb-2 text-lg font-semibold">Raid Cancelled</h3>
-              <p className="text-sm">This raid has been cancelled and is no longer available for management.</p>
-            </div>
-            <div className="text-muted-foreground text-xs">Cancelled raids cannot be reopened or modified.</div>
-          </div>
+          <RaidStatusMessage
+            icon={raidStatuses.CANCELLED.icon}
+            title="Raid Cancelled"
+            description="This raid has been cancelled and is no longer available for management."
+            note="Cancelled raids cannot be reopened or modified"
+            iconColor="text-red-500 dark:text-red-400"
+            bgColor="bg-red-50 dark:bg-red-950/30"
+          />
         ) : hasStatus("FINISHED") ? (
-          <div className="py-8 text-center">
-            <div className="text-muted-foreground mb-4">
-              <FontAwesomeIcon icon={faStop} className="mx-auto mb-3 h-12 w-12 text-green-500" />
-              <h3 className="mb-2 text-lg font-semibold">Raid Completed</h3>
-              <p className="text-sm">This raid has been finished successfully.</p>
-            </div>
-            <div className="text-muted-foreground text-xs">Completed raids are read-only and cannot be modified.</div>
-          </div>
+          <RaidStatusMessage
+            icon={raidStatuses.FINISHED.icon}
+            title="Raid Completed"
+            description="This raid has been finished successfully."
+            note="Completed raids are read-only and cannot be modified"
+            iconColor="text-gray-500 dark:text-gray-400"
+            bgColor="bg-gray-50 dark:bg-gray-950/30"
+          />
         ) : (
-          <div className="flex flex-wrap gap-3">
-            {hasStatus("SCHEDULED", "CLOSED") && (
-              <Button
-                onClick={() => handleUpdateRaidStatus("OPEN")}
-                className="bg-green-600 text-white hover:bg-green-700"
-              >
-                <FontAwesomeIcon icon={faUnlock} className="mr-2 h-4 w-4" />
-                Open Registration
-              </Button>
-            )}
-            {hasStatus("OPEN") && (
-              <Button
-                onClick={() => handleUpdateRaidStatus("CLOSED")}
-                className="bg-red-600 text-white hover:bg-red-700"
-              >
-                <FontAwesomeIcon icon={faLock} className="mr-2 h-4 w-4" />
-                Close Registration
-              </Button>
-            )}
-            {hasStatus("OPEN", "CLOSED", "FINISHED") && (
-              <Button
-                onClick={() => handleUpdateRaidStatus("ONGOING")}
-                className="bg-blue-600 text-white hover:bg-blue-700"
-              >
-                <FontAwesomeIcon icon={faPlay} className="mr-2 h-4 w-4" />
-                Start Raid
-              </Button>
-            )}
-            {hasStatus("ONGOING") && (
-              <Button
-                onClick={() => handleUpdateRaidStatus("FINISHED")}
-                className="bg-gray-600 text-white hover:bg-gray-700"
-              >
-                <FontAwesomeIcon icon={faStop} className="mr-2 h-4 w-4" />
-                Finish Raid
-              </Button>
-            )}
+          <div className="space-y-6">
+            {/* Primary Actions */}
+            <div className="space-y-3">
+              <h4 className="text-muted-foreground text-sm font-medium uppercase tracking-wide">Raid Actions</h4>
+              <div className="flex flex-wrap gap-3">
+                {hasStatus("SCHEDULED", "CLOSED") && (
+                  <Button
+                    onClick={() => handleUpdateRaidStatus("OPEN")}
+                    size="lg"
+                    className={`${raidStatuses.OPEN.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-green-500/20`}
+                  >
+                    <FontAwesomeIcon icon={faUnlock} className="mr-2 h-4 w-4" />
+                    Open Registration
+                  </Button>
+                )}
+                {hasStatus("OPEN") && (
+                  <Button
+                    onClick={() => handleUpdateRaidStatus("CLOSED")}
+                    size="lg"
+                    className={`${raidStatuses.CLOSED.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-red-500/20`}
+                  >
+                    <FontAwesomeIcon icon={faLock} className="mr-2 h-4 w-4" />
+                    Close Registration
+                  </Button>
+                )}
+                {hasStatus("OPEN", "CLOSED", "FINISHED") && (
+                  <Button
+                    onClick={() => handleUpdateRaidStatus("ONGOING")}
+                    size="lg"
+                    className={`${raidStatuses.ONGOING.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-yellow-500/20`}
+                  >
+                    <FontAwesomeIcon icon={raidStatuses.ONGOING.icon} className="mr-2 h-4 w-4" />
+                    Start Raid
+                  </Button>
+                )}
+                {hasStatus("ONGOING") && (
+                  <Button
+                    onClick={() => handleUpdateRaidStatus("FINISHED")}
+                    size="lg"
+                    className={`${raidStatuses.FINISHED.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-gray-500/20`}
+                  >
+                    <FontAwesomeIcon icon={raidStatuses.FINISHED.icon} className="mr-2 h-4 w-4" />
+                    Finish Raid
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Secondary Actions */}
             {hasStatus("SCHEDULED", "OPEN", "CLOSED", "ONGOING") && (
-              <Button
-                onClick={() => handleUpdateRaidStatus("CANCELLED")}
-                className="bg-red-600 text-white hover:bg-red-700"
-              >
-                <FontAwesomeIcon icon={faXmark} className="mr-2 h-4 w-4" />
-                Cancel Raid
-              </Button>
+              <div className="border-border/50 border-t pt-4">
+                <h4 className="text-muted-foreground mb-3 text-sm font-medium uppercase tracking-wide">Danger Zone</h4>
+                <Button
+                  onClick={() => handleUpdateRaidStatus("CANCELLED")}
+                  variant="destructive"
+                  size="lg"
+                  className={`${raidStatuses.CANCELLED.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-red-500/20`}
+                >
+                  <FontAwesomeIcon icon={raidStatuses.CANCELLED.icon} className="mr-2 h-4 w-4" />
+                  Cancel Raid
+                </Button>
+                <p className="text-muted-foreground mt-2 text-xs">
+                  This action cannot be undone. All participants will be notified.
+                </p>
+              </div>
             )}
           </div>
         )}
