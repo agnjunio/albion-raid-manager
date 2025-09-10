@@ -59,7 +59,7 @@ export function MemberSelection({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="focus:border-primary/50 h-12 w-full justify-between border-2 text-base font-medium transition-colors"
           disabled={disabled}
         >
           <div className="flex items-center gap-2">
