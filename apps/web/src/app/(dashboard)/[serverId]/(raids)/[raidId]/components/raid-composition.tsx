@@ -2,21 +2,19 @@ import type { RaidRole } from "@albion-raid-manager/types";
 
 import { useState } from "react";
 
-import { faPlus, faSave, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
 import { useRaidContext } from "../contexts/raid-context";
-import { ROLE_OPTIONS, type EditingSlot } from "../helpers/raid-composition-utils";
+import { type EditingSlot } from "../helpers/raid-composition-utils";
 
 import { RaidCompositionGridView } from "./raid-composition-grid-view";
 import { RaidCompositionListView } from "./raid-composition-list-view";
+import { RaidSlotSheet } from "./raid-slot-sheet";
 import { ViewToggle, type ViewMode } from "./view-toggle";
 
 export function RaidComposition() {
@@ -34,24 +32,25 @@ export function RaidComposition() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [editingSlot, setEditingSlot] = useState<EditingSlot | null>(null);
   const [isAddingSlot, setIsAddingSlot] = useState(false);
-  const [newSlot, setNewSlot] = useState({
-    name: "",
-    role: undefined as RaidRole | undefined,
-    comment: "",
-  });
 
-  const handleSaveSlot = () => {
+  const handleSaveSlot = (slotData: {
+    name: string;
+    role?: RaidRole | null;
+    comment?: string | null;
+    userId?: string | null;
+  }) => {
     if (!editingSlot) return;
 
-    if (!editingSlot.name.trim()) {
+    if (!slotData.name.trim()) {
       toast.error("Slot name is required");
       return;
     }
 
     handleRaidSlotUpdate(editingSlot.id, {
-      name: editingSlot.name.trim(),
-      role: editingSlot.role,
-      comment: editingSlot.comment?.trim() || undefined,
+      name: slotData.name.trim(),
+      role: slotData.role,
+      comment: slotData.comment?.trim() || undefined,
+      userId: slotData.userId,
     });
 
     setEditingSlot(null);
@@ -67,35 +66,45 @@ export function RaidComposition() {
     }
   };
 
-  const handleAddSlot = () => {
-    if (!newSlot.name.trim()) {
+  const handleAddSlot = (slotData: {
+    name: string;
+    role?: RaidRole | null;
+    comment?: string | null;
+    userId?: string | null;
+  }) => {
+    if (!slotData.name.trim()) {
       toast.error("Slot name is required");
       return;
     }
 
     handleRaidSlotCreate({
-      name: newSlot.name.trim(),
-      role: newSlot.role || null,
-      comment: newSlot.comment?.trim() || null,
+      name: slotData.name.trim(),
+      role: slotData.role || null,
+      comment: slotData.comment?.trim() || null,
       raidId: raid.id,
       userId: null,
     });
 
-    setNewSlot({ name: "", role: undefined, comment: "" });
     setIsAddingSlot(false);
   };
 
   const handleCancelAdd = () => {
-    setNewSlot({ name: "", role: undefined, comment: "" });
     setIsAddingSlot(false);
   };
 
-  const handleEditSlot = (slot: { id: string; name: string; role?: RaidRole | null; comment?: string | null }) => {
+  const handleEditSlot = (slot: {
+    id: string;
+    name: string;
+    role?: RaidRole | null;
+    comment?: string | null;
+    userId?: string | null;
+  }) => {
     setEditingSlot({
       id: slot.id,
       name: slot.name,
       role: slot.role || undefined,
       comment: slot.comment || "",
+      userId: slot.userId || null,
     });
   };
 
@@ -143,66 +152,6 @@ export function RaidComposition() {
           </div>
         )}
 
-        {/* Add New Slot Form */}
-        {isAddingSlot && (
-          <Card className="border-primary/50 border-2 border-dashed">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Add New Slot</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="text-sm font-medium">Slot Name</label>
-                  <Input
-                    placeholder="Enter slot name..."
-                    value={newSlot.name}
-                    onChange={(e) => setNewSlot({ ...newSlot, name: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Role (Optional)</label>
-                  <Select
-                    value={newSlot.role || ""}
-                    onValueChange={(value) => setNewSlot({ ...newSlot, role: value as RaidRole })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select role..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ROLE_OPTIONS.map((option: { value: RaidRole; label: string }) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Comment (Optional)</label>
-                <Textarea
-                  placeholder="Enter slot requirements or notes..."
-                  value={newSlot.comment}
-                  onChange={(e) => setNewSlot({ ...newSlot, comment: e.target.value })}
-                  className="mt-1"
-                  rows={2}
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleAddSlot} size="sm">
-                  <FontAwesomeIcon icon={faSave} className="mr-2 h-4 w-4" />
-                  Add Slot
-                </Button>
-                <Button onClick={handleCancelAdd} variant="outline" size="sm">
-                  <FontAwesomeIcon icon={faTimes} className="mr-2 h-4 w-4" />
-                  Cancel
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Slots List */}
         <div className="space-y-4">
           {viewMode === "grid" ? (
@@ -238,6 +187,9 @@ export function RaidComposition() {
           )}
         </div>
       </CardContent>
+
+      {/* Add Slot Sheet */}
+      <RaidSlotSheet isOpen={isAddingSlot} onClose={handleCancelAdd} mode="add" onSave={handleAddSlot} />
     </Card>
   );
 }

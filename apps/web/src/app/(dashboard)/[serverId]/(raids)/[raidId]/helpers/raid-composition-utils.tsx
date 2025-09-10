@@ -1,4 +1,4 @@
-import type { RaidRole, RaidSlot } from "@albion-raid-manager/types";
+import type { RaidRole } from "@albion-raid-manager/types";
 
 // Simple role icons and colors
 export const getRoleIcon = (role: RaidRole | "UNASSIGNED") => {
@@ -49,18 +49,5 @@ export interface EditingSlot {
   name: string;
   role?: RaidRole;
   comment?: string;
+  userId?: string | null;
 }
-
-export const roleOrder = ["CALLER", "TANK", "HEALER", "SUPPORT", "RANGED_DPS", "MELEE_DPS", "BATTLEMOUNT", "UNASSIGNED"];
-
-export const groupSlotsByRole = (slots: RaidSlot[]) => {
-  return slots.reduce(
-    (acc, slot) => {
-      const role = slot.role || "UNASSIGNED";
-      if (!acc[role]) acc[role] = [];
-      acc[role].push(slot);
-      return acc;
-    },
-    {} as Record<string, RaidSlot[]>,
-  );
-};

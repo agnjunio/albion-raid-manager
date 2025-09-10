@@ -46,12 +46,12 @@ export namespace CreateRaidSlot {
 }
 
 export namespace UpdateRaidSlot {
-  export type Params = { slotId: string };
+  export type Params = { raidId: string; slotId: string };
   export type Body = Partial<RaidSlot>;
   export type Response = { raid: Raid };
 }
 
 export namespace DeleteRaidSlot {
-  export type Params = { slotId: string };
+  export type Params = { raidId: string; slotId: string };
   export type Response = { message: string };
 }

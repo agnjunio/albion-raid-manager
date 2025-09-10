@@ -2,12 +2,21 @@ import type { Raid, RaidSlot, RaidStatus } from "@albion-raid-manager/types";
 
 import { createContext, useContext, type ReactNode } from "react";
 
+import { ServerMemberWithRegistration } from "@albion-raid-manager/types/api";
 import { toast } from "sonner";
 
-import { useDeleteRaidMutation, useUpdateRaidMutation } from "@/store/raids";
+import {
+  useCreateRaidSlotMutation,
+  useDeleteRaidMutation,
+  useDeleteRaidSlotMutation,
+  useUpdateRaidMutation,
+  useUpdateRaidSlotMutation,
+} from "@/store/raids";
+import { useGetServerMembersQuery } from "@/store/servers";
 
 interface RaidContextValue {
   raid: Raid;
+  serverMembers: ServerMemberWithRegistration[];
   handleCopyRaidLink: () => void;
   handleDeleteRaid: () => void;
   handleRaidSlotCreate: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => void;
@@ -40,6 +49,16 @@ interface RaidProviderProps {
 export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderProps) {
   const [updateRaid] = useUpdateRaidMutation();
   const [deleteRaid] = useDeleteRaidMutation();
+  const [createRaidSlot] = useCreateRaidSlotMutation();
+  const [updateRaidSlot] = useUpdateRaidSlotMutation();
+  const [deleteRaidSlot] = useDeleteRaidSlotMutation();
+
+  // Get server members for member selection
+  const { data: serverMembersData } = useGetServerMembersQuery({
+    params: { serverId },
+  });
+
+  const serverMembers = serverMembersData?.members || [];
 
   const canManageRaid = true; // TODO: Use the permission system to determine if the user has permission to edit raid
   const canEditComposition =
@@ -156,20 +175,57 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
     }
   };
 
-  const handleRaidSlotCreate = (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => {
-    console.log("handleRaidSlotCreate", slot);
+  const handleRaidSlotCreate = async (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => {
+    try {
+      await createRaidSlot({
+        params: { serverId, raidId },
+        body: {
+          name: slot.name,
+          role: slot.role || undefined,
+          comment: slot.comment || undefined,
+        },
+      }).unwrap();
+
+      toast.success("Slot created successfully");
+    } catch {
+      toast.error("Failed to create slot", {
+        description: "There was an error creating the slot. Please try again.",
+      });
+    }
   };
 
-  const handleRaidSlotDelete = (slotId: string) => {
-    console.log("handleRaidSlotDelete", slotId);
+  const handleRaidSlotDelete = async (slotId: string) => {
+    try {
+      await deleteRaidSlot({
+        params: { serverId, raidId, slotId },
+      }).unwrap();
+
+      toast.success("Slot deleted successfully");
+    } catch {
+      toast.error("Failed to delete slot", {
+        description: "There was an error deleting the slot. Please try again.",
+      });
+    }
   };
 
-  const handleRaidSlotUpdate = (slotId: string, updates: Partial<RaidSlot>) => {
-    console.log("handleRaidSlotUpdate", slotId, updates);
+  const handleRaidSlotUpdate = async (slotId: string, updates: Partial<RaidSlot>) => {
+    try {
+      await updateRaidSlot({
+        params: { serverId, raidId, slotId },
+        body: updates,
+      }).unwrap();
+
+      toast.success("Slot updated successfully");
+    } catch {
+      toast.error("Failed to update slot", {
+        description: "There was an error updating the slot. Please try again.",
+      });
+    }
   };
 
   const value: RaidContextValue = {
     raid,
+    serverMembers,
     handleCopyRaidLink,
     handleDeleteRaid,
     handleRaidSlotCreate,

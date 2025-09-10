@@ -336,6 +336,7 @@ export namespace RaidService {
       name?: string;
       role?: RaidRole;
       comment?: string;
+      userId?: string | null;
     },
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
@@ -368,6 +369,8 @@ export namespace RaidService {
               name: input.name,
               role: input.role,
               comment: input.comment,
+              userId: input.userId,
+              joinedAt: input.userId ? new Date() : null,
             },
           },
         },

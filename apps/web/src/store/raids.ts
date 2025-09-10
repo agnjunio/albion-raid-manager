@@ -1,4 +1,13 @@
-import type { CreateRaid, DeleteRaid, GetRaid, GetRaids, UpdateRaid } from "@albion-raid-manager/types/api";
+import type {
+  CreateRaid,
+  CreateRaidSlot,
+  DeleteRaid,
+  DeleteRaidSlot,
+  GetRaid,
+  GetRaids,
+  UpdateRaid,
+  UpdateRaidSlot,
+} from "@albion-raid-manager/types/api";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -49,6 +58,38 @@ export const raidsApi = createApi({
         }),
         invalidatesTags: tagHelper.list("raids"),
       }),
+      createRaidSlot: builder.mutation<
+        CreateRaidSlot.Response,
+        { params: CreateRaidSlot.Params; body: CreateRaidSlot.Body }
+      >({
+        query: ({ params, body }) => ({
+          url: `/servers/${params.serverId}/raids/${params.raidId}/slots`,
+          method: "POST",
+          data: body,
+        }),
+        invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
+      }),
+      updateRaidSlot: builder.mutation<
+        UpdateRaidSlot.Response,
+        { params: { serverId: string } & UpdateRaidSlot.Params; body: UpdateRaidSlot.Body }
+      >({
+        query: ({ params, body }) => ({
+          url: `/servers/${params.serverId}/raids/${params.raidId}/slots/${params.slotId}`,
+          method: "PUT",
+          data: body,
+        }),
+        invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
+      }),
+      deleteRaidSlot: builder.mutation<
+        DeleteRaidSlot.Response,
+        { params: { serverId: string } & DeleteRaidSlot.Params }
+      >({
+        query: ({ params }) => ({
+          url: `/servers/${params.serverId}/raids/${params.raidId}/slots/${params.slotId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
+      }),
     };
   },
 });
@@ -59,4 +100,7 @@ export const {
   useCreateRaidMutation,
   useUpdateRaidMutation,
   useDeleteRaidMutation,
+  useCreateRaidSlotMutation,
+  useUpdateRaidSlotMutation,
+  useDeleteRaidSlotMutation,
 } = raidsApi;
