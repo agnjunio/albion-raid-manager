@@ -2,9 +2,9 @@ import { ContentType, RaidType } from "@albion-raid-manager/types";
 
 export type ContentTypeInfo = {
   type: ContentType;
-  partySize: {
-    min?: number;
-    max?: number;
+  partySize?: {
+    min: number;
+    max: number;
   };
   raidType: RaidType;
   description: string;
@@ -28,7 +28,6 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
   },
   {
     type: "OPEN_WORLD_FARMING",
-    partySize: { min: 1, max: 20 },
     raidType: "FLEX",
     description: "Open world farming and resource gathering activities. Suitable for police content.",
     displayName: "Open World Farming",
@@ -38,7 +37,6 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
   },
   {
     type: "GROUP_DUNGEON",
-    partySize: { min: 0, max: 5 },
     raidType: "FLEX",
     description: "Small group dungeon content for 2-5 players",
     displayName: "Group Dungeon",
@@ -89,7 +87,6 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
   },
   {
     type: "OPEN_WORLD_GANKING",
-    partySize: { min: 0, max: 20 },
     raidType: "FLEX",
     description: "Ganking squad for open world PvP",
     displayName: "Open World Ganking",
@@ -99,7 +96,6 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
   },
   {
     type: "OPEN_WORLD_SMALL_SCALE",
-    partySize: { min: 0, max: 20 },
     raidType: "FLEX",
     description: "Open World ",
     displayName: "Open World Small Scale",
@@ -110,7 +106,6 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
   },
   {
     type: "OPEN_WORLD_ZVZ",
-    partySize: { min: 0, max: 100 },
     raidType: "FLEX",
     description: "Open World ZvZ for large scale battles. Suited for Guild's calls to arms.",
     displayName: "Open World ZvZ (CTA)",
@@ -165,7 +160,6 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
   },
   {
     type: "OTHER",
-    partySize: { min: 0, max: 0 },
     raidType: "FLEX",
     description: "Other content type not specifically categorized",
     displayName: "Other",
@@ -177,7 +171,7 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
 ];
 
 // Convenience function to get the content type info for a given content type
-export function getContentTypeInfo(contentType?: string): ContentTypeInfo {
+export function getContentTypeInfo(contentType?: string | null): ContentTypeInfo {
   const otherContentTypeInfo = CONTENT_TYPE_INFO.find((cti) => cti.type === "OTHER");
   if (!otherContentTypeInfo) {
     throw new Error("Other content type not found");

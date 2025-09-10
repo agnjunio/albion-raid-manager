@@ -1,8 +1,9 @@
 import type { Raid, RaidSlot, RaidStatus } from "@albion-raid-manager/types";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import { ServerMemberWithRegistration } from "@albion-raid-manager/types/api";
+import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
 import { toast } from "sonner";
 
 import {
@@ -27,6 +28,7 @@ interface RaidContextValue {
   handleUpdateRaidStatus: (status: RaidStatus) => void;
   handleUpdateRaid: (updates: { title?: string; description?: string; date?: Date; location?: string }) => void;
   canEditComposition: boolean;
+  canChangeRaidSlotCount: boolean;
   canManageRaid: boolean;
   isFlexRaid: boolean;
   currentSlotCount: number;
@@ -57,12 +59,15 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   const { data: serverMembersData } = useGetServerMembersQuery({
     params: { serverId },
   });
+  const contentTypeInfo = useMemo(() => getContentTypeInfo(raid.contentType), [raid.contentType]);
 
   const serverMembers = serverMembersData?.members || [];
 
   const canManageRaid = true; // TODO: Use the permission system to determine if the user has permission to edit raid
   const canEditComposition =
     canManageRaid && (raid.status === "SCHEDULED" || raid.status === "OPEN" || raid.status === "CLOSED");
+  const canChangeRaidSlotCount =
+    canManageRaid && canEditComposition && contentTypeInfo.partySize?.min !== contentTypeInfo.partySize?.max;
   const isFlexRaid = raid.type === "FLEX";
   const currentSlotCount = raid.slots?.length || 0;
   const maxSlots = raid.maxPlayers || 0;
@@ -236,6 +241,7 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
     handleUpdateRaidStatus,
     handleUpdateRaid,
     canEditComposition,
+    canChangeRaidSlotCount,
     canManageRaid,
     isFlexRaid,
     currentSlotCount,

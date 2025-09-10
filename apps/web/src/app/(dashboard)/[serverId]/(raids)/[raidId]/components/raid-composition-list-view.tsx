@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import { useRaidContext } from "../contexts/raid-context";
 import { getRoleColor, getRoleIcon, type EditingSlot } from "../helpers/raid-composition-utils";
+
 import { RaidSlotSheet } from "./raid-slot-sheet";
 
 interface RaidCompositionListViewProps {
@@ -39,7 +40,7 @@ export function RaidCompositionListView({
   onDeleteSlot,
   setEditingSlot,
 }: RaidCompositionListViewProps) {
-  const { raid, serverMembers, canEditComposition } = useRaidContext();
+  const { raid, serverMembers, canEditComposition, canChangeRaidSlotCount } = useRaidContext();
   const slots = raid.slots || [];
 
   const handleSaveSlot = (slotData: {
@@ -116,15 +117,17 @@ export function RaidCompositionListView({
                       <FontAwesomeIcon icon={faEdit} className="mr-2 h-4 w-4" />
                       Edit
                     </Button>
-                    <Button
-                      onClick={() => onDeleteSlot(slot.id)}
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
-                      Delete
-                    </Button>
+                    {canChangeRaidSlotCount && (
+                      <Button
+                        onClick={() => onDeleteSlot(slot.id)}
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    )}
                   </div>
                 )}
               </div>
