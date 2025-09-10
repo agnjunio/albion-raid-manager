@@ -141,7 +141,6 @@ enum RaidStatus {
 }
 
 enum RaidRole {
-  CALLER
   TANK
   SUPPORT
   HEALER

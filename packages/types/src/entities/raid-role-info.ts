@@ -9,12 +9,6 @@ export type RaidRoleInfo = {
 
 export const RAID_ROLE_INFO: RaidRoleInfo[] = [
   {
-    role: "CALLER",
-    emoji: "🧠",
-    displayName: "Caller",
-    description: "Raid leader and strategist",
-  },
-  {
     role: "TANK",
     emoji: "🛡️",
     displayName: "Tank",
