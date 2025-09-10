@@ -6,6 +6,7 @@ import { isAPIError } from "@/lib/api";
 import { useGetRaidQuery } from "@/store/raids";
 
 import { RaidProvider } from "./contexts/raid-context";
+import { ViewModeProvider } from "./contexts/view-mode-context";
 
 export function RaidLayout() {
   const { serverId, raidId } = useParams();
@@ -30,7 +31,9 @@ export function RaidLayout() {
 
   return (
     <RaidProvider raid={data.raid} serverId={serverId as string} raidId={raidId as string}>
-      <Outlet />
+      <ViewModeProvider>
+        <Outlet />
+      </ViewModeProvider>
     </RaidProvider>
   );
 }

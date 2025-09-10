@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Button } from "@/components/ui/button";
 
-export type ViewMode = "list" | "grid";
+import { type ViewMode } from "../contexts/view-mode-context";
 
 interface ViewToggleProps {
   currentView: ViewMode;

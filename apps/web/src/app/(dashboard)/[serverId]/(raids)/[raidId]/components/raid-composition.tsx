@@ -10,12 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { useRaidContext } from "../contexts/raid-context";
+import { useViewMode } from "../contexts/view-mode-context";
 import { type EditingSlot } from "../helpers/raid-composition-utils";
 
 import { RaidCompositionGridView } from "./raid-composition-grid-view";
 import { RaidCompositionListView } from "./raid-composition-list-view";
 import { RaidSlotSheet } from "./raid-slot-sheet";
-import { ViewToggle, type ViewMode } from "./view-toggle";
+import { ViewToggle } from "./view-toggle";
 
 export function RaidComposition() {
   const {
@@ -29,7 +30,7 @@ export function RaidComposition() {
     maxSlots,
     canAddSlots,
   } = useRaidContext();
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const { viewMode, setViewMode } = useViewMode();
   const [editingSlot, setEditingSlot] = useState<EditingSlot | null>(null);
   const [isAddingSlot, setIsAddingSlot] = useState(false);
 
