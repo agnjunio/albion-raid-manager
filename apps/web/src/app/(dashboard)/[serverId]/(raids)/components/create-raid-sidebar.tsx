@@ -76,6 +76,7 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
       contentType: data.contentType,
       description: data.description,
       date: data.date.toISOString(),
+      location: data.location,
     };
     const createRaidResponse = await createRaid({
       params: { serverId: serverId as string },
@@ -277,9 +278,9 @@ export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSide
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
-                          <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                            <FontAwesomeIcon icon={faFileText} className="text-primary h-4 w-4" />
+                        <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                          <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+                            <FontAwesomeIcon icon={faFileText} className="text-muted-foreground h-4 w-4" />
                           </div>
                           Description
                         </FormLabel>
