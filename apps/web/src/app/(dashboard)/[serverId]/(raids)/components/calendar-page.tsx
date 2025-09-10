@@ -5,7 +5,7 @@ import { CalendarProvider } from "../contexts/calendar-context";
 import { CalendarGrid } from "./calendar-grid";
 import { CalendarHeader } from "./calendar-header";
 import { CalendarSidebar } from "./calendar-sidebar";
-import { CreateRaidSidebar, useTimeSlotClick } from "./create-raid-sidebar";
+import { CreateRaidSheet, useTimeSlotClick } from "./create-raid-sheet";
 
 interface CalendarPageProps {
   raids: Raid[];
@@ -23,11 +23,6 @@ export function CalendarPage({ raids, onRefresh, isRefreshing = false }: Calenda
 
 function CalendarPageContent() {
   const { selectedDateTime, handleTimeSlotClick } = useTimeSlotClick();
-
-  const handleTimeSlotSelect = (_dateTime: Date) => {
-    // This is called when the form is opened with a pre-selected time
-    // The actual time slot clicking is handled by handleTimeSlotClick
-  };
 
   return (
     <div className="flex h-full flex-col">
@@ -47,11 +42,11 @@ function CalendarPageContent() {
 
         {/* Calendar Grid with Create Raid Sidebar */}
         <div className="flex-1">
-          <CreateRaidSidebar selectedDateTime={selectedDateTime} onTimeSlotSelect={handleTimeSlotSelect}>
+          <CreateRaidSheet selectedDateTime={selectedDateTime}>
             <div className="h-full">
               <CalendarGrid onTimeSlotClick={handleTimeSlotClick} />
             </div>
-          </CreateRaidSidebar>
+          </CreateRaidSheet>
         </div>
       </div>
     </div>

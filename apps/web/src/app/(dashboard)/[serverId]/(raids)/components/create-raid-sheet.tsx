@@ -33,13 +33,12 @@ import { raidFormSchema } from "../schemas";
 
 const DEFAULT_CONTENT_TYPE = CONTENT_TYPE_INFO.filter((contentTypeInfo) => contentTypeInfo.isActive)[0];
 
-interface CreateRaidSidebarProps {
+interface CreateRaidSheetProps {
   children: React.ReactNode;
   selectedDateTime?: Date;
-  onTimeSlotSelect?: (_dateTime: Date) => void;
 }
 
-export function CreateRaidSidebar({ children, selectedDateTime }: CreateRaidSidebarProps) {
+export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetProps) {
   const { serverId } = useParams();
   const [createRaid] = useCreateRaidMutation();
   const [isOpen, setIsOpen] = useState(false);

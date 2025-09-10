@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 import { CalendarView, useCalendar } from "../contexts/calendar-context";
 
-import { CreateRaidSidebar } from "./create-raid-sidebar";
+import { CreateRaidSheet } from "./create-raid-sheet";
 
 export function CalendarHeader() {
   const { currentDate, view, isRefreshing, hotkeys, setCurrentDate, setView, refresh } = useCalendar();
@@ -159,12 +159,12 @@ export function CalendarHeader() {
 
         <HotkeysHelp hotkeys={hotkeys} />
 
-        <CreateRaidSidebar>
+        <CreateRaidSheet>
           <Button className="h-8 gap-1 px-3 text-sm font-normal">
             <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
             <span className="hidden sm:inline">New Raid</span>
           </Button>
-        </CreateRaidSidebar>
+        </CreateRaidSheet>
       </div>
     </div>
   );

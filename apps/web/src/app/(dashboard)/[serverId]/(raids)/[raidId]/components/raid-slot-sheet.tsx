@@ -1,18 +1,26 @@
 import type { RaidRole } from "@albion-raid-manager/types";
 
+import { useEffect } from "react";
+
 import { faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 import { MemberSelection } from "@/components/servers/member-selection";
 import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 
 import { useRaidContext } from "../contexts/raid-context";
 import { ROLE_OPTIONS, type EditingSlot } from "../helpers/raid-composition-utils";
+import { raidSlotSchema } from "../schemas/raid-slot-schema";
+
+type RaidSlotFormData = z.infer<typeof raidSlotSchema>;
 
 interface RaidSlotSheetProps {
   isOpen: boolean;
@@ -24,55 +32,49 @@ interface RaidSlotSheetProps {
 
 export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotSheetProps) {
   const { serverMembers } = useRaidContext();
-  const [formData, setFormData] = useState({
-    name: slot?.name || "",
-    role: slot?.role || ("" as RaidRole | ""),
-    comment: slot?.comment || "",
-    userId: slot?.userId || null,
-  });
 
-  // Reset form when slot changes or mode changes
-  useState(() => {
-    setFormData({
-      name: slot?.name || "",
-      role: slot?.role || ("" as RaidRole | ""),
-      comment: slot?.comment || "",
-      userId: slot?.userId || null,
-    });
-  });
-
-  const handleSave = () => {
-    if (!formData.name.trim()) {
-      return;
-    }
-
-    onSave({
-      name: formData.name.trim(),
-      role: formData.role || null,
-      comment: formData.comment?.trim() || null,
-      userId: formData.userId,
-    });
-
-    // Reset form
-    setFormData({
+  const form = useForm<RaidSlotFormData>({
+    resolver: zodResolver(raidSlotSchema),
+    defaultValues: {
       name: "",
-      role: "" as RaidRole | "",
+      role: undefined,
       comment: "",
-      userId: null,
+      userId: undefined,
+    },
+  });
+
+  useEffect(() => {
+    if (slot) {
+      form.reset({
+        name: slot.name || "",
+        role: slot.role || undefined,
+        comment: slot.comment || "",
+        userId: slot.userId || undefined,
+      });
+    } else {
+      form.reset({
+        name: "",
+        role: undefined,
+        comment: "",
+        userId: undefined,
+      });
+    }
+  }, [slot, form]);
+
+  const handleSubmit = (data: z.infer<typeof raidSlotSchema>) => {
+    onSave({
+      name: data.name.trim(),
+      role: data.role || null,
+      comment: data.comment?.trim() || null,
+      userId: data.userId || null,
     });
 
+    form.reset();
     onClose();
   };
 
   const handleCancel = () => {
-    // Reset form
-    setFormData({
-      name: "",
-      role: "" as RaidRole | "",
-      comment: "",
-      userId: null,
-    });
-
+    form.reset();
     onClose();
   };
 
@@ -81,121 +83,185 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" size="lg" className="flex flex-col">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-3">
-            <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-              <span className="text-xl">{mode === "add" ? "➕" : "✏️"}</span>
+      <SheetContent side="right" size="xl">
+        <div className="flex h-full flex-col">
+          {/* Header Section */}
+          <SheetHeader className="border-border border-b px-6 pb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+                <span className="text-2xl">{mode === "add" ? "➕" : "✏️"}</span>
+              </div>
+              <div>
+                <SheetTitle className="text-foreground text-2xl font-bold">{title}</SheetTitle>
+                <SheetDescription className="text-muted-foreground text-base">{description}</SheetDescription>
+              </div>
             </div>
-            {title}
-          </SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
-        </SheetHeader>
+          </SheetHeader>
 
-        <div className="flex-1 space-y-6 py-6">
-          <div className="space-y-6">
-            <div>
-              <label className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
-                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                  <span className="text-sm">📝</span>
-                </div>
-                Slot Name
-              </label>
-              <Input
-                placeholder="Enter slot name..."
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
-              />
-              <p className="text-muted-foreground mt-2 text-sm">
-                A descriptive name for this slot (e.g., "Main Tank", "Healer 1")
-              </p>
-            </div>
+          {/* Form Section */}
+          <div className="flex flex-1 flex-col overflow-y-auto">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="flex grow">
+                <div className="flex w-full flex-col justify-between gap-6">
+                  <div className="space-y-6 p-6">
+                    {/* Slot Name */}
+                    <div className="space-y-6">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                              <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                                <span className="text-sm">📝</span>
+                              </div>
+                              Slot Name
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Enter slot name..."
+                                className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription className="text-muted-foreground mt-2 text-sm">
+                              A descriptive name for this slot (e.g., &quot;Main Tank&quot;, &quot;Healer 1&quot;)
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-            <div>
-              <label className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
-                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                  <span className="text-sm">⚔️</span>
-                </div>
-                Role (Optional)
-              </label>
-              <Select
-                value={formData.role}
-                onValueChange={(value) => setFormData({ ...formData, role: value as RaidRole })}
-              >
-                <SelectTrigger className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors">
-                  <SelectValue placeholder="Select role..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {ROLE_OPTIONS.map((option: { value: RaidRole; label: string }) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-muted-foreground mt-2 text-sm">Choose the primary role for this slot</p>
-            </div>
+                    {/* Divider */}
+                    <div className="border-border border-t"></div>
 
-            <div>
-              <label className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
-                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                  <span className="text-sm">👤</span>
-                </div>
-                Member (Optional)
-              </label>
-              <MemberSelection
-                members={serverMembers}
-                selectedUserId={formData.userId}
-                onSelect={(userId) => setFormData({ ...formData, userId })}
-                placeholder="Select a member..."
-              />
-              <p className="text-muted-foreground mt-2 text-sm">Assign a specific member to this slot</p>
-            </div>
+                    {/* Role and Member */}
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                      {/* Role */}
+                      <FormField
+                        control={form.control}
+                        name="role"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                              <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                                <span className="text-sm">⚔️</span>
+                              </div>
+                              Role (Optional)
+                            </FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger className="text-foreground focus:border-primary/50 h-12 w-full border-2 text-base transition-colors">
+                                  <SelectValue placeholder="Select role..." />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {ROLE_OPTIONS.map((option: { value: RaidRole; label: string }) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormDescription className="text-muted-foreground mt-2 text-sm">
+                              Choose the primary role for this slot
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-            <div>
-              <label className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
-                <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                  <span className="text-sm">💬</span>
+                      {/* Member */}
+                      <FormField
+                        control={form.control}
+                        name="userId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                              <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                                <span className="text-sm">👤</span>
+                              </div>
+                              Member (Optional)
+                            </FormLabel>
+                            <FormControl>
+                              <MemberSelection
+                                members={serverMembers}
+                                selectedUserId={field.value}
+                                onSelect={field.onChange}
+                                placeholder="Select a member..."
+                              />
+                            </FormControl>
+                            <FormDescription className="text-muted-foreground mt-2 text-sm">
+                              Assign a specific member to this slot
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-border border-t"></div>
+
+                    {/* Comment */}
+                    <div className="space-y-6">
+                      <FormField
+                        control={form.control}
+                        name="comment"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                              <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+                                <span className="text-sm">💬</span>
+                              </div>
+                              Comment (Optional)
+                            </FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Enter slot requirements or notes..."
+                                className="focus:border-primary/50 min-h-[120px] resize-none border-2 text-base leading-relaxed transition-colors"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription className="text-muted-foreground mt-2 text-sm">
+                              Add any special requirements or notes for this slot
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="border-border bg-muted/30 px-6 py-4">
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="lg"
+                        className="hover:bg-muted flex-1 transition-all duration-200"
+                        onClick={handleCancel}
+                      >
+                        <FontAwesomeIcon icon={faTimes} className="mr-2 h-4 w-4" />
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 transition-all duration-200"
+                      >
+                        <FontAwesomeIcon icon={faSave} className="mr-2 h-4 w-4" />
+                        {mode === "add" ? "Add Slot" : "Save Changes"}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                Comment (Optional)
-              </label>
-              <Textarea
-                placeholder="Enter slot requirements or notes..."
-                value={formData.comment}
-                onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                className="focus:border-primary/50 h-20 border-2 text-base font-medium transition-colors"
-                rows={3}
-              />
-              <p className="text-muted-foreground mt-2 text-sm">Add any special requirements or notes for this slot</p>
-            </div>
+              </form>
+            </Form>
           </div>
         </div>
-
-        <SheetFooter className="border-border bg-muted/30 -mx-6 -mb-6 mt-8 border-t px-6 py-6">
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              className="hover:bg-muted flex-1 transition-all duration-200"
-              onClick={handleCancel}
-            >
-              <FontAwesomeIcon icon={faTimes} className="mr-2 h-4 w-4" />
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 transition-all duration-200"
-              onClick={handleSave}
-              disabled={!formData.name.trim()}
-            >
-              <FontAwesomeIcon icon={faSave} className="mr-2 h-4 w-4" />
-              {mode === "add" ? "Add Slot" : "Save Changes"}
-            </Button>
-          </div>
-        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
