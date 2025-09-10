@@ -49,6 +49,7 @@
     "@albion-raid-manager/logger": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
     "@albion-raid-manager/redis": "workspace:*",
+    "@albion-raid-manager/discord": "workspace:*",
     "cron": "^3.1.7"
   },
   "devDependencies": {

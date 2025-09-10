@@ -1,5 +1,5 @@
 import { ensureUser } from "@albion-raid-manager/database";
-import { discordService, isAxiosError } from "@albion-raid-manager/discord";
+import { DiscordService, isAxiosError } from "@albion-raid-manager/discord";
 import { transformUser } from "@albion-raid-manager/discord/helpers";
 import { logger } from "@albion-raid-manager/logger";
 import { APIErrorType, APIResponse, GetMeResponse } from "@albion-raid-manager/types/api";
@@ -12,7 +12,7 @@ export const authRouter: Router = Router();
 
 authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<GetMeResponse>>) => {
   const get = async () => {
-    const discordUser = await discordService.users.getCurrentUser({
+    const discordUser = await DiscordService.users.getCurrentUser({
       type: "user",
       token: req.session.accessToken,
     });
@@ -31,7 +31,7 @@ authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<
   } catch {
     if (req.session.refreshToken) {
       try {
-        const { access_token, refresh_token } = await discordService.auth.refreshToken(req.session.refreshToken);
+        const { access_token, refresh_token } = await DiscordService.auth.refreshToken(req.session.refreshToken);
         req.session.accessToken = access_token;
         req.session.refreshToken = refresh_token;
         req.session.save();
@@ -50,9 +50,9 @@ authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<
 authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type>) => {
   try {
     const { code, redirectUri } = discordCallbackSchema.parse(req.body);
-    const { access_token, refresh_token } = await discordService.auth.exchangeCode(code, redirectUri);
+    const { access_token, refresh_token } = await DiscordService.auth.exchangeCode(code, redirectUri);
 
-    const discordUser = await discordService.users.getCurrentUser({
+    const discordUser = await DiscordService.users.getCurrentUser({
       type: "user",
       token: access_token,
     });

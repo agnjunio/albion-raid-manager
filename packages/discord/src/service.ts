@@ -11,7 +11,7 @@ import {
 } from "./service/servers";
 import { getCurrentUser, getUser } from "./service/users";
 
-export const discordService = {
+export const DiscordService = {
   auth: {
     exchangeCode,
     refreshToken,

@@ -15,7 +15,6 @@ import {
 import { CacheInvalidation, CacheKeys, withCache } from "@albion-raid-manager/core/cache/redis";
 
 import { ServersService } from "./servers";
-
 export interface RaidServiceOptions {
   cache?: Cache;
   cacheTtl?: number;
@@ -367,6 +366,10 @@ export namespace RaidService {
         ServiceErrorCode.INVALID_STATE,
         "Cannot modify slots for raids that have started or finished",
       );
+    }
+
+    if (input.userId) {
+      await ServersService.getServerMember(slot.raid.serverId, input.userId);
     }
 
     const updatedRaid = await prisma.raid.update({

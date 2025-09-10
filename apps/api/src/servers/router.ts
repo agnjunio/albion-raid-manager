@@ -1,5 +1,5 @@
 import { ServersService } from "@albion-raid-manager/core/services";
-import { discordService, isAxiosError } from "@albion-raid-manager/discord";
+import { DiscordService, isAxiosError } from "@albion-raid-manager/discord";
 import { logger } from "@albion-raid-manager/logger";
 import {
   APIErrorType,
@@ -33,7 +33,7 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
 
     const [botServers, adminServers] = await Promise.all([
       ServersService.getServersForUser(req.session.user.id),
-      discordService.servers.getServers({
+      DiscordService.servers.getServers({
         type: "user",
         token: req.session.accessToken,
         admin: true,
@@ -81,7 +81,7 @@ serverRouter.post(
     try {
       const { serverId } = req.body;
 
-      const discordServer = await discordService.servers.getServer(serverId);
+      const discordServer = await DiscordService.servers.getServer(serverId);
       if (!discordServer) {
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
@@ -145,7 +145,7 @@ serverRouter.get(
       }
 
       // Get Discord server members
-      const discordMembers = await discordService.servers.getServerMembers(serverId);
+      const discordMembers = await DiscordService.servers.getServerMembers(serverId);
 
       // Get registered members from database
       const registeredMembers = await ServersService.getServerMembers(serverId);

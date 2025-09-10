@@ -6,6 +6,8 @@ import { Server } from "@albion-raid-manager/types";
 
 import { CacheInvalidation, CacheKeys, withCache } from "@albion-raid-manager/core/cache/redis";
 
+import { UsersService } from "./users";
+
 export interface ServersServiceOptions {
   cache?: Cache;
   cacheTtl?: number;
@@ -124,6 +126,37 @@ export namespace ServersService {
           where: { serverId },
           include: { user: true },
         }),
+      {
+        cache,
+        key: cacheKey,
+        ttl: cacheTtl,
+      },
+    );
+  }
+
+  export async function getServerMember(serverId: string, userId: string, options: ServersServiceOptions = {}) {
+    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+    const cacheKey = CacheKeys.serverMember(serverId, userId);
+
+    return withCache(
+      async () => {
+        let serverMember = await prisma.serverMember.findUnique({
+          where: { serverId_userId: { serverId, userId } },
+        });
+
+        if (!serverMember) {
+          const user = await UsersService.getUser(userId);
+
+          serverMember = await prisma.serverMember.create({
+            data: {
+              serverId,
+              userId: user.id,
+            },
+          });
+        }
+
+        return serverMember;
+      },
       {
         cache,
         key: cacheKey,
