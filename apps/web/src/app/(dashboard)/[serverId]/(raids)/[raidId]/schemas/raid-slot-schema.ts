@@ -11,4 +11,5 @@ export const raidSlotSchema = z.object({
     .optional(),
   comment: z.string().optional(),
   userId: z.string().optional(),
+  order: z.number().int().min(0).optional(),
 });

@@ -47,7 +47,7 @@ export function MemberSelection({
   };
 
   const handleClear = () => {
-    onSelect(null);
+    onSelect(undefined);
     setOpen(false);
     setSearchValue("");
   };
