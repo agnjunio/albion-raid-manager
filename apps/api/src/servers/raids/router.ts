@@ -128,7 +128,7 @@ serverRaidsRouter.post(
     res: Response<APIResponse.Type<CreateRaidSlot.Response>>,
   ) => {
     const { raidId } = req.params;
-    const { name, role, comment } = req.body;
+    const { name, role, comment, order } = req.body;
 
     try {
       const raid = await RaidService.createRaidSlot(
@@ -137,6 +137,7 @@ serverRaidsRouter.post(
           name,
           role,
           comment,
+          order,
         },
         { publisher: await getRaidEventPublisher() },
       );

@@ -43,7 +43,7 @@ export namespace RaidService {
           date,
           type: raidType,
           contentType: contentTypeInfo.type,
-          maxPlayers: contentTypeInfo.partySize.max ?? null,
+          maxPlayers: contentTypeInfo.partySize?.max ?? null,
           location,
           serverId,
           status: "SCHEDULED",
@@ -56,7 +56,7 @@ export namespace RaidService {
       // Create slots for FIXED raids
       if (raidType === "FIXED") {
         try {
-          const slotCount = contentTypeInfo.partySize.min ?? 0;
+          const slotCount = contentTypeInfo.partySize?.min ?? 0;
 
           await tx.raidSlot.createMany({
             data: Array.from({ length: slotCount }, (_, i) => ({
@@ -115,7 +115,14 @@ export namespace RaidService {
       async () => {
         return prisma.raid.findUnique({
           where: { id },
-          include,
+          include: {
+            ...include,
+            slots: include.slots
+              ? {
+                  orderBy: { order: "asc" },
+                }
+              : false,
+          },
         });
       },
       {
@@ -272,10 +279,11 @@ export namespace RaidService {
       name: string;
       role?: RaidRole;
       comment?: string;
+      order?: number;
     },
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { raidId, name, role, comment } = input;
+    const { raidId, name, role, comment, order } = input;
     const { cache, publisher } = options;
 
     // Verify the raid exists and is in a state where slots can be modified
@@ -300,6 +308,7 @@ export namespace RaidService {
             name,
             role,
             comment,
+            order: order ?? (raid.slots?.length || 0),
           },
         },
       },
@@ -337,6 +346,7 @@ export namespace RaidService {
       role?: RaidRole;
       comment?: string;
       userId?: string | null;
+      order?: number;
     },
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
@@ -371,6 +381,7 @@ export namespace RaidService {
               comment: input.comment,
               userId: input.userId,
               joinedAt: input.userId ? new Date() : null,
+              order: input.order,
             },
           },
         },

@@ -182,12 +182,14 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
 
   const handleRaidSlotCreate = async (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => {
     try {
+      const currentSlotCount = raid.slots?.length || 0;
       await createRaidSlot({
         params: { serverId, raidId },
         body: {
           name: slot.name,
           role: slot.role || undefined,
           comment: slot.comment || undefined,
+          order: currentSlotCount,
         },
       }).unwrap();
 

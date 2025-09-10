@@ -14,4 +14,5 @@ export const createRaidSlotSchema = z.object({
   name: z.string().min(3),
   role: z.custom<RaidRole>().optional(),
   comment: z.string().optional(),
+  order: z.number().int().min(0).optional(),
 });
