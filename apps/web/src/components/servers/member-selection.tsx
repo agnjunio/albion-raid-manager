@@ -85,25 +85,32 @@ export function MemberSelection({
               </>
             )}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {selectedMember && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hover:bg-destructive hover:text-destructive-foreground h-6 w-6 p-0"
+              <div
+                className="hover:bg-destructive/2 0 hover:text-destructive-foreground flex h-6 w-6 cursor-pointer items-center justify-center rounded-sm transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleClear();
                 }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClear();
+                  }
+                }}
               >
                 <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
-              </Button>
+              </div>
             )}
             <FontAwesomeIcon icon={faSearch} className="h-4 w-4 shrink-0 opacity-50" />
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+      <PopoverContent className="p-0" align="start">
         <Command>
           <CommandInput placeholder="Search members..." value={searchValue} onValueChange={setSearchValue} />
           <CommandList>

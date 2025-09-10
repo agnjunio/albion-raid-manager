@@ -159,7 +159,7 @@ serverRouter.get(
 
         return {
           ...discordMember,
-          isRegistered: !!registeredMember,
+          isRegistered: registeredMember?.albionPlayerId ? true : false,
           albionPlayerId: registeredMember?.albionPlayerId || null,
           albionGuildId: registeredMember?.albionGuildId || null,
           killFame: registeredMember?.killFame || 0,
