@@ -1,7 +1,8 @@
 import type { RaidRole } from "@albion-raid-manager/types";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
+import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
 import { toast } from "sonner";
 
 import { type EditingSlot } from "../helpers/raid-composition-utils";
@@ -12,6 +13,8 @@ interface RaidSlotContextValue {
   // State
   editingSlot: EditingSlot | null;
   isAddingSlot: boolean;
+  isReordering: boolean;
+  currentSlotCount: number;
 
   // Actions
   startEditingSlot: (slot: {
@@ -33,6 +36,12 @@ interface RaidSlotContextValue {
     userId?: string | null;
   }) => void;
   deleteSlot: (slotId: string) => void;
+  reorderSlots: (activeId: string, overId: string) => void;
+
+  // Conditions
+  canEditRaidSlot: boolean;
+  canAddRaidSlot: boolean;
+  canDeleteRaidSlot: boolean;
 }
 
 const RaidSlotContext = createContext<RaidSlotContextValue | undefined>(undefined);
@@ -42,17 +51,27 @@ interface RaidSlotProviderProps {
 }
 
 export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
-  const {
-    raid,
-    handleRaidSlotCreate,
-    handleRaidSlotUpdate,
-    handleRaidSlotDelete,
-    canEditComposition,
-    canChangeRaidSlotCount,
-  } = useRaidContext();
+  const { raid, handleRaidSlotCreate, handleRaidSlotUpdate, handleRaidSlotDelete, canManageRaid } = useRaidContext();
 
   const [editingSlot, setEditingSlot] = useState<EditingSlot | null>(null);
   const [isAddingSlot, setIsAddingSlot] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
+
+  const contentTypeInfo = useMemo(() => getContentTypeInfo(raid.contentType), [raid.contentType]);
+  const currentSlotCount = useMemo(() => raid.slots?.length || 0, [raid.slots]);
+
+  const canEditRaidSlot = useMemo(
+    () => canManageRaid && (raid.status === "SCHEDULED" || raid.status === "OPEN" || raid.status === "CLOSED"),
+    [canManageRaid, raid.status],
+  );
+  const canAddRaidSlot = useMemo(
+    () => canEditRaidSlot && (!contentTypeInfo.partySize?.max || currentSlotCount < contentTypeInfo.partySize.max),
+    [canEditRaidSlot, contentTypeInfo.partySize?.max, currentSlotCount],
+  );
+  const canDeleteRaidSlot = useMemo(
+    () => canEditRaidSlot && (!contentTypeInfo.partySize?.min || currentSlotCount > contentTypeInfo.partySize.min),
+    [canEditRaidSlot, contentTypeInfo.partySize?.min, currentSlotCount],
+  );
 
   const startEditingSlot = (slot: {
     id: string;
@@ -61,7 +80,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     comment?: string | null;
     userId?: string | null;
   }) => {
-    if (!canEditComposition) {
+    if (!canEditRaidSlot) {
       toast.error("Cannot edit slot", {
         description: "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
       });
@@ -78,9 +97,9 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
   };
 
   const startAddingSlot = () => {
-    if (!canEditComposition) {
+    if (!canAddRaidSlot) {
       toast.error("Cannot add slot", {
-        description: "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
+        description: "Cannot add more slots. Maximum party size reached or raid is not editable.",
       });
       return;
     }
@@ -130,9 +149,9 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
   };
 
   const deleteSlot = (slotId: string) => {
-    if (!canChangeRaidSlotCount) {
+    if (!canDeleteRaidSlot) {
       toast.error("Cannot delete slot", {
-        description: "Slot deletion is not allowed for this raid type.",
+        description: "Cannot delete slots. Minimum party size reached or raid is not editable.",
       });
       return;
     }
@@ -144,10 +163,60 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     handleRaidSlotDelete(slotId);
   };
 
+  const reorderSlots = async (activeId: string, overId: string) => {
+    if (!canEditRaidSlot) {
+      toast.error("Cannot reorder slots", {
+        description: "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
+      });
+      return;
+    }
+
+    const slots = raid.slots || [];
+    const activeIndex = slots.findIndex((slot) => slot.id === activeId);
+    const overIndex = slots.findIndex((slot) => slot.id === overId);
+
+    if (activeIndex === -1 || overIndex === -1) {
+      return;
+    }
+
+    // Set loading state
+    setIsReordering(true);
+
+    try {
+      // Create a new array with the reordered slots
+      const newSlots = [...slots];
+      const [removed] = newSlots.splice(activeIndex, 1);
+      newSlots.splice(overIndex, 0, removed);
+
+      // Only update slots that have actually changed position
+      const slotsToUpdate = newSlots
+        .map((slot, index) => ({ slot, newOrder: index }))
+        .filter(({ slot, newOrder }) => slot.order !== newOrder);
+
+      // Update each slot that needs reordering
+      const updatePromises = slotsToUpdate.map(({ slot, newOrder }) =>
+        handleRaidSlotUpdate(slot.id, { order: newOrder }),
+      );
+
+      // Wait for all updates to complete
+      await Promise.all(updatePromises);
+    } catch (error) {
+      console.error("Failed to reorder slots:", error);
+      toast.error("Failed to reorder slots", {
+        description: "Please try again.",
+      });
+    } finally {
+      // Clear loading state
+      setIsReordering(false);
+    }
+  };
+
   const value: RaidSlotContextValue = {
     // State
     editingSlot,
     isAddingSlot,
+    isReordering,
+    currentSlotCount,
 
     // Actions
     startEditingSlot,
@@ -158,6 +227,12 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     // CRUD operations
     saveSlot,
     deleteSlot,
+    reorderSlots,
+
+    // Conditions
+    canEditRaidSlot,
+    canAddRaidSlot,
+    canDeleteRaidSlot,
   };
 
   return <RaidSlotContext.Provider value={value}>{children}</RaidSlotContext.Provider>;

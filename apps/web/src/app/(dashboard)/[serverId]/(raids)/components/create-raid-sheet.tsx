@@ -174,9 +174,7 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                           onValueChange={(value) => {
                             field.onChange(value);
                             const defaultLocation = getContentTypeInfo(value).defaultLocation;
-                            if (defaultLocation) {
-                              form.setValue("location", defaultLocation);
-                            }
+                            form.setValue("location", defaultLocation);
                           }}
                           defaultValue={field.value}
                         >
@@ -245,16 +243,16 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                     name="location"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-base font-medium">
-                          <div className="bg-muted flex h-6 w-6 items-center justify-center rounded-lg">
-                            <FontAwesomeIcon icon={faLocationDot} className="text-muted-foreground h-3 w-3" />
+                        <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                          <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+                            <FontAwesomeIcon icon={faLocationDot} className="text-muted-foreground h-4 w-4" />
                           </div>
                           Location (Optional)
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder="e.g., Black Zone, Royal City..."
-                            className="focus:border-primary/50 h-10 border-2 text-base transition-colors"
+                            className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
                             {...field}
                           />
                         </FormControl>

@@ -8,15 +8,15 @@ import { useRaidContext } from "../contexts/raid-context";
 import { useRaidSlotContext } from "../contexts/raid-slot-context";
 import { useViewMode } from "../contexts/view-mode-context";
 
-import { RaidCompositionGridView } from "./raid-composition-grid-view";
-import { RaidCompositionListView } from "./raid-composition-list-view";
+import { RaidCompositionList } from "./raid-composition-list";
 import { RaidSlotSheet } from "./raid-slot-sheet";
 import { ViewToggle } from "./view-toggle";
 
 export function RaidComposition() {
-  const { raid, canEditComposition, isFlexRaid, currentSlotCount, maxSlots, canAddSlots } = useRaidContext();
+  const { raid, isFlexRaid, maxSlots } = useRaidContext();
   const { viewMode, setViewMode } = useViewMode();
-  const { isAddingSlot, startAddingSlot, saveSlot, cancelAdding } = useRaidSlotContext();
+  const { isAddingSlot, currentSlotCount, startAddingSlot, saveSlot, cancelAdding, canEditRaidSlot, canAddRaidSlot } =
+    useRaidSlotContext();
 
   return (
     <Card>
@@ -30,16 +30,14 @@ export function RaidComposition() {
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold">Raid Composition</h2>
               </div>
-              {canAddSlots && (
-                <p className="text-muted-foreground text-sm">
-                  {currentSlotCount} / {maxSlots === 0 ? "∞" : maxSlots} slots
-                </p>
-              )}
+              <p className="text-muted-foreground text-sm">
+                {currentSlotCount} / {maxSlots === 0 ? "∞" : maxSlots} slots
+              </p>
             </div>
           </CardTitle>
           <div className="flex items-center gap-3">
             <ViewToggle currentView={viewMode} onViewChange={setViewMode} />
-            {canEditComposition && canAddSlots && (
+            {canEditRaidSlot && canAddRaidSlot && (
               <Button
                 onClick={startAddingSlot}
                 size="sm"
@@ -54,7 +52,7 @@ export function RaidComposition() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {!canEditComposition && (
+        {!canEditRaidSlot && (
           <div className="mb-3 rounded-lg bg-yellow-50 p-3 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
             <p className="text-sm">
               Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.
@@ -62,8 +60,7 @@ export function RaidComposition() {
           </div>
         )}
 
-        {/* Slots List */}
-        {viewMode === "grid" ? <RaidCompositionGridView /> : <RaidCompositionListView />}
+        <RaidCompositionList viewMode={viewMode} />
 
         {(!raid.slots || raid.slots.length === 0) && (
           <div className="py-12 text-center">

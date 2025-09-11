@@ -133,6 +133,50 @@ alwaysApply: true
 - **Apply consistent input styling** with focus states and transitions
 - **Use proper input types** (Input, Select, Textarea, DateTimePicker)
 
+### Standard Form Label and Icon Sizing
+
+**CRITICAL: Use consistent sizing across all forms for visual harmony.**
+
+#### Required Fields (Primary Styling)
+
+```tsx
+<FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+  <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+    <FontAwesomeIcon icon={faIcon} className="text-primary h-4 w-4" />
+  </div>
+  Field Label
+</FormLabel>
+```
+
+#### Optional Fields (Muted Styling)
+
+```tsx
+<FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+  <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+    <FontAwesomeIcon icon={faIcon} className="text-muted-foreground h-4 w-4" />
+  </div>
+  Field Label (Optional)
+</FormLabel>
+```
+
+#### Header Icons (Sheet/Modal Headers)
+
+```tsx
+<div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
+  <FontAwesomeIcon icon={faIcon} className="text-primary h-6 w-6" />
+</div>
+```
+
+#### Standard Sizes
+
+- **Field Labels**: `text-lg font-semibold` (both required and optional)
+- **Field Icon Containers**: `h-8 w-8` (both required and optional)
+- **Field Icons**: `h-4 w-4` (both required and optional)
+- **Header Icon Containers**: `h-12 w-12`
+- **Header Icons**: `h-6 w-6`
+- **Required Fields**: Use `text-foreground` and `bg-primary/10` with `text-primary` icons
+- **Optional Fields**: Use `text-muted-foreground` and `bg-muted` with `text-muted-foreground` icons
+
 ### Form Validation
 
 - **Define Zod schemas** in separate schema files

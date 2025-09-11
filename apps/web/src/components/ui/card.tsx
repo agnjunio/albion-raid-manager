@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 interface CardProps extends React.ComponentProps<"div"> {
   variant?: "default" | "outline";
 }
-function Card({ variant = "default", className, ...props }: CardProps) {
+const Card = React.forwardRef<HTMLDivElement, CardProps>(({ variant = "default", className, ...props }, ref) => {
   const variantClass = {
     default: "bg-card text-card-foreground border-[var(--card-border)] shadow-[var(--card-shadow)]",
     outline: "bg-card border-[var(--card-border)] text-card-foreground",
@@ -13,12 +13,14 @@ function Card({ variant = "default", className, ...props }: CardProps) {
 
   return (
     <div
+      ref={ref}
       data-slot="card"
       className={cn("bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6", variantClass, className)}
       {...props}
     />
   );
-}
+});
+Card.displayName = "Card";
 
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="card-header" className={cn("flex flex-col gap-1.5 px-6", className)} {...props} />;

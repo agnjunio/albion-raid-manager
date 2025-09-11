@@ -2,7 +2,16 @@ import type { RaidRole } from "@albion-raid-manager/types";
 
 import { useEffect } from "react";
 
-import { faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faComment,
+  faFilePen,
+  faPenToSquare,
+  faPlus,
+  faSave,
+  faShieldAlt,
+  faTimes,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -89,7 +98,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
           <SheetHeader className="border-border border-b px-6 pb-6">
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-lg">
-                <span className="text-2xl">{mode === "add" ? "➕" : "✏️"}</span>
+                <FontAwesomeIcon icon={mode === "add" ? faPlus : faPenToSquare} className="text-primary h-6 w-6" />
               </div>
               <div>
                 <SheetTitle className="text-foreground text-2xl font-bold">{title}</SheetTitle>
@@ -113,7 +122,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                           <FormItem>
                             <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
                               <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                                <span className="text-sm">📝</span>
+                                <FontAwesomeIcon icon={faFilePen} className="text-primary h-4 w-4" />
                               </div>
                               Slot Name
                             </FormLabel>
@@ -144,9 +153,9 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                         name="role"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
-                              <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                                <span className="text-sm">⚔️</span>
+                            <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                              <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+                                <FontAwesomeIcon icon={faShieldAlt} className="text-muted-foreground h-4 w-4" />
                               </div>
                               Role (Optional)
                             </FormLabel>
@@ -178,9 +187,9 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                         name="userId"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
-                              <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
-                                <span className="text-sm">👤</span>
+                            <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                              <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+                                <FontAwesomeIcon icon={faUser} className="text-muted-foreground h-4 w-4" />
                               </div>
                               Member (Optional)
                             </FormLabel>
@@ -213,7 +222,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                           <FormItem>
                             <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
                               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
-                                <span className="text-sm">💬</span>
+                                <FontAwesomeIcon icon={faComment} className="text-muted-foreground h-4 w-4" />
                               </div>
                               Comment (Optional)
                             </FormLabel>

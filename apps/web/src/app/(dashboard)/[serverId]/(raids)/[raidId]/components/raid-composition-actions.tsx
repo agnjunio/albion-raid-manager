@@ -1,11 +1,10 @@
 import { RaidSlot } from "@albion-raid-manager/types";
-import { faEdit, faGripVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { useRaidContext } from "../contexts/raid-context";
 import { useRaidSlotContext } from "../contexts/raid-slot-context";
 
 interface RaidCompositionActionsProps {
@@ -15,10 +14,9 @@ interface RaidCompositionActionsProps {
 }
 
 export function RaidCompositionActions({ slot, viewMode, className }: RaidCompositionActionsProps) {
-  const { canEditComposition, canChangeRaidSlotCount } = useRaidContext();
-  const { startEditingSlot, deleteSlot } = useRaidSlotContext();
+  const { startEditingSlot, deleteSlot, canDeleteRaidSlot, canEditRaidSlot } = useRaidSlotContext();
 
-  if (!canEditComposition) return null;
+  if (!canEditRaidSlot) return null;
 
   const buttonSize = viewMode === "list" ? "icon" : "sm";
   const iconSize = viewMode === "list" ? "size-4" : "size-3";
@@ -28,7 +26,7 @@ export function RaidCompositionActions({ slot, viewMode, className }: RaidCompos
       <Button onClick={() => startEditingSlot(slot)} variant="outline" size={buttonSize}>
         <FontAwesomeIcon icon={faEdit} className={iconSize} />
       </Button>
-      {canChangeRaidSlotCount && (
+      {canDeleteRaidSlot && (
         <Button
           onClick={() => deleteSlot(slot.id)}
           variant="outline"
@@ -38,9 +36,6 @@ export function RaidCompositionActions({ slot, viewMode, className }: RaidCompos
           <FontAwesomeIcon icon={faTrash} className={iconSize} />
         </Button>
       )}
-      <Button onClick={() => {}} variant="ghost" size={buttonSize}>
-        <FontAwesomeIcon icon={faGripVertical} className={iconSize} />
-      </Button>
     </div>
   );
 }
