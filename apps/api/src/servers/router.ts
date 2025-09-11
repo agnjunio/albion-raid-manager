@@ -1,5 +1,5 @@
-import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
 import { logger } from "@albion-raid-manager/core/logger";
+import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
 import {
   APIErrorType,
   APIResponse,
@@ -156,8 +156,8 @@ serverRouter.get(
 
           return {
             id,
-            username: registeredMember?.user?.username || discordMember.user.username,
-            nickname: registeredMember?.nickname || discordMember.nick,
+            username: discordMember.user.username || registeredMember?.user?.username || "",
+            nickname: discordMember.nick || registeredMember?.nickname || null,
             avatar: discordMember.avatar || discordMember.user.avatar,
             roles: discordMember.roles,
             adminPermission: registeredMember?.adminPermission || false,

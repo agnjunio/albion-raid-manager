@@ -1,68 +1,24 @@
-import type { RaidRole, RaidSlot } from "@albion-raid-manager/types";
+import type { RaidSlot } from "@albion-raid-manager/types";
 
-import { useMemo } from "react";
-
-import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
-import { faEdit, faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { useRaidContext } from "../contexts/raid-context";
-import { getRoleColor, getRoleIcon, type EditingSlot } from "../helpers/raid-composition-utils";
+import { useRaidSlotContext } from "../contexts/raid-slot-context";
+import { getRoleColor, getRoleIcon } from "../helpers/raid-composition-utils";
 
+import { RaidCompositionActions } from "./raid-composition-actions";
 import { RaidSlotSheet } from "./raid-slot-sheet";
+import { ServerMemberInfo } from "./server-member-info";
 
-interface RaidCompositionListViewProps {
-  editingSlot: EditingSlot | null;
-  onEditSlot: (slot: {
-    id: string;
-    name: string;
-    role?: RaidRole | null;
-    comment?: string | null;
-    userId?: string | null;
-  }) => void;
-  onSaveSlot: (slotData: {
-    name: string;
-    role?: RaidRole | null;
-    comment?: string | null;
-    userId?: string | null;
-  }) => void;
-  onCancelEdit: () => void;
-  onDeleteSlot: (slotId: string) => void;
-  setEditingSlot: (slot: EditingSlot | null) => void;
-}
-
-export function RaidCompositionListView({
-  editingSlot,
-  onEditSlot,
-  onSaveSlot,
-  onCancelEdit,
-  onDeleteSlot,
-  setEditingSlot,
-}: RaidCompositionListViewProps) {
-  const { raid, canEditComposition, canChangeRaidSlotCount } = useRaidContext();
+export function RaidCompositionListView() {
+  const { raid } = useRaidContext();
+  const { editingSlot, saveSlot, cancelEditing } = useRaidSlotContext();
   const slots = raid.slots || [];
-
-  const handleSaveSlot = (slotData: {
-    name: string;
-    role?: RaidRole | null;
-    comment?: string | null;
-    userId?: string | null;
-  }) => {
-    if (editingSlot) {
-      onSaveSlot(slotData);
-      setEditingSlot(null);
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingSlot(null);
-    onCancelEdit();
-  };
 
   if (slots.length === 0) {
     return (
@@ -74,55 +30,49 @@ export function RaidCompositionListView({
 
   return (
     <>
-      <div className="space-y-2">
+      <div className="flex flex-col gap-1">
         {slots.map((slot: RaidSlot) => (
-          <Card key={slot.id} className="transition-all duration-200 hover:shadow-md">
-            <CardContent className="p-4">
+          <Card key={slot.id} className="hover:bg-muted/50 py-4 transition-all duration-200 hover:shadow-sm">
+            <CardContent className="px-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
                   {/* Role Icon */}
-                  <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-lg">
+                  <div className="bg-muted flex size-12 items-center justify-center rounded-lg">
                     <span className="text-xl">{slot.role ? getRoleIcon(slot.role) : "❓"}</span>
                   </div>
 
                   {/* Slot Info */}
                   <div className="min-w-0 flex-1">
-                    <div className="mb-2 flex items-center gap-3">
-                      <h4 className="truncate text-lg font-semibold">{slot.name}</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="truncate text-base font-medium">{slot.name}</h4>
                       {slot.role && (
-                        <Badge variant="outline" className={`text-xs ${getRoleColor(slot.role)}`}>
+                        <Badge variant="outline" className={`px-1.5 py-0.5 text-xs ${getRoleColor(slot.role)}`}>
                           {slot.role.replace("_", " ")}
                         </Badge>
                       )}
+
+                      {slot.comment && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FontAwesomeIcon icon={faComment} className="mt-0.5 size-3" />
+                          </TooltipTrigger>
+                          <TooltipContent variant="info">
+                            <pre className="text-muted-foreground flex flex-1 items-center gap-2 text-wrap text-xs leading-relaxed">
+                              {slot.comment}
+                            </pre>
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
                     </div>
 
-                    {slot.userId && <ServerMemberInfo userId={slot.userId} />}
-                    {slot.comment && (
-                      <p className="text-muted-foreground mb-2 text-sm leading-relaxed">{slot.comment}</p>
-                    )}
+                    <div className="mt-0.5 flex items-center gap-3">
+                      <ServerMemberInfo userId={slot.userId} size="md" />
+                    </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                {canEditComposition && (
-                  <div className="flex gap-2">
-                    <Button onClick={() => onEditSlot(slot)} variant="outline" size="sm">
-                      <FontAwesomeIcon icon={faEdit} className="mr-2 h-4 w-4" />
-                      Edit
-                    </Button>
-                    {canChangeRaidSlotCount && (
-                      <Button
-                        onClick={() => onDeleteSlot(slot.id)}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
-                        Delete
-                      </Button>
-                    )}
-                  </div>
-                )}
+                <RaidCompositionActions slot={slot} viewMode="list" />
               </div>
             </CardContent>
           </Card>
@@ -130,30 +80,7 @@ export function RaidCompositionListView({
       </div>
 
       {/* Edit Slot Sheet */}
-      <RaidSlotSheet
-        isOpen={!!editingSlot}
-        onClose={handleCancelEdit}
-        mode="edit"
-        slot={editingSlot}
-        onSave={handleSaveSlot}
-      />
+      <RaidSlotSheet isOpen={!!editingSlot} onClose={cancelEditing} mode="edit" slot={editingSlot} onSave={saveSlot} />
     </>
-  );
-}
-
-function ServerMemberInfo({ userId }: { userId: string }) {
-  const { serverMembers } = useRaidContext();
-  const serverMember = useMemo(() => serverMembers.find((m) => m.id === userId), [serverMembers, userId]);
-
-  return (
-    <div className="flex items-center gap-2">
-      <Avatar className="h-6 w-6">
-        <AvatarImage src={getUserPictureUrl(userId, serverMember?.avatar)} />
-        <AvatarFallback className="bg-primary/10">
-          <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
-        </AvatarFallback>
-      </Avatar>
-      <span className="text-muted-foreground text-xs">{serverMember?.nickname || "Unknown Member"}</span>
-    </div>
   );
 }
