@@ -32,7 +32,6 @@
   "packageManager": "pnpm@10.6.1",
   "dependencies": {
     "@albion-raid-manager/core": "workspace:^",
-    "@albion-raid-manager/logger": "workspace:^",
     "axios": "^1.8.4"
   },
   "devDependencies": {

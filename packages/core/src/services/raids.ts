@@ -1,7 +1,6 @@
 import type { Cache, RaidEventPublisher } from "@albion-raid-manager/redis";
 
 import { prisma, Prisma } from "@albion-raid-manager/database";
-import { logger } from "@albion-raid-manager/logger";
 import { Raid, RaidRole } from "@albion-raid-manager/types";
 import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
 import {
@@ -13,6 +12,7 @@ import {
 } from "@albion-raid-manager/types/services";
 
 import { CacheInvalidation, CacheKeys, withCache } from "@albion-raid-manager/core/cache/redis";
+import { logger } from "@albion-raid-manager/core/logger";
 
 import { ServersService } from "./servers";
 export interface RaidServiceOptions {

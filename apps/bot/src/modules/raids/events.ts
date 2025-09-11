@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { isRaidEvent, RaidEventSubscriber, Redis } from "@albion-raid-manager/redis";
 import { Client } from "discord.js";
 

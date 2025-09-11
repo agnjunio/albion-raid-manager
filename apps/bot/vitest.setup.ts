@@ -55,7 +55,7 @@ vi.mock("@anthropic-ai/sdk", () => {
   };
 });
 
-vi.mock("@albion-raid-manager/logger", () => ({
+vi.mock("@albion-raid-manager/core/logger", () => ({
   logger: {
     info: vi.fn(),
     warn: vi.fn(),
@@ -89,7 +89,7 @@ vi.mock("@albion-raid-manager/core", () => ({
 }));
 
 vi.mock("@albion-raid-manager/core/cache/file", () => ({
-  runIfChanged: vi.fn((key: string, fn: () => any) => fn()),
+  runIfChanged: vi.fn((key: string, fn: () => unknown) => fn()),
 }));
 
 vi.mock("@albion-raid-manager/core/entities", () => ({
@@ -191,7 +191,7 @@ vi.mock("@albion-raid-manager/database", () => ({
     BATTLEMOUNT: "BATTLEMOUNT",
   },
 }));
-vi.mock("@albion-raid-manager/logger");
+vi.mock("@albion-raid-manager/core/logger");
 
 // Mock local discord utils
 vi.mock("@/utils/discord", () => ({

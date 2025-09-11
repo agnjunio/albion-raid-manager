@@ -1,5 +1,6 @@
-import { logger } from "@albion-raid-manager/logger";
 import { CronJob } from "cron";
+
+import { logger } from "@albion-raid-manager/core/logger";
 
 type SchedulerCallback = () => Promise<void>;
 

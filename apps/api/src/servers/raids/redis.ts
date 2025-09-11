@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { RaidEventPublisher, Redis } from "@albion-raid-manager/redis";
 
 let raidEventPublisher: RaidEventPublisher | null = null;

@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 
 import bot from "./bot";
 import shard from "./shard";

@@ -1,5 +1,5 @@
 import { prisma } from "@albion-raid-manager/database";
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { GuildMember } from "discord.js";
 
 /**

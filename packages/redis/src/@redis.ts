@@ -1,6 +1,6 @@
 import type { RedisClientType } from "redis";
 
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 
 import { RedisCache } from "./cache";
 import { RedisClient } from "./client";

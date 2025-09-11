@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { RedisClientType } from "redis";
 
 import { RedisEventMessage } from "../events";

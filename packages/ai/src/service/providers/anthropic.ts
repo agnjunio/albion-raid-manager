@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import Anthropic from "@anthropic-ai/sdk";
 
 import { AIProvider } from "../../types";

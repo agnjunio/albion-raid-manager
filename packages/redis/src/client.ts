@@ -1,5 +1,5 @@
 import config from "@albion-raid-manager/core/config";
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { createClient, RedisClientType } from "redis";
 
 export class RedisClient {

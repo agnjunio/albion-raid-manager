@@ -1,6 +1,6 @@
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { ensureUser, prisma, RaidStatus } from "@albion-raid-manager/database";
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { Client, GuildMember, Interaction } from "discord.js";
 
 import { ClientError, ErrorCodes } from "@/errors";

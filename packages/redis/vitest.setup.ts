@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 
 // Mock the logger package globally
-vi.mock("@albion-raid-manager/logger", () => ({
+vi.mock("@albion-raid-manager/core/logger", () => ({
   logger: {
     info: vi.fn(),
     error: vi.fn(),

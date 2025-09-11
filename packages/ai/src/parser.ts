@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 
 import { getAIService } from "./service/factory";
 import { AIParsingError, DiscordMessageContext, ParsedRaidData } from "./types";

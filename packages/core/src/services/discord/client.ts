@@ -1,6 +1,6 @@
-import { logger } from "@albion-raid-manager/logger";
 import axios from "axios";
 
+import { logger } from "@albion-raid-manager/core/logger";
 import { sleep } from "@albion-raid-manager/core/scheduler";
 
 export const discordApiClient = axios.create({

@@ -1,6 +1,6 @@
 import { AlbionAPIError, verifyAlbionPlayer } from "@albion-raid-manager/albion";
 import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
 import { Command } from "@/commands";

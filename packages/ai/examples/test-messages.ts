@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "fs";
 
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 
 import { parseDiscordMessage } from "../src";
 

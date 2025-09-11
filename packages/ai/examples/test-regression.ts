@@ -3,7 +3,7 @@ import type { AIService, RaidRole } from "../src/types";
 import * as fs from "fs";
 import * as path from "path";
 
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 
 import { createAIService } from "../src/service";
 

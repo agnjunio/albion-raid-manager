@@ -1,9 +1,10 @@
 import path from "path";
 
-import config from "@albion-raid-manager/core/config";
 import { createLogger, format, transports } from "winston";
 
-export const logger = createLogger({
+import config from "@albion-raid-manager/core/config";
+
+const logger = createLogger({
   level: config.logger.level,
   format: format.combine(format.timestamp(), format.errors({ stack: true }), format.json()),
   defaultMeta: {
@@ -59,3 +60,5 @@ if (config.logger.files) {
     }),
   );
 }
+
+export { logger };

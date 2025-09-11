@@ -35,7 +35,7 @@ This project uses **pnpm workspaces** exclusively for package management. This i
 **Workspace Dependencies:**
 
 - `pnpm add @albion-raid-manager/core@workspace:*` - Add workspace dependency
-- `pnpm add -D @albion-raid-manager/logger@workspace:*` - Add workspace dev dependency
+- `pnpm add -D @albion-raid-manager/core@workspace:*` - Add workspace dev dependency
 
 **Running Scripts:**
 
@@ -96,7 +96,7 @@ Use `workspace:*` syntax for internal dependencies:
 {
   "dependencies": {
     "@albion-raid-manager/core": "workspace:*",
-    "@albion-raid-manager/logger": "workspace:*"
+    "@albion-raid-manager/types": "workspace:*"
   }
 }
 ```

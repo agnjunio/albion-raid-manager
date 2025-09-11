@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 
 import { SLOT_EMOJI_INDICATORS, getSlotDictionaryForText } from "../../dictionaries";
 

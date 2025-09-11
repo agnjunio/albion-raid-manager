@@ -1,6 +1,6 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 
-import { run, cleanup } from "./app";
+import { cleanup, run } from "./app";
 
 async function start() {
   try {

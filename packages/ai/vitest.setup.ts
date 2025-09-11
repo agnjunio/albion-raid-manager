@@ -10,7 +10,7 @@ process.env.DISCORD_TOKEN = "test-discord-token";
 process.env.DISCORD_CLIENT_ID = "test-discord-client-id";
 
 // Mock logger to avoid console output during tests
-vi.mock("@albion-raid-manager/logger", () => ({
+vi.mock("@albion-raid-manager/core/logger", () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),

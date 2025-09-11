@@ -40,6 +40,11 @@
       "types": "./src/config/index.ts",
       "import": "./src/config/index.ts",
       "require": "./src/config/index.ts"
+    },
+    "./logger": {
+      "types": "./src/logger/index.ts",
+      "import": "./src/logger/index.ts",
+      "require": "./src/logger/index.ts"
     }
   },
   "scripts": {
@@ -50,12 +55,12 @@
   },
   "dependencies": {
     "@albion-raid-manager/database": "workspace:*",
-    "@albion-raid-manager/logger": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
     "@albion-raid-manager/redis": "workspace:*",
     "axios": "^1.8.4",
     "cron": "^3.1.7",
     "discord-api-types": "^0.37.69",
+    "winston": "^3.13.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

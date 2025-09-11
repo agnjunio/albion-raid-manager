@@ -1,5 +1,5 @@
 import { RaidService } from "@albion-raid-manager/core/services";
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import {
   APIErrorType,
   APIResponse,

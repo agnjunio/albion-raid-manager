@@ -258,7 +258,7 @@ describe("createRaid", () => {
 ### Core Package Dependencies
 
 - **Database**: Use `@albion-raid-manager/database` for Prisma client
-- **Logger**: Use `@albion-raid-manager/logger` for logging
+- **Logger**: Use `@albion-raid-manager/core/logger` for logging
 - **Types**: Define types in `@albion-raid-manager/core/types`
 
 ### External Dependencies

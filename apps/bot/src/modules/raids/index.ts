@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { Events } from "discord.js";
 
 import { type Module } from "@/modules/modules";

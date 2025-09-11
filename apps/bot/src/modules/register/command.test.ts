@@ -1,6 +1,6 @@
 import { AlbionAPIError, AlbionUser, verifyAlbionPlayer } from "@albion-raid-manager/albion";
 import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { Guild, GuildMember } from "discord.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

@@ -26,7 +26,6 @@
       "@albion-raid-manager/core": ["./packages/core/src/index.ts"],
       "@albion-raid-manager/core/*": ["./packages/core/src/*"],
       "@albion-raid-manager/database": ["./packages/database/src/index.ts"],
-      "@albion-raid-manager/logger": ["./packages/logger/src/index.ts"],
       "@albion-raid-manager/redis": ["./packages/redis/src/index.ts"],
       "@albion-raid-manager/types": ["./packages/types/generated/index.ts"],
       "@albion-raid-manager/types/*": ["./packages/types/src/*"]

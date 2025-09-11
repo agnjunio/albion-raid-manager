@@ -4,7 +4,7 @@ import { vi } from "vitest";
 process.env.ALBION_SERVER = "AMERICAS";
 
 // Mock logger to avoid console output during tests
-vi.mock("@albion-raid-manager/logger", () => ({
+vi.mock("@albion-raid-manager/core/logger", () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),

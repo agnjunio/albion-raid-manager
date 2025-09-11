@@ -1,8 +1,8 @@
 import { Server } from "http";
 
 import config from "@albion-raid-manager/core/config";
+import { logger } from "@albion-raid-manager/core/logger";
 import { prisma } from "@albion-raid-manager/database";
-import { logger } from "@albion-raid-manager/logger";
 import { Redis } from "@albion-raid-manager/redis";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import cors from "cors";

@@ -80,9 +80,6 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@albion-raid-manager/logger':
-        specifier: workspace:*
-        version: link:../../packages/logger
       '@albion-raid-manager/redis':
         specifier: workspace:*
         version: link:../../packages/redis
@@ -150,9 +147,6 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:^
         version: link:../../packages/database
-      '@albion-raid-manager/logger':
-        specifier: workspace:*
-        version: link:../../packages/logger
       '@albion-raid-manager/redis':
         specifier: workspace:*
         version: link:../../packages/redis
@@ -328,9 +322,6 @@ importers:
       '@albion-raid-manager/core':
         specifier: workspace:*
         version: link:../core
-      '@albion-raid-manager/logger':
-        specifier: workspace:*
-        version: link:../logger
       '@albion-raid-manager/types':
         specifier: workspace:*
         version: link:../types
@@ -365,9 +356,6 @@ importers:
       '@albion-raid-manager/core':
         specifier: workspace:^
         version: link:../core
-      '@albion-raid-manager/logger':
-        specifier: workspace:^
-        version: link:../logger
       axios:
         specifier: ^1.8.4
         version: 1.11.0
@@ -393,9 +381,6 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:*
         version: link:../database
-      '@albion-raid-manager/logger':
-        specifier: workspace:*
-        version: link:../logger
       '@albion-raid-manager/redis':
         specifier: workspace:*
         version: link:../redis
@@ -411,6 +396,9 @@ importers:
       discord-api-types:
         specifier: ^0.37.69
         version: 0.37.120
+      winston:
+        specifier: ^3.13.0
+        version: 3.17.0
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -424,9 +412,6 @@ importers:
 
   packages/database:
     dependencies:
-      '@albion-raid-manager/logger':
-        specifier: workspace:^
-        version: link:../logger
       '@prisma/client':
         specifier: 6.13.0
         version: 6.13.0(prisma@6.13.0(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2)
@@ -441,20 +426,11 @@ importers:
         specifier: ^3.24.4
         version: 3.25.76
 
-  packages/logger:
-    dependencies:
-      winston:
-        specifier: ^3.13.0
-        version: 3.17.0
-
   packages/redis:
     dependencies:
       '@albion-raid-manager/core':
         specifier: workspace:*
         version: link:../core
-      '@albion-raid-manager/logger':
-        specifier: workspace:*
-        version: link:../logger
       '@albion-raid-manager/types':
         specifier: workspace:*
         version: link:../types

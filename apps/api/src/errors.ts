@@ -1,4 +1,4 @@
-import { logger } from "@albion-raid-manager/logger";
+import { logger } from "@albion-raid-manager/core/logger";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
 import { NextFunction, Request, Response } from "express";
 
