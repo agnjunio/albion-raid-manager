@@ -1,6 +1,6 @@
-import { AlbionAPIError, AlbionUser, verifyAlbionPlayer } from "@albion-raid-manager/albion";
-import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { AlbionService } from "@albion-raid-manager/core/services";
+import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
 import { Guild, GuildMember } from "discord.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -68,7 +68,7 @@ describe("registerCommand", () => {
     vi.mocked(getGuildMember).mockResolvedValue(mockMember as unknown as GuildMember);
 
     // Mock the albion functions
-    vi.mocked(verifyAlbionPlayer).mockResolvedValue(mockUserData as unknown as AlbionUser);
+    vi.mocked(AlbionService.players.verifyAlbionPlayer).mockResolvedValue(mockUserData as unknown as any);
 
     // Mock the database functions
     vi.mocked(ensureUserAndServer).mockResolvedValue({ serverMember: mockServerMember } as any);
@@ -142,7 +142,7 @@ describe("registerCommand", () => {
 
   describe("when Albion player not found", () => {
     it("should send error message and not call audit", async () => {
-      vi.mocked(verifyAlbionPlayer).mockResolvedValue(null);
+      vi.mocked(AlbionService.players.verifyAlbionPlayer).mockResolvedValue(null);
 
       await registerCommand.execute(mockInteraction);
 
@@ -156,7 +156,9 @@ describe("registerCommand", () => {
 
   describe("error handling", () => {
     it("should handle Albion API errors gracefully", async () => {
-      vi.mocked(verifyAlbionPlayer).mockRejectedValue(new AlbionAPIError("Not found", 404, ""));
+      vi.mocked(AlbionService.players.verifyAlbionPlayer).mockRejectedValue(
+        new AlbionService.errors.AlbionAPIError("Not found", 404, ""),
+      );
 
       await registerCommand.execute(mockInteraction);
 
@@ -166,7 +168,9 @@ describe("registerCommand", () => {
     });
 
     it("should handle network errors gracefully", async () => {
-      vi.mocked(verifyAlbionPlayer).mockImplementation(() => Promise.reject(new Error("Network timeout")));
+      vi.mocked(AlbionService.players.verifyAlbionPlayer).mockImplementation(() =>
+        Promise.reject(new Error("Network timeout")),
+      );
 
       await registerCommand.execute(mockInteraction);
 

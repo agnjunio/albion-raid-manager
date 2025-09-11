@@ -20,7 +20,6 @@
   "license": "MIT",
   "dependencies": {
     "@albion-raid-manager/ai": "workspace:*",
-    "@albion-raid-manager/albion": "workspace:*",
     "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/database": "workspace:^",
     "@albion-raid-manager/redis": "workspace:*",

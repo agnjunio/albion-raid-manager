@@ -6,9 +6,10 @@ import type {
   AlbionUser,
 } from "./types";
 
-import { sleep } from "@albion-raid-manager/core/scheduler";
-import { logger } from "@albion-raid-manager/core/logger";
 import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+
+import { logger } from "@albion-raid-manager/core/logger";
+import { sleep } from "@albion-raid-manager/core/scheduler";
 
 import { getServerUrl, type ServerId } from "./servers";
 

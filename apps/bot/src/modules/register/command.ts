@@ -1,6 +1,6 @@
-import { AlbionAPIError, verifyAlbionPlayer } from "@albion-raid-manager/albion";
-import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { AlbionService } from "@albion-raid-manager/core/services";
+import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
 import { Command } from "@/commands";
@@ -45,7 +45,7 @@ export const registerCommand: Command = {
       });
 
       // Verify the user exists in Albion Online
-      const userData = await verifyAlbionPlayer(username, "AMERICAS");
+      const userData = await AlbionService.players.verifyAlbionPlayer(username, "AMERICAS");
 
       if (!userData) {
         await interaction.editReply({
@@ -116,7 +116,7 @@ export const registerCommand: Command = {
 
       let errorMessage = "❌ An error occurred while registering. Please try again later.";
 
-      if (error instanceof AlbionAPIError) {
+      if (error instanceof AlbionService.errors.AlbionAPIError) {
         // Handle specific Albion API errors
         switch (error.status) {
           case 404:

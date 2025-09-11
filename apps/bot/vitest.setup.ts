@@ -71,12 +71,42 @@ vi.mock("@albion-raid-manager/core/config", () => ({
   },
 }));
 
-vi.mock("@albion-raid-manager/albion", async () => {
-  const actual = await vi.importActual<typeof import("@albion-raid-manager/albion")>("@albion-raid-manager/albion");
+vi.mock("@albion-raid-manager/core/services", async () => {
+  const actual = await vi.importActual<typeof import("@albion-raid-manager/core/services")>(
+    "@albion-raid-manager/core/services",
+  );
   return {
     ...actual,
-    verifyAlbionPlayer: vi.fn(),
-    AlbionUser: vi.fn().mockImplementation(() => ({})),
+    AlbionService: {
+      players: {
+        verifyAlbionPlayer: vi.fn(),
+        searchAlbionPlayers: vi.fn(),
+        getAlbionPlayer: vi.fn(),
+      },
+      guilds: {
+        getAlbionGuild: vi.fn(),
+      },
+      killboard: {
+        getAlbionPlayerKillboard: vi.fn(),
+        getAlbionGuildKillboard: vi.fn(),
+      },
+      servers: {
+        getAllServers: vi.fn(),
+        getServer: vi.fn(),
+        getServerById: vi.fn(),
+        getServerByLiveId: vi.fn(),
+        getServerUrl: vi.fn(),
+        SERVERS: {},
+      },
+      errors: {
+        AlbionAPIError: vi.fn().mockImplementation((message: string, status: number, url: string) => ({
+          message,
+          status,
+          url,
+          name: "AlbionAPIError",
+        })),
+      },
+    },
   };
 });
 vi.mock("@albion-raid-manager/core", () => ({
