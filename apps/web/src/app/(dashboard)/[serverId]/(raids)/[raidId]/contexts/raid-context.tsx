@@ -223,6 +223,7 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
           name: updates.name,
           role: updates.role || undefined,
           comment: updates.comment || undefined,
+          userId: updates.userId || undefined,
           order: updates.order || 0,
         },
       }).unwrap();
