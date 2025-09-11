@@ -1,5 +1,6 @@
-import { logger } from "@albion-raid-manager/core/logger";
 import { RedisClientType } from "redis";
+
+import { logger } from "@albion-raid-manager/core/logger";
 
 export interface Cache {
   get<T>(key: string): Promise<T | null>;

@@ -1,3 +1,4 @@
+import { Raid } from "@albion-raid-manager/types";
 import { describe, expect, it } from "vitest";
 
 import { RedisEventMessageBuilder } from "./builder";
@@ -83,7 +84,10 @@ describe("RedisEventMessageBuilder", () => {
 
   describe("withData", () => {
     it("should set the event data", () => {
-      const data: RaidEventData = { raid: { id: "raid123" }, changes: { title: "Updated" } };
+      const data: RaidEventData = {
+        raid: { id: "raid123" } as Raid,
+        previousRaid: { title: "Updated" } as Partial<Raid>,
+      };
       const builder = RedisEventMessageBuilder.create<RaidEventData>().withData(data);
       const event = builder
         .withEventType(RaidEventType.CREATED)
@@ -102,7 +106,7 @@ describe("RedisEventMessageBuilder", () => {
         .withEventType(RaidEventType.CREATED)
         .withEntityId("raid123")
         .withServerId("server123")
-        .withData({ raid: { id: "raid123" } })
+        .withData({ raid: { id: "raid123" } as Raid })
         .build();
 
       expect(event.metadata.source).toBe("bot");
@@ -116,7 +120,7 @@ describe("RedisEventMessageBuilder", () => {
         .withEventType(RaidEventType.CREATED)
         .withEntityId("raid123")
         .withServerId("server123")
-        .withData({ raid: { id: "raid123" } })
+        .withData({ raid: { id: "raid123" } as Raid })
         .build();
 
       expect(event.metadata.version).toBe("2.0.0");
@@ -129,7 +133,7 @@ describe("RedisEventMessageBuilder", () => {
         .withEventType(RaidEventType.CREATED)
         .withEntityId("raid123")
         .withServerId("server123")
-        .withData({ raid: { id: "raid123" } })
+        .withData({ raid: { id: "raid123" } as Raid })
         .build();
 
       expect(event).toEqual({
@@ -158,7 +162,7 @@ describe("RedisEventMessageBuilder", () => {
         RedisEventMessageBuilder.create()
           .withEntityId("raid123")
           .withServerId("server123")
-          .withData({ raid: { id: "raid123" } })
+          .withData({ raid: { id: "raid123" } as Raid })
           .build();
       }).toThrow("Missing required fields: type, entityId, serverId, timestamp, and data must be set");
     });
@@ -168,7 +172,7 @@ describe("RedisEventMessageBuilder", () => {
         RedisEventMessageBuilder.create()
           .withEventType(RaidEventType.CREATED)
           .withServerId("server123")
-          .withData({ raid: { id: "raid123" } })
+          .withData({ raid: { id: "raid123" } as Raid })
           .build();
       }).toThrow("Missing required fields: type, entityId, serverId, timestamp, and data must be set");
     });
@@ -178,7 +182,7 @@ describe("RedisEventMessageBuilder", () => {
         RedisEventMessageBuilder.create()
           .withEventType(RaidEventType.CREATED)
           .withEntityId("raid123")
-          .withData({ raid: { id: "raid123" } })
+          .withData({ raid: { id: "raid123" } as Raid })
           .build();
       }).toThrow("Missing required fields: type, entityId, serverId, timestamp, and data must be set");
     });
@@ -200,7 +204,7 @@ describe("RedisEventMessageBuilder", () => {
         .withEventType(RaidEventType.UPDATED)
         .withEntityId("raid123")
         .withServerId("server123")
-        .withData({ raid: { id: "raid123" }, changes: { title: "Updated" } })
+        .withData({ raid: { id: "raid123" } as Raid, previousRaid: { title: "Updated" } as Partial<Raid> })
         .withSource("bot")
         .withVersion("2.0.0");
 

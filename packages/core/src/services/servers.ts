@@ -1,4 +1,4 @@
-import type { Cache } from "@albion-raid-manager/redis";
+import type { Cache } from "@albion-raid-manager/core/redis";
 
 import { Server } from "@albion-raid-manager/types";
 

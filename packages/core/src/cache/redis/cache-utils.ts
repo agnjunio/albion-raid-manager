@@ -1,14 +1,6 @@
-import type { Cache } from "@albion-raid-manager/redis";
+import type { Cache } from "@albion-raid-manager/core/redis";
 
-/**
- * Simple cache utilities
- */
-export async function cacheQuery<T>(
-  cache: Cache,
-  key: string,
-  queryFn: () => Promise<T>,
-  ttl: number,
-): Promise<T> {
+export async function cacheQuery<T>(cache: Cache, key: string, queryFn: () => Promise<T>, ttl: number): Promise<T> {
   // Try to get from cache first
   const cached = await cache.get<T>(key);
   if (cached !== null) {

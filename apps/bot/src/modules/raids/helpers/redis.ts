@@ -1,5 +1,5 @@
 import { logger } from "@albion-raid-manager/core/logger";
-import { RaidEventPublisher, Redis } from "@albion-raid-manager/redis";
+import { RaidEventPublisher, Redis } from "@albion-raid-manager/core/redis";
 
 let raidEventPublisher: RaidEventPublisher | null = null;
 

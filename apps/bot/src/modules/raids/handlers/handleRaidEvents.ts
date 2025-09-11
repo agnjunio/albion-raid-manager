@@ -1,6 +1,6 @@
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
-import { RaidEvent } from "@albion-raid-manager/redis";
+import { RaidEvent } from "@albion-raid-manager/core/redis";
 import { Client } from "discord.js";
 
 import { handleAnnouncementCreate } from "./handleAnnouncementCreate";

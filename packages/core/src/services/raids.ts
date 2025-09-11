@@ -1,4 +1,4 @@
-import type { Cache, RaidEventPublisher } from "@albion-raid-manager/redis";
+import type { Cache, RaidEventPublisher } from "@albion-raid-manager/core/redis";
 
 import { Raid, RaidRole } from "@albion-raid-manager/types";
 import { getContentTypeInfo } from "@albion-raid-manager/types/entities";

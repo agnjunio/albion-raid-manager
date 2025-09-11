@@ -50,6 +50,11 @@
       "types": "./src/database/index.ts",
       "import": "./src/database/index.ts",
       "require": "./src/database/index.ts"
+    },
+    "./redis": {
+      "types": "./src/redis/index.ts",
+      "import": "./src/redis/index.ts",
+      "require": "./src/redis/index.ts"
     }
   },
   "scripts": {
@@ -63,13 +68,13 @@
   },
   "dependencies": {
     "@albion-raid-manager/types": "workspace:*",
-    "@albion-raid-manager/redis": "workspace:*",
+    "@prisma/client": "6.13.0",
     "axios": "^1.8.4",
     "cron": "^3.1.7",
     "discord-api-types": "^0.37.69",
+    "redis": "^4.7.1",
     "winston": "^3.13.0",
-    "zod": "^3.23.8",
-    "@prisma/client": "6.13.0"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",

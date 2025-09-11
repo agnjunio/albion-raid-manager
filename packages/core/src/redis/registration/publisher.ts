@@ -1,10 +1,11 @@
-import { logger } from "@albion-raid-manager/core/logger";
 import { RedisClientType } from "redis";
+
+import { logger } from "@albion-raid-manager/core/logger";
 
 import { RedisEventMessageBuilder } from "../builder";
 import { RedisEventMessage } from "../events";
 
-import { RegistrationEventType, RegistrationEventData } from "./types";
+import { RegistrationEventData, RegistrationEventType } from "./types";
 
 export class RegistrationEventPublisher {
   private client: RedisClientType;

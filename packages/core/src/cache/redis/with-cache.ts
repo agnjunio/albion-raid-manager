@@ -1,9 +1,5 @@
-import type { Cache } from "@albion-raid-manager/redis";
+import type { Cache } from "@albion-raid-manager/core/redis";
 
-/**
- * Simple utility to execute a query with optional caching
- * Eliminates duplication between cached and non-cached code paths
- */
 export async function withCache<T>(
   queryFn: () => Promise<T>,
   options: {

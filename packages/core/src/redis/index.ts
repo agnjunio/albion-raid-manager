@@ -2,11 +2,11 @@
 export { Redis } from "./@redis";
 
 // Core Redis functionality
+export { RedisEventMessageBuilder } from "./builder";
 export { RedisClient } from "./client";
+export type { BaseEvent, RedisEventMessage } from "./events";
 export { RedisPublisher } from "./publisher";
 export { RedisSubscriber } from "./subscriber";
-export { RedisEventMessageBuilder } from "./builder";
-export type { BaseEvent, RedisEventMessage } from "./events";
 
 // Caching functionality
 export { RedisCache } from "./cache";
