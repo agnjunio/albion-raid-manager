@@ -4,11 +4,11 @@ import { logger } from "@albion-raid-manager/logger";
 import {
   APIErrorType,
   APIResponse,
-  DiscordServer,
+  APIServer,
+  APIServerMember,
   GetServer,
   GetServerMembers,
   GetServers,
-  ServerMemberWithRegistration,
   SetupServer,
 } from "@albion-raid-manager/types/api";
 import { Request, Response, Router } from "express";
@@ -40,7 +40,7 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
       }),
     ]);
 
-    const servers = new Map<string, DiscordServer>();
+    const servers = new Map<string, APIServer>();
 
     for (const server of adminServers) {
       servers.set(server.id, {
@@ -144,31 +144,36 @@ serverRouter.get(
           .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You don't have permission to view server members"));
       }
 
-      // Get Discord server members
       const discordMembers = await DiscordService.servers.getServerMembers(serverId);
-
-      // Get registered members from database
       const registeredMembers = await ServersService.getServerMembers(serverId);
-
-      // Create a map of registered members for quick lookup
       const registeredMembersMap = new Map(registeredMembers.map((member) => [member.userId, member]));
 
-      // Combine Discord members with registration data
-      const membersWithRegistration: ServerMemberWithRegistration[] = discordMembers.map((discordMember) => {
-        const registeredMember = registeredMembersMap.get(discordMember.user.id);
+      const members: APIServerMember[] = discordMembers
+        .map((discordMember) => {
+          const registeredMember = registeredMembersMap.get(discordMember.user.id);
+          const id = discordMember.user.id || registeredMember?.userId;
+          if (!id) return null;
 
-        return {
-          ...discordMember,
-          isRegistered: registeredMember?.albionPlayerId ? true : false,
-          albionPlayerId: registeredMember?.albionPlayerId || null,
-          albionGuildId: registeredMember?.albionGuildId || null,
-          killFame: registeredMember?.killFame || 0,
-          deathFame: registeredMember?.deathFame || 0,
-          lastUpdated: registeredMember?.lastUpdated || null,
-        };
-      });
+          return {
+            id,
+            username: registeredMember?.user?.username || discordMember.user.username,
+            nickname: registeredMember?.nickname || discordMember.nick,
+            avatar: discordMember.avatar || discordMember.user.avatar,
+            roles: discordMember.roles,
+            adminPermission: registeredMember?.adminPermission || false,
+            raidPermission: registeredMember?.raidPermission || false,
+            compositionPermission: registeredMember?.compositionPermission || false,
+            registered: registeredMember?.albionPlayerId ? true : false,
+            albionPlayerId: registeredMember?.albionPlayerId || null,
+            albionGuildId: registeredMember?.albionGuildId || null,
+            killFame: registeredMember?.killFame || 0,
+            deathFame: registeredMember?.deathFame || 0,
+            lastUpdated: registeredMember?.lastUpdated || null,
+          };
+        })
+        .filter((member) => member !== null);
 
-      res.json(APIResponse.Success({ members: membersWithRegistration }));
+      res.json(APIResponse.Success({ members }));
     } catch (error) {
       if (isAxiosError(error) && error.response?.status === 401) {
         res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));

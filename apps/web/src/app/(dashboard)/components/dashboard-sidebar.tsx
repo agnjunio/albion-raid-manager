@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
-import { DiscordServer } from "@albion-raid-manager/types/api";
+import { APIServer } from "@albion-raid-manager/types/api";
 import {
   faArrowRightFromBracket,
   faCheck,
@@ -122,7 +122,7 @@ export function DashboardSidebar() {
 }
 
 interface ServerInfoProps {
-  server?: DiscordServer;
+  server?: APIServer;
   icon?: IconDefinition;
   isLoading?: boolean;
 }

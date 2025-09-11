@@ -1,6 +1,6 @@
 import { Server } from "../../generated/index";
 
-export type DiscordServer = {
+export type APIServer = {
   id: string;
   name: string;
   icon: string | null;
@@ -9,39 +9,25 @@ export type DiscordServer = {
   bot?: boolean;
 };
 
-export type DiscordServerMember = {
-  user: {
-    id: string;
-    username: string;
-    discriminator: string;
-    avatar: string | null;
-    bot?: boolean;
-    system?: boolean;
-  };
-  nick?: string | null;
-  avatar?: string | null;
-  roles: string[];
-  joined_at: string;
-  premium_since?: string | null;
-  deaf: boolean;
-  mute: boolean;
-  flags: number;
-  pending?: boolean;
-  permissions?: string;
-  communication_disabled_until?: string | null;
-};
-
-export type ServerMemberWithRegistration = DiscordServerMember & {
-  isRegistered: boolean;
-  albionPlayerId?: string | null;
-  albionGuildId?: string | null;
-  killFame?: number;
-  deathFame?: number;
-  lastUpdated?: Date | null;
+export type APIServerMember = {
+  id: string;
+  username: string;
+  nickname?: string | null;
+  avatar: string | null;
+  roles?: string[];
+  adminPermission: boolean;
+  raidPermission: boolean;
+  compositionPermission: boolean;
+  registered: boolean;
+  albionPlayerId: string | null;
+  albionGuildId: string | null;
+  killFame: number;
+  deathFame: number;
+  lastUpdated: Date | null;
 };
 
 export namespace GetServers {
-  export type Response = { servers: DiscordServer[] };
+  export type Response = { servers: APIServer[] };
 }
 
 export namespace SetupServer {
@@ -56,5 +42,5 @@ export namespace GetServer {
 
 export namespace GetServerMembers {
   export type Params = { serverId: string };
-  export type Response = { members: ServerMemberWithRegistration[] };
+  export type Response = { members: APIServerMember[] };
 }

@@ -2,7 +2,7 @@ import type { Raid, RaidSlot, RaidStatus } from "@albion-raid-manager/types";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 
-import { ServerMemberWithRegistration } from "@albion-raid-manager/types/api";
+import { APIServerMember } from "@albion-raid-manager/types/api";
 import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
 import { toast } from "sonner";
 
@@ -17,7 +17,7 @@ import { useGetServerMembersQuery } from "@/store/servers";
 
 interface RaidContextValue {
   raid: Raid;
-  serverMembers: ServerMemberWithRegistration[];
+  serverMembers: APIServerMember[];
   handleCopyRaidLink: () => void;
   handleDeleteRaid: () => void;
   handleRaidSlotCreate: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => void;
@@ -56,12 +56,12 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   const [deleteRaidSlot] = useDeleteRaidSlotMutation();
 
   // Get server members for member selection
-  const { data: serverMembersData } = useGetServerMembersQuery({
+  const { data } = useGetServerMembersQuery({
     params: { serverId },
   });
   const contentTypeInfo = useMemo(() => getContentTypeInfo(raid.contentType), [raid.contentType]);
 
-  const serverMembers = serverMembersData?.members || [];
+  const serverMembers = data?.members || [];
 
   const canManageRaid = true; // TODO: Use the permission system to determine if the user has permission to edit raid
   const canEditComposition =
@@ -219,7 +219,12 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
     try {
       await updateRaidSlot({
         params: { serverId, raidId, slotId },
-        body: updates,
+        body: {
+          name: updates.name,
+          role: updates.role || undefined,
+          comment: updates.comment || undefined,
+          order: updates.order || 0,
+        },
       }).unwrap();
 
       toast.success("Slot updated successfully");

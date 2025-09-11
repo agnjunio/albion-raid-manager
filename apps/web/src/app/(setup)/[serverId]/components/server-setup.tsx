@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { APIErrorType, DiscordServer, SetupServer } from "@albion-raid-manager/types/api";
+import { APIErrorType, APIServer, SetupServer } from "@albion-raid-manager/types/api";
 
 import Alert from "@/components/ui/alert";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +20,7 @@ enum CreateStep {
 const STEP_LABELS = ["Server Info", "Discord Invite", "Verification", "Complete"];
 
 interface ServerSetupProps {
-  server: DiscordServer;
+  server: APIServer;
 }
 
 export function ServerSetup({ server }: ServerSetupProps) {

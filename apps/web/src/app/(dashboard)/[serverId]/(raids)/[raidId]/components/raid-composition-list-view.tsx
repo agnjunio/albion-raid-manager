@@ -1,8 +1,12 @@
 import type { RaidRole, RaidSlot } from "@albion-raid-manager/types";
 
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useMemo } from "react";
+
+import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { faEdit, faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -40,7 +44,7 @@ export function RaidCompositionListView({
   onDeleteSlot,
   setEditingSlot,
 }: RaidCompositionListViewProps) {
-  const { raid, serverMembers, canEditComposition, canChangeRaidSlotCount } = useRaidContext();
+  const { raid, canEditComposition, canChangeRaidSlotCount } = useRaidContext();
   const slots = raid.slots || [];
 
   const handleSaveSlot = (slotData: {
@@ -92,18 +96,7 @@ export function RaidCompositionListView({
                       )}
                     </div>
 
-                    {slot.userId && (
-                      <div className="mb-2 flex items-center gap-2">
-                        <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-full">
-                          <span className="text-xs">👤</span>
-                        </div>
-                        <span className="text-muted-foreground text-sm">
-                          {serverMembers.find((m) => m.user.id === slot.userId)?.nick ||
-                            serverMembers.find((m) => m.user.id === slot.userId)?.user.username ||
-                            "Unknown Member"}
-                        </span>
-                      </div>
-                    )}
+                    {slot.userId && <ServerMemberInfo userId={slot.userId} />}
                     {slot.comment && (
                       <p className="text-muted-foreground mb-2 text-sm leading-relaxed">{slot.comment}</p>
                     )}
@@ -145,5 +138,22 @@ export function RaidCompositionListView({
         onSave={handleSaveSlot}
       />
     </>
+  );
+}
+
+function ServerMemberInfo({ userId }: { userId: string }) {
+  const { serverMembers } = useRaidContext();
+  const serverMember = useMemo(() => serverMembers.find((m) => m.id === userId), [serverMembers, userId]);
+
+  return (
+    <div className="flex items-center gap-2">
+      <Avatar className="h-6 w-6">
+        <AvatarImage src={getUserPictureUrl(userId, serverMember?.avatar)} />
+        <AvatarFallback className="bg-primary/10">
+          <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
+        </AvatarFallback>
+      </Avatar>
+      <span className="text-muted-foreground text-xs">{serverMember?.nickname || "Unknown Member"}</span>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { DiscordServer } from "@albion-raid-manager/types/api";
+import { APIServer } from "@albion-raid-manager/types/api";
 import { faCrown, faShield } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 
 interface ServerInfoProps {
-  server: DiscordServer;
+  server: APIServer;
   onNext: () => void;
 }
 

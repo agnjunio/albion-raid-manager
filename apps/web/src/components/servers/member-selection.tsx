@@ -1,18 +1,19 @@
-import type { ServerMemberWithRegistration } from "@albion-raid-manager/types/api";
+import type { APIServerMember } from "@albion-raid-manager/types/api";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
 import { faCheck, faSearch, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface MemberSelectionProps {
-  members: ServerMemberWithRegistration[];
+  members: APIServerMember[];
   selectedUserId?: string | null | undefined;
   onSelect: (userId: string | null | undefined) => void;
   placeholder?: string;
@@ -29,16 +30,18 @@ export function MemberSelection({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  const selectedMember = members.find((member) => member.user.id === selectedUserId);
+  const selectedMember = members.find((member) => member.id === selectedUserId);
+  const filteredMembers = useMemo(
+    () =>
+      members.filter((member) => {
+        const searchTerm = searchValue.toLowerCase();
+        const username = member.username.toLowerCase();
+        const nickname = member.nickname?.toLowerCase() || "";
 
-  // Simple local search on member names (as per user preference)
-  const filteredMembers = members.filter((member) => {
-    const searchTerm = searchValue.toLowerCase();
-    const username = member.user.username.toLowerCase();
-    const displayName = (member.nick || member.user.username).toLowerCase();
-
-    return username.includes(searchTerm) || displayName.includes(searchTerm);
-  });
+        return username.includes(searchTerm) || nickname.includes(searchTerm);
+      }),
+    [members, searchValue],
+  );
 
   const handleSelect = (userId: string | null) => {
     onSelect(userId);
@@ -64,20 +67,7 @@ export function MemberSelection({
         >
           <div className="flex items-center gap-2">
             {selectedMember ? (
-              <>
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={selectedMember.user.avatar || undefined} />
-                  <AvatarFallback>
-                    <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
-                  </AvatarFallback>
-                </Avatar>
-                <span className="truncate">{selectedMember.nick || selectedMember.user.username}</span>
-                {selectedMember.isRegistered && (
-                  <Badge variant="secondary" className="text-xs">
-                    Registered
-                  </Badge>
-                )}
-              </>
+              <MemberInfo member={selectedMember} />
             ) : (
               <>
                 <FontAwesomeIcon icon={faUser} className="text-muted-foreground h-4 w-4" />
@@ -111,7 +101,7 @@ export function MemberSelection({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0" align="start">
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput placeholder="Search members..." value={searchValue} onValueChange={setSearchValue} />
           <CommandList>
             <CommandEmpty>No members found.</CommandEmpty>
@@ -123,26 +113,13 @@ export function MemberSelection({
               </CommandItem>
               {filteredMembers.map((member) => (
                 <CommandItem
-                  key={member.user.id}
-                  value={member.user.id}
-                  onSelect={() => handleSelect(member.user.id)}
+                  key={member.id}
+                  value={member.id}
+                  onSelect={() => handleSelect(member.id)}
                   className="flex items-center gap-2"
                 >
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={member.user.avatar || undefined} />
-                    <AvatarFallback>
-                      <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-1 items-center gap-2">
-                    <span className="truncate">{member.nick || member.user.username}</span>
-                    {member.isRegistered && (
-                      <Badge variant="secondary" className="text-xs">
-                        Registered
-                      </Badge>
-                    )}
-                  </div>
-                  {selectedUserId === member.user.id && <FontAwesomeIcon icon={faCheck} className="ml-auto h-4 w-4" />}
+                  <MemberInfo member={member} />
+                  {selectedUserId === member.id && <FontAwesomeIcon icon={faCheck} className="ml-auto h-4 w-4" />}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -150,5 +127,23 @@ export function MemberSelection({
         </Command>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function MemberInfo({ member }: { member: APIServerMember }) {
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <Avatar className="h-6 w-6">
+          <AvatarImage src={getUserPictureUrl(member.id, member.avatar)} />
+        </Avatar>
+      </div>
+      <span className="truncate">{member.nickname || member.username}</span>
+      {member.registered && (
+        <Badge variant="secondary" className="text-xs">
+          Registered
+        </Badge>
+      )}
+    </>
   );
 }
