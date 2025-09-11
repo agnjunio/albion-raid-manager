@@ -191,10 +191,6 @@ vi.mock("@albion-raid-manager/database", () => ({
     BATTLEMOUNT: "BATTLEMOUNT",
   },
 }));
-vi.mock("@albion-raid-manager/discord", () => ({
-  getGuildMember: vi.fn(),
-  sendAuditMessage: vi.fn(),
-}));
 vi.mock("@albion-raid-manager/logger");
 
 // Mock local discord utils

@@ -83,9 +83,6 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@albion-raid-manager/discord':
-        specifier: workspace:*
-        version: link:../../packages/discord
       '@albion-raid-manager/logger':
         specifier: workspace:*
         version: link:../../packages/logger
@@ -159,9 +156,6 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:^
         version: link:../../packages/database
-      '@albion-raid-manager/discord':
-        specifier: workspace:^
-        version: link:../../packages/discord
       '@albion-raid-manager/logger':
         specifier: workspace:*
         version: link:../../packages/logger
@@ -177,9 +171,9 @@ importers:
 
   apps/web:
     dependencies:
-      '@albion-raid-manager/discord':
+      '@albion-raid-manager/core':
         specifier: workspace:*
-        version: link:../../packages/discord
+        version: link:../../packages/core
       '@albion-raid-manager/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -423,9 +417,6 @@ importers:
       '@albion-raid-manager/database':
         specifier: workspace:*
         version: link:../database
-      '@albion-raid-manager/discord':
-        specifier: workspace:*
-        version: link:../discord
       '@albion-raid-manager/logger':
         specifier: workspace:*
         version: link:../logger
@@ -435,9 +426,15 @@ importers:
       '@albion-raid-manager/types':
         specifier: workspace:*
         version: link:../types
+      axios:
+        specifier: ^1.8.4
+        version: 1.11.0
       cron:
         specifier: ^3.1.7
         version: 3.5.0
+      discord-api-types:
+        specifier: ^0.37.69
+        version: 0.37.120
     devDependencies:
       '@types/node':
         specifier: ^20.11.24
@@ -464,27 +461,6 @@ importers:
       zod:
         specifier: ^3.24.4
         version: 3.25.76
-
-  packages/discord:
-    dependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:^
-        version: link:../config
-      '@albion-raid-manager/core':
-        specifier: workspace:^
-        version: link:../core
-      '@albion-raid-manager/logger':
-        specifier: workspace:^
-        version: link:../logger
-      '@albion-raid-manager/types':
-        specifier: workspace:*
-        version: link:../types
-      axios:
-        specifier: ^1.8.4
-        version: 1.11.0
-      discord-api-types:
-        specifier: ^0.37.119
-        version: 0.37.120
 
   packages/logger:
     dependencies:

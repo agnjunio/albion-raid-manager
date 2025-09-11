@@ -1,6 +1,6 @@
 import type { RaidSlot } from "@albion-raid-manager/types";
 
-import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faComment, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

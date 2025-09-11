@@ -2,7 +2,7 @@ import type { RaidRole, RaidSlot } from "@albion-raid-manager/types";
 
 import { useMemo } from "react";
 
-import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faEdit, faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

@@ -1,5 +1,5 @@
-import { exchangeCode, refreshToken } from "./service/auth";
-import { sendMessage } from "./service/messages";
+import { exchangeCode, refreshToken } from "./auth";
+import { sendMessage } from "./messages";
 import {
   addServerMemberRole,
   getServer,
@@ -8,8 +8,8 @@ import {
   getServerMembers,
   getServers,
   removeServerMemberRole,
-} from "./service/servers";
-import { getCurrentUser, getUser } from "./service/users";
+} from "./servers";
+import { getCurrentUser, getUser } from "./users";
 
 export const DiscordService = {
   auth: {

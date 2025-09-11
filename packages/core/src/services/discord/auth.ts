@@ -1,7 +1,7 @@
 import config from "@albion-raid-manager/config";
 
-import { discordApiClient } from "../client";
-import { DiscordAccessToken } from "../types";
+import { discordApiClient } from "./client";
+import { DiscordAccessToken } from "./types";
 
 function getDiscordClientCredentials() {
   if (!config.discord.clientId || !config.discord.clientSecret) {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { getServerInviteUrl } from "@albion-raid-manager/discord/helpers";
+import { getServerInviteUrl } from "@albion-raid-manager/core/utils/discord";
 import { APIServer } from "@albion-raid-manager/types/api";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

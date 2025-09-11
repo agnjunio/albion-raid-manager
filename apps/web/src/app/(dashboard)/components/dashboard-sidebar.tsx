@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { APIServer } from "@albion-raid-manager/types/api";
 import {
   faArrowRightFromBracket,

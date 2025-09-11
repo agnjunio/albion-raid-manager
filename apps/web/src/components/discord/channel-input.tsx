@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-import { cn } from "@/lib/utils";
-import { type Channel, ChannelType } from "@albion-raid-manager/discord";
+import { type Channel, ChannelType } from "@albion-raid-manager/core/services";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-
+import { cn } from "@/lib/utils";
 
 interface Props extends React.ComponentProps<"input"> {
   channels: Channel[];

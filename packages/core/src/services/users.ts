@@ -1,10 +1,11 @@
 import config from "@albion-raid-manager/config";
 import { prisma } from "@albion-raid-manager/database";
-import { DiscordService } from "@albion-raid-manager/discord";
 import { Cache } from "@albion-raid-manager/redis";
 import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 
 import { CacheKeys, withCache } from "../cache/redis";
+
+import { DiscordService } from "./discord";
 
 export interface UsersServiceOptions {
   cache?: Cache;

@@ -1,13 +1,15 @@
-import { sleep } from "@albion-raid-manager/core/scheduler";
 import { logger } from "@albion-raid-manager/logger";
 import axios from "axios";
+
+import { sleep } from "@albion-raid-manager/core/scheduler";
 
 export const discordApiClient = axios.create({
   baseURL: "https://discord.com/api/v10",
 });
 
 // Handle Discord 429: Too Many Requests
-discordApiClient.interceptors.response.use(null, async (error) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+discordApiClient.interceptors.response.use(null, async (error: any) => {
   const { config, response } = error;
 
   if (config && response && response.status == 429) {

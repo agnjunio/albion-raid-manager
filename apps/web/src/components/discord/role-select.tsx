@@ -1,11 +1,11 @@
-import { cn } from "@/lib/utils";
-import { type APIRole } from "@albion-raid-manager/discord";
+import { type APIRole } from "@albion-raid-manager/core/services";
 import { faCheck, faChevronDown, faClose, faPeopleCarryBox } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface Props {
   roles: APIRole[];

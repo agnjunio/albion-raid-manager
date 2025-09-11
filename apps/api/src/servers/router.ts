@@ -1,5 +1,4 @@
-import { ServersService } from "@albion-raid-manager/core/services";
-import { DiscordService, isAxiosError } from "@albion-raid-manager/discord";
+import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
 import { logger } from "@albion-raid-manager/logger";
 import {
   APIErrorType,
@@ -11,6 +10,7 @@ import {
   GetServers,
   SetupServer,
 } from "@albion-raid-manager/types/api";
+import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
 
 import { auth } from "@/auth/middleware";

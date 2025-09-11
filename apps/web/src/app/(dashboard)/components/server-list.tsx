@@ -1,4 +1,4 @@
-import { getServerPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { getServerPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faCrown, faShield, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";

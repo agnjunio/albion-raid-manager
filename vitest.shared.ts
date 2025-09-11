@@ -13,7 +13,6 @@ export const sharedConfig = {
       "@albion-raid-manager/core": resolve(__dirname, "packages/core/src/index.ts"),
       "@albion-raid-manager/config": resolve(__dirname, "packages/config/src/index.ts"),
       "@albion-raid-manager/database": resolve(__dirname, "packages/database/src/index.ts"),
-      "@albion-raid-manager/discord": resolve(__dirname, "packages/discord/src/index.ts"),
       "@albion-raid-manager/logger": resolve(__dirname, "packages/logger/src/index.ts"),
     },
   },

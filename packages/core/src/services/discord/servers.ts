@@ -1,12 +1,18 @@
 import config from "@albion-raid-manager/config";
+import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
+
 import { memoize } from "@albion-raid-manager/core/cache/memory";
 import { sleep } from "@albion-raid-manager/core/scheduler";
 import { getMilliseconds } from "@albion-raid-manager/core/utils";
-import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
+import {
+  getAuthorization,
+  hasPermissions,
+  transformChannel,
+  transformGuild,
+} from "@albion-raid-manager/core/utils/discord";
 
-import { discordApiClient } from "../client";
-import { getAuthorization, hasPermissions, transformChannel, transformGuild } from "../helpers";
-import { DiscordServiceOptions } from "../types";
+import { discordApiClient } from "./client";
+import { DiscordServiceOptions } from "./types";
 
 type GetUserGuildsOptions = DiscordServiceOptions & {
   admin?: boolean;

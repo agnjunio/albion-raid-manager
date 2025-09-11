@@ -1,4 +1,4 @@
-import { createDiscordTimestamp } from "@albion-raid-manager/discord";
+import { createDiscordTimestamp } from "@albion-raid-manager/core/utils/discord";
 import { type Raid, type RaidSlot } from "@albion-raid-manager/types";
 import { getContentTypeInfo, getRaidRoleEmoji, RAID_STATUS_INFO } from "@albion-raid-manager/types/entities";
 import {

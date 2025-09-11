@@ -16,7 +16,6 @@
     "@albion-raid-manager/config": "workspace:*",
     "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/database": "workspace:*",
-    "@albion-raid-manager/discord": "workspace:*",
     "@albion-raid-manager/logger": "workspace:*",
     "@albion-raid-manager/redis": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",

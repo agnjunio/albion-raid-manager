@@ -1,6 +1,6 @@
 ---
 description: Discord bot development standards and Discord.js best practices
-globs: ["apps/bot/**/*.ts", "apps/bot/**/*.js", "packages/discord/**/*.ts"]
+globs: ["apps/bot/**/*.ts", "apps/bot/**/*.js", "packages/core/src/services/discord/**/*.ts"]
 alwaysApply: true
 ---
 
@@ -10,7 +10,7 @@ alwaysApply: true
 
 - Use TypeScript for all bot functionality
 - Implement proper error handling for Discord API calls
-- Use the shared discord package: `@albion-raid-manager/discord`
+- Use the Discord services from the core package: `@albion-raid-manager/core/services`
 - Handle Discord rate limits appropriately
 - Implement proper command handling structure
 
@@ -68,5 +68,5 @@ alwaysApply: true
 ---
 
 description: Discord bot development standards and Discord.js best practices
-globs: ["apps/bot/**/*.ts", "apps/bot/**/*.js", "packages/discord/**/*.ts"]
+globs: ["apps/bot/**/*.ts", "apps/bot/**/*.js", "packages/core/src/services/discord/**/*.ts"]
 alwaysApply: true

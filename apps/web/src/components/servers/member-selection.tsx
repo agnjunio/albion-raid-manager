@@ -2,7 +2,7 @@ import type { APIServerMember } from "@albion-raid-manager/types/api";
 
 import { useMemo, useState } from "react";
 
-import { getUserPictureUrl } from "@albion-raid-manager/discord/helpers";
+import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faCheck, faSearch, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

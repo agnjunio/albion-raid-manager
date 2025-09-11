@@ -1,11 +1,12 @@
 import config from "@albion-raid-manager/config";
-import { memoize } from "@albion-raid-manager/core/cache/memory";
-import { getMilliseconds } from "@albion-raid-manager/core/utils/time";
 import { APIUser } from "discord-api-types/v10";
 
-import { discordApiClient } from "../client";
-import { getAuthorization } from "../helpers";
-import { DiscordServiceOptions } from "../types";
+import { memoize } from "@albion-raid-manager/core/cache/memory";
+import { getAuthorization } from "@albion-raid-manager/core/utils/discord";
+import { getMilliseconds } from "@albion-raid-manager/core/utils/time";
+
+import { discordApiClient } from "./client";
+import { DiscordServiceOptions } from "./types";
 
 export async function getCurrentUser({ type = "bot", token = config.discord.token }: DiscordServiceOptions) {
   return memoize<APIUser>(

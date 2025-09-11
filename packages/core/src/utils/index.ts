@@ -1,3 +1,4 @@
+export * from "./discord";
 export * from "./errors";
 export * from "./files";
 export * from "./math";

@@ -1,9 +1,10 @@
 import config from "@albion-raid-manager/config";
 import { APIMessage } from "discord-api-types/v10";
 
-import { discordApiClient } from "../client";
-import { getAuthorization } from "../helpers";
-import { DiscordServiceOptions } from "../types";
+import { getAuthorization } from "@albion-raid-manager/core/utils/discord";
+
+import { discordApiClient } from "./client";
+import { DiscordServiceOptions } from "./types";
 
 type File = {
   id: number;

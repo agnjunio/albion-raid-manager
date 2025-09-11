@@ -1,5 +1,5 @@
 import { getLocation } from "@albion-raid-manager/core/entities";
-import { createDiscordTimestamp } from "@albion-raid-manager/discord";
+import { createDiscordTimestamp } from "@albion-raid-manager/core/utils/discord";
 import { type Raid, type RaidSlot } from "@albion-raid-manager/types";
 import { getContentTypeInfo, getRaidRoleEmoji } from "@albion-raid-manager/types/entities";
 import { EmbedBuilder, MessageCreateOptions } from "discord.js";

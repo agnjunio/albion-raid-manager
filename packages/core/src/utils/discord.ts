@@ -84,3 +84,16 @@ export function getAuthorization(type: "user" | "bot", token?: string) {
   if (!token) throw new Error("Token is required for authorization");
   return type === "user" ? `Bearer ${token}` : `Bot ${token}`;
 }
+
+export function createDiscordTimestamp(date: Date): string {
+  const timestamp = Math.floor(date.getTime() / 1000);
+  return `<t:${timestamp}:R>`;
+}
+
+export function createDiscordTimestampWithFormat(
+  date: Date,
+  format: "t" | "T" | "d" | "D" | "f" | "F" | "R" = "R",
+): string {
+  const timestamp = Math.floor(date.getTime() / 1000);
+  return `<t:${timestamp}:${format}>`;
+}
