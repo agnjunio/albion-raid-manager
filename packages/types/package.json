@@ -2,9 +2,6 @@
   "name": "@albion-raid-manager/types",
   "version": "0.0.0",
   "private": true,
-  "main": "./generated/index.ts",
-  "module": "./generated/index.ts",
-  "types": "./generated/index.ts",
   "exports": {
     ".": "./generated/index.ts",
     "./api": "./src/api/index.ts",

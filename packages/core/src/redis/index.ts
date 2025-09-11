@@ -5,8 +5,6 @@ export { Redis } from "./@redis";
 export { RedisEventMessageBuilder } from "./builder";
 export { RedisClient } from "./client";
 export type { BaseEvent, RedisEventMessage } from "./events";
-export { RedisPublisher } from "./publisher";
-export { RedisSubscriber } from "./subscriber";
 
 // Caching functionality
 export { RedisCache } from "./cache";

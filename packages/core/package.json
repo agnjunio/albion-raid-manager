@@ -16,45 +16,50 @@
       "import": "./src/cache/*/index.ts",
       "require": "./src/cache/*/index.ts"
     },
-    "./scheduler": {
-      "types": "./src/scheduler.ts",
-      "import": "./src/scheduler.ts",
-      "require": "./src/scheduler.ts"
-    },
-    "./utils": {
-      "types": "./src/utils/index.ts",
-      "import": "./src/utils/index.ts",
-      "require": "./src/utils/index.ts"
-    },
-    "./entities": {
-      "types": "./src/entities/index.ts",
-      "import": "./src/entities/index.ts",
-      "require": "./src/entities/index.ts"
-    },
-    "./services": {
-      "types": "./src/services/index.ts",
-      "import": "./src/services/index.ts",
-      "require": "./src/services/index.ts"
-    },
     "./config": {
       "types": "./src/config/index.ts",
       "import": "./src/config/index.ts",
       "require": "./src/config/index.ts"
-    },
-    "./logger": {
-      "types": "./src/logger/index.ts",
-      "import": "./src/logger/index.ts",
-      "require": "./src/logger/index.ts"
     },
     "./database": {
       "types": "./src/database/index.ts",
       "import": "./src/database/index.ts",
       "require": "./src/database/index.ts"
     },
+    "./discord": {
+      "types": "./src/discord/index.ts",
+      "import": "./src/discord/index.ts",
+      "require": "./src/discord/index.ts"
+    },
+    "./entities": {
+      "types": "./src/entities/index.ts",
+      "import": "./src/entities/index.ts",
+      "require": "./src/entities/index.ts"
+    },
+    "./logger": {
+      "types": "./src/logger/index.ts",
+      "import": "./src/logger/index.ts",
+      "require": "./src/logger/index.ts"
+    },
     "./redis": {
       "types": "./src/redis/index.ts",
       "import": "./src/redis/index.ts",
       "require": "./src/redis/index.ts"
+    },
+    "./scheduler": {
+      "types": "./src/scheduler.ts",
+      "import": "./src/scheduler.ts",
+      "require": "./src/scheduler.ts"
+    },
+    "./services": {
+      "types": "./src/services/index.ts",
+      "import": "./src/services/index.ts",
+      "require": "./src/services/index.ts"
+    },
+    "./utils": {
+      "types": "./src/utils/index.ts",
+      "import": "./src/utils/index.ts",
+      "require": "./src/utils/index.ts"
     }
   },
   "scripts": {
@@ -62,6 +67,9 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset"
@@ -78,8 +86,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
+    "@vitest/coverage-v8": "^1.6.1",
     "prisma": "6.13.0",
     "prisma-generator-typescript-interfaces": "^2.1.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^3.2.4"
   }
 }

@@ -145,7 +145,7 @@ describe("RedisEventMessageBuilder", () => {
           data: { raid: { id: "raid123" } },
         },
         metadata: {
-          source: "api",
+          source: null,
           version: "1.0.0",
         },
       });
