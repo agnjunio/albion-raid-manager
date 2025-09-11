@@ -432,8 +432,31 @@ export namespace RaidService {
       );
     }
 
-    await prisma.raidSlot.delete({
-      where: { id: slotId },
+    const deletedSlotOrder = slot.order;
+
+    await prisma.$transaction(async (tx) => {
+      // Delete the slot
+      await tx.raidSlot.delete({
+        where: { id: slotId },
+      });
+
+      // This is already handled but typescript complaions
+      if (!slot.raid) return;
+
+      // Reorder remaining slots that come after the deleted slot
+      await tx.raidSlot.updateMany({
+        where: {
+          raidId: slot.raid.id,
+          order: {
+            gt: deletedSlotOrder,
+          },
+        },
+        data: {
+          order: {
+            decrement: 1,
+          },
+        },
+      });
     });
 
     logger.info(`Raid slot deleted: ${slotId}`, { slotId, raidId: slot.raid.id });
