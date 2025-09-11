@@ -7,32 +7,26 @@ import { cn } from "@/lib/utils";
 
 import { useRaidSlotContext } from "../contexts/raid-slot-context";
 
-interface RaidCompositionActionsProps {
+interface RaidSlotActionsProps {
   slot: RaidSlot;
-  viewMode: "list" | "grid";
-  className?: string;
+  size: "md" | "sm";
 }
 
-export function RaidCompositionActions({ slot, viewMode, className }: RaidCompositionActionsProps) {
+export function RaidSlotActions({ slot, size }: RaidSlotActionsProps) {
   const { startEditingSlot, deleteSlot, canDeleteRaidSlot, canEditRaidSlot } = useRaidSlotContext();
 
   if (!canEditRaidSlot) return null;
 
-  const buttonSize = viewMode === "list" ? "icon" : "sm";
-  const iconSize = viewMode === "list" ? "size-4" : "size-3";
+  const buttonSize = size === "md" ? "icon" : "sm";
+  const iconSize = size === "md" ? "size-4" : "size-3";
 
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className={cn("flex gap-2")}>
       <Button onClick={() => startEditingSlot(slot)} variant="outline" size={buttonSize}>
         <FontAwesomeIcon icon={faEdit} className={iconSize} />
       </Button>
       {canDeleteRaidSlot && (
-        <Button
-          onClick={() => deleteSlot(slot.id)}
-          variant="outline"
-          size={buttonSize}
-          className="text-red-600 hover:text-red-700"
-        >
+        <Button onClick={() => deleteSlot(slot.id)} variant="destructiveOutline" size={buttonSize}>
           <FontAwesomeIcon icon={faTrash} className={iconSize} />
         </Button>
       )}

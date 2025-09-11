@@ -23,7 +23,7 @@ export function RaidPage() {
   const [description, setDescription] = useState(raid.description || "");
 
   return (
-    <Page className="items-center">
+    <Page className="items-center pb-20">
       <div className="flex max-w-7xl flex-col gap-6">
         {/* Raid Header with integrated back button */}
         <Card>

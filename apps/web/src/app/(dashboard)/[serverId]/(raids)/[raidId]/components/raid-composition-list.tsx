@@ -17,6 +17,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { faPlus, faShield } from "@fortawesome/free-solid-svg-icons";
+
+import { EmptyState } from "@/components/ui/empty-state";
 
 import { useRaidContext } from "../contexts/raid-context";
 import { useRaidSlotContext } from "../contexts/raid-slot-context";
@@ -30,7 +33,16 @@ interface RaidCompositionListProps {
 
 export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
   const { raid } = useRaidContext();
-  const { editingSlot, saveSlot, cancelEditing, reorderSlots, isReordering } = useRaidSlotContext();
+  const {
+    editingSlot,
+    saveSlot,
+    cancelEditing,
+    reorderSlots,
+    isReordering,
+    canEditRaidSlot,
+    canAddRaidSlot,
+    startAddingSlot,
+  } = useRaidSlotContext();
 
   const slots = useMemo(() => {
     if (!raid.slots || raid.slots.length === 0) return [];
@@ -62,9 +74,25 @@ export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
 
   if (slots.length === 0) {
     return (
-      <div className="py-8 text-center">
-        <p className="text-muted-foreground">No slots created yet.</p>
-      </div>
+      <EmptyState
+        icon={faShield}
+        title="No Raid Slots"
+        description={
+          raid.type === "FLEX"
+            ? "This flexible raid doesn't have any slots defined yet. Add slots to organize your raid composition."
+            : "This fixed raid doesn't have any slots defined yet."
+        }
+        action={
+          canEditRaidSlot && canAddRaidSlot
+            ? {
+                label: "Add Slot",
+                onClick: startAddingSlot,
+                icon: faPlus,
+              }
+            : undefined
+        }
+        size="md"
+      />
     );
   }
 

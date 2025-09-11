@@ -23,6 +23,7 @@ const Toaster = () => {
           color: "var(--color-primary-foreground)",
         },
       }}
+      closeButton
       richColors
       position="bottom-center"
     />

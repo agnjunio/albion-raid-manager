@@ -1,6 +1,6 @@
 import type { Raid, RaidSlot, RaidStatus } from "@albion-raid-manager/types";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useCallback, useContext, type ReactNode } from "react";
 
 import { APIServerMember } from "@albion-raid-manager/types/api";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ import { useGetServerMembersQuery } from "@/store/servers";
 interface RaidContextValue {
   raid: Raid;
   serverMembers: APIServerMember[];
+  hasStatus: (...statuses: RaidStatus[]) => boolean;
   handleCopyRaidLink: () => void;
   handleDeleteRaid: () => void;
   handleRaidSlotCreate: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt" | "order">) => void;
@@ -62,6 +63,8 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   const isFlexRaid = raid.type === "FLEX";
   const currentSlotCount = raid.slots?.length || 0;
   const maxSlots = raid.maxPlayers || 0;
+
+  const hasStatus = useCallback((...statuses: RaidStatus[]) => statuses.includes(raid.status), [raid.status]);
 
   const handleUpdateRaidStatus = async (status: RaidStatus) => {
     try {
@@ -229,6 +232,7 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   const value: RaidContextValue = {
     raid,
     serverMembers,
+    hasStatus,
     handleCopyRaidLink,
     handleDeleteRaid,
     handleRaidSlotCreate,

@@ -10,8 +10,9 @@
   --border: #e0e0e0;
   --radius: 0.625rem;
   --font-size-base: 16px;
+  --ring: #d4af37;
 
-  /* Primary & Secondary */
+  /* Variants */
   --primary: #b8860b;
   --primary-foreground: #ffffff;
   --secondary: #1d3557;
@@ -23,7 +24,10 @@
   --destructive-foreground: #ffffff;
   --success: #00ff00;
   --success-foreground: #ffffff;
-  --ring: #d4af37;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --info: #3b82f6;
+  --info-foreground: #ffffff;
 
   /* Card */
   --card: #fafafa;
@@ -77,8 +81,9 @@
   --border: #2a2a2a;
   --radius: 0.625rem;
   --font-size-base: 16px;
+  --ring: #b8860b;
 
-  /* Primary & Secondary */
+  /* Variants */
   --primary: #b8860b;
   --primary-foreground: #ffffff;
   --secondary: #1d3557;
@@ -90,7 +95,10 @@
   --destructive-foreground: #ff4d4d;
   --success: #22c55e;
   --success-foreground: #ffffff;
-  --ring: #b8860b;
+  --warning: #f59e0b;
+  --warning-foreground: #ffffff;
+  --info: #45558f;
+  --info-foreground: #ffffff;
 
   /* Card */
   --card: #1f1f1f;
@@ -155,6 +163,10 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-ring: var(--ring);
 
   --color-card: var(--card);

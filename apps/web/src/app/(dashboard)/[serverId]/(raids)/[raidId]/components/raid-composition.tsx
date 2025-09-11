@@ -1,6 +1,7 @@
 import { faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -9,12 +10,12 @@ import { useRaidSlotContext } from "../contexts/raid-slot-context";
 import { useViewMode } from "../contexts/view-mode-context";
 
 import { RaidCompositionList } from "./raid-composition-list";
+import { RaidCompositionViewToggle } from "./raid-composition-view-toggle";
 import { RaidSlotSheet } from "./raid-slot-sheet";
-import { ViewToggle } from "./view-toggle";
 
 export function RaidComposition() {
-  const { raid, isFlexRaid, maxSlots } = useRaidContext();
-  const { viewMode, setViewMode } = useViewMode();
+  const { maxSlots, hasStatus } = useRaidContext();
+  const { viewMode } = useViewMode();
   const { isAddingSlot, currentSlotCount, startAddingSlot, saveSlot, cancelAdding, canEditRaidSlot, canAddRaidSlot } =
     useRaidSlotContext();
 
@@ -36,11 +37,11 @@ export function RaidComposition() {
             </div>
           </CardTitle>
           <div className="flex items-center gap-3">
-            <ViewToggle currentView={viewMode} onViewChange={setViewMode} />
-            {canEditRaidSlot && canAddRaidSlot && (
+            <RaidCompositionViewToggle />
+            {canEditRaidSlot && canAddRaidSlot && currentSlotCount > 0 && (
               <Button
                 onClick={startAddingSlot}
-                size="sm"
+                size="md"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
@@ -52,27 +53,15 @@ export function RaidComposition() {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {!canEditRaidSlot && (
-          <div className="mb-3 rounded-lg bg-yellow-50 p-3 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
+        {!canEditRaidSlot && !hasStatus("SCHEDULED", "OPEN", "CLOSED") && (
+          <Alert variant="warning">
             <p className="text-sm">
               Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.
             </p>
-          </div>
+          </Alert>
         )}
 
         <RaidCompositionList viewMode={viewMode} />
-
-        {(!raid.slots || raid.slots.length === 0) && (
-          <div className="py-12 text-center">
-            <div className="text-muted-foreground mb-4 text-6xl">⚔️</div>
-            <h3 className="mb-2 text-lg font-semibold">No Raid Slots</h3>
-            <p className="text-muted-foreground">
-              {isFlexRaid
-                ? "This flexible raid doesn't have any slots defined yet. Add slots to organize your raid composition."
-                : "This fixed raid doesn't have any slots defined yet."}
-            </p>
-          </div>
-        )}
       </CardContent>
 
       {/* Add Slot Sheet */}

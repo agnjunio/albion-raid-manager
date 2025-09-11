@@ -1,5 +1,3 @@
-import type { RaidStatus } from "@albion-raid-manager/types";
-
 import { faLock, faUnlock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -32,8 +30,9 @@ function RaidStatusMessage({ icon, title, description, note, iconColor, bgColor 
 }
 
 export function RaidActions() {
-  const { raid, handleUpdateRaidStatus } = useRaidContext();
-  const hasStatus = (...statuses: RaidStatus[]) => statuses.includes(raid.status);
+  const { raid, canManageRaid, handleUpdateRaidStatus, hasStatus } = useRaidContext();
+
+  if (!canManageRaid) return null;
 
   return (
     <Card className="border-border/50 shadow-sm">

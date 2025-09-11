@@ -12,7 +12,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useRaidSlotContext } from "../contexts/raid-slot-context";
 import { getRoleColor, getRoleIcon } from "../helpers/raid-composition-utils";
 
-import { RaidCompositionActions } from "./raid-composition-actions";
+import { RaidSlotActions } from "./raid-slot-actions";
 import { ServerMemberInfo } from "./server-member-info";
 
 export function ListRaidSlotCard({ slot }: { slot: RaidSlot }) {
@@ -82,7 +82,7 @@ export function ListRaidSlotCard({ slot }: { slot: RaidSlot }) {
           </div>
 
           {/* Action Buttons */}
-          <RaidCompositionActions slot={slot} viewMode="list" />
+          <RaidSlotActions slot={slot} size="md" />
         </div>
       </CardContent>
     </Card>
@@ -106,7 +106,7 @@ export function GridRaidSlotCard({ slot }: { slot: RaidSlot }) {
         isDragging ? "scale-105 opacity-50 shadow-lg" : ""
       } ${isOver ? "ring-primary/50 ring-2" : ""}`}
     >
-      <CardContent className="flex w-full flex-col gap-3 px-6">
+      <CardContent className="flex w-full flex-col gap-3 pl-6 pr-4">
         {/* Header with drag handle and actions */}
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export function GridRaidSlotCard({ slot }: { slot: RaidSlot }) {
               </Badge>
             )}
           </div>
-          <RaidCompositionActions slot={slot} viewMode="grid" />
+          <RaidSlotActions slot={slot} size="sm" />
         </div>
 
         {/* Slot Header */}
