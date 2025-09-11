@@ -45,26 +45,36 @@
       "types": "./src/logger/index.ts",
       "import": "./src/logger/index.ts",
       "require": "./src/logger/index.ts"
+    },
+    "./database": {
+      "types": "./src/database/index.ts",
+      "import": "./src/database/index.ts",
+      "require": "./src/database/index.ts"
     }
   },
   "scripts": {
     "dev": "echo 'JIT compilation - no build needed'",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "@albion-raid-manager/database": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
     "@albion-raid-manager/redis": "workspace:*",
     "axios": "^1.8.4",
     "cron": "^3.1.7",
     "discord-api-types": "^0.37.69",
     "winston": "^3.13.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@prisma/client": "6.13.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.24",
+    "prisma": "6.13.0",
+    "prisma-generator-typescript-interfaces": "^2.1.0",
     "typescript": "^5.3.3"
   }
 }

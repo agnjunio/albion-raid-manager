@@ -21,7 +21,6 @@
   "dependencies": {
     "@albion-raid-manager/ai": "workspace:*",
     "@albion-raid-manager/core": "workspace:*",
-    "@albion-raid-manager/database": "workspace:^",
     "@albion-raid-manager/redis": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
     "discord.js": "^14.19.3"

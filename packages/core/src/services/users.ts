@@ -1,8 +1,8 @@
-import { prisma } from "@albion-raid-manager/database";
 import { Cache } from "@albion-raid-manager/redis";
 import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 
 import config from "@albion-raid-manager/core/config";
+import { prisma } from "@albion-raid-manager/core/database";
 
 import { CacheKeys, withCache } from "../cache/redis";
 

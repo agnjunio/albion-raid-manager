@@ -2,7 +2,7 @@
   "$schema": "https://turbo.build/schema.json",
   "envMode": "loose",
   "tasks": {
-    "@albion-raid-manager/database#db:generate": {
+    "@albion-raid-manager/core#db:generate": {
       "inputs": ["prisma/schema.prisma"],
       "outputs": ["node_modules/.prisma", "node_modules/@prisma/client", "generated/**"],
       "cache": false,
@@ -10,21 +10,21 @@
     },
 
     "build": {
-      "dependsOn": ["^@albion-raid-manager/database#db:generate"],
+      "dependsOn": ["^@albion-raid-manager/core#db:generate"],
       "inputs": ["src/**/*", "package.json", "tsconfig.json", "vite.config.ts"],
       "outputs": ["dist/**"],
       "env": ["NODE_ENV"]
     },
 
     "dev": {
-      "dependsOn": ["^@albion-raid-manager/database#db:generate"],
+      "dependsOn": ["^@albion-raid-manager/core#db:generate"],
       "inputs": ["src/**/*", "package.json"],
       "persistent": true,
       "env": ["NODE_ENV", "DATABASE_URL"]
     },
 
     "start": {
-      "dependsOn": ["^@albion-raid-manager/database#db:generate"],
+      "dependsOn": ["^@albion-raid-manager/core#db:generate"],
       "env": ["NODE_ENV", "DATABASE_URL"]
     },
 

@@ -1,6 +1,6 @@
-import { logger } from "@albion-raid-manager/core/logger";
+import { logger } from "../logger";
 
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "./generated/prisma";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 

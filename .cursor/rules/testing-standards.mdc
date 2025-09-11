@@ -73,7 +73,7 @@ describe("Discord Interaction", () => {
 
 ```typescript
 // ✅ Good - Mock external dependencies
-vi.mock("@albion-raid-manager/database", () => ({
+vi.mock("@albion-raid-manager/core/database", () => ({
   prisma: {
     raid: {
       create: vi.fn(),
@@ -151,7 +151,7 @@ describe("Feature Name", () => {
 
 ```typescript
 // vitest.setup.ts - Global mocks for all tests
-vi.mock("@albion-raid-manager/database", () => ({
+vi.mock("@albion-raid-manager/core/database", () => ({
   prisma: {
     server: { findUnique: vi.fn(), upsert: vi.fn(), update: vi.fn() },
     raid: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
@@ -237,7 +237,7 @@ export const createMockDateString = (date: Date) => {
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Import after mocking (mocks are in vitest.setup.ts)
-import { RaidStatus, RaidType } from "@albion-raid-manager/database";
+import { RaidStatus, RaidType } from "@albion-raid-manager/core/database";
 import { raidCommand } from "./raid";
 
 describe("Raid Command", () => {
@@ -245,7 +245,7 @@ describe("Raid Command", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockPrisma = vi.mocked(await import("@albion-raid-manager/database")).prisma;
+    mockPrisma = vi.mocked(await import("@albion-raid-manager/core/database")).prisma;
   });
 
   it("should create raid with valid data", async () => {

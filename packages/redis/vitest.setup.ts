@@ -28,6 +28,6 @@ vi.mock("redis", () => {
 });
 
 // Mock the database package globally
-vi.mock("@albion-raid-manager/database", () => ({
+vi.mock("@albion-raid-manager/core/database", () => ({
   // Mock database types
 }));

@@ -1,5 +1,5 @@
 import { RaidService, ServersService } from "@albion-raid-manager/core/services";
-import { prisma } from "@albion-raid-manager/database";
+import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { Client, MessageCreateOptions, MessageEditOptions } from "discord.js";
 

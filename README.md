@@ -84,8 +84,7 @@ Use Docker for infrastructure and Turbo for applications:
 - **apps/api** - Express.js REST API
 - **apps/web** - React + Vite frontend
 - **apps/bot** - Discord.js bot
-- **packages/core** - Shared business logic, Discord services, Albion API client, configuration, and logging
-- **packages/database** - Prisma database schema
+- **packages/core** - Shared business logic, Discord services, Albion API client, database, configuration, and logging
 - **packages/ai** - AI/ML utilities
 
 ## Contributing

@@ -7,7 +7,7 @@
 generator client {
   provider   = "prisma-client-js"
   engineType = "binary"
-  output     = "../generated/prisma"
+  output     = "../src/database/generated/prisma"
 }
 
 generator typescriptInterfaces {

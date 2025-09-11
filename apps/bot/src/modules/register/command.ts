@@ -1,6 +1,6 @@
 import { logger } from "@albion-raid-manager/core/logger";
 import { AlbionService } from "@albion-raid-manager/core/services";
-import { ensureUserAndServer, prisma } from "@albion-raid-manager/database";
+import { ensureUserAndServer, prisma } from "@albion-raid-manager/core/database";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
 import { Command } from "@/commands";

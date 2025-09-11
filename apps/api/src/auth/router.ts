@@ -1,6 +1,6 @@
 import { DiscordService } from "@albion-raid-manager/core/services";
 import { transformUser } from "@albion-raid-manager/core/utils/discord";
-import { ensureUser } from "@albion-raid-manager/database";
+import { ensureUser } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { APIErrorType, APIResponse, GetMeResponse } from "@albion-raid-manager/types/api";
 import { isAxiosError } from "axios";

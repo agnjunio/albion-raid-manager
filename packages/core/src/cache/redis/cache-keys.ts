@@ -1,10 +1,6 @@
-/**
- * Simple cache key generators for different entities
- */
-
 import crypto from "crypto";
 
-import { Prisma } from "@albion-raid-manager/database";
+import { Prisma } from "@albion-raid-manager/core/database";
 
 function hashObject(obj: object) {
   return crypto.createHash("sha256").update(JSON.stringify(obj)).digest("hex");

@@ -1,8 +1,7 @@
-import { logger } from "@albion-raid-manager/core/logger";
-
-import { Server, User } from "../generated/prisma";
+import { logger } from "../logger";
 
 import { prisma } from "./client";
+import { Server, User } from "./generated/prisma";
 
 /**
  * Ensures a Discord user exists in the database.

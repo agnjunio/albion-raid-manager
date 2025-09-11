@@ -1,4 +1,4 @@
-import { prisma } from "@albion-raid-manager/database";
+import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { RaidEvent } from "@albion-raid-manager/redis";
 import { Client } from "discord.js";

@@ -149,7 +149,7 @@ vi.mock("@albion-raid-manager/ai", () => ({
   ParsedRaidData: vi.fn(),
 }));
 vi.mock("@albion-raid-manager/core/config");
-vi.mock("@albion-raid-manager/database", () => ({
+vi.mock("@albion-raid-manager/core/database", () => ({
   prisma: {
     server: {
       findUnique: vi.fn(),

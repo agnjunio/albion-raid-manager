@@ -223,7 +223,7 @@ async function handleCreateRaid(interaction: ChatInputCommandInteraction) {
 
 ```typescript
 // Mock dependencies
-vi.mock("@albion-raid-manager/database", () => ({
+vi.mock("@albion-raid-manager/core/database", () => ({
   prisma: {
     raid: {
       create: vi.fn(),
@@ -257,9 +257,9 @@ describe("createRaid", () => {
 
 ### Core Package Dependencies
 
-- **Database**: Use `@albion-raid-manager/database` for Prisma client
+- **Database**: Use `@albion-raid-manager/core/database` for Prisma client
 - **Logger**: Use `@albion-raid-manager/core/logger` for logging
-- **Types**: Define types in `@albion-raid-manager/core/types`
+- **Types**: Define types in `@albion-raid-manager/types`
 
 ### External Dependencies
 

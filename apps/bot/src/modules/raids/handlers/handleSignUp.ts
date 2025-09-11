@@ -1,5 +1,5 @@
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { prisma, RaidStatus } from "@albion-raid-manager/database";
+import { prisma, RaidStatus } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { Client, Interaction } from "discord.js";
 

@@ -1,9 +1,9 @@
 import type { Cache } from "@albion-raid-manager/redis";
 
-import { prisma } from "@albion-raid-manager/database";
 import { Server } from "@albion-raid-manager/types";
 
 import { CacheInvalidation, CacheKeys, withCache } from "@albion-raid-manager/core/cache/redis";
+import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 
 import { UsersService } from "./users";
