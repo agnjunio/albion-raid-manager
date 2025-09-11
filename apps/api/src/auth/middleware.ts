@@ -1,4 +1,5 @@
-import { DiscordService, transformUser } from "@albion-raid-manager/core/services";
+import { DiscordService } from "@albion-raid-manager/core/services";
+import { transformUser } from "@albion-raid-manager/core/utils/discord";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
 import { NextFunction, Request, Response } from "express";
 

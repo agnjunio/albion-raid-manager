@@ -146,11 +146,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "prowling",
       ],
     },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
-    },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
       confidence: 0,
@@ -282,11 +277,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "kris",
       ],
     },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
-    },
     BATTLEMOUNT: {
       role: "",
       confidence: 0,
@@ -392,11 +382,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "estilete",
         "kris",
       ],
-    },
-    CALLER: {
-      role: "",
-      confidence: 0,
-      patterns: [],
     },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
@@ -504,11 +489,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "крис",
       ],
     },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
-    },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
       confidence: 0,
@@ -602,11 +582,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "短剑",
         "克里斯",
       ],
-    },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
     },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
@@ -714,11 +689,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "kris",
       ],
     },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
-    },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
       confidence: 0,
@@ -825,11 +795,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "kris",
       ],
     },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
-    },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
       confidence: 0,
@@ -935,11 +900,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "スティレット",
         "クリス",
       ],
-    },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
     },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
@@ -1057,11 +1017,6 @@ const ROLE_DICTIONARIES: MultiLanguageDictionary<RoleDictionary> = {
         "로드",
       ],
     },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0,
-      patterns: [],
-    },
     BATTLEMOUNT: {
       role: "BATTLEMOUNT",
       confidence: 0,
@@ -1101,11 +1056,6 @@ export function getRoleDictionaryForText(text: string): RoleDictionary {
     MELEE_DPS: {
       role: "MELEE_DPS",
       confidence: 0.9,
-      patterns: [],
-    },
-    CALLER: {
-      role: "CALLER",
-      confidence: 0.95,
       patterns: [],
     },
     BATTLEMOUNT: {

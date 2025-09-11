@@ -1,7 +1,7 @@
-import { detectContentType, getDefaultLocation, normalizeContentType } from "@albion-raid-manager/core/entities";
+import { getDefaultLocation, normalizeContentType } from "@albion-raid-manager/core/entities";
 
 import { type Preprocessor, type PreprocessorContext } from "./preprocessors";
-import { contentTypePreprocessor } from "./preprocessors/content-type-preprocessor";
+import { contentTypePreprocessor, detectContentType } from "./preprocessors/content-type-preprocessor";
 import { parseTimeString, timePreprocessor } from "./preprocessors/datetime-preprocessor";
 import { messagePreprocessor } from "./preprocessors/message-preprocessor";
 import { rolePreprocessor } from "./preprocessors/role-preprocessor";

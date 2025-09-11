@@ -12,6 +12,7 @@ export class RedisSubscriber {
 
   constructor(client: RedisClientType) {
     this.client = client;
+    this.client.on("message", this.handleEvent.bind(this));
   }
 
   private async handleEvent(channel: string, event: RedisEventMessage) {
@@ -82,5 +83,14 @@ export class RedisSubscriber {
       logger.error("Failed to unsubscribe from Redis channel", { channel, error });
       throw error;
     }
+  }
+
+  // Convenience methods for raid events
+  async subscribeToRaidEvents(handler: GenericEventHandler): Promise<void> {
+    await this.subscribe("raid.events", handler);
+  }
+
+  async unsubscribeFromRaidEvents(handler: GenericEventHandler): Promise<void> {
+    await this.unsubscribe("raid.events", handler);
   }
 }

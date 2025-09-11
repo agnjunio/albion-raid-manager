@@ -1,4 +1,4 @@
-import { type APIRole } from "@albion-raid-manager/core/services";
+import { type APIRole } from "@albion-raid-manager/types/api";
 import { faCheck, faChevronDown, faClose, faPeopleCarryBox } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

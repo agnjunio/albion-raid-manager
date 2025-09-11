@@ -66,11 +66,11 @@ function detectFixedSizeContentType(
 
     let contentType: ContentType;
     if (hasPvpKeywords) {
-      contentType = "ROADS_OF_AVALON_PVP"; // If PvP keywords are present, it's PvP
+      contentType = "ROADS_OF_AVALON"; // If PvP keywords are present, it's Roads
     } else if (hasPveKeywords) {
-      contentType = "ROADS_OF_AVALON_PVE"; // Otherwise check for PvE keywords
+      contentType = "ROADS_OF_AVALON"; // Otherwise check for PvE keywords
     } else {
-      contentType = "ROADS_OF_AVALON_PVP"; // Default to PvP for Roads content with no keywords
+      contentType = "ROADS_OF_AVALON"; // Default to Roads for Roads content with no keywords
     }
 
     const info = CONTENT_TYPE_MAPPING.find((ct) => ct.type === contentType);

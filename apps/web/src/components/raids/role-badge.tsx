@@ -3,7 +3,6 @@ import { RaidRole } from "@albion-raid-manager/types";
 export function RoleBadge({ role }: { role: RaidRole }) {
   const roleClassName: { [key in RaidRole]: string } = {
     TANK: "bg-role-tank/25",
-    CALLER: "bg-role-caller/25",
     SUPPORT: "bg-role-support/25",
     HEALER: "bg-role-healer/25",
     RANGED_DPS: "bg-role-ranged/25",

@@ -1,10 +1,9 @@
 import { logger } from "@albion-raid-manager/core/logger";
 import Anthropic from "@anthropic-ai/sdk";
 
-import { AIProvider } from "../../types";
-import { BaseAIService } from "../base";
-
 import { type PreprocessorContext } from "../../pipeline";
+import { AIProvider, type AiRaid } from "../../types";
+import { BaseAIService } from "../base";
 
 export class AnthropicService extends BaseAIService {
   private client: Anthropic;
@@ -25,7 +24,7 @@ export class AnthropicService extends BaseAIService {
     });
   }
 
-  async generateResponse(context: PreprocessorContext): Promise<unknown> {
+  async generateResponse(context: PreprocessorContext): Promise<AiRaid> {
     logger.info(`Generating Anthropic response for ${context.extractedSlots.length} slots`, {
       slots: context.extractedSlots,
     });

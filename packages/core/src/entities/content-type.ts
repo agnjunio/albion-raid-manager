@@ -46,43 +46,23 @@ export const CONTENT_TYPE_MAPPING: ContentTypeInfo[] = [
     isActive: false,
   },
   {
-    type: "AVALONIAN_DUNGEON_FULL_CLEAR",
-    partySize: { min: 20, max: 20 },
+    type: "AVALONIAN_DUNGEON",
+    partySize: { min: 10, max: 20 },
     raidType: "FIXED",
-    description: "Avalonian Dungeon full clear with all bosses",
-    displayName: "Avalonian Dungeon (Full Clear)",
+    description: "Avalonian Dungeon content",
+    displayName: "Avalonian Dungeon",
     defaultLocation: "Brecilien",
-    aliases: ["avalon", "ava", "full clear"],
+    aliases: ["avalon", "ava"],
     isActive: false,
   },
   {
-    type: "AVALONIAN_DUNGEON_BUFF_ONLY",
-    partySize: { min: 20, max: 20 },
-    raidType: "FIXED",
-    description: "Avalonian Dungeon buff only run",
-    displayName: "Avalonian Dungeon (Buff Only)",
-    defaultLocation: "Brecilien",
-    aliases: ["avalon", "ava", "buff only"],
-    isActive: false,
-  },
-  {
-    type: "ROADS_OF_AVALON_PVE",
+    type: "ROADS_OF_AVALON",
     partySize: { min: 7, max: 7 },
     raidType: "FIXED",
-    description: "Roads of Avalon PvE content with golden chests",
-    displayName: "Roads of Avalon (PvE)",
+    description: "Roads of Avalon content with fights and/or golden chests",
+    displayName: "Roads of Avalon",
     defaultLocation: "Brecilien",
-    aliases: ["roads", "roa", "avalon pve"],
-    isActive: true,
-  },
-  {
-    type: "ROADS_OF_AVALON_PVP",
-    partySize: { min: 7, max: 7 },
-    raidType: "FIXED",
-    description: "Roads of Avalon PvP content for roaming and ganking",
-    displayName: "Roads of Avalon (PvP)",
-    defaultLocation: "Brecilien",
-    aliases: ["roads", "roa", "avalon pvp"],
+    aliases: ["roads", "roa", "avalon"],
     isActive: true,
   },
   {
@@ -106,31 +86,31 @@ export const CONTENT_TYPE_MAPPING: ContentTypeInfo[] = [
     isActive: false,
   },
   {
-    type: "GANKING_SQUAD",
+    type: "OPEN_WORLD_GANKING",
     partySize: { min: 5, max: 20 },
     raidType: "FLEX",
     description: "Ganking squad for open world PvP",
-    displayName: "Ganking Squad",
+    displayName: "Open World Ganking",
     defaultLocation: "",
     aliases: ["gank", "ganking", "squad"],
     isActive: false,
   },
   {
-    type: "FIGHTING_SQUAD",
+    type: "OPEN_WORLD_SMALL_SCALE",
     partySize: { min: 5, max: 20 },
     raidType: "FLEX",
-    description: "Fighting squad for organized PvP",
-    displayName: "Fighting Squad",
+    description: "Open World small scale PvP",
+    displayName: "Open World Small Scale",
     defaultLocation: "",
-    aliases: ["fight", "fighting", "squad"],
+    aliases: ["small scale", "fighting", "squad"],
     isActive: false,
   },
   {
-    type: "ZVZ_CALL_TO_ARMS",
+    type: "OPEN_WORLD_ZVZ",
     partySize: { min: 20, max: 100 },
     raidType: "FLEX",
     description: "ZvZ call to arms for large scale battles",
-    displayName: "ZvZ Call to Arms",
+    displayName: "Open World ZvZ (CTA)",
     defaultLocation: "",
     aliases: ["zvz", "call to arms", "cta"],
     isActive: false,
@@ -153,16 +133,6 @@ export const CONTENT_TYPE_MAPPING: ContentTypeInfo[] = [
     displayName: "Hellgate (5v5)",
     defaultLocation: "Brecilien",
     aliases: ["hellgate", "hg", "5v5"],
-    isActive: false,
-  },
-  {
-    type: "HELLGATE_10V10",
-    partySize: { min: 10, max: 10 },
-    raidType: "FIXED",
-    description: "Hellgate 10v10 PvP content",
-    displayName: "Hellgate (10v10)",
-    defaultLocation: "Brecilien",
-    aliases: ["hellgate", "hg", "10v10"],
     isActive: false,
   },
   {
@@ -246,10 +216,10 @@ export class ContentTypeEntity {
 
   get defaultLocation(): string {
     switch (this.info.type) {
-      case "ROADS_OF_AVALON_PVE":
-      case "ROADS_OF_AVALON_PVP":
+      case "ROADS_OF_AVALON":
+      case "HELLGATE_2V2":
       case "HELLGATE_5V5":
-      case "HELLGATE_10V10":
+      case "AVALONIAN_DUNGEON":
         return "Brecilien";
       case "DEPTHS_DUO":
       case "DEPTHS_TRIO":
@@ -300,10 +270,10 @@ export class ContentTypeEntity {
     const normalized = contentType.toUpperCase().replace(/[^A-Z_]/g, "");
 
     switch (normalized) {
-      case "ROADS_OF_AVALON_PVE":
+      case "ROADS_OF_AVALON":
       case "AVALON_ROADS":
       case "ROADS":
-        return "ROADS_OF_AVALON_PVE";
+        return "ROADS_OF_AVALON";
       case "HELLGATE_2V2":
       case "HG_2V2":
       case "HG_2X2":
@@ -313,10 +283,10 @@ export class ContentTypeEntity {
       case "HG_5V5":
       case "HG_5X5":
         return "HELLGATE_5V5";
-      case "HELLGATE_10V10":
-      case "HG_10V10":
-      case "HG_10X10":
-        return "HELLGATE_10V10";
+      case "AVALONIAN_DUNGEON":
+      case "AVALON":
+      case "AVA":
+        return "AVALONIAN_DUNGEON";
       case "DEPTHS_DUO":
       case "DUO":
         return "DEPTHS_DUO";
@@ -336,6 +306,15 @@ export class ContentTypeEntity {
       case "OPEN_WORLD":
       case "FARMING":
         return "OPEN_WORLD_FARMING";
+      case "OPEN_WORLD_GANKING":
+      case "GANKING":
+        return "OPEN_WORLD_GANKING";
+      case "OPEN_WORLD_SMALL_SCALE":
+      case "SMALL_SCALE":
+        return "OPEN_WORLD_SMALL_SCALE";
+      case "OPEN_WORLD_ZVZ":
+      case "ZVZ":
+        return "OPEN_WORLD_ZVZ";
       default:
         return "GROUP_DUNGEON";
     }

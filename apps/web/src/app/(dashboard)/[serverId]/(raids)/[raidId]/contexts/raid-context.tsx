@@ -20,7 +20,7 @@ interface RaidContextValue {
   serverMembers: APIServerMember[];
   handleCopyRaidLink: () => void;
   handleDeleteRaid: () => void;
-  handleRaidSlotCreate: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => void;
+  handleRaidSlotCreate: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt" | "order">) => void;
   handleRaidSlotDelete: (slotId: string) => void;
   handleRaidSlotUpdate: (slotId: string, updates: Partial<RaidSlot>) => void;
   handleShareRaid: () => void;
@@ -180,7 +180,7 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
     }
   };
 
-  const handleRaidSlotCreate = async (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => {
+  const handleRaidSlotCreate = async (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt" | "order">) => {
     try {
       const currentSlotCount = raid.slots?.length || 0;
       await createRaidSlot({

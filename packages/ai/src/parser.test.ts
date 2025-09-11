@@ -4,6 +4,7 @@ import { parseDiscordMessage, resetAIService } from "./parser";
 import { detectContentType } from "./pipeline/preprocessors/content-type-preprocessor";
 import { extractTimeFromMessage } from "./pipeline/preprocessors/datetime-preprocessor";
 import { extractRequirements } from "./pipeline/preprocessors/slot-preprocessor";
+import { DiscordMessageContext } from "./types";
 
 // Mock the AI service
 vi.mock("./service/factory", () => ({
@@ -81,10 +82,20 @@ Montaria: Lobo +
   });
 
   describe("Full Message Parsing", () => {
-    it("should parse the complete message correctly", async () => {
-      const result = await parseDiscordMessage(testMessage);
+    const mockContext = {
+      guildId: "123",
+      channelId: "123",
+      authorId: "123",
+      messageId: "123",
+      timestamp: new Date(),
+      mentions: [],
+      attachments: [],
+    } as DiscordMessageContext;
 
-      expect(result.contentType).toBe("ROADS_OF_AVALON_PVE");
+    it("should parse the complete message correctly", async () => {
+      const result = await parseDiscordMessage(testMessage, mockContext);
+
+      expect(result.contentType).toBe("ROADS_OF_AVALON");
       expect(result.location).toBe("Brecilien");
       expect(result.requirements).toContain("T8");
       expect(result.requirements).toContain("1 food boa e 2 ruins");

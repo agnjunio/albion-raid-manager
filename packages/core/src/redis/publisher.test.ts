@@ -13,7 +13,7 @@ describe("RedisPublisher", () => {
       publish: vi.fn(),
     };
     publisher = new RedisPublisher(mockClient);
-    raidPublisher = new RaidEventPublisher(mockClient);
+    raidPublisher = new RaidEventPublisher(mockClient, "api");
     vi.clearAllMocks();
   });
 
@@ -65,10 +65,9 @@ describe("RedisPublisher", () => {
   describe("RaidEventPublisher", () => {
     describe("publishRaidCreated", () => {
       it("should publish a raid created event", async () => {
-        const raid = { id: "raid123", title: "Test Raid" };
-        const serverId = "server123";
+        const raid = { id: "raid123", title: "Test Raid", serverId: "server123" } as any;
 
-        await raidPublisher.publishRaidCreated(raid, serverId);
+        await raidPublisher.publishRaidCreated(raid);
 
         expect(mockClient.publish).toHaveBeenCalledWith(
           "raid.events",
@@ -79,11 +78,10 @@ describe("RedisPublisher", () => {
 
     describe("publishRaidUpdated", () => {
       it("should publish a raid updated event", async () => {
-        const raid = { id: "raid123", title: "Updated Raid" };
-        const serverId = "server123";
-        const changes = { title: "Updated Raid" };
+        const raid = { id: "raid123", title: "Updated Raid", serverId: "server123" } as any;
+        const previousRaid = { title: "Old Raid" };
 
-        await raidPublisher.publishRaidUpdated(raid, serverId, changes);
+        await raidPublisher.publishRaidUpdated(raid, previousRaid);
 
         expect(mockClient.publish).toHaveBeenCalledWith(
           "raid.events",
@@ -94,10 +92,9 @@ describe("RedisPublisher", () => {
 
     describe("publishRaidDeleted", () => {
       it("should publish a raid deleted event", async () => {
-        const raidId = "raid123";
-        const serverId = "server123";
+        const raid = { id: "raid123", serverId: "server123" } as any;
 
-        await raidPublisher.publishRaidDeleted(raidId, serverId);
+        await raidPublisher.publishRaidDeleted(raid);
 
         expect(mockClient.publish).toHaveBeenCalledWith(
           "raid.events",

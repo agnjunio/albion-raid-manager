@@ -26,6 +26,32 @@ export type APIServerMember = {
   lastUpdated: Date | null;
 };
 
+export enum APIChannelType {
+  TEXT = "TEXT",
+  VOICE = "VOICE",
+  CATEGORY = "CATEGORY",
+}
+
+export type APIChannel = {
+  id: string;
+  name: string;
+  type: APIChannelType;
+  parentId?: string;
+};
+
+export enum APIRoleType {
+  ROLE = "ROLE",
+  EMOJI = "EMOJI",
+}
+
+export type APIRole = {
+  id: string;
+  name: string;
+  type: APIRoleType;
+  color?: number;
+  position: number;
+};
+
 export namespace GetServers {
   export type Response = { servers: APIServer[] };
 }
