@@ -8,7 +8,6 @@ export const getRoleIcon = (role: RaidRole | "UNASSIGNED") => {
     RANGED_DPS: "🏹",
     MELEE_DPS: "⚔️",
     SUPPORT: "🔮",
-    CALLER: "📢",
     BATTLEMOUNT: "🐎",
     UNASSIGNED: "❓",
   };
@@ -35,7 +34,6 @@ export const getRoleColor = (role: RaidRole | "UNASSIGNED") => {
 };
 
 export const ROLE_OPTIONS: { value: RaidRole; label: string }[] = [
-  { value: "CALLER", label: "Caller" },
   { value: "TANK", label: "Tank" },
   { value: "HEALER", label: "Healer" },
   { value: "SUPPORT", label: "Support" },
