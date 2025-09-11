@@ -74,9 +74,6 @@ importers:
 
   apps/api:
     dependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:*
-        version: link:../../packages/config
       '@albion-raid-manager/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -147,9 +144,6 @@ importers:
       '@albion-raid-manager/albion':
         specifier: workspace:*
         version: link:../../packages/albion
-      '@albion-raid-manager/config':
-        specifier: workspace:^
-        version: link:../../packages/config
       '@albion-raid-manager/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -295,9 +289,6 @@ importers:
         specifier: ^3.24.4
         version: 3.25.76
     devDependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:^
-        version: link:../../packages/config
       '@tailwindcss/postcss':
         specifier: ^4.1.5
         version: 4.1.11
@@ -334,9 +325,6 @@ importers:
 
   packages/ai:
     dependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:*
-        version: link:../config
       '@albion-raid-manager/core':
         specifier: workspace:*
         version: link:../core
@@ -374,9 +362,6 @@ importers:
 
   packages/albion:
     dependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:^
-        version: link:../config
       '@albion-raid-manager/core':
         specifier: workspace:^
         version: link:../core
@@ -403,17 +388,8 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@20.19.9)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.1)
 
-  packages/config:
-    dependencies:
-      zod:
-        specifier: ^3.23.8
-        version: 3.25.76
-
   packages/core:
     dependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:^
-        version: link:../config
       '@albion-raid-manager/database':
         specifier: workspace:*
         version: link:../database
@@ -435,6 +411,9 @@ importers:
       discord-api-types:
         specifier: ^0.37.69
         version: 0.37.120
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
     devDependencies:
       '@types/node':
         specifier: ^20.11.24
@@ -464,18 +443,12 @@ importers:
 
   packages/logger:
     dependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:^
-        version: link:../config
       winston:
         specifier: ^3.13.0
         version: 3.17.0
 
   packages/redis:
     dependencies:
-      '@albion-raid-manager/config':
-        specifier: workspace:*
-        version: link:../config
       '@albion-raid-manager/core':
         specifier: workspace:*
         version: link:../core

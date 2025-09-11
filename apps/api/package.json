@@ -13,7 +13,6 @@
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
-    "@albion-raid-manager/config": "workspace:*",
     "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/database": "workspace:*",
     "@albion-raid-manager/logger": "workspace:*",

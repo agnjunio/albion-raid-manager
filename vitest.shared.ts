@@ -11,7 +11,6 @@ export const sharedConfig = {
       "@albion-raid-manager/core/scheduler": resolve(__dirname, "packages/core/src/scheduler.ts"),
       "@albion-raid-manager/core/utils": resolve(__dirname, "packages/core/src/utils/index.ts"),
       "@albion-raid-manager/core": resolve(__dirname, "packages/core/src/index.ts"),
-      "@albion-raid-manager/config": resolve(__dirname, "packages/config/src/index.ts"),
       "@albion-raid-manager/database": resolve(__dirname, "packages/database/src/index.ts"),
       "@albion-raid-manager/logger": resolve(__dirname, "packages/logger/src/index.ts"),
     },

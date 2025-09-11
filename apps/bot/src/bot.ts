@@ -1,4 +1,4 @@
-import config from "@albion-raid-manager/config";
+import config from "@albion-raid-manager/core/config";
 import { logger } from "@albion-raid-manager/logger";
 import { Redis } from "@albion-raid-manager/redis";
 import { Client, Events, IntentsBitField, Partials } from "discord.js";

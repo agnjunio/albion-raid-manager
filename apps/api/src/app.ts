@@ -1,6 +1,6 @@
 import { Server } from "http";
 
-import config from "@albion-raid-manager/config";
+import config from "@albion-raid-manager/core/config";
 import { prisma } from "@albion-raid-manager/database";
 import { logger } from "@albion-raid-manager/logger";
 import { Redis } from "@albion-raid-manager/redis";

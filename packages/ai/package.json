@@ -33,7 +33,6 @@
     "test:regression": "tsx --env-file=.env examples/test-regression.ts"
   },
   "dependencies": {
-    "@albion-raid-manager/config": "workspace:*",
     "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/logger": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",

@@ -18,9 +18,8 @@ This is a monorepo for an Albion Online raid management system built with TypeSc
 
 ### Shared Packages
 
-- **[packages/core](mdc:packages/core)** - Shared business logic, types, and Discord services
+- **[packages/core](mdc:packages/core)** - Shared business logic, types, Discord services, and configuration
 - **[packages/database](mdc:packages/database)** - Prisma database schema and client
-- **[packages/config](mdc:packages/config)** - Shared configuration management
 - **[packages/logger](mdc:packages/logger)** - Centralized logging utilities
 - **[packages/ai](mdc:packages/ai)** - AI/ML utilities for the application
 

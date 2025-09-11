@@ -1,7 +1,7 @@
-import config from "@albion-raid-manager/config";
 import { APIUser } from "discord-api-types/v10";
 
 import { memoize } from "@albion-raid-manager/core/cache/memory";
+import config from "@albion-raid-manager/core/config";
 import { getAuthorization } from "@albion-raid-manager/core/utils/discord";
 import { getMilliseconds } from "@albion-raid-manager/core/utils/time";
 

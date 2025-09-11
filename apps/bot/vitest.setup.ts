@@ -64,7 +64,7 @@ vi.mock("@albion-raid-manager/logger", () => ({
   },
 }));
 
-vi.mock("@albion-raid-manager/config", () => ({
+vi.mock("@albion-raid-manager/core/config", () => ({
   config: {
     get: vi.fn(),
     set: vi.fn(),
@@ -118,7 +118,7 @@ vi.mock("@albion-raid-manager/ai", () => ({
   ),
   ParsedRaidData: vi.fn(),
 }));
-vi.mock("@albion-raid-manager/config");
+vi.mock("@albion-raid-manager/core/config");
 vi.mock("@albion-raid-manager/database", () => ({
   prisma: {
     server: {
