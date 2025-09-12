@@ -29,6 +29,7 @@ model Server {
   icon    String?
   members ServerMember[]
   raids   Raid[]
+  builds  Build[]
 
   // Permissions configuration
   adminRoles                String[] @default([])
@@ -128,6 +129,9 @@ model RaidSlot {
   role      RaidRole?
   user      User?     @relation(fields: [userId], references: [id])
   userId    String?
+  weapon    String?
+  build     Build?    @relation(fields: [buildId], references: [id])
+  buildId   String?
   createdAt DateTime  @default(now())
   joinedAt  DateTime?
 }
@@ -148,6 +152,49 @@ enum RaidRole {
   RANGED_DPS
   MELEE_DPS
   BATTLEMOUNT
+}
+
+enum GearSlot {
+  MAIN_HAND
+  OFF_HAND
+  HEAD
+  BODY
+  FEET
+  CAPE
+  BAG
+  MOUNT
+  FOOD
+  POTION
+  INVENTORY
+}
+
+// Builds
+model Build {
+  id          String       @id @default(uuid())
+  name        String
+  contentType ContentType
+  description String?
+  role        RaidRole
+  serverId    String
+  server      Server       @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  pieces      BuildPiece[]
+  raidSlots   RaidSlot[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model BuildPiece {
+  id          String   @id @default(uuid())
+  buildId     String
+  build       Build    @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  gearSlot    GearSlot
+  itemName    String
+  tier        Int?
+  enchantment Int?     @default(0)
+  quantity    Int      @default(1)
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
 }
 
 // Sessions
