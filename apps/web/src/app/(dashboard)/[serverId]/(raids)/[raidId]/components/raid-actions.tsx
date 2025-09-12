@@ -32,6 +32,16 @@ function RaidStatusMessage({ icon, title, description, note, iconColor, bgColor 
 export function RaidActions() {
   const { raid, canManageRaid, handleUpdateRaidStatus, hasStatus } = useRaidContext();
 
+  const handleCancelRaid = () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to cancel the raid "${raid.title}"?\n\nThis action cannot be undone and all participants will be notified.`,
+    );
+
+    if (confirmed) {
+      handleUpdateRaidStatus("CANCELLED");
+    }
+  };
+
   if (!canManageRaid) return null;
 
   return (
@@ -117,7 +127,7 @@ export function RaidActions() {
               <div className="border-border/50 border-t pt-4">
                 <h4 className="text-muted-foreground mb-3 text-sm font-medium uppercase tracking-wide">Danger Zone</h4>
                 <Button
-                  onClick={() => handleUpdateRaidStatus("CANCELLED")}
+                  onClick={handleCancelRaid}
                   variant="destructive"
                   size="lg"
                   className={`${raidStatuses.CANCELLED.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-red-500/20`}
