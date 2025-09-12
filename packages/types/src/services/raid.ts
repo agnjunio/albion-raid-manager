@@ -67,6 +67,7 @@ export interface CreateRaidSlotInput {
   weapon?: string; // Albion item pattern: T6_2H_HOLYSTAFF@0
   buildId?: string;
   order?: number;
+  userId?: string;
 }
 
 export interface UpdateRaidSlotInput {

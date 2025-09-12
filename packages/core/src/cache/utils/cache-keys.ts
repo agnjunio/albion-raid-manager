@@ -39,7 +39,7 @@ export const CacheKeys = {
 
   // Item cache keys
   itemDatabase: (): string => `items:database`,
-  itemByUniqueName: (uniqueName: string): string => `item:unique:${uniqueName}`,
+  item: (id: string): string => `item:${id}`,
   itemsBySlot: (slotType: string): string => `items:slot:${slotType}`,
   itemSearch: (searchTerm: string, filters?: string): string =>
     `items:search:${searchTerm}${filters ? `:${filters}` : ""}`,

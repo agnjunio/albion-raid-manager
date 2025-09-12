@@ -149,7 +149,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
         comment: slotData.comment?.trim() || null,
         weapon: slotData.weapon || null,
         raidId: raid.id,
-        userId: null,
+        userId: slotData.userId || null,
       });
       setIsAddingSlot(false);
     }

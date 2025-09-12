@@ -24,7 +24,14 @@ export const raidSlotSchema = z.object({
       if (!comment || comment.trim() === "") return null;
       return comment.trim();
     }),
-  userId: z.string().nullable().optional(),
+  userId: z
+    .string()
+    .nullable()
+    .optional()
+    .transform((userId) => {
+      if (!userId || userId.trim() === "") return null;
+      return userId.trim();
+    }),
   weapon: z
     .string()
     .refine(validateItemPatternBoolean, {

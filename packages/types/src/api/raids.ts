@@ -43,7 +43,7 @@ export namespace CreateRaidSlot {
 
 export namespace UpdateRaidSlot {
   export type Params = { raidId: string; slotId: string };
-  export type Body = z.infer<typeof raidSlotSchema>;
+  export type Body = Partial<z.infer<typeof raidSlotSchema>>;
   export type Response = { raidSlot: RaidSlot };
 }
 

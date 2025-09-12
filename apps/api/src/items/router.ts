@@ -1,6 +1,6 @@
 import { logger } from "@albion-raid-manager/core/logger";
 import { ItemsService } from "@albion-raid-manager/core/services";
-import { APIErrorType, APIResponse, SearchItems } from "@albion-raid-manager/types/api";
+import { APIErrorType, APIResponse, GetItem, SearchItems } from "@albion-raid-manager/types/api";
 import { searchItemsQuerySchema } from "@albion-raid-manager/types/schemas";
 import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
@@ -46,6 +46,48 @@ itemsRouter.get(
       return res.json(APIResponse.Success(result));
     } catch (error) {
       logger.error("Items search error", { error, query: req.query });
+
+      if (ServiceError.isServiceError(error)) {
+        switch (error.code) {
+          case ServiceErrorCode.NOT_FOUND:
+            return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, error.message));
+          default:
+            return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, error.message));
+        }
+      }
+
+      return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Internal server error"));
+    }
+  },
+);
+
+/**
+ * GET /items/:id
+ * Get a specific item by its unique ID
+ *
+ * Path parameters:
+ * - id (required): The unique item ID (e.g., "T8_2H_HOLYSTAFF@3")
+ */
+itemsRouter.get(
+  "/:id",
+  async (req: Request<GetItem.Params, {}, GetItem.Query>, res: Response<APIResponse.Type<GetItem.Response>>) => {
+    try {
+      const { id } = req.params;
+
+      if (!id || typeof id !== "string") {
+        return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, "Item ID is required"));
+      }
+
+      // Find item by unique name using the core service
+      const item = await ItemsService.findItemById(id);
+
+      if (!item) {
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Item not found"));
+      }
+
+      return res.json(APIResponse.Success({ item }));
+    } catch (error) {
+      logger.error("Get item error", { error, params: req.params });
 
       if (ServiceError.isServiceError(error)) {
         switch (error.code) {

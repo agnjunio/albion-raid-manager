@@ -32,7 +32,7 @@ export namespace RaidService {
     const { title, description, date, contentType, location, serverId } = input;
     const { cache, publisher } = options;
 
-    await ServersService.ensureServerExists(serverId);
+    await ServersService.ensureServer(serverId);
 
     const contentTypeInfo = getContentTypeInfo(contentType);
     const raidType = contentTypeInfo.raidType;
@@ -66,6 +66,8 @@ export namespace RaidService {
               raidId: raid.id,
               name: `Slot ${i + 1}`,
               role: null,
+              weapon: null,
+              userId: null,
             })),
           });
 
@@ -270,7 +272,7 @@ export namespace RaidService {
     input: CreateRaidSlotInput & { raidId: string },
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { raidId, name, role, comment, weapon, buildId, order } = input;
+    const { raidId, name, role, comment, weapon, buildId, order, userId } = input;
     const { cache, publisher } = options;
 
     // Verify the raid exists and is in a state where slots can be modified
@@ -287,6 +289,12 @@ export namespace RaidService {
       );
     }
 
+    if (userId) {
+      // Ensure the user exists in our database to satisfy foreign key constraints
+      // This handles both normal user creation and fallback cases when Discord API is unavailable
+      await ServersService.ensureServerMember(raid.serverId, userId);
+    }
+
     const updatedRaid = await prisma.raid.update({
       where: { id: raidId },
       data: {
@@ -297,6 +305,7 @@ export namespace RaidService {
             comment,
             weapon,
             buildId,
+            userId,
             order: order ?? (raid.slots?.length || 0),
           },
         },
@@ -360,7 +369,9 @@ export namespace RaidService {
       }
 
       if (input.userId) {
-        await ServersService.getServerMember(existingSlot.raid.serverId, input.userId);
+        // Ensure the user exists in our database to satisfy foreign key constraints
+        // This handles both normal user creation and fallback cases when Discord API is unavailable
+        await ServersService.ensureServerMember(existingSlot.raid.serverId, input.userId);
       }
 
       // If order is specified, handle reordering logic
@@ -460,14 +471,6 @@ export namespace RaidService {
         throw new ServiceError(
           ServiceErrorCode.INVALID_STATE,
           "Cannot modify slots for raids that have started or finished",
-        );
-      }
-
-      // Check if slot has a user assigned
-      if (existingSlot.userId) {
-        throw new ServiceError(
-          ServiceErrorCode.INVALID_STATE,
-          "Cannot delete slot that has a user assigned. Please remove the user first.",
         );
       }
 

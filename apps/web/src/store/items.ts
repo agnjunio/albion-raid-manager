@@ -1,4 +1,4 @@
-import type { SearchItems } from "@albion-raid-manager/types/api";
+import type { GetItem, SearchItems } from "@albion-raid-manager/types/api";
 
 import { createApi } from "@reduxjs/toolkit/query/react";
 
@@ -16,10 +16,17 @@ export const itemsApi = createApi({
           params: query,
         }),
         providesTags: (_result, _error, { query }) => [{ type: "Item", id: `search:${query.q}` }],
-        keepUnusedDataFor: 300,
+        keepUnusedDataFor: 315360000, // 1 year
+      }),
+      getItem: builder.query<GetItem.Response, { id: string }>({
+        query: ({ id }) => ({
+          url: `/items/${id}`,
+        }),
+        providesTags: (_result, _error, { id }) => [{ type: "Item", id }],
+        keepUnusedDataFor: 315360000, // 1 year
       }),
     };
   },
 });
 
-export const { useSearchItemsQuery } = itemsApi;
+export const { useSearchItemsQuery, useGetItemQuery } = itemsApi;

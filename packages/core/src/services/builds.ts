@@ -16,8 +16,7 @@ import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
 import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
-
-import { ServersService } from "./servers";
+import { ServersService } from "@albion-raid-manager/core/services/servers";
 
 export interface BuildServiceOptions {
   cache?: Cache;
@@ -34,7 +33,7 @@ export namespace BuildService {
     const { name, description, role, serverId, pieces = [] } = input;
     const { cache } = options;
 
-    await ServersService.ensureServerExists(serverId);
+    await ServersService.ensureServer(serverId);
 
     // Check if build with same name already exists for this server
     const existingBuild = await prisma.build.findFirst({

@@ -176,15 +176,17 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   const handleRaidSlotCreate = async (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt" | "order">) => {
     try {
       const currentSlotCount = raid.slots?.length || 0;
+      const requestBody = {
+        name: slot.name,
+        role: slot.role || undefined,
+        comment: slot.comment ?? null,
+        weapon: slot.weapon ?? null,
+        userId: slot.userId ?? null,
+        order: currentSlotCount,
+      };
       await createRaidSlot({
         params: { serverId, raidId },
-        body: {
-          name: slot.name,
-          role: slot.role || undefined,
-          comment: slot.comment,
-          weapon: slot.weapon,
-          order: currentSlotCount,
-        },
+        body: requestBody,
       }).unwrap();
 
       toast.success("Slot created successfully");

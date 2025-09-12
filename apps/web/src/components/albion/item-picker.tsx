@@ -28,7 +28,7 @@ import {
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { useSearchItemsQuery } from "@/store/items";
+import { useGetItemQuery, useSearchItemsQuery } from "@/store/items";
 
 import { AlbionItemIcon } from "./item-icon";
 
@@ -117,16 +117,9 @@ export function ItemPicker({
     [onValueChange],
   );
 
-  // Fetch the item's display name if we have an item ID but the display name is the same as the ID
-  const { data: itemData } = useSearchItemsQuery(
-    {
-      query: {
-        q: value?.item_id || "",
-        slotType,
-        limit: 1,
-        offset: 0,
-      },
-    },
+  // Fetch the item's full details if we have an item ID but the display name is the same as the ID
+  const { data: itemDetails } = useGetItemQuery(
+    { id: value?.item_id || "" },
     {
       skip: !value?.item_id || value.localizedNames["EN-US"] !== value.item_id,
     },
@@ -135,13 +128,13 @@ export function ItemPicker({
   const displayName = useMemo(() => {
     if (!value) return placeholder;
 
-    // If we fetched item data and it has a proper display name, use it
-    if (itemData?.items?.[0]?.localizedNames?.["EN-US"]) {
-      return itemData.items[0].localizedNames["EN-US"];
+    // If we fetched item details and it has a proper display name, use it
+    if (itemDetails?.item?.localizedNames?.["EN-US"]) {
+      return itemDetails.item.localizedNames["EN-US"];
     }
 
     return value.localizedNames["EN-US"] || value.item_id;
-  }, [value, placeholder, itemData]);
+  }, [value, placeholder, itemDetails]);
 
   const slotIcon = useMemo(() => {
     if (!slotType) return null;

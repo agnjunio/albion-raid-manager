@@ -1,12 +1,16 @@
 import type { Cache } from "@albion-raid-manager/core/redis";
 
 import { Server, ServerMember } from "@albion-raid-manager/types";
+import { APIServer } from "@albion-raid-manager/types/api/servers";
+import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 
 import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
 import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
+import config from "@albion-raid-manager/core/config";
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 
+import { DiscordService } from "./discord";
 import { UsersService } from "./users";
 
 export interface ServersServiceOptions {
@@ -17,11 +21,26 @@ export interface ServersServiceOptions {
 export namespace ServersService {
   const DEFAULT_CACHE_TTL = 600;
 
-  export async function ensureServerExists(serverId: string): Promise<Server> {
-    const server = await getServerById(serverId);
+  export async function ensureServer(serverId: string): Promise<Server> {
+    let server = await getServerById(serverId);
 
     if (!server) {
-      throw new Error(`Server ${serverId} not found. Please ensure the server is registered.`);
+      const discordServer: APIServer = await DiscordService.servers.getServer(serverId, {
+        type: "bot",
+        token: config.discord.token,
+      });
+
+      if (!discordServer) {
+        throw new Error(`Server ${serverId} not found. Please ensure the server is registered.`);
+      }
+
+      server = await prisma.server.create({
+        data: {
+          id: serverId,
+          name: discordServer.name,
+          icon: discordServer.icon,
+        },
+      });
     }
 
     return server;
@@ -117,6 +136,42 @@ export namespace ServersService {
     return newServer;
   }
 
+  export async function ensureServerMember(
+    serverId: string,
+    userId: string,
+    options: ServersServiceOptions = {},
+  ): Promise<ServerMember> {
+    const { cache } = options;
+
+    let serverMember = await getServerMember(serverId, userId);
+
+    if (!serverMember) {
+      const user = await UsersService.ensureUser(userId);
+
+      if (!user) {
+        throw new ServiceError(
+          ServiceErrorCode.CREATE_FAILED,
+          `Failed to ensure server member ${userId} in server ${serverId} because user ${userId} does not exist after attempting to create it.`,
+        );
+      }
+
+      serverMember = await prisma.serverMember.create({
+        data: {
+          serverId,
+          userId: user.id,
+        },
+      });
+    }
+
+    if (cache) {
+      CacheInvalidation.invalidateServerMember(cache, serverId, userId).catch((error) => {
+        logger.warn("Cache invalidation failed", { error, serverId, userId });
+      });
+    }
+
+    return serverMember;
+  }
+
   export async function getServerMembers(
     serverId: string,
     options: ServersServiceOptions = {},
@@ -144,22 +199,9 @@ export namespace ServersService {
 
     return withCache(
       async () => {
-        let serverMember = await prisma.serverMember.findUnique({
+        return await prisma.serverMember.findUnique({
           where: { serverId_userId: { serverId, userId } },
         });
-
-        if (!serverMember) {
-          const user = await UsersService.getUser(userId);
-
-          serverMember = await prisma.serverMember.create({
-            data: {
-              serverId,
-              userId: user.id,
-            },
-          });
-        }
-
-        return serverMember;
       },
       {
         cache,

@@ -6,13 +6,6 @@ import { prisma } from "@albion-raid-manager/core/database";
 
 import { BuildService } from "./builds";
 
-// Mock the servers service
-vi.mock("./servers", () => ({
-  ServersService: {
-    ensureServerExists: vi.fn(),
-  },
-}));
-
 describe("BuildService", () => {
   let mockPrisma: any;
 

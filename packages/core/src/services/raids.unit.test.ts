@@ -9,7 +9,8 @@ import { RaidService } from "./raids";
 // Mock the ServersService dependency
 vi.mock("./servers", () => ({
   ServersService: {
-    ensureServerExists: vi.fn(),
+    ensureServer: vi.fn().mockResolvedValue(undefined),
+    ensureServerMember: vi.fn().mockResolvedValue(undefined),
   },
 }));
 

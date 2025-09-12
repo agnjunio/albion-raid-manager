@@ -8,3 +8,9 @@ export namespace SearchItems {
   export type Query = z.infer<typeof searchItemsQuerySchema>;
   export type Response = { items: Item[] };
 }
+
+export namespace GetItem {
+  export type Params = { id: string };
+  export type Query = {};
+  export type Response = { item: Item };
+}

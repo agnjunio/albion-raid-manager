@@ -47,13 +47,16 @@ export namespace ItemsService {
     );
   }
 
-  export async function findItemByUniqueName(uniqueName: string): Promise<Item | null> {
+  export async function findItemById(id: string): Promise<Item | null> {
     return withCache(
       async () => {
         const database = await getItemDatabase();
 
+        // Strip enchantment part from the ID (e.g., "T8_2H_HOLYSTAFF@3" -> "T8_2H_HOLYSTAFF")
+        const itemId = id.split("@")[0];
+
         for (const slotType of database.metadata.slotTypes) {
-          const item = database.itemsBySlot[slotType].find((item) => item.item_id === uniqueName);
+          const item = database.itemsBySlot[slotType].find((item) => item.item_id === itemId);
           if (item) {
             return item;
           }
@@ -63,7 +66,7 @@ export namespace ItemsService {
       },
       {
         cache: "memory",
-        key: CacheKeys.itemByUniqueName(uniqueName),
+        key: CacheKeys.item(id),
       },
     );
   }

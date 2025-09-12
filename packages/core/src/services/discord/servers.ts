@@ -1,3 +1,5 @@
+import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
+
 import { memoize } from "@albion-raid-manager/core/cache/memory";
 import config from "@albion-raid-manager/core/config";
 import { sleep } from "@albion-raid-manager/core/scheduler";
@@ -8,7 +10,6 @@ import {
   transformChannel,
   transformGuild,
 } from "@albion-raid-manager/core/utils/discord";
-import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
 
 import { discordApiClient } from "./client";
 import { DiscordServiceOptions } from "./types";

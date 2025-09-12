@@ -26,11 +26,6 @@
       "import": "./src/database/index.ts",
       "require": "./src/database/index.ts"
     },
-    "./discord": {
-      "types": "./src/discord/index.ts",
-      "import": "./src/discord/index.ts",
-      "require": "./src/discord/index.ts"
-    },
     "./entities": {
       "types": "./src/entities/index.ts",
       "import": "./src/entities/index.ts",
@@ -50,6 +45,11 @@
       "types": "./src/scheduler.ts",
       "import": "./src/scheduler.ts",
       "require": "./src/scheduler.ts"
+    },
+    "./services/discord": {
+      "types": "./src/services/discord/index.ts",
+      "import": "./src/services/discord/index.ts",
+      "require": "./src/services/discord/index.ts"
     },
     "./services": {
       "types": "./src/services/index.ts",
