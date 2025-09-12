@@ -1,11 +1,12 @@
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Command as CommandPrimitive } from "cmdk";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (
@@ -15,6 +16,10 @@ function Command({ className, ...props }: React.ComponentProps<typeof CommandPri
         "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-visible rounded-md",
         className,
       )}
+      onWheel={(e) => {
+        // Allow native scroll behavior for mouse wheel
+        e.stopPropagation();
+      }}
       {...props}
     />
   );
@@ -47,18 +52,32 @@ function CommandDialog({
 function CommandInput({
   searchIcon = true,
   className,
+  value,
+  onValueChange,
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input> & { searchIcon?: boolean }) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Allow arrow keys to pass through for Command navigation
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      return; // Let Command component handle arrow key navigation
+    }
+
+    // Allow standard text selection shortcuts to work normally
+    if (e.shiftKey || e.ctrlKey || e.metaKey) {
+      e.stopPropagation();
+    }
+  };
+
   return (
-    <div data-slot="command-input-wrapper" className={cn("relative flex h-9 items-center gap-2")}>
-      <CommandPrimitive.Input
+    <div data-slot="command-input-wrapper" className={cn("relative flex h-9 items-center gap-4")}>
+      <Input
         data-slot="command-input"
+        value={value}
+        onChange={(e) => onValueChange?.(e.target.value)}
+        onKeyDown={handleKeyDown}
         className={cn(
-          "inset-0 disabled:cursor-not-allowed disabled:opacity-50",
-          "border-input file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground shadow-xs flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base outline-none transition-[color,box-shadow] file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-          { "pl-7": searchIcon },
+          "h-9 border-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+          { "pl-9": searchIcon },
           className,
         )}
         {...props}
@@ -73,6 +92,10 @@ function CommandList({ className, ...props }: React.ComponentProps<typeof Comman
     <CommandPrimitive.List
       data-slot="command-list"
       className={cn("max-h-[300px] scroll-py-1 overflow-y-auto overflow-x-hidden", className)}
+      onWheel={(e) => {
+        // Allow native scroll behavior for mouse wheel
+        e.stopPropagation();
+      }}
       {...props}
     />
   );
@@ -128,6 +151,33 @@ function CommandShortcut({ className, ...props }: React.ComponentProps<"span">) 
   );
 }
 
+function CommandTips({
+  className,
+  title,
+  tips = [],
+  show = true,
+  ...props
+}: React.ComponentProps<"div"> & {
+  title?: string;
+  tips?: React.ReactNode[];
+  show?: boolean;
+}) {
+  if (!tips || tips.length === 0 || !show) return null;
+
+  return (
+    <div data-slot="command-tips" className={cn("bg-muted/30 border-t px-4 py-3", className)} {...props}>
+      <div className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">{title}</div>
+      <pre className="space-y-1 text-wrap font-sans">
+        {tips.map((tip, index) => (
+          <p key={index} className="text-muted-foreground font-mono text-xs">
+            {tip}
+          </p>
+        ))}
+      </pre>
+    </div>
+  );
+}
+
 export {
   Command,
   CommandDialog,
@@ -137,6 +187,6 @@ export {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut
+  CommandShortcut,
+  CommandTips,
 };
-

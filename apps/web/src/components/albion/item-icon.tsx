@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { validateItemPattern } from "@/lib/albion/item-validation";
+import { validateItemPattern } from "@albion-raid-manager/types/validators";
 
 interface AlbionItemIconProps {
   item?: string | null;

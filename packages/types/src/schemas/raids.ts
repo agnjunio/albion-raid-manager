@@ -1,21 +1,7 @@
 import { z } from "zod";
 
 import { ContentType, RaidRole } from "@albion-raid-manager/types";
-
-// Enhanced weapon validation function
-function validateWeaponPattern(weapon: string): boolean {
-  if (!weapon || weapon.trim() === "") return true; // Empty is valid
-  const pattern = /^T([1-8])_([A-Z0-9_]+)@([0-3])$/;
-  const match = weapon.trim().match(pattern);
-  if (!match) return false;
-
-  const [, tierStr, itemName, enchantmentStr] = match;
-  const tier = parseInt(tierStr, 10);
-  const enchantment = parseInt(enchantmentStr, 10);
-
-  // Additional validation
-  return tier >= 1 && tier <= 8 && enchantment >= 0 && enchantment <= 3 && itemName.length >= 3;
-}
+import { validateItemPatternBoolean } from "@albion-raid-manager/types/validators";
 
 export const createRaidBodySchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -41,8 +27,9 @@ export const raidSlotSchema = z.object({
   userId: z.string().nullable().optional(),
   weapon: z
     .string()
-    .refine(validateWeaponPattern, {
-      message: "Invalid weapon format. Use Albion pattern: T[1-8]_[ITEM_NAME]@[0-3] (e.g., T6_2H_HOLYSTAFF@0)",
+    .refine(validateItemPatternBoolean, {
+      message:
+        "Invalid weapon format. Use Albion pattern: [TIER]_[PREFIX]_[ITEM_NAME]@[ENCHANTMENT] (e.g., T8_2H_HOLYSTAFF@3)",
     })
     .nullable()
     .optional()

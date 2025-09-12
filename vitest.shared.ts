@@ -25,6 +25,7 @@ export const sharedConfig = {
       "@albion-raid-manager/types/entities": resolve(__dirname, "packages/types/src/entities/index.ts"),
       "@albion-raid-manager/types/services": resolve(__dirname, "packages/types/src/services/index.ts"),
       "@albion-raid-manager/types/schemas": resolve(__dirname, "packages/types/src/schemas/index.ts"),
+      "@albion-raid-manager/types/validators": resolve(__dirname, "packages/types/src/validators/index.ts"),
     },
   },
 };

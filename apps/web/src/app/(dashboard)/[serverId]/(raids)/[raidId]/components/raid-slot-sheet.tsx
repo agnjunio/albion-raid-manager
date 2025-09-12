@@ -3,6 +3,7 @@ import type { RaidRole } from "@albion-raid-manager/types";
 import { useEffect } from "react";
 
 import { raidSlotSchema } from "@albion-raid-manager/types/schemas";
+import { Item } from "@albion-raid-manager/types/services";
 import {
   faComment,
   faFilePen,
@@ -19,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { AlbionItemIcon } from "@/components/albion/item-icon";
+import { ItemPicker } from "@/components/albion/item-picker";
 import { MemberSelection } from "@/components/servers/member-selection";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -27,7 +28,37 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { WEAPON_EXAMPLES } from "@/lib/albion/item-validation";
+
+const stringToItem = (weaponString: string | null): Item | null => {
+  if (!weaponString || weaponString.trim() === "") return null;
+
+  // For now, return a basic item object with the ID
+  // The ItemPicker will fetch the proper display name when it renders
+  return {
+    item_id: weaponString.trim(),
+    localizedNames: {
+      "EN-US": weaponString.trim(),
+      "DE-DE": weaponString.trim(),
+      "FR-FR": weaponString.trim(),
+      "RU-RU": weaponString.trim(),
+      "PL-PL": weaponString.trim(),
+      "ES-ES": weaponString.trim(),
+      "PT-BR": weaponString.trim(),
+      "IT-IT": weaponString.trim(),
+      "ZH-CN": weaponString.trim(),
+      "KO-KR": weaponString.trim(),
+      "JA-JP": weaponString.trim(),
+      "ZH-TW": weaponString.trim(),
+      "ID-ID": weaponString.trim(),
+      "TR-TR": weaponString.trim(),
+      "AR-SA": weaponString.trim(),
+    },
+  };
+};
+
+const itemToString = (item: Item | null): string | null => {
+  return item?.item_id || null;
+};
 
 import { useRaidContext } from "../contexts/raid-context";
 import { ROLE_OPTIONS, type EditingSlot } from "../helpers/raid-composition-utils";
@@ -240,25 +271,19 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                               Weapon (Optional)
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="T6_2H_HOLYSTAFF@0"
-                                className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
-                                {...field}
-                                value={field.value || ""}
+                              <ItemPicker
+                                value={stringToItem(field.value)}
+                                onValueChange={(item: Item | null) => field.onChange(itemToString(item))}
+                                slotType="mainhand"
+                                placeholder="Select a weapon..."
+                                searchPlaceholder="Search weapons..."
+                                emptyMessage="No weapons found."
+                                maxResults={20}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Albion item pattern: T[1-8]_[ITEM_NAME]@[0-3]
-                              <br />
-                              Examples: {WEAPON_EXAMPLES.slice(0, 3).join(", ")}
+                              Search and select a weapon from the Albion Online database.
                             </FormDescription>
-                            {field.value && (
-                              <div className="mt-3 flex justify-center">
-                                <div className="flex h-20 w-20 items-center justify-center">
-                                  <AlbionItemIcon item={field.value} size="lg" />
-                                </div>
-                              </div>
-                            )}
                             <FormMessage />
                           </FormItem>
                         )}

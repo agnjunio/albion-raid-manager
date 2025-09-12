@@ -53,7 +53,7 @@ export const isAPIError = (error: unknown): error is { status: number; data: API
   return typeof error === "object" && error !== null && "status" in error && "data" in error;
 };
 
-export const createTagHelper = <T extends "Raid" | "Guild" | "Composition">(tag: T) => ({
+export const createTagHelper = <T extends "Raid" | "Guild" | "Composition" | "Item">(tag: T) => ({
   list:
     (key: string) =>
     (response: unknown): { type: T; id: string }[] => {
