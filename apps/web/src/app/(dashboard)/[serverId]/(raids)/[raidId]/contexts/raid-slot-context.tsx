@@ -136,9 +136,9 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
       handleRaidSlotUpdate(editingSlot.id, {
         name: slotData.name.trim(),
         role: slotData.role,
-        comment: slotData.comment?.trim() || undefined,
+        comment: slotData.comment?.trim() || null,
         userId: slotData.userId,
-        weapon: slotData.weapon?.trim() || undefined,
+        weapon: slotData.weapon,
       });
       setEditingSlot(null);
     } else if (isAddingSlot) {
@@ -147,7 +147,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
         name: slotData.name.trim(),
         role: slotData.role || null,
         comment: slotData.comment?.trim() || null,
-        weapon: slotData.weapon?.trim() || null,
+        weapon: slotData.weapon || null,
         raidId: raid.id,
         userId: null,
       });

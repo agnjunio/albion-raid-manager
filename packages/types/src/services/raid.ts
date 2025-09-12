@@ -50,14 +50,14 @@ export interface CreateRaidInput {
 
 export interface UpdateRaidInput {
   title?: string;
-  description?: string;
-  note?: string;
+  description?: string | null;
+  note?: string | null;
   date?: Date;
   type?: RaidType;
-  contentType?: ContentType;
-  location?: string;
+  contentType?: ContentType | null;
+  location?: string | null;
   status?: RaidStatus;
-  announcementMessageId?: string;
+  announcementMessageId?: string | null;
 }
 
 export interface CreateRaidSlotInput {
@@ -71,10 +71,10 @@ export interface CreateRaidSlotInput {
 
 export interface UpdateRaidSlotInput {
   name?: string;
-  comment?: string;
   role?: RaidRole;
-  userId?: string;
-  weapon?: string; // Albion item pattern: T6_2H_HOLYSTAFF@0
+  comment?: string | null;
+  userId?: string | null;
+  weapon?: string | null; // Albion item pattern: T6_2H_HOLYSTAFF@0
   buildId?: string;
   order?: number;
 }

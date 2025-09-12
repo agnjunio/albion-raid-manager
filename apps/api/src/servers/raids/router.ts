@@ -1,5 +1,6 @@
 import { logger } from "@albion-raid-manager/core/logger";
 import { RaidService } from "@albion-raid-manager/core/services";
+import { RaidSlot } from "@albion-raid-manager/types";
 import {
   APIErrorType,
   APIResponse,
@@ -11,7 +12,8 @@ import {
   UpdateRaid,
   UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
-import { createRaidBodySchema, createRaidSlotBodySchema } from "@albion-raid-manager/types/schemas";
+import { createRaidBodySchema, raidSlotSchema } from "@albion-raid-manager/types/schemas";
+import { UpdateRaidInput, UpdateRaidSlotInput } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
 import { validateRequest } from "@/request";
@@ -102,7 +104,7 @@ serverRaidsRouter.put(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
     }
 
-    const updates = Object.fromEntries(Object.entries(req.body).filter(([_, value]) => value !== null));
+    const updates = req.body as UpdateRaidInput;
     const raid = await RaidService.updateRaid(raidId, updates, { publisher: await getRaidEventPublisher() });
 
     res.json(APIResponse.Success({ raid }));
@@ -123,7 +125,7 @@ serverRaidsRouter.delete("/:raidId", async (req: Request<{ serverId: string; rai
 
 serverRaidsRouter.post(
   "/:raidId/slots",
-  validateRequest({ body: createRaidSlotBodySchema }),
+  validateRequest({ body: raidSlotSchema }),
   async (
     req: Request<CreateRaidSlot.Params, {}, CreateRaidSlot.Body>,
     res: Response<APIResponse.Type<CreateRaidSlot.Response>>,
@@ -137,7 +139,7 @@ serverRaidsRouter.post(
           raidId,
           name,
           role,
-          comment,
+          comment: comment || undefined,
           order,
         },
         { publisher: await getRaidEventPublisher() },
@@ -154,11 +156,11 @@ serverRaidsRouter.post(
 serverRaidsRouter.put(
   "/:raidId/slots/:slotId",
   async (
-    req: Request<UpdateRaidSlot.Params, {}, UpdateRaidSlot.Body>,
+    req: Request<UpdateRaidSlot.Params, {}, RaidSlot>,
     res: Response<APIResponse.Type<UpdateRaidSlot.Response>>,
   ) => {
     const { slotId } = req.params;
-    const updates = Object.fromEntries(Object.entries(req.body).filter(([_, value]) => value !== null));
+    const updates = req.body as UpdateRaidSlotInput;
 
     try {
       const raidSlot = await RaidService.updateRaidSlot(slotId, updates, { publisher: await getRaidEventPublisher() });

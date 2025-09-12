@@ -37,7 +37,7 @@ export function ServerMemberInfo({ userId, size = "md" }: ServerMemberInfoProps)
           }[size],
         )}
       >
-        {userId && <AvatarImage src={getUserPictureUrl(userId, serverMember?.avatar)} />}
+        <AvatarImage src={userId && serverMember ? getUserPictureUrl(userId, serverMember.avatar) : undefined} />
         <AvatarFallback className={cn("bg-primary/10")}>
           <FontAwesomeIcon
             icon={faUser}

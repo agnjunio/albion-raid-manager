@@ -6,7 +6,7 @@ import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faCheck, faSearch, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -14,8 +14,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 interface MemberSelectionProps {
   members: APIServerMember[];
-  selectedUserId?: string | null | undefined;
-  onSelect: (userId: string | null | undefined) => void;
+  selectedUserId?: string | null;
+  onSelect: (userId: string | null) => void;
   placeholder?: string;
   disabled?: boolean;
 }
@@ -50,7 +50,7 @@ export function MemberSelection({
   };
 
   const handleClear = () => {
-    onSelect(undefined);
+    onSelect(null);
     setOpen(false);
     setSearchValue("");
   };
@@ -136,6 +136,9 @@ function MemberInfo({ member }: { member: APIServerMember }) {
       <div className="flex items-center gap-2">
         <Avatar className="h-6 w-6">
           <AvatarImage src={getUserPictureUrl(member.id, member.avatar)} />
+          <AvatarFallback className="bg-primary/10">
+            <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
+          </AvatarFallback>
         </Avatar>
       </div>
       <span className="truncate">{member.nickname || member.username}</span>

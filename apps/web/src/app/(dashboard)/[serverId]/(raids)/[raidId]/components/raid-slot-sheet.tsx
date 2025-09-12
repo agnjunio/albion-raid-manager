@@ -2,6 +2,7 @@ import type { RaidRole } from "@albion-raid-manager/types";
 
 import { useEffect } from "react";
 
+import { raidSlotSchema } from "@albion-raid-manager/types/schemas";
 import {
   faComment,
   faFilePen,
@@ -30,7 +31,6 @@ import { WEAPON_EXAMPLES } from "@/lib/albion/item-validation";
 
 import { useRaidContext } from "../contexts/raid-context";
 import { ROLE_OPTIONS, type EditingSlot } from "../helpers/raid-composition-utils";
-import { raidSlotSchema } from "../schemas/raid-slot-schema";
 
 type RaidSlotFormData = z.infer<typeof raidSlotSchema>;
 
@@ -57,7 +57,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
       name: "",
       role: undefined,
       comment: "",
-      userId: undefined,
+      userId: null,
       weapon: "",
     },
   });
@@ -68,7 +68,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
         name: slot.name || "",
         role: slot.role || undefined,
         comment: slot.comment || "",
-        userId: slot.userId || undefined,
+        userId: slot.userId || null,
         weapon: slot.weapon || "",
       });
     } else {
@@ -76,7 +76,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
         name: "",
         role: undefined,
         comment: "",
-        userId: undefined,
+        userId: null,
         weapon: "",
       });
     }
@@ -88,7 +88,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
       role: data.role || null,
       comment: data.comment?.trim() || null,
       userId: data.userId || null,
-      weapon: data.weapon?.trim() || null,
+      weapon: data.weapon || null,
     });
 
     form.reset();
@@ -244,6 +244,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                                 placeholder="T6_2H_HOLYSTAFF@0"
                                 className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
                                 {...field}
+                                value={field.value || ""}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
@@ -285,6 +286,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                                 placeholder="Enter slot requirements or notes..."
                                 className="focus:border-primary/50 min-h-[120px] resize-none border-2 text-base leading-relaxed transition-colors"
                                 {...field}
+                                value={field.value || ""}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
