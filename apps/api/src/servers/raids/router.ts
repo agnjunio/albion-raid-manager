@@ -1,5 +1,5 @@
-import { RaidService } from "@albion-raid-manager/core/services";
 import { logger } from "@albion-raid-manager/core/logger";
+import { RaidService } from "@albion-raid-manager/core/services";
 import {
   APIErrorType,
   APIResponse,
@@ -54,14 +54,15 @@ serverRaidsRouter.post(
 
 serverRaidsRouter.get(
   "/",
-  async (req: Request<GetRaids.Params>, res: Response<APIResponse.Type<GetRaids.Response>>) => {
+  async (req: Request<GetRaids.Params, {}, GetRaids.Query>, res: Response<APIResponse.Type<GetRaids.Response>>) => {
     const { serverId } = req.params;
+    const filters = req.query.filters ? JSON.parse(req.query.filters as string) : undefined;
 
     if (!serverId) {
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID is required");
     }
 
-    const raids = await RaidService.findRaids({ serverId });
+    const raids = await RaidService.findRaidsByServer(serverId, filters);
 
     res.json(APIResponse.Success({ raids }));
   },
@@ -157,11 +158,11 @@ serverRaidsRouter.put(
     res: Response<APIResponse.Type<UpdateRaidSlot.Response>>,
   ) => {
     const { slotId } = req.params;
-    const updates = req.body;
+    const updates = Object.fromEntries(Object.entries(req.body).filter(([_, value]) => value !== null));
 
     try {
-      const raid = await RaidService.updateRaidSlot(slotId, updates, { publisher: await getRaidEventPublisher() });
-      res.json(APIResponse.Success({ raid }));
+      const raidSlot = await RaidService.updateRaidSlot(slotId, updates, { publisher: await getRaidEventPublisher() });
+      res.json(APIResponse.Success({ raidSlot }));
     } catch (error) {
       logger.error("Failed to update raid slot:", error);
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to update raid slot"));

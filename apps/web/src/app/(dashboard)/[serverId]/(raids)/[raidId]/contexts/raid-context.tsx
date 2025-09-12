@@ -217,11 +217,17 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
           role: updates.role || undefined,
           comment: updates.comment || undefined,
           userId: updates.userId || undefined,
-          order: updates.order || 0,
+          order: updates.order !== undefined ? updates.order : undefined,
         },
       }).unwrap();
 
-      toast.success("Slot updated successfully");
+      if (updates.order !== undefined) {
+        toast.success("Slot reordered successfully", {
+          duration: 1000,
+        });
+      } else {
+        toast.success("Slot updated successfully");
+      }
     } catch {
       toast.error("Failed to update slot", {
         description: "There was an error updating the slot. Please try again.",

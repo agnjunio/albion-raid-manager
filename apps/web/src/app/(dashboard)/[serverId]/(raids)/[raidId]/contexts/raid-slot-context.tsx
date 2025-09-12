@@ -171,7 +171,8 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
       return;
     }
 
-    const slots = raid.slots || [];
+    // Sort slots by order to match the UI
+    const slots = [...(raid.slots || [])].sort((a, b) => a.order - b.order);
     const activeIndex = slots.findIndex((slot) => slot.id === activeId);
     const overIndex = slots.findIndex((slot) => slot.id === overId);
 
@@ -183,23 +184,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     setIsReordering(true);
 
     try {
-      // Create a new array with the reordered slots
-      const newSlots = [...slots];
-      const [removed] = newSlots.splice(activeIndex, 1);
-      newSlots.splice(overIndex, 0, removed);
-
-      // Only update slots that have actually changed position
-      const slotsToUpdate = newSlots
-        .map((slot, index) => ({ slot, newOrder: index }))
-        .filter(({ slot, newOrder }) => slot.order !== newOrder);
-
-      // Update each slot that needs reordering
-      const updatePromises = slotsToUpdate.map(({ slot, newOrder }) =>
-        handleRaidSlotUpdate(slot.id, { order: newOrder }),
-      );
-
-      // Wait for all updates to complete
-      await Promise.all(updatePromises);
+      await handleRaidSlotUpdate(activeId, { order: overIndex });
     } catch (error) {
       console.error("Failed to reorder slots:", error);
       toast.error("Failed to reorder slots", {

@@ -61,10 +61,19 @@ export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
     }),
   );
 
-  // Disable sensors when reordering to prevent multiple simultaneous operations
-  const disabledSensors = isReordering ? [] : sensors;
+  const handleDragStart = () => {
+    // Prevent drag start if already reordering
+    if (isReordering) {
+      return false;
+    }
+  };
 
   const handleDragEnd = async (event: DragEndEvent) => {
+    // Don't process drag end if we're already reordering
+    if (isReordering) {
+      return;
+    }
+
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -99,7 +108,12 @@ export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
   return (
     <>
       <div className="relative">
-        <DndContext sensors={disabledSensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
           {viewMode === "list" ? (
             <SortableContext items={slots.map((slot) => slot.id)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-1">
