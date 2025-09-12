@@ -1,4 +1,3 @@
+export { CacheInvalidation } from "./cache-invalidation";
 export { CacheKeys } from "./cache-keys";
-export { cacheQuery, invalidatePatterns } from "./cache-utils";
-export { CacheInvalidation } from "./invalidation";
-export { withCache } from "./with-cache";
+export { withCache, type CacheOptions } from "./with-cache";
