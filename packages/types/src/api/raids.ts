@@ -1,16 +1,12 @@
-import { ContentType, Raid, RaidRole, RaidSlot } from "../../generated/index";
+import z from "zod";
+
+import { Raid, RaidSlot } from "../../generated/index";
+import { createRaidBodySchema, createRaidSlotBodySchema, updateRaidSlotBodySchema } from "../schemas/raids";
 import { RaidFilters } from "../services";
 
 export namespace CreateRaid {
   export type Params = { serverId: string };
-  export type Body = {
-    title: string;
-    contentType?: ContentType;
-    description: string;
-    date: string;
-    location?: string;
-    maxPlayers?: number;
-  };
+  export type Body = z.infer<typeof createRaidBodySchema>;
   export type Response = { raid: Raid };
 }
 
@@ -41,13 +37,13 @@ export namespace DeleteRaid {
 
 export namespace CreateRaidSlot {
   export type Params = { serverId: string; raidId: string };
-  export type Body = { name: string; role?: RaidRole; comment?: string; order?: number };
+  export type Body = z.infer<typeof createRaidSlotBodySchema>;
   export type Response = { raid: Raid };
 }
 
 export namespace UpdateRaidSlot {
   export type Params = { raidId: string; slotId: string };
-  export type Body = { name?: string; role?: RaidRole; comment?: string; userId?: string | null; order?: number };
+  export type Body = z.infer<typeof updateRaidSlotBodySchema>;
   export type Response = { raidSlot: RaidSlot };
 }
 

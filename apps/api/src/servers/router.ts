@@ -10,6 +10,7 @@ import {
   GetServers,
   SetupServer,
 } from "@albion-raid-manager/types/api";
+import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
 
@@ -17,7 +18,6 @@ import { auth } from "@/auth/middleware";
 import { validateRequest } from "@/request";
 
 import { serverRaidsRouter } from "./raids/router";
-import { addServerSchema } from "./schemas";
 
 export const serverRouter: Router = Router();
 
@@ -56,6 +56,7 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
         ...server,
         admin: false,
         bot: true,
+        icon: server.icon ?? null,
       });
     }
 

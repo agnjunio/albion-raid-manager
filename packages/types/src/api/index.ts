@@ -38,5 +38,6 @@ export namespace APIResponse {
 }
 
 export * from "./auth";
+export * from "./items";
 export * from "./raids";
 export * from "./servers";

@@ -13,23 +13,23 @@ export const validateRequest = (options: ValidationOptions) => {
     try {
       if (options.body) {
         const validatedBody = await options.body.parseAsync(req.body);
-        req.body = validatedBody;
+        Object.assign(req.body, validatedBody);
       }
 
       if (options.params) {
         const validatedPath = await options.params.parseAsync(req.params);
-        req.params = validatedPath;
+        Object.assign(req.params, validatedPath);
       }
 
       if (options.query) {
         const validatedQuery = await options.query.parseAsync(req.query);
-        req.query = validatedQuery;
+        Object.assign(req.query, validatedQuery);
       }
 
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const message = error.errors.map((error) => `${error.message}: ${error.path.join(".")}`).join(", ");
+        const message = error.issues.map((issue) => `${issue.message}: ${issue.path.join(".")}`).join(", ");
         res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, message));
       } else {
         next(error);

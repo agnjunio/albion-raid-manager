@@ -11,13 +11,13 @@ import {
   UpdateRaid,
   UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
+import { createRaidBodySchema, createRaidSlotBodySchema } from "@albion-raid-manager/types/schemas";
 import { Request, Response, Router } from "express";
 
 import { validateRequest } from "@/request";
 
 import { raidPermission } from "./middleware";
 import { getRaidEventPublisher } from "./redis";
-import { createRaidSchema, createRaidSlotSchema } from "./schemas";
 
 export const serverRaidsRouter: Router = Router({ mergeParams: true });
 
@@ -25,7 +25,7 @@ serverRaidsRouter.use(raidPermission);
 
 serverRaidsRouter.post(
   "/",
-  validateRequest({ body: createRaidSchema }),
+  validateRequest({ body: createRaidBodySchema }),
   async (
     req: Request<CreateRaid.Params, {}, CreateRaid.Body>,
     res: Response<APIResponse.Type<CreateRaid.Response>>,
@@ -123,7 +123,7 @@ serverRaidsRouter.delete("/:raidId", async (req: Request<{ serverId: string; rai
 
 serverRaidsRouter.post(
   "/:raidId/slots",
-  validateRequest({ body: createRaidSlotSchema }),
+  validateRequest({ body: createRaidSlotBodySchema }),
   async (
     req: Request<CreateRaidSlot.Params, {}, CreateRaidSlot.Body>,
     res: Response<APIResponse.Type<CreateRaidSlot.Response>>,

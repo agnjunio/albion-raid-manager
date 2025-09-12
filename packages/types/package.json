@@ -6,7 +6,8 @@
     ".": "./generated/index.ts",
     "./api": "./src/api/index.ts",
     "./entities": "./src/entities/index.ts",
-    "./services": "./src/services/index.ts"
+    "./services": "./src/services/index.ts",
+    "./schemas": "./src/schemas/index.ts"
   },
   "scripts": {
     "dev": "echo 'JIT compilation - no build needed'",
@@ -17,5 +18,8 @@
   "devDependencies": {
     "@types/node": "^20.11.24",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "zod": "^4.1.8"
   }
 }

@@ -1,8 +1,9 @@
 import type { Cache } from "@albion-raid-manager/core/redis";
 
-import { Server } from "@albion-raid-manager/types";
+import { Server, ServerMember } from "@albion-raid-manager/types";
 
-import { CacheInvalidation, CacheKeys, withCache } from "@albion-raid-manager/core/cache/redis";
+import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
+import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 
@@ -49,7 +50,7 @@ export namespace ServersService {
     const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
     const cacheKey = CacheKeys.serversByUser(userId);
 
-    return withCache(
+    return withCache<Server[]>(
       () =>
         prisma.server.findMany({
           where: {
@@ -116,7 +117,10 @@ export namespace ServersService {
     return newServer;
   }
 
-  export async function getServerMembers(serverId: string, options: ServersServiceOptions = {}) {
+  export async function getServerMembers(
+    serverId: string,
+    options: ServersServiceOptions = {},
+  ): Promise<ServerMember[]> {
     const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
     const cacheKey = CacheKeys.serverMembers(serverId);
 
