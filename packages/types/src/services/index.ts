@@ -2,6 +2,7 @@ export enum ServiceErrorCode {
   NOT_AUTHORIZED = "NOT_AUTHORIZED",
   NOT_FOUND = "NOT_FOUND",
   INVALID_STATE = "INVALID_STATE",
+  CREATE_FAILED = "CREATE_FAILED",
 }
 
 export class ServiceError extends Error {
@@ -19,4 +20,5 @@ export class ServiceError extends Error {
   }
 }
 
+export * from "./build";
 export * from "./raid";

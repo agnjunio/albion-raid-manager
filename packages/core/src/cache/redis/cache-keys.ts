@@ -1,12 +1,10 @@
 import crypto from "crypto";
 
-import { Prisma } from "@albion-raid-manager/core/database";
-
-function hashObject(obj: object) {
-  return crypto.createHash("sha256").update(JSON.stringify(obj)).digest("hex");
-}
-
 export const CacheKeys = {
+  hashObject: (obj: object) => {
+    return crypto.createHash("sha256").update(JSON.stringify(obj)).digest("hex");
+  },
+
   // User keys
   user: (id: string) => `user:${id}`,
   userByDiscord: (discordId: string) => `user:discord:${discordId}`,
@@ -20,16 +18,11 @@ export const CacheKeys = {
   serverConfig: (serverId: string) => `config:server:${serverId}`,
 
   // Raid keys
-  raid: (id: string, include?: Prisma.RaidInclude) => {
-    if (include) {
-      return `raid:${id}:${hashObject(include)}`;
-    }
-    return `raid:${id}`;
-  },
+  raid: (id: string, include?: string) => `raid:${id}${include ? `:${include}` : ""}`,
   raids: (filters: string, include: string) => `raids:${filters}:${include}`,
-  raidsByServer: (serverId: string, status?: string) => `raids:server:${serverId}${status ? `:${status}` : ""}`,
-  raidsByUser: (userId: string) => `raids:user:${userId}`,
-  upcomingRaids: (serverId: string) => `raids:${serverId}:upcoming`,
-  activeRaids: (serverId: string) => `raids:${serverId}:active`,
-  raidStats: (serverId: string) => `raid:${serverId}:stats`,
+  raidsByServer: (serverId: string, filters?: string) => `raids:server:${serverId}${filters ? `:${filters}` : ""}`,
+
+  // Build keys
+  build: (id: string) => `build:${id}`,
+  buildsByServer: (serverId: string, filters?: string) => `builds:server:${serverId}${filters ? `:${filters}` : ""}`,
 } as const;

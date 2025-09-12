@@ -6,6 +6,7 @@ import { beforeEach, vi } from "vitest";
 // Mock Prisma client
 vi.mock("@albion-raid-manager/core/database", () => ({
   prisma: {
+    $transaction: vi.fn(),
     server: {
       findUnique: vi.fn(),
       findMany: vi.fn(),
@@ -64,7 +65,21 @@ vi.mock("@albion-raid-manager/core/database", () => ({
       upsert: vi.fn(),
       delete: vi.fn(),
     },
-    $transaction: vi.fn(),
+    build: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    buildPiece: {
+      create: vi.fn(),
+      createMany: vi.fn(),
+      findFirst: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
   },
   RaidStatus: {
     SCHEDULED: "SCHEDULED",
@@ -89,6 +104,27 @@ vi.mock("@albion-raid-manager/core/database", () => ({
     HEALER: "HEALER",
     DPS: "DPS",
     SUPPORT: "SUPPORT",
+  },
+  RaidRole: {
+    TANK: "TANK",
+    SUPPORT: "SUPPORT",
+    HEALER: "HEALER",
+    RANGED_DPS: "RANGED_DPS",
+    MELEE_DPS: "MELEE_DPS",
+    BATTLEMOUNT: "BATTLEMOUNT",
+  },
+  GearSlot: {
+    MAIN_HAND: "MAIN_HAND",
+    OFF_HAND: "OFF_HAND",
+    HEAD: "HEAD",
+    BODY: "BODY",
+    FEET: "FEET",
+    CAPE: "CAPE",
+    BAG: "BAG",
+    MOUNT: "MOUNT",
+    FOOD: "FOOD",
+    POTION: "POTION",
+    INVENTORY: "INVENTORY",
   },
 }));
 
@@ -130,6 +166,7 @@ vi.mock("@albion-raid-manager/core/logger", () => ({
     warn: vi.fn(),
     error: vi.fn(),
     debug: vi.fn(),
+    verbose: vi.fn(),
   },
 }));
 

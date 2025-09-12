@@ -14,8 +14,6 @@ export class CacheInvalidation {
       cache.delete(CacheKeys.user(userId)),
       cache.delete(CacheKeys.userByDiscord(userId)),
       cache.delete(CacheKeys.serversByUser(userId)),
-      cache.deletePattern(`raids:user:${userId}*`),
-      cache.deletePattern(`member:*:${userId}`),
     ]);
   }
 
@@ -31,6 +29,7 @@ export class CacheInvalidation {
       cache.deletePattern(`raids:active:${serverId}`),
       cache.deletePattern(`member:${serverId}:*`),
       cache.deletePattern(`users:server:${serverId}`),
+      cache.deletePattern(`builds:server:${serverId}*`),
     ]);
   }
 
@@ -42,11 +41,7 @@ export class CacheInvalidation {
 
     // If serverId is provided, also invalidate server-specific raid caches
     if (serverId) {
-      await Promise.all([
-        cache.deletePattern(`raids:server:${serverId}*`),
-        cache.deletePattern(`raids:upcoming:${serverId}*`),
-        cache.deletePattern(`raids:active:${serverId}`),
-      ]);
+      await Promise.all([cache.deletePattern(CacheKeys.raidsByServer(serverId, "*"))]);
     }
   }
 
@@ -54,11 +49,7 @@ export class CacheInvalidation {
    * Invalidate all raid caches for a server (useful after creating/updating raids)
    */
   static async invalidateServerRaids(cache: Cache, serverId: string): Promise<void> {
-    await Promise.all([
-      cache.deletePattern(`raids:server:${serverId}*`),
-      cache.deletePattern(`raids:upcoming:${serverId}*`),
-      cache.deletePattern(`raids:active:${serverId}`),
-    ]);
+    await Promise.all([cache.deletePattern(CacheKeys.raidsByServer(serverId, "*"))]);
   }
 
   /**
@@ -70,6 +61,23 @@ export class CacheInvalidation {
       cache.delete(CacheKeys.serverMembers(serverId)),
       cache.delete(CacheKeys.server(serverId)),
       cache.delete(CacheKeys.serversByUser(userId)),
+    ]);
+  }
+
+  /**
+   * Invalidate all caches related to a specific build
+   */
+  static async invalidateBuild(cache: Cache, buildId: string): Promise<void> {
+    await Promise.all([cache.delete(CacheKeys.build(buildId)), cache.deletePattern(`build:${buildId}:*`)]);
+  }
+
+  /**
+   * Invalidate all build caches for a server (useful after creating/updating builds)
+   */
+  static async invalidateServerBuilds(cache: Cache, serverId: string): Promise<void> {
+    await Promise.all([
+      cache.deletePattern(`builds:server:${serverId}*`),
+      cache.deletePattern(`build:${serverId}:name:*`),
     ]);
   }
 }

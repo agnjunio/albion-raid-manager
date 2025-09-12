@@ -129,7 +129,7 @@ model RaidSlot {
   role      RaidRole?
   user      User?     @relation(fields: [userId], references: [id])
   userId    String?
-  weapon    String?
+  weapon    String?   // Albion item pattern: T6_2H_HOLYSTAFF@0
   build     Build?    @relation(fields: [buildId], references: [id])
   buildId   String?
   createdAt DateTime  @default(now())
@@ -172,7 +172,6 @@ enum GearSlot {
 model Build {
   id          String       @id @default(uuid())
   name        String
-  contentType ContentType
   description String?
   role        RaidRole
   serverId    String
@@ -188,9 +187,7 @@ model BuildPiece {
   buildId     String
   build       Build    @relation(fields: [buildId], references: [id], onDelete: Cascade)
   gearSlot    GearSlot
-  itemName    String
-  tier        Int?
-  enchantment Int?     @default(0)
+  itemName    String   // Albion item pattern: T6_2H_HOLYSTAFF@0
   quantity    Int      @default(1)
   description String?
   order       Int      @default(0)

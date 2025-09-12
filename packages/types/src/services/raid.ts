@@ -1,5 +1,6 @@
 import { ContentType, RaidRole, RaidStatus, RaidType } from "../../generated/index";
 
+// Service-specific interfaces that extend or compose the generated types
 export interface RaidData {
   id: string;
   title: string;
@@ -17,6 +18,10 @@ export interface RaidData {
   updatedAt: Date;
 }
 
+export interface RaidWithSlots extends RaidData {
+  slots: RaidSlotData[];
+}
+
 export interface RaidSlotData {
   id: string;
   name: string;
@@ -24,12 +29,10 @@ export interface RaidSlotData {
   role?: RaidRole;
   userId?: string;
   raidId?: string;
+  weapon?: string; // Albion item pattern: T6_2H_HOLYSTAFF@0
+  buildId?: string;
   createdAt: Date;
   joinedAt?: Date;
-}
-
-export interface RaidWithSlots extends RaidData {
-  slots: RaidSlotData[];
 }
 
 export interface CreateRaidInput {
@@ -55,6 +58,25 @@ export interface UpdateRaidInput {
   location?: string;
   status?: RaidStatus;
   announcementMessageId?: string;
+}
+
+export interface CreateRaidSlotInput {
+  name: string;
+  comment?: string;
+  role?: RaidRole;
+  weapon?: string; // Albion item pattern: T6_2H_HOLYSTAFF@0
+  buildId?: string;
+  order?: number;
+}
+
+export interface UpdateRaidSlotInput {
+  name?: string;
+  comment?: string;
+  role?: RaidRole;
+  userId?: string;
+  weapon?: string; // Albion item pattern: T6_2H_HOLYSTAFF@0
+  buildId?: string;
+  order?: number;
 }
 
 export interface RaidFilters {
