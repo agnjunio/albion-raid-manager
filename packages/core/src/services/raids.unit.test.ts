@@ -69,7 +69,9 @@ describe("RaidService", () => {
           serverId: "guild123",
           status: "SCHEDULED",
         },
-        include: expect.any(Object),
+        include: {
+          slots: true,
+        },
       });
     });
 
@@ -147,7 +149,7 @@ describe("RaidService", () => {
         date: new Date("2024-12-31T20:00:00Z"),
         type: "FLEX",
         contentType: "GROUP_DUNGEON",
-        maxPlayers: 5,
+        maxPlayers: null,
         location: "Test Location",
         serverId: "guild123",
         status: "SCHEDULED",
@@ -184,7 +186,7 @@ describe("RaidService", () => {
     });
   });
 
-  describe("findRaids", () => {
+  describe("findRaidsByServer", () => {
     it("should return raids with default filters", async () => {
       // Arrange
       const mockRaids: Raid[] = [
@@ -208,7 +210,7 @@ describe("RaidService", () => {
       mockPrisma.raid.findMany.mockResolvedValue(mockRaids);
 
       // Act
-      const result = await RaidService.findRaids({ serverId: "guild123" });
+      const result = await RaidService.findRaidsByServer("guild123");
 
       // Assert
       expect(result).toEqual(mockRaids);
@@ -217,7 +219,7 @@ describe("RaidService", () => {
           serverId: "guild123",
         },
         include: {
-          slots: undefined,
+          slots: true,
         },
         orderBy: {
           date: "asc",
@@ -231,7 +233,10 @@ describe("RaidService", () => {
       mockPrisma.raid.findMany.mockResolvedValue(mockRaids);
 
       // Act
-      await RaidService.findRaids({ serverId: "guild123", status: "OPEN", contentType: "ROADS_OF_AVALON" });
+      await RaidService.findRaidsByServer("guild123", {
+        status: "OPEN",
+        contentType: "ROADS_OF_AVALON",
+      });
 
       // Assert
       expect(mockPrisma.raid.findMany).toHaveBeenCalledWith({
@@ -241,7 +246,7 @@ describe("RaidService", () => {
           contentType: "ROADS_OF_AVALON",
         },
         include: {
-          slots: undefined,
+          slots: true,
         },
         orderBy: {
           date: "asc",
