@@ -182,6 +182,7 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
           name: slot.name,
           role: slot.role || undefined,
           comment: slot.comment || undefined,
+          weapon: slot.weapon || undefined,
           order: currentSlotCount,
         },
       }).unwrap();
@@ -217,6 +218,7 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
           role: updates.role || undefined,
           comment: updates.comment || undefined,
           userId: updates.userId || undefined,
+          weapon: updates.weapon || undefined,
           order: updates.order !== undefined ? updates.order : undefined,
         },
       }).unwrap();

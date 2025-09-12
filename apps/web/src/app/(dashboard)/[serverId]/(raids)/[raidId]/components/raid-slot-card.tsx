@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { faComment, faGripVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { AlbionItemIcon } from "@/components/albion/item-icon";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -46,9 +47,15 @@ export function ListRaidSlotCard({ slot }: { slot: RaidSlot }) {
               </div>
             )}
 
-            {/* Role Icon */}
-            <div className="bg-muted flex size-12 items-center justify-center rounded-lg">
-              <span className="text-xl">{slot.role ? getRoleIcon(slot.role) : "❓"}</span>
+            {/* Role/Weapon Icon */}
+            <div className="flex size-16 items-center justify-center">
+              {slot.weapon ? (
+                <AlbionItemIcon item={slot.weapon} size="lg" />
+              ) : (
+                <div className="bg-muted flex size-16 items-center justify-center rounded-lg">
+                  <span className="text-2xl">{slot.role ? getRoleIcon(slot.role) : "❓"}</span>
+                </div>
+              )}
             </div>
 
             {/* Slot Info */}
@@ -136,9 +143,15 @@ export function GridRaidSlotCard({ slot }: { slot: RaidSlot }) {
 
         {/* Slot Header */}
         <div className="flex w-full items-start justify-start gap-2">
-          <div className="flex min-w-0 flex-1 items-start justify-start gap-3">
-            <div className="bg-muted flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg">
-              <span className="text-xl">{slot.role ? getRoleIcon(slot.role) : "❓"}</span>
+          <div className="flex min-w-0 flex-1 items-center justify-start gap-2.5">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center">
+              {slot.weapon ? (
+                <AlbionItemIcon item={slot.weapon} size="md" />
+              ) : (
+                <div className="bg-muted flex h-12 w-12 items-center justify-center rounded-lg">
+                  <span className="text-xl">{slot.role ? getRoleIcon(slot.role) : "❓"}</span>
+                </div>
+              )}
             </div>
             <div className="flex flex-col">
               <ServerMemberInfo userId={slot.userId} size="sm" />

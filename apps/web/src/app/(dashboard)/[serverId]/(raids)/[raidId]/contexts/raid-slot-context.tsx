@@ -23,6 +23,7 @@ interface RaidSlotContextValue {
     role?: RaidRole | null;
     comment?: string | null;
     userId?: string | null;
+    weapon?: string | null;
   }) => void;
   startAddingSlot: () => void;
   cancelEditing: () => void;
@@ -34,6 +35,7 @@ interface RaidSlotContextValue {
     role?: RaidRole | null;
     comment?: string | null;
     userId?: string | null;
+    weapon?: string | null;
   }) => void;
   deleteSlot: (slotId: string) => void;
   reorderSlots: (activeId: string, overId: string) => void;
@@ -79,6 +81,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     role?: RaidRole | null;
     comment?: string | null;
     userId?: string | null;
+    weapon?: string | null;
   }) => {
     if (!canEditRaidSlot) {
       toast.error("Cannot edit slot", {
@@ -93,6 +96,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
       role: slot.role || undefined,
       comment: slot.comment || "",
       userId: slot.userId || null,
+      weapon: slot.weapon || "",
     });
   };
 
@@ -120,6 +124,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     role?: RaidRole | null;
     comment?: string | null;
     userId?: string | null;
+    weapon?: string | null;
   }) => {
     if (!slotData.name.trim()) {
       toast.error("Slot name is required");
@@ -133,6 +138,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
         role: slotData.role,
         comment: slotData.comment?.trim() || undefined,
         userId: slotData.userId,
+        weapon: slotData.weapon?.trim() || undefined,
       });
       setEditingSlot(null);
     } else if (isAddingSlot) {
@@ -141,6 +147,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
         name: slotData.name.trim(),
         role: slotData.role || null,
         comment: slotData.comment?.trim() || null,
+        weapon: slotData.weapon?.trim() || null,
         raidId: raid.id,
         userId: null,
       });

@@ -48,4 +48,5 @@ export interface EditingSlot {
   role?: RaidRole;
   comment?: string;
   userId?: string | null;
+  weapon?: string;
 }

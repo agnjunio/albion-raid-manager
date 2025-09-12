@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import {
   faComment,
   faFilePen,
+  faHammer,
   faPenToSquare,
   faPlus,
   faSave,
@@ -17,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { AlbionItemIcon } from "@/components/albion/item-icon";
 import { MemberSelection } from "@/components/servers/member-selection";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -24,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { WEAPON_EXAMPLES } from "@/lib/albion/item-validation";
 
 import { useRaidContext } from "../contexts/raid-context";
 import { ROLE_OPTIONS, type EditingSlot } from "../helpers/raid-composition-utils";
@@ -36,7 +39,13 @@ interface RaidSlotSheetProps {
   onClose: () => void;
   mode: "add" | "edit";
   slot?: EditingSlot | null;
-  onSave: (slotData: { name: string; role?: RaidRole | null; comment?: string | null; userId?: string | null }) => void;
+  onSave: (slotData: {
+    name: string;
+    role?: RaidRole | null;
+    comment?: string | null;
+    userId?: string | null;
+    weapon?: string | null;
+  }) => void;
 }
 
 export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotSheetProps) {
@@ -49,6 +58,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
       role: undefined,
       comment: "",
       userId: undefined,
+      weapon: "",
     },
   });
 
@@ -59,6 +69,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
         role: slot.role || undefined,
         comment: slot.comment || "",
         userId: slot.userId || undefined,
+        weapon: slot.weapon || "",
       });
     } else {
       form.reset({
@@ -66,6 +77,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
         role: undefined,
         comment: "",
         userId: undefined,
+        weapon: "",
       });
     }
   }, [slot, form]);
@@ -76,6 +88,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
       role: data.role || null,
       comment: data.comment?.trim() || null,
       userId: data.userId || null,
+      weapon: data.weapon?.trim() || null,
     });
 
     form.reset();
@@ -204,6 +217,47 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
                               Assign a specific member to this slot
                             </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-border border-t"></div>
+
+                    {/* Weapon */}
+                    <div className="space-y-6">
+                      <FormField
+                        control={form.control}
+                        name="weapon"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-muted-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                              <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+                                <FontAwesomeIcon icon={faHammer} className="text-muted-foreground h-4 w-4" />
+                              </div>
+                              Weapon (Optional)
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="T6_2H_HOLYSTAFF@0"
+                                className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormDescription className="text-muted-foreground mt-2 text-sm">
+                              Albion item pattern: T[1-8]_[ITEM_NAME]@[0-3]
+                              <br />
+                              Examples: {WEAPON_EXAMPLES.slice(0, 3).join(", ")}
+                            </FormDescription>
+                            {field.value && (
+                              <div className="mt-3 flex justify-center">
+                                <div className="flex h-20 w-20 items-center justify-center">
+                                  <AlbionItemIcon item={field.value} size="lg" />
+                                </div>
+                              </div>
+                            )}
                             <FormMessage />
                           </FormItem>
                         )}
