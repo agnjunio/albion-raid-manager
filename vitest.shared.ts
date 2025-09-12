@@ -10,6 +10,7 @@ export const sharedConfig = {
       "@albion-raid-manager/core/cache/memory": resolve(__dirname, "packages/core/src/cache/memory/index.ts"),
       "@albion-raid-manager/core/cache/redis": resolve(__dirname, "packages/core/src/cache/redis/index.ts"),
       "@albion-raid-manager/core/cache/file": resolve(__dirname, "packages/core/src/cache/file/index.ts"),
+      "@albion-raid-manager/core/cache/utils": resolve(__dirname, "packages/core/src/cache/utils/index.ts"),
       "@albion-raid-manager/core/config": resolve(__dirname, "packages/core/src/config/index.ts"),
       "@albion-raid-manager/core/database": resolve(__dirname, "packages/core/src/database/index.ts"),
       "@albion-raid-manager/core/discord": resolve(__dirname, "packages/core/src/discord/index.ts"),

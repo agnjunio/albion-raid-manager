@@ -1,6 +1,7 @@
 export * from "./discord";
 export * from "./errors";
 export * from "./files";
+export * from "./fuzzy-search";
 export * from "./math";
 export * from "./objects";
 export * from "./parsers";

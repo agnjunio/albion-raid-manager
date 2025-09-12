@@ -5,9 +5,11 @@ import { searchItemsQuerySchema } from "@albion-raid-manager/types/schemas";
 import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
+import { auth } from "@/auth/middleware";
 import { validateRequest } from "@/request";
 
 export const itemsRouter: Router = Router();
+itemsRouter.use(auth);
 
 /**
  * GET /items/search
@@ -15,6 +17,7 @@ export const itemsRouter: Router = Router();
  *
  * Query parameters:
  * - q (required): Search term (minimum 2 characters)
+ *   Supports Albion Online patterns like "8.1" (tier 8, enchant 1) or "T8.1"
  * - slotType (optional): Filter by item slot type
  * - limit (optional): Number of results to return (1-100, default: 20)
  * - offset (optional): Number of results to skip (default: 0)

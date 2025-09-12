@@ -12,7 +12,8 @@ import {
   UpdateBuildPieceInput,
 } from "@albion-raid-manager/types/services";
 
-import { CacheInvalidation, CacheKeys, withCache } from "@albion-raid-manager/core/cache/redis";
+import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
+import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 

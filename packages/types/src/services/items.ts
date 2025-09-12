@@ -54,6 +54,13 @@ export interface ItemSearchFilters {
   offset?: number;
 }
 
+export interface ItemSearchInput {
+  originalTerm: string;
+  processedTerm: string;
+  tier?: number;
+  enchant?: number;
+}
+
 export interface ItemSearchResult {
   items: Item[];
   total: number;
