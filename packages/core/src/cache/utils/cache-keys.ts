@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
 /**
- * Cache key utilities for consistent Redis key generation
+ * Cache key utilities for consistent cache key generation
  *
  * Key naming convention:
  * - Use colons (:) as separators
@@ -36,4 +36,11 @@ export const CacheKeys = {
   build: (id: string): string => `build:${id}`,
   buildsByServer: (serverId: string, filters?: string): string =>
     `builds:server:${serverId}${filters ? `:${filters}` : ""}`,
+
+  // Item cache keys
+  itemDatabase: (): string => `items:database`,
+  itemByUniqueName: (uniqueName: string): string => `item:unique:${uniqueName}`,
+  itemsBySlot: (slotType: string): string => `items:slot:${slotType}`,
+  itemSearch: (searchTerm: string, filters?: string): string =>
+    `items:search:${searchTerm}${filters ? `:${filters}` : ""}`,
 } as const;

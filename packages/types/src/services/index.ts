@@ -21,4 +21,5 @@ export class ServiceError extends Error {
 }
 
 export * from "./build";
+export * from "./items";
 export * from "./raid";

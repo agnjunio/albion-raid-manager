@@ -1,9 +1,11 @@
 import type { Cache } from "@albion-raid-manager/core/redis";
 
+import { memoize } from "../memory";
+
 export interface CacheOptions {
-  cache?: Cache;
+  cache?: Cache | "memory";
   key: string;
-  ttl: number;
+  ttl?: number;
 }
 
 /**
@@ -31,6 +33,10 @@ export async function withCache<T>(queryFn: () => Promise<T>, options: CacheOpti
   // If no cache provided, just execute the query
   if (!cache) {
     return queryFn();
+  }
+
+  if (cache === "memory") {
+    return memoize(key, queryFn, { timeout: ttl });
   }
 
   // Try to get from cache first

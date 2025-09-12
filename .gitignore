@@ -22,3 +22,6 @@ generated/
 
 # Tests
 coverage/
+
+# Input files
+scripts/inputs/

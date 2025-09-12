@@ -1,6 +1,6 @@
 import type { Cache } from "@albion-raid-manager/core/redis";
 
-import { CacheKeys } from "./cache-keys";
+import { CacheKeys } from "@albion-raid-manager/core/cache/utils";
 
 /**
  * Cache invalidation utilities for different entities
