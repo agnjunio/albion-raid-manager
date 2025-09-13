@@ -4,7 +4,7 @@
   "private": true,
   "main": "src/index.ts",
   "scripts": {
-    "dev": "tsx watch --env-file=.env .",
+    "dev": "tsx watch --env-file=.env --exclude=logs/** --exclude=src/**/*.test.ts .",
     "build": "tsc",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
