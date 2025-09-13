@@ -1,9 +1,10 @@
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+
+import { cn } from "@/lib/utils";
 
 import { Button } from "./button";
 

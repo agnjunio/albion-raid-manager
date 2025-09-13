@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { faCopy, faShare, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faDownload, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { toast } from "sonner";
 
 import { RaidStatusBadge } from "@/components/raids/raid-badge";
 import { BackButton } from "@/components/ui/back-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Page } from "@/components/ui/page";
+import Loading from "@/components/ui/loading";
+import { Page, PageError } from "@/components/ui/page";
+import { isAPIError } from "@/lib/api";
 
 import { InlineEditField } from "./components/inline-edit-field";
 import { RaidActions } from "./components/raid-actions";
@@ -15,12 +18,44 @@ import { RaidComposition } from "./components/raid-composition";
 import { RaidNotes } from "./components/raid-notes";
 import { RaidStats } from "./components/raid-stats";
 import { useRaidContext } from "./contexts/raid-context";
+import { downloadRaidConfiguration, exportRaidConfiguration } from "./utils/raid-export-import";
 
 export function RaidPage() {
-  const { raid, handleCopyRaidLink, handleShareRaid, handleDeleteRaid, handleUpdateRaid, canManageRaid } =
+  const { raid, isLoading, error, handleCopyRaidLink, handleDeleteRaid, handleUpdateRaid, canManageRaid } =
     useRaidContext();
-  const [title, setTitle] = useState(raid.title);
-  const [description, setDescription] = useState(raid.description || "");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (raid) {
+      setTitle(raid.title);
+      setDescription(raid.description || "");
+    }
+  }, [raid]);
+
+  // Handle loading state
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  // Handle error state
+  if (error || !raid) {
+    return <PageError variant="error" error={isAPIError(error) ? error.data : "Failed to get raid"} />;
+  }
+
+  const handleExport = () => {
+    try {
+      const configuration = exportRaidConfiguration(raid);
+      downloadRaidConfiguration(configuration, raid.title);
+      toast.success("Raid configuration exported successfully", {
+        description: "The raid configuration has been downloaded as a JSON file.",
+      });
+    } catch (error) {
+      toast.error("Failed to export raid configuration", {
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
+      });
+    }
+  };
 
   return (
     <Page className="items-center pb-20">
@@ -47,11 +82,11 @@ export function RaidPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleShareRaid}
+                  onClick={handleExport}
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  <FontAwesomeIcon icon={faShare} className="mr-2 h-4 w-4" />
-                  Share
+                  <FontAwesomeIcon icon={faDownload} className="mr-2 h-4 w-4" />
+                  Export Config
                 </Button>
                 {canManageRaid && (
                   <Button

@@ -59,19 +59,24 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
   const [isAddingSlot, setIsAddingSlot] = useState(false);
   const [isReordering, setIsReordering] = useState(false);
 
-  const contentTypeInfo = useMemo(() => getContentTypeInfo(raid.contentType), [raid.contentType]);
-  const currentSlotCount = useMemo(() => raid.slots?.length || 0, [raid.slots]);
+  const contentTypeInfo = useMemo(() => getContentTypeInfo(raid?.contentType), [raid?.contentType]);
+  const currentSlotCount = useMemo(() => raid?.slots?.length || 0, [raid?.slots]);
 
   const canEditRaidSlot = useMemo(
-    () => canManageRaid && (raid.status === "SCHEDULED" || raid.status === "OPEN" || raid.status === "CLOSED"),
-    [canManageRaid, raid.status],
+    () =>
+      Boolean(
+        canManageRaid && raid && (raid.status === "SCHEDULED" || raid.status === "OPEN" || raid.status === "CLOSED"),
+      ),
+    [canManageRaid, raid],
   );
   const canAddRaidSlot = useMemo(
-    () => canEditRaidSlot && (!contentTypeInfo.partySize?.max || currentSlotCount < contentTypeInfo.partySize.max),
+    () =>
+      Boolean(canEditRaidSlot && (!contentTypeInfo.partySize?.max || currentSlotCount < contentTypeInfo.partySize.max)),
     [canEditRaidSlot, contentTypeInfo.partySize?.max, currentSlotCount],
   );
   const canDeleteRaidSlot = useMemo(
-    () => canEditRaidSlot && (!contentTypeInfo.partySize?.min || currentSlotCount > contentTypeInfo.partySize.min),
+    () =>
+      Boolean(canEditRaidSlot && (!contentTypeInfo.partySize?.min || currentSlotCount > contentTypeInfo.partySize.min)),
     [canEditRaidSlot, contentTypeInfo.partySize?.min, currentSlotCount],
   );
 
@@ -148,7 +153,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
         role: slotData.role || null,
         comment: slotData.comment?.trim() || null,
         weapon: slotData.weapon || null,
-        raidId: raid.id,
+        raidId: raid?.id || "",
         userId: slotData.userId || null,
       });
       setIsAddingSlot(false);
@@ -179,7 +184,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     }
 
     // Sort slots by order to match the UI
-    const slots = [...(raid.slots || [])].sort((a, b) => a.order - b.order);
+    const slots = [...(raid?.slots || [])].sort((a, b) => a.order - b.order);
     const activeIndex = slots.findIndex((slot) => slot.id === activeId);
     const overIndex = slots.findIndex((slot) => slot.id === overId);
 

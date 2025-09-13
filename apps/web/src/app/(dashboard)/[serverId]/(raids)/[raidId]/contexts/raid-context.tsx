@@ -1,4 +1,5 @@
 import type { Raid, RaidSlot, RaidStatus } from "@albion-raid-manager/types";
+import type { RaidConfiguration } from "@albion-raid-manager/types/entities";
 
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 
@@ -9,17 +10,22 @@ import {
   useCreateRaidSlotMutation,
   useDeleteRaidMutation,
   useDeleteRaidSlotMutation,
+  useGetRaidQuery,
+  useImportRaidConfigurationMutation,
   useUpdateRaidMutation,
   useUpdateRaidSlotMutation,
 } from "@/store/raids";
 import { useGetServerMembersQuery } from "@/store/servers";
 
 interface RaidContextValue {
-  raid: Raid;
+  raid: Raid | undefined;
+  isLoading: boolean;
+  error: unknown;
   serverMembers: APIServerMember[];
   hasStatus: (...statuses: RaidStatus[]) => boolean;
   handleCopyRaidLink: () => void;
   handleDeleteRaid: () => void;
+  handleImportRaidConfiguration: (configuration: RaidConfiguration) => Promise<void>;
   handleRaidSlotCreate: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt" | "order">) => void;
   handleRaidSlotDelete: (slotId: string) => void;
   handleRaidSlotUpdate: (slotId: string, updates: Partial<RaidSlot>) => void;
@@ -36,7 +42,6 @@ interface RaidContextValue {
 const RaidContext = createContext<RaidContextValue | undefined>(undefined);
 
 interface RaidProviderProps {
-  raid: Raid;
   children: ReactNode;
   serverId: string;
   raidId: string;
@@ -45,12 +50,28 @@ interface RaidProviderProps {
   onSlotCreate?: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt">) => void;
 }
 
-export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderProps) {
+export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) {
   const [updateRaid] = useUpdateRaidMutation();
   const [deleteRaid] = useDeleteRaidMutation();
   const [createRaidSlot] = useCreateRaidSlotMutation();
   const [updateRaidSlot] = useUpdateRaidSlotMutation();
   const [deleteRaidSlot] = useDeleteRaidSlotMutation();
+  const [importRaidConfiguration] = useImportRaidConfigurationMutation();
+
+  // Get raid data - this will automatically update when cache is invalidated
+  const {
+    data: raidData,
+    isLoading: isRaidLoading,
+    error: raidError,
+  } = useGetRaidQuery({
+    params: {
+      serverId,
+      raidId,
+    },
+    query: {
+      slots: true,
+    },
+  });
 
   // Get server members for member selection
   const { data } = useGetServerMembersQuery({
@@ -59,12 +80,22 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
 
   const serverMembers = data?.members || [];
 
-  const canManageRaid = true; // TODO: Use the permission system to determine if the user has permission to edit raid
-  const isFlexRaid = raid.type === "FLEX";
-  const currentSlotCount = raid.slots?.length || 0;
-  const maxSlots = raid.maxPlayers || 0;
+  // Define hasStatus callback - handle case where raid data might not be available yet
+  const hasStatus = useCallback(
+    (...statuses: RaidStatus[]) => {
+      if (!raidData?.raid) return false;
+      return statuses.includes(raidData.raid.status);
+    },
+    [raidData?.raid],
+  );
 
-  const hasStatus = useCallback((...statuses: RaidStatus[]) => statuses.includes(raid.status), [raid.status]);
+  // Get raid data - will be undefined during loading or on error
+  const raid = raidData?.raid;
+
+  const canManageRaid = true; // TODO: Use the permission system to determine if the user has permission to edit raid
+  const isFlexRaid = raid?.type === "FLEX";
+  const currentSlotCount = raid?.slots?.length || 0;
+  const maxSlots = raid?.maxPlayers || 0;
 
   const handleUpdateRaidStatus = async (status: RaidStatus) => {
     try {
@@ -136,6 +167,8 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   };
 
   const handleShareRaid = () => {
+    if (!raid) return;
+
     if (navigator.share) {
       navigator.share({
         title: raid.title,
@@ -148,6 +181,8 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   };
 
   const handleDeleteRaid = async () => {
+    if (!raid) return;
+
     if (!window.confirm(`Are you sure you want to delete "${raid.title}"? This action cannot be undone.`)) {
       return;
     }
@@ -161,7 +196,7 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
       }).unwrap();
 
       toast.success("Raid deleted successfully", {
-        description: `"${raid.title}" has been permanently deleted.`,
+        description: `"${raid?.title}" has been permanently deleted.`,
       });
 
       // Navigate back to raids list
@@ -174,8 +209,10 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
   };
 
   const handleRaidSlotCreate = async (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt" | "order">) => {
+    if (!raid) return;
+
     try {
-      const currentSlotCount = raid.slots?.length || 0;
+      const currentSlotCount = raid?.slots?.length || 0;
       const requestBody = {
         name: slot.name,
         role: slot.role || undefined,
@@ -239,12 +276,32 @@ export function RaidProvider({ raid, children, serverId, raidId }: RaidProviderP
     }
   };
 
+  const handleImportRaidConfiguration = async (configuration: RaidConfiguration) => {
+    try {
+      await importRaidConfiguration({
+        params: { serverId, raidId },
+        body: configuration,
+      }).unwrap();
+
+      toast.success("Raid configuration imported successfully", {
+        description: `Applied configuration with ${configuration.composition.slots.length} slots.`,
+      });
+    } catch (error) {
+      toast.error("Failed to import raid configuration", {
+        description: error instanceof Error ? error.message : "An unknown error occurred.",
+      });
+    }
+  };
+
   const value: RaidContextValue = {
     raid,
+    isLoading: isRaidLoading,
+    error: raidError,
     serverMembers,
     hasStatus,
     handleCopyRaidLink,
     handleDeleteRaid,
+    handleImportRaidConfiguration,
     handleRaidSlotCreate,
     handleRaidSlotDelete,
     handleRaidSlotUpdate,

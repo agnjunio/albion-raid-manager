@@ -5,6 +5,7 @@ import type {
   DeleteRaidSlot,
   GetRaid,
   GetRaids,
+  ImportRaidConfiguration,
   UpdateRaid,
   UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
@@ -90,6 +91,17 @@ export const raidsApi = createApi({
         }),
         invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
       }),
+      importRaidConfiguration: builder.mutation<
+        ImportRaidConfiguration.Response,
+        { params: ImportRaidConfiguration.Params; body: ImportRaidConfiguration.Body }
+      >({
+        query: ({ params, body }) => ({
+          url: `/servers/${params.serverId}/raids/${params.raidId}/import`,
+          method: "POST",
+          data: body,
+        }),
+        invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
+      }),
     };
   },
 });
@@ -103,4 +115,5 @@ export const {
   useCreateRaidSlotMutation,
   useUpdateRaidSlotMutation,
   useDeleteRaidSlotMutation,
+  useImportRaidConfigurationMutation,
 } = raidsApi;

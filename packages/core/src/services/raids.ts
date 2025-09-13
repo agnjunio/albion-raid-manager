@@ -1,7 +1,7 @@
 import type { Cache, RaidEventPublisher } from "@albion-raid-manager/core/redis";
 
 import { Raid, RaidSlot } from "@albion-raid-manager/types";
-import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
+import { getContentTypeInfo, type RaidConfiguration } from "@albion-raid-manager/types/entities";
 import {
   CreateRaidInput,
   CreateRaidSlotInput,
@@ -266,6 +266,115 @@ export namespace RaidService {
     }
 
     logger.verbose(`Raid deleted: ${id}`, { raidId: id });
+  }
+
+  export async function importRaidConfiguration(
+    raidId: string,
+    configuration: RaidConfiguration,
+    options: RaidServiceOptions = {},
+  ): Promise<Raid> {
+    const { cache, publisher } = options;
+
+    const raid = await prisma.$transaction(async (tx) => {
+      // Check if raid exists and get current state
+      const existingRaid = await tx.raid.findUnique({
+        where: { id: raidId },
+        include: {
+          slots: true,
+        },
+      });
+
+      if (!existingRaid) {
+        throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${raidId}" not found`);
+      }
+
+      // Check if raid is in a state where it can be modified
+      if (!["SCHEDULED", "OPEN", "CLOSED"].includes(existingRaid.status)) {
+        throw new ServiceError(
+          ServiceErrorCode.INVALID_STATE,
+          "Cannot import configuration for raids that are not scheduled, open, or closed",
+        );
+      }
+
+      // Check content type compatibility
+      if (existingRaid.contentType !== configuration.contentType) {
+        throw new ServiceError(
+          ServiceErrorCode.INVALID_INPUT,
+          `Content type mismatch. Raid is ${existingRaid.contentType}, but configuration is for ${configuration.contentType}`,
+        );
+      }
+
+      // Update raid data
+      await tx.raid.update({
+        where: { id: raidId },
+        data: {
+          description: configuration.raidData.description,
+          note: configuration.raidData.note,
+          location: configuration.raidData.location,
+        },
+        include: {
+          slots: true,
+        },
+      });
+
+      // Delete all existing slots
+      if (existingRaid.slots.length > 0) {
+        await tx.raidSlot.deleteMany({
+          where: { raidId },
+        });
+      }
+
+      // Create new slots from configuration
+      if (configuration.composition.slots.length > 0) {
+        await tx.raidSlot.createMany({
+          data: configuration.composition.slots.map((slot, index) => ({
+            raidId,
+            name: slot.name,
+            role: slot.role || null,
+            weapon: slot.weapon || null,
+            comment: slot.comment || null,
+            order: index,
+            userId: null,
+          })),
+        });
+      }
+
+      // Get the updated raid with all slots
+      const finalRaid = await tx.raid.findUnique({
+        where: { id: raidId },
+        include: {
+          slots: {
+            orderBy: { order: "asc" },
+          },
+        },
+      });
+
+      if (!finalRaid) {
+        throw new ServiceError(ServiceErrorCode.INTERNAL_ERROR, "Failed to retrieve updated raid");
+      }
+
+      logger.verbose(`Raid configuration imported: ${raidId}`, {
+        raidId,
+        slotsCount: configuration.composition.slots.length,
+        configurationVersion: configuration.version,
+      });
+
+      return finalRaid;
+    });
+
+    if (cache && raid.serverId) {
+      CacheInvalidation.invalidateRaid(cache, raidId, raid.serverId).catch((error) => {
+        logger.warn("Cache invalidation failed", { error, raidId });
+      });
+    }
+
+    if (publisher) {
+      publisher.publishRaidUpdated(raid).catch((error) => {
+        logger.warn("Event publishing failed", { error, raidId });
+      });
+    }
+
+    return raid;
   }
 
   export async function createRaidSlot(

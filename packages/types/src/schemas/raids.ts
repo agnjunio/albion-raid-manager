@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-import { ContentType, RaidRole } from "@albion-raid-manager/types";
+import { CONTENT_TYPE_VALUES, RAID_ROLE_VALUES } from "@albion-raid-manager/types/entities";
 import { validateItemPatternBoolean } from "@albion-raid-manager/types/validators";
 
 export const createRaidBodySchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
-  contentType: z.custom<ContentType>().optional(),
+  contentType: z.enum(CONTENT_TYPE_VALUES).optional(),
   description: z.string().optional(),
-  date: z.string().datetime("Invalid date format"),
+  date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid date format"),
   location: z.string().optional(),
   maxPlayers: z.number().int().min(0).optional(),
 });
@@ -15,7 +15,7 @@ export const createRaidBodySchema = z.object({
 // Unified raid slot schema - used for create, update, and form validation
 export const raidSlotSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
-  role: z.custom<RaidRole>().optional(),
+  role: z.enum(RAID_ROLE_VALUES).optional(),
   comment: z
     .string()
     .nullable()
@@ -45,4 +45,25 @@ export const raidSlotSchema = z.object({
       return weapon.trim();
     }),
   order: z.number().int().min(0).optional(),
+});
+
+export const raidConfigurationSchema = z.object({
+  version: z.string().min(1, "Version is required"),
+  exportedAt: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid exportedAt format"),
+  contentType: z.enum(CONTENT_TYPE_VALUES),
+  raidData: z.object({
+    description: z.string().optional(),
+    note: z.string().optional(),
+    location: z.string().optional(),
+  }),
+  composition: z.object({
+    slots: z.array(
+      z.object({
+        name: z.string().min(1, "Slot name is required"),
+        role: z.enum(RAID_ROLE_VALUES).optional(),
+        weapon: z.string().optional(),
+        comment: z.string().optional(),
+      }),
+    ),
+  }),
 });

@@ -9,10 +9,11 @@ import {
   DeleteRaidSlot,
   GetRaid,
   GetRaids,
+  ImportRaidConfiguration,
   UpdateRaid,
   UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
-import { createRaidBodySchema, raidSlotSchema } from "@albion-raid-manager/types/schemas";
+import { createRaidBodySchema, raidConfigurationSchema, raidSlotSchema } from "@albion-raid-manager/types/schemas";
 import { UpdateRaidInput, UpdateRaidSlotInput } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
@@ -185,6 +186,48 @@ serverRaidsRouter.delete(
     } catch (error) {
       logger.error("Failed to delete raid slot:", error);
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to delete raid slot"));
+    }
+  },
+);
+
+serverRaidsRouter.post(
+  "/:raidId/import",
+  validateRequest({ body: raidConfigurationSchema }),
+  async (
+    req: Request<ImportRaidConfiguration.Params, {}, ImportRaidConfiguration.Body>,
+    res: Response<APIResponse.Type<ImportRaidConfiguration.Response>>,
+  ) => {
+    const { serverId, raidId } = req.params;
+    const configuration = req.body;
+
+    if (!serverId || !raidId) {
+      throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
+    }
+
+    try {
+      const raid = await RaidService.importRaidConfiguration(raidId, configuration, {
+        publisher: await getRaidEventPublisher(),
+      });
+
+      res.json(APIResponse.Success({ raid }));
+    } catch (error) {
+      logger.error("Failed to import raid configuration:", error);
+
+      if (error instanceof Error) {
+        if (error.message.includes("not found")) {
+          res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, error.message));
+        } else if (error.message.includes("Content type mismatch") || error.message.includes("Cannot import")) {
+          res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, error.message));
+        } else {
+          res
+            .status(500)
+            .json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to import raid configuration"));
+        }
+      } else {
+        res
+          .status(500)
+          .json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to import raid configuration"));
+      }
     }
   },
 );

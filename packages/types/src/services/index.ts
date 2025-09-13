@@ -2,7 +2,9 @@ export enum ServiceErrorCode {
   NOT_AUTHORIZED = "NOT_AUTHORIZED",
   NOT_FOUND = "NOT_FOUND",
   INVALID_STATE = "INVALID_STATE",
+  INVALID_INPUT = "INVALID_INPUT",
   CREATE_FAILED = "CREATE_FAILED",
+  INTERNAL_ERROR = "INTERNAL_ERROR",
 }
 
 export class ServiceError extends Error {

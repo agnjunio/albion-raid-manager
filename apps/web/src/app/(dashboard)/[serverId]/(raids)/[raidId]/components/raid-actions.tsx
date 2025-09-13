@@ -1,4 +1,14 @@
-import { faLock, faUnlock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
+
+import {
+  faChevronDown,
+  faChevronUp,
+  faGear,
+  faLock,
+  faPlay,
+  faUnlock,
+  IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { Button } from "@/components/ui/button";
@@ -6,6 +16,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { raidStatuses } from "@/lib/constants";
 
 import { useRaidContext } from "../contexts/raid-context";
+
+import { RaidImportDragDrop } from "./raid-import-drag-drop";
 
 interface RaidStatusMessageProps {
   icon: IconDefinition;
@@ -31,6 +43,11 @@ function RaidStatusMessage({ icon, title, description, note, iconColor, bgColor 
 
 export function RaidActions() {
   const { raid, canManageRaid, handleUpdateRaidStatus, hasStatus } = useRaidContext();
+  const [expandedSections, setExpandedSections] = useState({
+    actions: false,
+    configuration: false,
+    danger: false,
+  });
 
   const handleCancelRaid = () => {
     const confirmed = window.confirm(
@@ -42,6 +59,13 @@ export function RaidActions() {
     }
   };
 
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
+
   if (!canManageRaid) return null;
 
   return (
@@ -49,12 +73,12 @@ export function RaidActions() {
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-3 text-xl font-semibold">
           <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-            <FontAwesomeIcon icon={raidStatuses[raid.status].icon} className="text-primary h-5 w-5" />
+            <FontAwesomeIcon icon={faGear} className="text-primary h-5 w-5" />
           </div>
           Raid Management
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-2">
         {hasStatus("CANCELLED") ? (
           <RaidStatusMessage
             icon={raidStatuses.CANCELLED.icon}
@@ -74,73 +98,164 @@ export function RaidActions() {
             bgColor="bg-gray-50 dark:bg-gray-950/30"
           />
         ) : (
-          <div className="space-y-6">
-            {/* Primary Actions */}
-            <div className="space-y-3">
-              <h4 className="text-muted-foreground text-sm font-medium uppercase tracking-wide">Raid Actions</h4>
-              <div className="flex flex-wrap gap-3">
-                {hasStatus("SCHEDULED", "CLOSED") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("OPEN")}
-                    size="lg"
-                    className={`${raidStatuses.OPEN.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-green-500/20`}
-                  >
-                    <FontAwesomeIcon icon={faUnlock} className="mr-2 h-4 w-4" />
-                    Open Registration
-                  </Button>
-                )}
-                {hasStatus("OPEN") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("CLOSED")}
-                    size="lg"
-                    className={`${raidStatuses.CLOSED.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-red-500/20`}
-                  >
-                    <FontAwesomeIcon icon={faLock} className="mr-2 h-4 w-4" />
-                    Close Registration
-                  </Button>
-                )}
-                {hasStatus("OPEN", "CLOSED", "FINISHED") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("ONGOING")}
-                    size="lg"
-                    className={`${raidStatuses.ONGOING.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-yellow-500/20`}
-                  >
-                    <FontAwesomeIcon icon={raidStatuses.ONGOING.icon} className="mr-2 h-4 w-4" />
-                    Start Raid
-                  </Button>
-                )}
-                {hasStatus("ONGOING") && (
-                  <Button
-                    onClick={() => handleUpdateRaidStatus("FINISHED")}
-                    size="lg"
-                    className={`${raidStatuses.FINISHED.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-gray-500/20`}
-                  >
-                    <FontAwesomeIcon icon={raidStatuses.FINISHED.icon} className="mr-2 h-4 w-4" />
-                    Finish Raid
-                  </Button>
-                )}
-              </div>
+          <>
+            {/* Raid Actions Section */}
+            <div className="border-border/50 rounded-lg border">
+              <button
+                onClick={() => toggleSection("actions")}
+                className="hover:bg-muted/50 flex w-full items-center justify-between p-3 text-left transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                    <FontAwesomeIcon icon={faPlay} className="text-primary h-4 w-4" />
+                  </div>
+                  <span className="font-medium">Raid Actions</span>
+                </div>
+                <FontAwesomeIcon
+                  icon={expandedSections.actions ? faChevronUp : faChevronDown}
+                  className="text-muted-foreground h-4 w-4"
+                />
+              </button>
+              {expandedSections.actions && (
+                <div className="border-border/50 border-t p-3">
+                  <div className="space-y-3">
+                    {hasStatus("SCHEDULED", "CLOSED") && (
+                      <div className="space-y-1">
+                        <Button
+                          onClick={() => handleUpdateRaidStatus("OPEN")}
+                          size="sm"
+                          className={`${raidStatuses.OPEN.color} shadow-sm transition-all duration-200 hover:opacity-90`}
+                        >
+                          <FontAwesomeIcon icon={faUnlock} className="mr-2 h-3 w-3" />
+                          Open Registration
+                        </Button>
+                        <p className="text-muted-foreground text-xs">
+                          Allow players to join the raid and fill available slots.
+                        </p>
+                      </div>
+                    )}
+                    {hasStatus("OPEN") && (
+                      <div className="space-y-1">
+                        <Button
+                          onClick={() => handleUpdateRaidStatus("CLOSED")}
+                          size="sm"
+                          className={`${raidStatuses.CLOSED.color} shadow-sm transition-all duration-200 hover:opacity-90`}
+                        >
+                          <FontAwesomeIcon icon={faLock} className="mr-2 h-3 w-3" />
+                          Close Registration
+                        </Button>
+                        <p className="text-muted-foreground text-xs">
+                          Stop new players from joining while keeping current participants.
+                        </p>
+                      </div>
+                    )}
+                    {hasStatus("OPEN", "CLOSED", "FINISHED") && (
+                      <div className="space-y-1">
+                        <Button
+                          onClick={() => handleUpdateRaidStatus("ONGOING")}
+                          size="sm"
+                          className={`${raidStatuses.ONGOING.color} shadow-sm transition-all duration-200 hover:opacity-90`}
+                        >
+                          <FontAwesomeIcon icon={raidStatuses.ONGOING.icon} className="mr-2 h-3 w-3" />
+                          Start Raid
+                        </Button>
+                        <p className="text-muted-foreground text-xs">
+                          Mark the raid as currently in progress and notify all participants.
+                        </p>
+                      </div>
+                    )}
+                    {hasStatus("ONGOING") && (
+                      <div className="space-y-1">
+                        <Button
+                          onClick={() => handleUpdateRaidStatus("FINISHED")}
+                          size="sm"
+                          className={`${raidStatuses.FINISHED.color} shadow-sm transition-all duration-200 hover:opacity-90`}
+                        >
+                          <FontAwesomeIcon icon={raidStatuses.FINISHED.icon} className="mr-2 h-3 w-3" />
+                          Finish Raid
+                        </Button>
+                        <p className="text-muted-foreground text-xs">
+                          Complete the raid and mark it as finished for all participants.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Secondary Actions */}
+            {/* Configuration Section */}
+            <div className="border-border/50 rounded-lg border">
+              <button
+                onClick={() => toggleSection("configuration")}
+                className="hover:bg-muted/50 flex w-full items-center justify-between p-3 text-left transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
+                    <FontAwesomeIcon icon={faUnlock} className="h-4 w-4 text-blue-500" />
+                  </div>
+                  <span className="font-medium">Configuration</span>
+                </div>
+                <FontAwesomeIcon
+                  icon={expandedSections.configuration ? faChevronUp : faChevronDown}
+                  className="text-muted-foreground h-4 w-4"
+                />
+              </button>
+              {expandedSections.configuration && (
+                <div className="border-border/50 border-t p-3">
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-muted-foreground mb-3 text-xs">
+                        Import a raid configuration from another raid of the same content type. This will replace the
+                        current raid&apos;s description, notes, location, and slot composition.
+                      </p>
+                      <RaidImportDragDrop disabled={!hasStatus("SCHEDULED", "OPEN", "CLOSED", "ONGOING")} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Danger Zone Section */}
             {hasStatus("SCHEDULED", "OPEN", "CLOSED", "ONGOING") && (
-              <div className="border-border/50 border-t pt-4">
-                <h4 className="text-muted-foreground mb-3 text-sm font-medium uppercase tracking-wide">Danger Zone</h4>
-                <Button
-                  onClick={handleCancelRaid}
-                  variant="destructive"
-                  size="lg"
-                  className={`${raidStatuses.CANCELLED.color} shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl focus:ring-2 focus:ring-red-500/20`}
+              <div className="rounded-lg border border-red-500/20">
+                <button
+                  onClick={() => toggleSection("danger")}
+                  className="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-red-500/5"
                 >
-                  <FontAwesomeIcon icon={raidStatuses.CANCELLED.icon} className="mr-2 h-4 w-4" />
-                  Cancel Raid
-                </Button>
-                <p className="text-muted-foreground mt-2 text-xs">
-                  This action cannot be undone. All participants will be notified.
-                </p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
+                      <FontAwesomeIcon icon={raidStatuses.CANCELLED.icon} className="h-4 w-4 text-red-500" />
+                    </div>
+                    <span className="font-medium text-red-600 dark:text-red-400">Danger Zone</span>
+                  </div>
+                  <FontAwesomeIcon
+                    icon={expandedSections.danger ? faChevronUp : faChevronDown}
+                    className="text-muted-foreground h-4 w-4"
+                  />
+                </button>
+                {expandedSections.danger && (
+                  <div className="border-t border-red-500/20 p-3">
+                    <div className="space-y-3">
+                      <p className="text-muted-foreground text-xs">
+                        Permanently cancel this raid and notify all participants. This action cannot be undone and will
+                        remove the raid from all participants&apos; views.
+                      </p>
+                      <Button
+                        onClick={handleCancelRaid}
+                        variant="destructive"
+                        size="sm"
+                        className="shadow-sm transition-all duration-200 hover:opacity-90"
+                      >
+                        <FontAwesomeIcon icon={raidStatuses.CANCELLED.icon} className="mr-2 h-3 w-3" />
+                        Cancel Raid
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </div>
+          </>
         )}
       </CardContent>
     </Card>

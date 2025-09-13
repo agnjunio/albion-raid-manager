@@ -46,6 +46,8 @@ export const RAID_ROLE_INFO: RaidRoleInfo[] = [
   },
 ];
 
+export const RAID_ROLE_VALUES = RAID_ROLE_INFO.map((rri) => rri.role);
+
 // Convenience function to get the raid role info for a given role
 export function getRaidRoleInfo(role?: RaidRole): RaidRoleInfo | null {
   return RAID_ROLE_INFO.find((rri) => rri.role === role) || null;

@@ -16,16 +16,16 @@ export function RaidStats() {
   const { raid } = useRaidContext();
 
   const stats = useMemo(() => {
-    const totalSlots = raid.slots?.length || 0;
-    const filledSlots = raid.slots?.filter((slot) => slot.userId).length || 0;
+    const totalSlots = raid?.slots?.length || 0;
+    const filledSlots = raid?.slots?.filter((slot) => slot.userId).length || 0;
     const fillPercentage = totalSlots > 0 ? (filledSlots / totalSlots) * 100 : 0;
 
     return { totalSlots, filledSlots, fillPercentage };
-  }, [raid.slots]);
+  }, [raid?.slots]);
 
   const contentTypeInfo = useMemo(() => {
-    return getContentTypeInfo(raid.contentType ?? undefined);
-  }, [raid.contentType]);
+    return getContentTypeInfo(raid?.contentType ?? undefined);
+  }, [raid?.contentType]);
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">

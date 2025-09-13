@@ -1,9 +1,10 @@
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+
+import { cn } from "@/lib/utils";
 
 function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
   return (

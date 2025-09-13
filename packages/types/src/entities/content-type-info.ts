@@ -170,6 +170,8 @@ export const CONTENT_TYPE_INFO: ContentTypeInfo[] = [
   },
 ];
 
+export const CONTENT_TYPE_VALUES: ContentType[] = CONTENT_TYPE_INFO.map((cti) => cti.type);
+
 // Convenience function to get the content type info for a given content type
 export function getContentTypeInfo(contentType?: string | null): ContentTypeInfo {
   const otherContentTypeInfo = CONTENT_TYPE_INFO.find((cti) => cti.type === "OTHER");
