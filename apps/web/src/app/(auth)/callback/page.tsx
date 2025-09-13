@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import { AUTH_FLAG_KEY } from "@/lib/auth";
 import { useDiscordCallbackMutation } from "@/store/auth";
@@ -20,6 +21,10 @@ export function AuthCallback() {
       const redirectUri = window.location.origin + "/auth/callback";
 
       if (!code) {
+        toast.error("Authentication failed", {
+          description: "No authorization code received from Discord. Please try again.",
+          duration: 5000,
+        });
         window.location.href = "/";
         return;
       }
@@ -33,6 +38,13 @@ export function AuthCallback() {
       } catch (error) {
         console.error("Auth callback failed:", error);
         localStorage.removeItem(AUTH_FLAG_KEY);
+
+        // Show user-friendly error message
+        toast.error("Authentication failed", {
+          description: "Unable to complete Discord authentication. Please try again.",
+          duration: 5000,
+        });
+
         navigate("/");
       }
     };
