@@ -1,7 +1,7 @@
 import type { Cache } from "@albion-raid-manager/core/redis";
 
 import { Server, ServerMember } from "@albion-raid-manager/types";
-import { APIServer } from "@albion-raid-manager/types/api/servers";
+import { APIServer } from "@albion-raid-manager/types/api";
 import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 
 import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";

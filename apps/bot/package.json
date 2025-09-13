@@ -4,8 +4,8 @@
   "description": "Discord bot for Albion Raid Manager.",
   "main": "src/index.ts",
   "scripts": {
-    "start": "tsx .",
     "dev": "tsx watch --env-file=.env --exclude=logs/** --exclude=src/**/*.test.ts .",
+    "start": "tsx .",
     "type-check": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -22,6 +22,7 @@
     "@albion-raid-manager/ai": "workspace:*",
     "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
-    "discord.js": "^14.19.3"
+    "discord.js": "^14.19.3",
+    "tsx": "^4.20.5"
   }
 }
