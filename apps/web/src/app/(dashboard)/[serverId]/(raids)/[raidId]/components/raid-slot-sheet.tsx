@@ -152,7 +152,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
           </SheetHeader>
 
           {/* Form Section */}
-          <div className="flex flex-1 flex-col overflow-y-auto">
+          <div className="relative flex flex-1 flex-col overflow-y-auto">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="flex grow">
                 <div className="flex w-full flex-col justify-between gap-6">
@@ -325,7 +325,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                   </div>
 
                   {/* Form Actions */}
-                  <div className="border-border bg-muted/30 px-6 py-4">
+                  <div className="border-border bg-muted/95 supports-[backdrop-filter]:bg-muted/60 sticky bottom-0 border-t px-6 py-4 backdrop-blur">
                     <div className="flex flex-col gap-3 sm:flex-row">
                       <Button
                         type="button"
