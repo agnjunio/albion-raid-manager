@@ -1,3 +1,6 @@
+import { auth } from "@/auth/middleware";
+import { validateRequest } from "@/request";
+import config from "@albion-raid-manager/core/config";
 import { logger } from "@albion-raid-manager/core/logger";
 import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
 import {
@@ -13,10 +16,6 @@ import {
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
-
-import { auth } from "@/auth/middleware";
-import { validateRequest } from "@/request";
-
 import { serverRaidsRouter } from "./raids/router";
 
 export const serverRouter: Router = Router();
@@ -145,7 +144,10 @@ serverRouter.get(
           .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You don't have permission to view server members"));
       }
 
-      const discordMembers = await DiscordService.servers.getServerMembers(serverId);
+      const discordMembers = await DiscordService.servers.getServerMembers(serverId, {
+        type: "bot",
+        token: config.discord.token,
+      });
       const registeredMembers = await ServersService.getServerMembers(serverId);
       const registeredMembersMap = new Map(registeredMembers.map((member) => [member.userId, member]));
 

@@ -1,4 +1,5 @@
-export function parseShardsTotal(SHARDS_TOTAL?: string) {
+export function parseShardsTotal(data: unknown): number | "auto" | undefined {
+  const SHARDS_TOTAL = data as string | undefined;
   if (!SHARDS_TOTAL) return undefined;
   if (SHARDS_TOTAL === "auto") return "auto";
 
@@ -7,7 +8,8 @@ export function parseShardsTotal(SHARDS_TOTAL?: string) {
   return totalShards;
 }
 
-export function parseShardList(SHARDS_SPAWN?: string) {
+export function parseShardList(data: unknown): number[] | "auto" | undefined {
+  const SHARDS_SPAWN = data as string | undefined;
   if (!SHARDS_SPAWN) return undefined;
   if (SHARDS_SPAWN === "auto") return "auto";
 
