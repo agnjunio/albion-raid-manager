@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CONTENT_TYPE_VALUES, RAID_ROLE_VALUES } from "@albion-raid-manager/types/entities";
+import { CONTENT_TYPE_VALUES } from "@albion-raid-manager/types/entities";
 import { validateItemPatternBoolean } from "@albion-raid-manager/types/validators";
 
 export const createRaidBodySchema = z.object({
@@ -15,7 +15,7 @@ export const createRaidBodySchema = z.object({
 // Unified raid slot schema - used for create, update, and form validation
 export const raidSlotSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
-  role: z.enum(RAID_ROLE_VALUES).optional(),
+  role: z.enum(["TANK", "SUPPORT", "HEALER", "RANGED_DPS", "MELEE_DPS", "BATTLEMOUNT"] as const).optional(),
   comment: z
     .string()
     .nullable()
@@ -60,7 +60,7 @@ export const raidConfigurationSchema = z.object({
     slots: z.array(
       z.object({
         name: z.string().min(1, "Slot name is required"),
-        role: z.enum(RAID_ROLE_VALUES).optional(),
+        role: z.enum(["TANK", "SUPPORT", "HEALER", "RANGED_DPS", "MELEE_DPS", "BATTLEMOUNT"] as const).optional(),
         weapon: z.string().optional(),
         comment: z.string().optional(),
       }),

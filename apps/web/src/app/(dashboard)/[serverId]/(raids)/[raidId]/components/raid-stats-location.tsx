@@ -10,11 +10,11 @@ import { InlineEditCard } from "./inline-edit-card";
 
 export function RaidStatsLocation() {
   const { raid, handleUpdateRaid, canManageRaid } = useRaidContext();
-  const [location, setLocation] = useState(raid.location || "");
+  const [location, setLocation] = useState(raid?.location || "");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSave = async () => {
-    if (location === raid.location) {
+    if (location === raid?.location) {
       return;
     }
 
@@ -22,14 +22,14 @@ export function RaidStatsLocation() {
     try {
       await handleUpdateRaid({ location });
     } catch {
-      setLocation(raid.location || "");
+      setLocation(raid?.location || "");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    setLocation(raid.location || "");
+    setLocation(raid?.location || "");
   };
 
   const editContent = (

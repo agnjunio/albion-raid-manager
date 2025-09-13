@@ -12,10 +12,12 @@ import { InlineEditCard } from "./inline-edit-card";
 
 export function RaidStatsTime() {
   const { raid, handleUpdateRaid, canManageRaid } = useRaidContext();
-  const [value, setValue] = useState(new Date(raid.date));
+  const [value, setValue] = useState(raid ? new Date(raid.date) : new Date());
   const [isLoading, setIsLoading] = useState(false);
 
   const timeStatus = useMemo(() => {
+    if (!raid) return { text: "Loading...", color: "bg-gray-500" };
+
     const now = new Date();
     const raidDate = new Date(raid.date);
     const daysUntilRaid = differenceInDays(raidDate, now);
@@ -29,9 +31,11 @@ export function RaidStatsTime() {
     if (daysUntilRaid > 1) return { text: `${daysUntilRaid} days`, color: "bg-yellow-500" };
     if (hoursUntilRaid > 1) return { text: `${hoursUntilRaid} hours`, color: "bg-orange-500" };
     return { text: "Starting soon", color: "bg-red-500" };
-  }, [raid.date]);
+  }, [raid?.date]);
 
   const handleSave = async () => {
+    if (!raid) return;
+
     const originalDate = new Date(raid.date);
     if (value.getTime() === originalDate.getTime()) {
       return;
@@ -48,7 +52,9 @@ export function RaidStatsTime() {
   };
 
   const handleCancel = () => {
-    setValue(new Date(raid.date));
+    if (raid) {
+      setValue(new Date(raid.date));
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -66,7 +72,7 @@ export function RaidStatsTime() {
       <div className="flex items-center gap-2">
         <Badge className={`${timeStatus.color} text-white`}>{timeStatus.text}</Badge>
       </div>
-      <p className="text-muted-foreground mt-1 text-xs">{formatDate(new Date(raid.date))}</p>
+      <p className="text-muted-foreground mt-1 text-xs">{raid ? formatDate(new Date(raid.date)) : "Loading..."}</p>
     </>
   );
 

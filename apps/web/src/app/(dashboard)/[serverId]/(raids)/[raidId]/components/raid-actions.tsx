@@ -50,6 +50,8 @@ export function RaidActions() {
   });
 
   const handleCancelRaid = () => {
+    if (!raid) return;
+
     const confirmed = window.confirm(
       `Are you sure you want to cancel the raid "${raid.title}"?\n\nThis action cannot be undone and all participants will be notified.`,
     );

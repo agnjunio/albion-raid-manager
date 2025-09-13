@@ -45,10 +45,10 @@ export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
   } = useRaidSlotContext();
 
   const slots = useMemo(() => {
-    if (!raid.slots || raid.slots.length === 0) return [];
+    if (!raid?.slots || raid.slots.length === 0) return [];
     const slots = [...raid.slots];
     return slots.sort((a, b) => a.order - b.order);
-  }, [raid.slots]);
+  }, [raid?.slots]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -87,7 +87,7 @@ export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
         icon={faShield}
         title="No Raid Slots"
         description={
-          raid.type === "FLEX"
+          raid?.type === "FLEX"
             ? "This flexible raid doesn't have any slots defined yet. Add slots to organize your raid composition."
             : "This fixed raid doesn't have any slots defined yet."
         }

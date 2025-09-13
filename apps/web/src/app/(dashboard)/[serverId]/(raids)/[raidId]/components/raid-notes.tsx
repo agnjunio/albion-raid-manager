@@ -16,7 +16,7 @@ interface RaidNotesProps {
 export function RaidNotes({ className }: RaidNotesProps) {
   const { raid, handleUpdateRaidNotes } = useRaidContext();
   const [isEditing, setIsEditing] = useState(false);
-  const [notes, setNotes] = useState(raid.note || "");
+  const [notes, setNotes] = useState(raid?.note || "");
 
   const handleSave = () => {
     handleUpdateRaidNotes(notes);
@@ -24,7 +24,7 @@ export function RaidNotes({ className }: RaidNotesProps) {
   };
 
   const handleCancel = () => {
-    setNotes(raid.note || "");
+    setNotes(raid?.note || "");
     setIsEditing(false);
   };
 
@@ -64,7 +64,7 @@ export function RaidNotes({ className }: RaidNotesProps) {
               </Button>
             </div>
           </div>
-        ) : raid.note ? (
+        ) : raid?.note ? (
           <div className="prose prose-sm max-w-none">
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{raid.note}</p>
           </div>
