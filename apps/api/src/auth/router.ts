@@ -29,20 +29,31 @@ authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<
 
   try {
     await get();
-  } catch {
+  } catch (error) {
+    logger.debug("Initial request failed, attempting token refresh", {
+      sessionId: req.session.id,
+      hasRefreshToken: !!req.session.refreshToken,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+
     if (req.session.refreshToken) {
       try {
         const { access_token, refresh_token } = await DiscordService.auth.refreshToken(req.session.refreshToken);
         req.session.accessToken = access_token;
         req.session.refreshToken = refresh_token;
-        req.session.save();
         await get();
-      } catch {
+      } catch (refreshError) {
+        logger.error("Token refresh failed", {
+          error: refreshError,
+          sessionId: req.session.id,
+          hasRefreshToken: !!req.session.refreshToken,
+        });
         req.session.destroy(() => {
           res.status(401).json(APIResponse.Error(APIErrorType.SESSION_EXPIRED));
         });
       }
     } else {
+      logger.warn("No refresh token available", { sessionId: req.session.id });
       res.status(401).json(APIResponse.Error(APIErrorType.SESSION_EXPIRED));
     }
   }
@@ -57,6 +68,7 @@ authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type
       type: "user",
       token: access_token,
     });
+
     if (!discordUser) {
       return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
     }
@@ -65,30 +77,26 @@ authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type
     req.session.refreshToken = refresh_token;
     req.session.user = transformUser(discordUser);
 
-    // Force session to be marked as modified
-    req.session.touch();
+    // Explicitly save the session to ensure it's persisted
+    // req.session.save((err) => {
+    //   if (err) {
+    //     logger.error("Failed to save session", { error: err, sessionId: req.session.id });
+    //     return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
+    //   }
 
-    req.session.save((err) => {
-      if (err) {
-        logger.error("Failed to save session:", err);
-        return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
-      }
-      logger.info("Session saved successfully", {
-        cookie: req.session.cookie,
-        sessionId: req.session.id,
-      });
+    //   logger.info("Session data set and saved", {
+    //     sessionId: req.session.id,
+    //     hasAccessToken: !!req.session.accessToken,
+    //     hasRefreshToken: !!req.session.refreshToken,
+    //     hasUser: !!req.session.user,
+    //     cookie: req.session.cookie,
+    //     responseHeaders: res.getHeaders(),
+    //   });
+    // res.sendStatus(200);
 
-      // Explicitly set the cookie header
-      res.cookie("connect.sid", req.session.id, {
-        domain: ".albion-raid-manager.com",
-        secure: true,
-        sameSite: "lax",
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      });
+    // });
 
-      res.sendStatus(200);
-    });
+    res.sendStatus(200);
   } catch (error) {
     if (isAxiosError(error)) {
       logger.debug("Discord API error response:", error.response?.data);
@@ -103,7 +111,8 @@ authRouter.post("/logout", (req: Request, res: Response<APIResponse.Type>) => {
     if (err) {
       return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
     }
-    res.clearCookie("connect.sid");
-    res.sendStatus(200);
+    req.session.destroy(() => {
+      res.sendStatus(200);
+    });
   });
 });

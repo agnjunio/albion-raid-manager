@@ -48,9 +48,8 @@ const config = schema.safeParse({
     secret: process.env.SESSION_SECRET ?? "your-secret-key",
     cookie: {
       secure: isProd,
-      sameSite: isProd ? "lax" : "none",
+      sameSite: isProd ? "none" : "lax",
       domain: process.env.SESSION_DOMAIN ?? (isProd ? ".albion-raid-manager.com" : undefined),
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
       httpOnly: true,
     },
   },
