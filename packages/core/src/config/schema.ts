@@ -10,7 +10,7 @@ export const schema = z.object({
   api: z.object({
     port: z.coerce.number().default(3000),
     cors: z.object({
-      origin: z.string(),
+      origin: z.union([z.string(), z.array(z.string())]),
     }),
   }),
 
