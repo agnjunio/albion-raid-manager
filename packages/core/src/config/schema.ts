@@ -46,8 +46,9 @@ export const schema = z.object({
     secret: z.string(),
     cookie: z.object({
       secure: z.boolean().default(false),
+      sameSite: z.enum(["lax", "strict", "none"]).default("none"),
+      domain: z.string().optional(),
       maxAge: z.number().default(24 * 60 * 60 * 1000), // 24 hours
-      sameSite: z.enum(["lax", "strict", "none"]).default("lax"),
       httpOnly: z.boolean().default(true),
     }),
   }),

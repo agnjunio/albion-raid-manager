@@ -10,7 +10,9 @@ const config = schema.safeParse({
   api: {
     port: process.env.API_PORT,
     cors: {
-      origin: process.env.API_CORS_ORIGIN ?? (isProd ? "https://albion-raid-manager.com" : "http://localhost:5173"),
+      origin:
+        process.env.API_CORS_ORIGIN ??
+        (isProd ? ["https://albion-raid-manager.com", "https://www.albion-raid-manager.com"] : "http://localhost:5173"),
     },
   },
 
@@ -46,8 +48,9 @@ const config = schema.safeParse({
     secret: process.env.SESSION_SECRET ?? "your-secret-key",
     cookie: {
       secure: isProd,
+      sameSite: isProd ? "lax" : "none",
+      domain: process.env.SESSION_DOMAIN ?? (isProd ? ".albion-raid-manager.com" : undefined),
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: isProd ? "none" : "lax",
       httpOnly: true,
     },
   },
