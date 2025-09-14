@@ -39,8 +39,9 @@ export function createApp(): express.Application {
   });
 
   // HTTP request logging
+  const loggerFormat = config.logger.pretty ? "dev" : "combined";
   app.use(
-    morgan("dev", {
+    morgan(loggerFormat, {
       stream: {
         write: (message: string) => {
           logger.info(message.trim());
