@@ -1,5 +1,3 @@
-import { auth } from "@/auth/middleware";
-import { validateRequest } from "@/request";
 import config from "@albion-raid-manager/core/config";
 import { logger } from "@albion-raid-manager/core/logger";
 import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
@@ -16,6 +14,10 @@ import {
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
+
+import { auth } from "@/auth/middleware";
+import { validateRequest } from "@/request";
+
 import { serverRaidsRouter } from "./raids/router";
 
 export const serverRouter: Router = Router();
