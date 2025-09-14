@@ -29,6 +29,15 @@ export function createApp(): express.Application {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
+  // Health check middleware
+  app.get("/health", (req, res) => {
+    res.status(200).json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
+  });
+
   // HTTP request logging
   app.use(
     morgan("dev", {
@@ -41,16 +50,17 @@ export function createApp(): express.Application {
   );
 
   // Session configuration
+  app.set("trust proxy", 1);
   app.use(
     session({
+      cookie: config.session.cookie,
       secret: config.session.secret,
       resave: false,
-      saveUninitialized: true,
-      cookie: config.session.cookie,
+      saveUninitialized: false,
       store: new PrismaSessionStore(prisma, {
         checkPeriod: 12 * 60 * 60 * 1000, // 12 hours
+        ttl: 24 * 60 * 60 * 1000, // 24 hours - session TTL
       }),
-      name: "connect.sid",
     }),
   );
 
