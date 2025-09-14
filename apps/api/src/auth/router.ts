@@ -65,6 +65,9 @@ authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type
     req.session.refreshToken = refresh_token;
     req.session.user = transformUser(discordUser);
 
+    // Force session to be marked as modified
+    req.session.touch();
+
     req.session.save((err) => {
       if (err) {
         logger.error("Failed to save session:", err);
@@ -74,6 +77,16 @@ authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type
         cookie: req.session.cookie,
         sessionId: req.session.id,
       });
+
+      // Explicitly set the cookie header
+      res.cookie("connect.sid", req.session.id, {
+        domain: ".albion-raid-manager.com",
+        secure: true,
+        sameSite: "lax",
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      });
+
       res.sendStatus(200);
     });
   } catch (error) {
@@ -92,28 +105,5 @@ authRouter.post("/logout", (req: Request, res: Response<APIResponse.Type>) => {
     }
     res.clearCookie("connect.sid");
     res.sendStatus(200);
-  });
-});
-
-// Debug endpoint to test cookie setting
-authRouter.get("/debug-cookie", (req: Request, res: Response) => {
-  req.session.testData = "cookie-test";
-  req.session.save((err) => {
-    if (err) {
-      logger.error("Failed to save debug session:", err);
-      return res.status(500).json({ error: "Failed to save session" });
-    }
-
-    logger.info("Debug session saved", {
-      cookie: req.session.cookie,
-      sessionId: req.session.id,
-      headers: res.getHeaders(),
-    });
-
-    res.json({
-      message: "Debug cookie set",
-      sessionId: req.session.id,
-      cookie: req.session.cookie,
-    });
   });
 });
