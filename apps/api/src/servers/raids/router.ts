@@ -150,7 +150,7 @@ serverRaidsRouter.post(
 
       res.json(APIResponse.Success({ raid }));
     } catch (error) {
-      logger.error("Failed to create raid slot:", error);
+      logger.error("Failed to create raid slot:", { error });
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to create raid slot"));
     }
   },
@@ -169,7 +169,7 @@ serverRaidsRouter.put(
       const raidSlot = await RaidService.updateRaidSlot(slotId, updates, { publisher: await getRaidEventPublisher() });
       res.json(APIResponse.Success({ raidSlot }));
     } catch (error) {
-      logger.error("Failed to update raid slot:", error);
+      logger.error("Failed to update raid slot:", { error });
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to update raid slot"));
     }
   },
@@ -184,7 +184,7 @@ serverRaidsRouter.delete(
       await RaidService.deleteRaidSlot(slotId, { publisher: await getRaidEventPublisher() });
       res.json(APIResponse.Success({ message: "Slot deleted successfully" }));
     } catch (error) {
-      logger.error("Failed to delete raid slot:", error);
+      logger.error("Failed to delete raid slot:", { error });
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to delete raid slot"));
     }
   },
@@ -211,7 +211,7 @@ serverRaidsRouter.post(
 
       res.json(APIResponse.Success({ raid }));
     } catch (error) {
-      logger.error("Failed to import raid configuration:", error);
+      logger.error("Failed to import raid configuration:", { error });
 
       if (error instanceof Error) {
         if (error.message.includes("not found")) {

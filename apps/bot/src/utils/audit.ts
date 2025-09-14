@@ -130,7 +130,7 @@ export async function sendAuditMessage(
       action,
     });
   } catch (error) {
-    logger.error(`Failed to send audit message for ${action}:`, error);
+    logger.error(`Failed to send audit message for ${action}:`, { error });
     // Don't throw - audit failure shouldn't break the main flow
   }
 }

@@ -86,7 +86,7 @@ export async function searchAlbionPlayers(query: string, server: ServerId = "AME
     );
     return response.data;
   } catch (error) {
-    logger.error("Search failed:", error);
+    logger.error("Search failed:", { error });
     throw error;
   }
 }
@@ -104,7 +104,7 @@ export async function getAlbionPlayer(playerId: string, server: ServerId = "AMER
     logger.debug(`Player data retrieved for: ${response.data.Name}`);
     return response.data;
   } catch (error) {
-    logger.error("Get player failed:", error);
+    logger.error("Get player failed:", { error });
     throw error;
   }
 }
@@ -122,7 +122,7 @@ export async function getAlbionGuild(guildId: string, server: ServerId = "AMERIC
     logger.debug(`Guild data retrieved for: ${response.data.Name}`);
     return response.data;
   } catch (error) {
-    logger.error("Get guild failed:", error);
+    logger.error("Get guild failed:", { error });
     throw error;
   }
 }
@@ -146,7 +146,7 @@ export async function getAlbionPlayerKillboard(
     logger.debug(`Killboard data retrieved: ${response.data.length} events`);
     return response.data;
   } catch (error) {
-    logger.error("Get player killboard failed:", error);
+    logger.error("Get player killboard failed:", { error });
     throw error;
   }
 }
@@ -170,7 +170,7 @@ export async function getAlbionGuildKillboard(
     logger.debug(`Guild killboard data retrieved: ${response.data.length} events`);
     return response.data;
   } catch (error) {
-    logger.error("Get guild killboard failed:", error);
+    logger.error("Get guild killboard failed:", { error });
     throw error;
   }
 }
@@ -197,7 +197,7 @@ export async function verifyAlbionPlayer(username: string, server: ServerId = "A
 
     return null;
   } catch (error) {
-    logger.error("Player verification failed:", error);
+    logger.error("Player verification failed:", { error });
     throw error;
   }
 }

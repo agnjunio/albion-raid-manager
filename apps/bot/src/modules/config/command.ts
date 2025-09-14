@@ -201,7 +201,7 @@ export const configCommand: Command = {
         }
       }
     } catch (error) {
-      logger.error("Error in config command:", error);
+      logger.error("Error in config command:", { error });
       await interaction.editReply({
         content: "❌ An error occurred while configuring server settings.",
       });

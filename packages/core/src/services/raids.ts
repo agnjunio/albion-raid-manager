@@ -77,7 +77,7 @@ export namespace RaidService {
             slotCount: slotCount,
           });
         } catch (error) {
-          logger.error(`Failed to create slots for raid ${raid.id}:`, error);
+          logger.error(`Failed to create slots for raid ${raid.id}:`, { error });
           // Don't fail the raid creation if slot creation fails
           // The raid can still be created and slots can be added manually
         }

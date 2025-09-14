@@ -31,7 +31,7 @@ async function start() {
 
     //catches uncaught exceptions
     process.on("uncaughtException", async (error) => {
-      logger.error(`Uncaught exception:`, error);
+      logger.error(`Uncaught exception:`, { error });
     });
 
     await run();

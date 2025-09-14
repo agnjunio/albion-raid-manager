@@ -70,7 +70,7 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
     if (isAxiosError(error) && error.response?.status === 401) {
       res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     } else {
-      logger.warn("Failed to get servers", error);
+      logger.warn("Failed to get servers", { error });
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
     }
   }
@@ -105,7 +105,7 @@ serverRouter.post(
 
       res.json(APIResponse.Success({ server }));
     } catch (error) {
-      logger.warn("Failed to add server", error);
+      logger.warn("Failed to add server", { error });
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to add server"));
     }
   },
@@ -183,7 +183,7 @@ serverRouter.get(
       if (isAxiosError(error) && error.response?.status === 401) {
         res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
       } else {
-        logger.warn("Failed to get server members", error);
+        logger.warn("Failed to get server members", { error });
         res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server members"));
       }
     }

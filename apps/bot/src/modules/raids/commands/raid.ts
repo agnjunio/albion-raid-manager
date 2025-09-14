@@ -74,7 +74,7 @@ export const raidCommand: Command = {
               userId: interaction.user.id,
             });
           } catch (error) {
-            logger.error("Failed to delete raid:", error);
+            logger.error("Failed to delete raid:", { error });
 
             let errorMessage = "❌ Failed to delete raid. Please try again later.";
 
@@ -104,7 +104,7 @@ export const raidCommand: Command = {
         }
       }
     } catch (error) {
-      logger.error("Error in raid command:", error);
+      logger.error("Error in raid command:", { error });
       await interaction.editReply({
         content: "❌ An error occurred while processing the command.",
       });

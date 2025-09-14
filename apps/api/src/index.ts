@@ -21,7 +21,7 @@ async function start() {
 
     // Catches uncaught exceptions
     process.on("uncaughtException", async (error) => {
-      logger.error(`Uncaught exception:`, error);
+      logger.error(`Uncaught exception:`, { error });
     });
   } catch (error) {
     let message = "Unknown error";

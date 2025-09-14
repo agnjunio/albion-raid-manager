@@ -61,7 +61,7 @@ export async function assignRolesBasedOnGuild(
       });
     }
   } catch (error) {
-    logger.error(`Failed to assign roles for user ${member.user.id} in server ${serverId}:`, error);
+    logger.error(`Failed to assign roles for user ${member.user.id} in server ${serverId}:`, { error });
     // Don't throw - role assignment failure shouldn't break registration
   }
 }

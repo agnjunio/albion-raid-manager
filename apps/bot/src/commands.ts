@@ -76,7 +76,7 @@ export async function handleCommand(interaction: Interaction) {
   try {
     await command.execute(interaction);
   } catch (error) {
-    logger.error(`handleCommand ~ ${command.data.name} ~ Error:`, error);
+    logger.error(`handleCommand ~ ${command.data.name} ~ Error:`, { error });
     if (interaction.replied || interaction.deferred) {
       await interaction.followUp({
         content: "There was an error while executing this command!",

@@ -36,7 +36,7 @@ export async function initModules({ discord }: ModuleParams) {
         await loadCommands(module);
       }
     } catch (error) {
-      logger.error(`${module.id} ~ Load error:`, error);
+      logger.error(`${module.id} ~ Load error:`, { error });
     }
   }
 
@@ -52,7 +52,7 @@ export async function initModules({ discord }: ModuleParams) {
       } catch (error) {
         let message = "Unknown error";
         if (error instanceof Error) message = error.message;
-        logger.error(`${module.id} ~ onReady error: ${message}`, error);
+        logger.error(`${module.id} ~ onReady error: ${message}`, { error });
       }
     }
   });

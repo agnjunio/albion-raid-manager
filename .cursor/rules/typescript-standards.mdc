@@ -49,6 +49,51 @@ Follow the import order defined in [eslint.config.js](mdc:eslint.config.js):
 - Use Zod for runtime type validation
 - Handle async operations with try-catch blocks
 
+## Logging Standards
+
+### Error Logging Pattern
+
+**CRITICAL: Always pass errors as object properties, never as second parameters.**
+
+```typescript
+// ✅ Correct - Error as object property
+logger.error("Operation failed:", { error });
+logger.warn("Warning message:", { error });
+logger.info("Info with context:", { error, userId, action });
+
+// ❌ Incorrect - Error as second parameter
+logger.error("Operation failed:", error);
+logger.warn("Warning message:", error);
+```
+
+### Benefits of Object Pattern
+
+- **Structured Logging**: Errors are properly nested in log metadata
+- **Searchability**: Easy to filter and search logs by error properties
+- **Winston Compatibility**: Works better with Winston's structured logging format
+- **Consistency**: All logging follows the same pattern across the codebase
+
+### Additional Context
+
+When logging errors, include relevant context:
+
+```typescript
+// ✅ Good - Include relevant context
+logger.error("Failed to create user:", { 
+  error, 
+  userId, 
+  username, 
+  serverId 
+});
+
+// ✅ Good - Include operation context
+logger.error("Database query failed:", { 
+  error, 
+  query: "SELECT * FROM users", 
+  params: { id: userId } 
+});
+```
+
 ---
 
 description: TypeScript coding standards and best practices for the Albion Raid Manager project

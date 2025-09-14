@@ -30,7 +30,7 @@ export async function ensureUser(user: Pick<User, "id" | "username" | "nickname"
     logger.debug(`Ensured user exists: ${user.username} (${user.id})`);
     return updatedUser;
   } catch (error) {
-    logger.error("Error ensuring user exists:", error);
+    logger.error("Error ensuring user exists:", { error });
     throw error;
   }
 }
@@ -105,7 +105,7 @@ export async function ensureUserAndServer({
     logger.debug(`Ensured user and server exist: ${user.username} (${user.id}) in server ${server.id}`);
     return result;
   } catch (error) {
-    logger.error("Error ensuring user and server exist:", error);
+    logger.error("Error ensuring user and server exist:", { error });
     throw error;
   }
 }

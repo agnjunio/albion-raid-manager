@@ -175,6 +175,6 @@ async function runRegressionTests() {
 
 // Run the regression test
 runRegressionTests().catch((error) => {
-  logger.error("Regression test failed:", error);
+  logger.error("Regression test failed:", { error });
   process.exit(1);
 });

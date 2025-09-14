@@ -1,6 +1,6 @@
+import { ensureUserAndServer, prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { AlbionService } from "@albion-raid-manager/core/services";
-import { ensureUserAndServer, prisma } from "@albion-raid-manager/core/database";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
 import { Command } from "@/commands";
@@ -112,7 +112,7 @@ export const registerCommand: Command = {
         guild,
       });
     } catch (error) {
-      logger.error("Register command error:", error);
+      logger.error("Register command error:", { error });
 
       let errorMessage = "❌ An error occurred while registering. Please try again later.";
 

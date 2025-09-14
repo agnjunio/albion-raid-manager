@@ -77,31 +77,12 @@ authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type
     req.session.refreshToken = refresh_token;
     req.session.user = transformUser(discordUser);
 
-    // Explicitly save the session to ensure it's persisted
-    // req.session.save((err) => {
-    //   if (err) {
-    //     logger.error("Failed to save session", { error: err, sessionId: req.session.id });
-    //     return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
-    //   }
-
-    //   logger.info("Session data set and saved", {
-    //     sessionId: req.session.id,
-    //     hasAccessToken: !!req.session.accessToken,
-    //     hasRefreshToken: !!req.session.refreshToken,
-    //     hasUser: !!req.session.user,
-    //     cookie: req.session.cookie,
-    //     responseHeaders: res.getHeaders(),
-    //   });
-    // res.sendStatus(200);
-
-    // });
-
     res.sendStatus(200);
   } catch (error) {
     if (isAxiosError(error)) {
       logger.debug("Discord API error response:", error.response?.data);
     }
-    logger.error("Failed to authenticate user:", error);
+    logger.error("Failed to authenticate user:", { error });
     res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
   }
 });
