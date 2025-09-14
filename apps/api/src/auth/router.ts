@@ -94,3 +94,26 @@ authRouter.post("/logout", (req: Request, res: Response<APIResponse.Type>) => {
     res.sendStatus(200);
   });
 });
+
+// Debug endpoint to test cookie setting
+authRouter.get("/debug-cookie", (req: Request, res: Response) => {
+  req.session.testData = "cookie-test";
+  req.session.save((err) => {
+    if (err) {
+      logger.error("Failed to save debug session:", err);
+      return res.status(500).json({ error: "Failed to save session" });
+    }
+
+    logger.info("Debug session saved", {
+      cookie: req.session.cookie,
+      sessionId: req.session.id,
+      headers: res.getHeaders(),
+    });
+
+    res.json({
+      message: "Debug cookie set",
+      sessionId: req.session.id,
+      cookie: req.session.cookie,
+    });
+  });
+});

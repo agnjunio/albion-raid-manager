@@ -53,6 +53,30 @@ export function createApp(): express.Application {
     }),
   );
 
+  // Debug middleware to log Set-Cookie headers
+  app.use((req, res, next) => {
+    const originalSend = res.send;
+    res.send = function (data) {
+      const setCookieHeader = res.getHeader("Set-Cookie");
+      if (setCookieHeader) {
+        logger.info("Set-Cookie header being sent", {
+          setCookie: setCookieHeader,
+          url: req.url,
+          method: req.method,
+        });
+      } else {
+        logger.warn("No Set-Cookie header found", {
+          url: req.url,
+          method: req.method,
+          hasSession: !!req.session,
+          sessionId: req.session?.id,
+        });
+      }
+      return originalSend.call(this, data);
+    };
+    next();
+  });
+
   // Application middleware
   app.use(context);
   app.use(router);
