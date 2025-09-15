@@ -522,6 +522,9 @@
     "confirmations": {
       "deleteRaid": "Tem certeza de que deseja excluir \"{{title}}\"? Esta ação não pode ser desfeita.",
       "deleteSlot": "Tem certeza de que deseja excluir este slot?"
+    },
+    "actions": {
+      "retry": "Tentar Novamente"
     }
   },
   "contentTypes": {

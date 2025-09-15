@@ -517,6 +517,9 @@
     "confirmations": {
       "deleteRaid": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
       "deleteSlot": "Are you sure you want to delete this slot?"
+    },
+    "actions": {
+      "retry": "Retry"
     }
   },
   "contentTypes": {

@@ -26,11 +26,11 @@ export function RaidsPage() {
     toast.error(t("toasts.raids.loadError"), {
       description: t("toasts.raids.loadErrorDescription"),
       action: {
-        label: "Retry",
+        label: t("toasts.actions.retry"),
         onClick: () => refetch(),
       },
     });
-  }, [error, refetch]);
+  }, [error, refetch, t]);
 
   if (isLoading) {
     return <PageLoading label="Loading raids..." />;
