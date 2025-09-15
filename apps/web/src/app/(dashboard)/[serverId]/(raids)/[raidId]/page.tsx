@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { faCopy, faDownload, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { RaidStatusBadge } from "@/components/raids/raid-badge";
@@ -21,6 +22,7 @@ import { useRaidContext } from "./contexts/raid-context";
 import { downloadRaidConfiguration, exportRaidConfiguration } from "./utils/raid-export-import";
 
 export function RaidPage() {
+  const { serverId } = useParams();
   const { raid, isLoading, error, handleCopyRaidLink, handleDeleteRaid, handleUpdateRaid, canManageRaid } =
     useRaidContext();
   const [title, setTitle] = useState("");
@@ -66,7 +68,7 @@ export function RaidPage() {
             {/* Top navigation bar */}
             <div className="border-border/50 mb-6 flex items-center justify-between border-b pb-4">
               <div className="flex items-center gap-4">
-                <BackButton label="Back to Raids" />
+                <BackButton label="Back to Raids" to={`/dashboard/${serverId}/raids`} replace />
               </div>
 
               <div className="flex gap-2">

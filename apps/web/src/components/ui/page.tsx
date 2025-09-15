@@ -2,24 +2,15 @@ import type { SizeProp } from "@fortawesome/fontawesome-svg-core";
 
 import { useMemo, type PropsWithChildren } from "react";
 
-import { faArrowLeft, faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faTriangleExclamation, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { cn } from "@/lib/utils";
 
-import { Button } from "./button";
 import Loading from "./loading";
 
 export function Page({ children, className }: PropsWithChildren<{ className?: string }>) {
   return <div className={cn("flex h-full flex-col gap-4 overflow-auto p-4", className)}>{children}</div>;
-}
-
-export function PageBackButton() {
-  return (
-    <Button variant="ghost" size="icon" className="rounded-full" onClick={() => window.history.back()}>
-      <FontAwesomeIcon icon={faArrowLeft} />
-    </Button>
-  );
 }
 
 export function PageTitle({ children, className }: { className?: string } & PropsWithChildren) {

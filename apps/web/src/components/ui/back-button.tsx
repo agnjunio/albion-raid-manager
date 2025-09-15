@@ -1,21 +1,25 @@
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 
 import { Button } from "./button";
 
-interface BackButtonProps {
+interface BackButtonProps extends React.ComponentProps<typeof Link> {
   onClick?: () => void;
   label?: string;
   variant?: "default" | "subtle" | "minimal";
   className?: string;
 }
 
-export function BackButton({
-  onClick = () => window.history.back(),
-  label = "Back",
-  variant = "default",
-  className,
-}: BackButtonProps) {
+export function BackButton({ onClick, to, label = "Back", variant = "default", replace, className }: BackButtonProps) {
+  const handleBackClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (!to) {
+      window.history.back();
+    }
+  };
+
   const getVariantStyles = () => {
     switch (variant) {
       case "minimal":
@@ -27,11 +31,11 @@ export function BackButton({
     }
   };
 
-  return (
+  const button = (
     <Button
       variant="ghost"
       size="sm"
-      onClick={onClick}
+      onClick={handleBackClick}
       className={`group flex items-center gap-2 transition-colors ${getVariantStyles()} ${className}`}
     >
       <FontAwesomeIcon
@@ -41,4 +45,19 @@ export function BackButton({
       {variant !== "minimal" && <span className="text-sm font-medium">{label}</span>}
     </Button>
   );
+
+  if (to) {
+    return (
+      <Link
+        to={to}
+        className={`group flex items-center gap-2 transition-colors ${getVariantStyles()} ${className}`}
+        tabIndex={-1}
+        replace={replace}
+      >
+        {button}
+      </Link>
+    );
+  }
+
+  return button;
 }
