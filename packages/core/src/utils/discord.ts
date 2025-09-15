@@ -33,7 +33,7 @@ export const getServerPictureUrl = (
 
 export const getServerInviteUrl = (clientId: string, serverId?: string) => {
   const serverParam = serverId ? `&guild_id=${serverId}` : ``;
-  return `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot&permissions=2147534848${serverParam}`;
+  return `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot&permissions=8${serverParam}`;
 };
 
 export function hasPermissions(permissions: string | bigint = 0n, requiredPermissions: bigint[]): boolean {

@@ -17,10 +17,6 @@ const config = schema.safeParse({
   },
 
   bot: {
-    register: {
-      enabled: process.env.BOT_REGISTER_ENABLED,
-    },
-
     shards: {
       total: process.env.SHARDS_TOTAL,
       list: process.env.SHARDS_SPAWN,

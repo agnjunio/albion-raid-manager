@@ -84,9 +84,6 @@ serverRouter.post(
       const { serverId } = req.body;
 
       const discordServer = await DiscordService.servers.getServer(serverId);
-      if (!discordServer) {
-        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-      }
 
       const existingServer = await ServersService.getServerById(serverId);
       if (existingServer) {
@@ -105,6 +102,18 @@ serverRouter.post(
 
       res.json(APIResponse.Success({ server }));
     } catch (error) {
+      // Handle Discord API 404 error when bot is not invited to server
+      if (isAxiosError(error) && error.response?.status === 404) {
+        return res
+          .status(400)
+          .json(
+            APIResponse.Error(
+              APIErrorType.SERVER_VERIFICATION_FAILED,
+              "Bot is not invited to this server. Please invite the bot to the server first.",
+            ),
+          );
+      }
+
       logger.warn("Failed to add server", { error });
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to add server"));
     }
