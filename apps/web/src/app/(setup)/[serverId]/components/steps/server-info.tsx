@@ -1,6 +1,7 @@
 import { APIServer } from "@albion-raid-manager/types/api";
 import { faCrown, faShield } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,8 @@ interface ServerInfoProps {
 }
 
 export function ServerInfo({ server, onNext }: ServerInfoProps) {
+  const { t } = useTranslation();
+
   return (
     <CardContent className="space-y-4">
       <div className="flex justify-center text-center">
@@ -29,13 +32,13 @@ export function ServerInfo({ server, onNext }: ServerInfoProps) {
               {server.owner && (
                 <Badge variant="outline" size="xs">
                   <FontAwesomeIcon icon={faCrown} className="text-primary mr-1 size-3" />
-                  Owner
+                  {t("servers.owner")}
                 </Badge>
               )}
               {!server.owner && server.admin && (
                 <Badge variant="outline" size="xs">
                   <FontAwesomeIcon icon={faShield} className="text-secondary mr-1 size-3" />
-                  Admin
+                  {t("servers.admin")}
                 </Badge>
               )}
             </div>
@@ -43,12 +46,10 @@ export function ServerInfo({ server, onNext }: ServerInfoProps) {
         </div>
       </div>
 
-      <p className="text-muted-foreground text-center text-xs">
-        This server will be added to your account once you complete the setup process.
-      </p>
+      <p className="text-muted-foreground text-center text-xs">{t("setup.serverInfo.description")}</p>
 
       <Button onClick={onNext} className="w-full">
-        Continue to Discord Invitation
+        {t("setup.serverInfo.continueButton")}
       </Button>
     </CardContent>
   );

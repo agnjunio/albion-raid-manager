@@ -1,9 +1,11 @@
 import { faChevronLeft, faChevronRight, faCog, faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { HotkeysHelp } from "@/components/ui/hotkeys-help";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getCurrentLanguage } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 import { CalendarView, useCalendar } from "../contexts/calendar-context";
@@ -12,11 +14,14 @@ import { CreateRaidSheet } from "./create-raid-sheet";
 
 export function CalendarHeader() {
   const { currentDate, view, isRefreshing, hotkeys, setCurrentDate, setView, refresh } = useCalendar();
+  const { t } = useTranslation();
 
   const formatDateRange = (date: Date, view: CalendarView) => {
+    const language = getCurrentLanguage();
+
     switch (view) {
       case CalendarView.DAY:
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString(language, {
           weekday: "long",
           year: "numeric",
           month: "long",
@@ -29,11 +34,11 @@ export function CalendarHeader() {
         const endOfWeek = new Date(startOfWeek);
         endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-        const startDate = startOfWeek.toLocaleDateString("en-US", {
+        const startDate = startOfWeek.toLocaleDateString(language, {
           month: "long",
           day: "numeric",
         });
-        const endDate = endOfWeek.toLocaleDateString("en-US", {
+        const endDate = endOfWeek.toLocaleDateString(language, {
           month: "long",
           day: "numeric",
         });
@@ -42,13 +47,13 @@ export function CalendarHeader() {
       }
 
       case CalendarView.MONTH:
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString(language, {
           year: "numeric",
           month: "long",
         });
 
       default:
-        return date.toLocaleDateString("en-US", {
+        return date.toLocaleDateString(language, {
           weekday: "long",
           year: "numeric",
           month: "long",
@@ -120,11 +125,11 @@ export function CalendarHeader() {
 
         {/* Title */}
         <div className="ml-4 flex items-center gap-4">
-          <h1 className="text-foreground text-xl font-normal">{formatDateRange(currentDate, view)}</h1>
+          <h1 className="text-foreground capitalize-first text-xl font-normal">{formatDateRange(currentDate, view)}</h1>
 
           {!isCurrentlyShowingToday() && (
             <Button variant="outline" size="sm" onClick={goToToday} className="px-3 py-1 text-sm font-normal">
-              Today
+              {t("calendar.navigation.today")}
             </Button>
           )}
         </div>
@@ -137,9 +142,9 @@ export function CalendarHeader() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={CalendarView.DAY}>Day</SelectItem>
-            <SelectItem value={CalendarView.WEEK}>Week</SelectItem>
-            <SelectItem value={CalendarView.MONTH}>Month</SelectItem>
+            <SelectItem value={CalendarView.DAY}>{t("calendar.views.day")}</SelectItem>
+            <SelectItem value={CalendarView.WEEK}>{t("calendar.views.week")}</SelectItem>
+            <SelectItem value={CalendarView.MONTH}>{t("calendar.views.month")}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -162,7 +167,7 @@ export function CalendarHeader() {
         <CreateRaidSheet>
           <Button className="h-8 gap-1 px-3 text-sm font-normal">
             <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-            <span className="hidden sm:inline">New Raid</span>
+            <span className="hidden sm:inline">{t("calendar.navigation.newRaid")}</span>
           </Button>
         </CreateRaidSheet>
       </div>

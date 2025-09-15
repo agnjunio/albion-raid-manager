@@ -2,7 +2,7 @@ import { logger } from "@albion-raid-manager/core/logger";
 import { ItemsService } from "@albion-raid-manager/core/services";
 import { APIErrorType, APIResponse, GetItem, SearchItems } from "@albion-raid-manager/types/api";
 import { searchItemsQuerySchema } from "@albion-raid-manager/types/schemas";
-import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
+import { ItemLocalizations, ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
 import { auth } from "@/auth/middleware";
@@ -21,6 +21,7 @@ itemsRouter.use(auth);
  * - slotType (optional): Filter by item slot type
  * - limit (optional): Number of results to return (1-100, default: 20)
  * - offset (optional): Number of results to skip (default: 0)
+ * - language (optional): Language code for localized search (e.g., "EN-US", "PT-BR")
  */
 itemsRouter.get(
   "/search",
@@ -30,7 +31,7 @@ itemsRouter.get(
     res: Response<APIResponse.Type<SearchItems.Response>>,
   ) => {
     try {
-      const { q, slotType, limit, offset } = req.query as unknown as SearchItems.Query;
+      const { q, slotType, limit, offset, language } = req.query as unknown as SearchItems.Query;
 
       if (!q || typeof q !== "string") {
         return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, "Search term is required"));
@@ -41,6 +42,7 @@ itemsRouter.get(
         slotType,
         limit,
         offset,
+        language: language as keyof ItemLocalizations | undefined,
       });
 
       return res.json(APIResponse.Success(result));

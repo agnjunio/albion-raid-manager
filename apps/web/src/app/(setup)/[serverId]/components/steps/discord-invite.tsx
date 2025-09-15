@@ -4,6 +4,7 @@ import { getServerInviteUrl } from "@albion-raid-manager/core/utils/discord";
 import { APIServer } from "@albion-raid-manager/types/api";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import Alert from "@/components/ui/alert";
@@ -16,6 +17,7 @@ interface DiscordInviteProps {
 }
 
 export function DiscordInvite({ server, onStartVerification }: DiscordInviteProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const inviteUrl = getServerInviteUrl(import.meta.env.VITE_DISCORD_CLIENT_ID, server.id);
 
@@ -40,16 +42,14 @@ export function DiscordInvite({ server, onStartVerification }: DiscordInviteProp
   return (
     <CardContent className="flex flex-col gap-4">
       <div className="text-center">
-        <p className="text-muted-foreground mb-4">
-          Click the link below to open Discord and accept the bot invitation to your server.
-        </p>
+        <p className="text-muted-foreground mb-4">{t("setup.discordInvite.description")}</p>
       </div>
 
       <div className="flex flex-col gap-2">
         <Button asChild className="h-14 w-full" variant="secondary">
           <Link to={inviteUrl} target="_blank" rel="noopener noreferrer">
             <FontAwesomeIcon icon={faDiscord} size="lg" />
-            Open Discord Invitation
+            {t("setup.discordInvite.openButton")}
           </Link>
         </Button>
 
@@ -61,17 +61,17 @@ export function DiscordInvite({ server, onStartVerification }: DiscordInviteProp
             className="border-input bg-muted flex-1 rounded-md border px-3 py-2 text-sm"
           />
           <Button variant="outline" onClick={handleCopyLink}>
-            {copied ? "Copied!" : "Copy"}
+            {copied ? t("setup.discordInvite.copied") : t("setup.discordInvite.copy")}
           </Button>
         </div>
       </div>
 
       <Alert variant="info" className="my-2 text-sm">
-        <strong>Important:</strong> Make sure you have admin permissions on the server before accepting the invitation.
+        <strong>{t("setup.discordInvite.important")}:</strong> {t("setup.discordInvite.permissionsWarning")}
       </Alert>
 
       <Button variant="primary" onClick={onStartVerification} className="w-full">
-        Continue to verification
+        {t("setup.discordInvite.continueButton")}
       </Button>
     </CardContent>
   );

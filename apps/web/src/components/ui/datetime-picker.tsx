@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { add, format } from "date-fns";
 import { type Locale, enUS } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
+import { useTranslation } from "react-i18next";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -228,6 +229,8 @@ export function Calendar({
   yearRange = 50,
   ...props
 }: React.ComponentProps<typeof DayPicker> & { yearRange?: number }) {
+  const { t } = useTranslation();
+
   const MONTHS = React.useMemo(() => {
     let locale: Pick<Locale, "options" | "localize" | "formatLong"> = enUS;
     const { options, localize, formatLong } = props.locale || {};
@@ -318,12 +321,12 @@ export function Calendar({
                   props.onMonthChange?.(newDate);
                 }}
               >
-                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0">
+                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 capitalize">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {MONTHS.map((month) => (
-                    <SelectItem key={month.value} value={month.value.toString()}>
+                    <SelectItem key={month.value} value={month.value.toString()} className="capitalize">
                       {month.label}
                     </SelectItem>
                   ))}
@@ -362,7 +365,7 @@ export function Calendar({
               }}
             >
               <FontAwesomeIcon icon={faCalendarDay} />
-              <div>Today</div>
+              <div>{t("calendar.today")}</div>
             </Button>
           </div>
         ),

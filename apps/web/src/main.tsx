@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 
 import App from "./app";
 import "./index.css";
+import "./lib/i18n";
 import { Theme, ThemeProvider } from "./lib/theme";
 import { store } from "./store";
 

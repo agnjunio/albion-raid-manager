@@ -1,6 +1,7 @@
 import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { useAuth } from "@/lib/auth";
 
 export function Home() {
   const { user, status, signIn } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div className="flex size-full justify-center">
@@ -25,9 +27,7 @@ export function Home() {
 
         <div className="flex size-full flex-col items-center justify-center gap-2">
           <h1 className="text-secondary-foreground font-title text-5xl drop-shadow-lg">Albion Raid Manager</h1>
-          <p className="text-secondary-foreground mx-auto mt-4 max-w-md text-lg">
-            Command every raid with precision. Plan, strategize, and lead your guild to victory.
-          </p>
+          <p className="text-secondary-foreground mx-auto mt-4 max-w-md text-lg">{t("dashboard.welcome")}</p>
         </div>
       </div>
 
@@ -51,21 +51,21 @@ export function Home() {
               </picture>
             )}
             <div className="flex items-center gap-1">
-              <div>Authenticated as</div>
+              <div>{t("auth.authenticatedAs")}</div>
               <div className="text-secondary dark:text-primary font-semibold">@{user.username}</div>
             </div>
 
             <Link to="/dashboard" tabIndex={-1}>
-              <Button variant="primary">Enter</Button>
+              <Button variant="primary">{t("common.enter")}</Button>
             </Link>
           </>
         ) : (
           <>
-            <p>You are not logged in. Please sign in with Discord to continue.</p>
+            <p>{t("auth.notLoggedIn")}</p>
 
             <Button onClick={() => signIn()}>
               <FontAwesomeIcon icon={faDiscord} />
-              Login
+              {t("auth.loginWithDiscord")}
             </Button>
           </>
         )}

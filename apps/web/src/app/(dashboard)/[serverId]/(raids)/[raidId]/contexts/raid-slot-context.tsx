@@ -3,6 +3,7 @@ import type { RaidRole } from "@albion-raid-manager/types";
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
 import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { type EditingSlot } from "../helpers/raid-composition-utils";
@@ -53,6 +54,7 @@ interface RaidSlotProviderProps {
 }
 
 export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
+  const { t } = useTranslation();
   const { raid, handleRaidSlotCreate, handleRaidSlotUpdate, handleRaidSlotDelete, canManageRaid } = useRaidContext();
 
   const [editingSlot, setEditingSlot] = useState<EditingSlot | null>(null);
@@ -89,8 +91,8 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     weapon?: string | null;
   }) => {
     if (!canEditRaidSlot) {
-      toast.error("Cannot edit slot", {
-        description: "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
+      toast.error(t("toasts.slot.cannotEdit"), {
+        description: t("toasts.slot.cannotEditDescription"),
       });
       return;
     }
@@ -107,8 +109,8 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
 
   const startAddingSlot = () => {
     if (!canAddRaidSlot) {
-      toast.error("Cannot add slot", {
-        description: "Cannot add more slots. Maximum party size reached or raid is not editable.",
+      toast.error(t("toasts.slot.cannotAdd"), {
+        description: t("toasts.slot.cannotAddDescription"),
       });
       return;
     }
@@ -132,7 +134,7 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
     weapon?: string | null;
   }) => {
     if (!slotData.name.trim()) {
-      toast.error("Slot name is required");
+      toast.error(t("toasts.slot.nameRequired"));
       return;
     }
 
@@ -162,13 +164,13 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
 
   const deleteSlot = (slotId: string) => {
     if (!canDeleteRaidSlot) {
-      toast.error("Cannot delete slot", {
-        description: "Cannot delete slots. Minimum party size reached or raid is not editable.",
+      toast.error(t("toasts.slot.cannotDelete"), {
+        description: t("toasts.slot.cannotDeleteDescription"),
       });
       return;
     }
 
-    if (!window.confirm("Are you sure you want to delete this slot?")) {
+    if (!window.confirm(t("toasts.confirmations.deleteSlot"))) {
       return;
     }
 
@@ -177,8 +179,8 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
 
   const reorderSlots = async (activeId: string, overId: string) => {
     if (!canEditRaidSlot) {
-      toast.error("Cannot reorder slots", {
-        description: "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
+      toast.error(t("toasts.slot.cannotReorder"), {
+        description: t("toasts.slot.cannotReorderDescription"),
       });
       return;
     }
@@ -199,8 +201,8 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
       await handleRaidSlotUpdate(activeId, { order: overIndex });
     } catch (error) {
       console.error("Failed to reorder slots:", error);
-      toast.error("Failed to reorder slots", {
-        description: "Please try again.",
+      toast.error(t("toasts.slot.reorderError"), {
+        description: t("toasts.slot.reorderErrorDescription"),
       });
     } finally {
       // Clear loading state

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { faCopy, faDownload, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -23,6 +24,7 @@ import { downloadRaidConfiguration, exportRaidConfiguration } from "./utils/raid
 
 export function RaidPage() {
   const { serverId } = useParams();
+  const { t } = useTranslation();
   const { raid, isLoading, error, handleCopyRaidLink, handleDeleteRaid, handleUpdateRaid, canManageRaid } =
     useRaidContext();
   const [title, setTitle] = useState("");
@@ -42,19 +44,19 @@ export function RaidPage() {
 
   // Handle error state
   if (error || !raid) {
-    return <PageError variant="error" error={isAPIError(error) ? error.data : "Failed to get raid"} />;
+    return <PageError variant="error" error={isAPIError(error) ? error.data : t("raids.details.getRaidError")} />;
   }
 
   const handleExport = () => {
     try {
       const configuration = exportRaidConfiguration(raid);
       downloadRaidConfiguration(configuration, raid.title);
-      toast.success("Raid configuration exported successfully", {
-        description: "The raid configuration has been downloaded as a JSON file.",
+      toast.success(t("raids.details.exportSuccess"), {
+        description: t("raids.details.exportSuccessDescription"),
       });
     } catch (error) {
-      toast.error("Failed to export raid configuration", {
-        description: error instanceof Error ? error.message : "An unknown error occurred.",
+      toast.error(t("raids.details.exportError"), {
+        description: error instanceof Error ? error.message : t("raids.details.exportErrorDescription"),
       });
     }
   };
@@ -68,7 +70,7 @@ export function RaidPage() {
             {/* Top navigation bar */}
             <div className="border-border/50 mb-6 flex items-center justify-between border-b pb-4">
               <div className="flex items-center gap-4">
-                <BackButton label="Back to Raids" to={`/dashboard/${serverId}/raids`} replace />
+                <BackButton label={t("raids.details.backToRaids")} to={`/dashboard/${serverId}/raids`} replace />
               </div>
 
               <div className="flex gap-2">
@@ -79,7 +81,7 @@ export function RaidPage() {
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <FontAwesomeIcon icon={faCopy} className="mr-2 h-4 w-4" />
-                  Copy Link
+                  {t("raids.details.copyLink")}
                 </Button>
                 <Button
                   variant="outline"
@@ -88,7 +90,7 @@ export function RaidPage() {
                   className="text-muted-foreground hover:text-foreground"
                 >
                   <FontAwesomeIcon icon={faDownload} className="mr-2 h-4 w-4" />
-                  Export Config
+                  {t("raids.details.exportConfig")}
                 </Button>
                 {canManageRaid && (
                   <Button
@@ -98,7 +100,7 @@ export function RaidPage() {
                     className="bg-red-800 text-white hover:bg-red-900"
                   >
                     <FontAwesomeIcon icon={faTrash} className="mr-2 h-4 w-4" />
-                    Delete
+                    {t("raids.details.delete")}
                   </Button>
                 )}
               </div>
@@ -121,7 +123,9 @@ export function RaidPage() {
                   />
                   <RaidStatusBadge status={raid.status} />
                 </div>
-                <div className="text-muted-foreground font-mono text-sm">Raid ID: {raid.id}</div>
+                <div className="text-muted-foreground font-mono text-sm">
+                  {t("raids.details.raidId")}: {raid.id}
+                </div>
               </div>
 
               <InlineEditField
@@ -133,10 +137,10 @@ export function RaidPage() {
                 onCancel={() => setDescription(raid.description || "")}
                 canEdit={canManageRaid}
                 multiline
-                placeholder="Enter raid description..."
+                placeholder={t("raids.details.descriptionPlaceholder")}
                 className="text-muted-foreground text-lg leading-relaxed"
                 displayClassName="text-muted-foreground text-lg leading-relaxed"
-                emptyText="No description provided - click to add"
+                emptyText={t("raids.details.noDescription")}
               />
             </div>
           </CardHeader>

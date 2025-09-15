@@ -51,10 +51,10 @@ export function validateRaidConfiguration(data: unknown): {
       return { isValid: true, configuration: result.data };
     } else {
       const errorMessage = result.error.issues.map((err) => `${err.path.join(".")}: ${err.message}`).join("; ");
-      return { isValid: false, error: `Validation error: ${errorMessage}` };
+      return { isValid: false, error: errorMessage };
     }
   } catch (error) {
-    return { isValid: false, error: `Validation error: ${error instanceof Error ? error.message : "Unknown error"}` };
+    return { isValid: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
 

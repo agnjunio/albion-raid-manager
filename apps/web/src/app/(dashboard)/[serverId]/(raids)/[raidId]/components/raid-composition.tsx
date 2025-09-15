@@ -1,5 +1,6 @@
 import { faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { RaidCompositionViewToggle } from "./raid-composition-view-toggle";
 import { RaidSlotSheet } from "./raid-slot-sheet";
 
 export function RaidComposition() {
+  const { t } = useTranslation();
   const { maxSlots, hasStatus } = useRaidContext();
   const { viewMode } = useViewMode();
   const { isAddingSlot, currentSlotCount, startAddingSlot, saveSlot, cancelAdding, canEditRaidSlot, canAddRaidSlot } =
@@ -29,10 +31,10 @@ export function RaidComposition() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold">Raid Composition</h2>
+                <h2 className="text-xl font-bold">{t("raids.composition.title")}</h2>
               </div>
               <p className="text-muted-foreground text-sm">
-                {currentSlotCount} / {maxSlots === 0 ? "∞" : maxSlots} slots
+                {currentSlotCount} / {maxSlots === 0 ? "∞" : maxSlots} {t("raids.composition.slots")}
               </p>
             </div>
           </CardTitle>
@@ -45,7 +47,7 @@ export function RaidComposition() {
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
-                Add Slot
+                {t("raids.composition.addSlot")}
               </Button>
             )}
           </div>
@@ -55,9 +57,7 @@ export function RaidComposition() {
       <CardContent className="space-y-4">
         {!canEditRaidSlot && !hasStatus("SCHEDULED", "OPEN", "CLOSED") && (
           <Alert variant="warning">
-            <p className="text-sm">
-              Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.
-            </p>
+            <p className="text-sm">{t("raids.composition.editWarning")}</p>
           </Alert>
         )}
 

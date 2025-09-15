@@ -13,6 +13,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { Link, NavLink, useParams } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,13 +44,14 @@ import { cn } from "@/lib/utils";
 import { useGetServersQuery } from "@/store/servers";
 
 const navigation = [
-  { name: "Raids", href: "raids", icon: faShield },
-  { name: "Settings", href: "settings", icon: faCog },
+  { name: "raids", href: "raids", icon: faShield },
+  { name: "settings", href: "settings", icon: faCog },
 ];
 
 export function DashboardSidebar() {
   const { serverId } = useParams<{ serverId: string }>();
   const { data, isLoading } = useGetServersQuery();
+  const { t } = useTranslation();
 
   const servers = useMemo(() => data?.servers.filter((server) => server.bot), [data]);
   const selectedServer = useMemo(() => servers?.find((server) => server.id === serverId), [servers, serverId]);
@@ -79,7 +81,7 @@ export function DashboardSidebar() {
             <Link to="/dashboard">
               <DropdownMenuItem>
                 <FontAwesomeIcon icon={faChevronCircleLeft} className="size-4" />
-                <div className="leading-normal">Back to dashboard</div>
+                <div className="leading-normal">{t("dashboard.sidebar.backToDashboard")}</div>
               </DropdownMenuItem>
             </Link>
           </DropdownMenuContent>
@@ -88,7 +90,7 @@ export function DashboardSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("dashboard.sidebar.menu")}</SidebarGroupLabel>
           <SidebarMenu>
             {navigation.map((item) => (
               <SidebarMenuItem key={item.name}>
@@ -100,7 +102,7 @@ export function DashboardSidebar() {
                     }
                   >
                     <FontAwesomeIcon icon={item.icon} className="size-4" />
-                    <span>{item.name}</span>
+                    <span>{t(`navigation.${item.name}`)}</span>
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -128,12 +130,14 @@ interface ServerInfoProps {
 }
 
 export function ServerInfo({ server, icon, isLoading }: ServerInfoProps) {
+  const { t } = useTranslation();
+
   const badge = useMemo(() => {
     if (server?.owner) {
       return (
         <Badge variant="outline" size="xs">
           <FontAwesomeIcon icon={faCrown} className="text-primary mr-1 size-3" />
-          Owner
+          {t("dashboard.sidebar.owner")}
         </Badge>
       );
     }
@@ -142,13 +146,13 @@ export function ServerInfo({ server, icon, isLoading }: ServerInfoProps) {
       return (
         <Badge variant="outline" size="xs">
           <FontAwesomeIcon icon={faShield} className="text-secondary mr-1 size-3" />
-          Admin
+          {t("dashboard.sidebar.admin")}
         </Badge>
       );
     }
 
     return null;
-  }, [server]);
+  }, [server, t]);
 
   return (
     <div className="flex w-full items-center gap-2">
@@ -178,7 +182,7 @@ export function ServerInfo({ server, icon, isLoading }: ServerInfoProps) {
           </div>
         ) : (
           <div className={cn("flex min-w-0 grow flex-col whitespace-nowrap leading-tight")}>
-            <span className="truncate font-semibold">{server?.name || "Unknown server"}</span>
+            <span className="truncate font-semibold">{server?.name || t("dashboard.sidebar.unknownServer")}</span>
             {badge && <div>{badge}</div>}
           </div>
         )}
@@ -191,6 +195,7 @@ export function ServerInfo({ server, icon, isLoading }: ServerInfoProps) {
 
 export function UserInfo() {
   const { user, signOut, status } = useAuth();
+  const { t } = useTranslation();
 
   if (status === "loading" || !user)
     return (
@@ -209,7 +214,7 @@ export function UserInfo() {
         </Avatar>
 
         <div className="flex min-w-0 flex-col text-sm leading-tight group-data-[collapsible=icon]:hidden">
-          <span className="truncate font-semibold">{user.nickname || "Unknown User"}</span>
+          <span className="truncate font-semibold">{user.nickname || t("dashboard.sidebar.unknownUser")}</span>
           <span className="text-muted-foreground text-xs">@{user.username}</span>
         </div>
       </div>

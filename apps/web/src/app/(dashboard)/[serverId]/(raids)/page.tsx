@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -9,6 +10,7 @@ import { useGetRaidsQuery } from "@/store/raids";
 import { CalendarPage } from "./components/calendar-page";
 
 export function RaidsPage() {
+  const { t } = useTranslation();
   const { serverId } = useParams();
 
   const { data, isLoading, refetch, status, error } = useGetRaidsQuery(
@@ -21,8 +23,8 @@ export function RaidsPage() {
 
   useEffect(() => {
     if (!error) return;
-    toast.error("Failed to load raids", {
-      description: "There was an error loading raids. Please try again.",
+    toast.error(t("toasts.raids.loadError"), {
+      description: t("toasts.raids.loadErrorDescription"),
       action: {
         label: "Retry",
         onClick: () => refetch(),

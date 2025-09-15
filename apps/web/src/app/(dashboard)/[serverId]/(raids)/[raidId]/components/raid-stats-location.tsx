@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import { Input } from "@/components/ui/input";
 
@@ -10,6 +11,7 @@ import { InlineEditCard } from "./inline-edit-card";
 
 export function RaidStatsLocation() {
   const { raid, handleUpdateRaid, canManageRaid } = useRaidContext();
+  const { t } = useTranslation();
   const [location, setLocation] = useState(raid?.location || "");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,14 +38,14 @@ export function RaidStatsLocation() {
     <Input
       value={location}
       onChange={(e) => setLocation(e.target.value)}
-      placeholder="e.g., Black Zone, Royal City..."
+      placeholder={t("raids.stats.locationPlaceholder")}
       className="focus:border-primary/50 h-10 border-2 text-base transition-colors"
     />
   );
 
   return (
     <InlineEditCard
-      title="Location"
+      title={t("raids.stats.location")}
       icon={faMapMarkerAlt}
       canEdit={canManageRaid}
       onSave={handleSave}
@@ -51,8 +53,8 @@ export function RaidStatsLocation() {
       isLoading={isLoading}
       editContent={editContent}
     >
-      <div className="truncate text-lg font-semibold">{location || "No location set"}</div>
-      <p className="text-muted-foreground mt-1 text-xs">Meeting point</p>
+      <div className="truncate text-lg font-semibold">{location || t("raids.stats.noLocationSet")}</div>
+      <p className="text-muted-foreground mt-1 text-xs">{t("raids.stats.meetingPoint")}</p>
     </InlineEditCard>
   );
 }

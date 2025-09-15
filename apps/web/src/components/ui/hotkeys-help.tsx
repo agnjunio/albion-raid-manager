@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { faKeyboard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -18,25 +19,26 @@ interface HotkeyHelpProps {
 }
 
 export function HotkeysHelp({ hotkeys }: HotkeyHelpProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const formatKey = (hotkey: (typeof hotkeys)[0]) => {
     const keys = [];
 
     if (hotkey.ctrlKey || hotkey.metaKey) {
-      keys.push(navigator.platform.includes("Mac") ? "⌘" : "Ctrl");
+      keys.push(navigator.platform.includes("Mac") ? t("hotkeys.keys.cmd") : t("hotkeys.keys.ctrl"));
     }
     if (hotkey.altKey) {
-      keys.push("Alt");
+      keys.push(t("hotkeys.keys.alt"));
     }
     if (hotkey.shiftKey) {
-      keys.push("Shift");
+      keys.push(t("hotkeys.keys.shift"));
     }
 
     // Format the main key
     let mainKey = hotkey.key;
     if (mainKey === " ") {
-      mainKey = "Space";
+      mainKey = t("hotkeys.keys.space");
     } else if (mainKey.length === 1) {
       mainKey = mainKey.toUpperCase();
     }
@@ -55,7 +57,7 @@ export function HotkeysHelp({ hotkeys }: HotkeyHelpProps) {
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Keyboard Shortcuts</DialogTitle>
+          <DialogTitle>{t("hotkeys.title")}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {hotkeys.map((hotkey, index) => (

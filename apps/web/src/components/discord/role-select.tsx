@@ -1,6 +1,7 @@
 import { type APIRole } from "@albion-raid-manager/types/api";
 import { faCheck, faChevronDown, faClose, faPeopleCarryBox } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export const RoleSelect = ({ roles, value = [], disabled = false, onRolesChange }: Props) => {
+  const { t } = useTranslation();
+
   const handleRoleSelect = (role: APIRole) => {
     const exists = value.find((r) => r.id === role.id);
     if (exists) {
@@ -42,7 +45,7 @@ export const RoleSelect = ({ roles, value = [], disabled = false, onRolesChange 
           <FontAwesomeIcon icon={faPeopleCarryBox} className="size-4" />
 
           <div className="flex grow flex-wrap gap-2">
-            {!value || (!value.length && "Select roles")}
+            {!value || (!value.length && t("discord.selectRoles"))}
             {value.map((role) => (
               <div
                 key={role.id}
@@ -75,9 +78,9 @@ export const RoleSelect = ({ roles, value = [], disabled = false, onRolesChange 
 
       <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
         <Command>
-          <CommandInput placeholder="Search roles..." autoFocus />
+          <CommandInput placeholder={t("discord.searchRoles")} autoFocus />
           <CommandList>
-            <CommandEmpty>No roles found.</CommandEmpty>
+            <CommandEmpty>{t("discord.noRolesFound")}</CommandEmpty>
             <CommandGroup>
               {roles
                 .sort((a, b) => b.position - a.position)

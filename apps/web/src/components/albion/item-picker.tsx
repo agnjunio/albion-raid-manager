@@ -14,6 +14,7 @@ import {
   faUtensils,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getLocalizedName } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 import { useGetItemQuery, useSearchItemsQuery } from "@/store/items";
 
@@ -46,9 +48,6 @@ const slotTypeIcons = {
   mount: faHorse,
 } as const;
 
-// Weapon search tips for better user experience
-const weaponSearchTips = ["Arctic Staff 8.", "T8 Fire Staff", "Rotcaller 5.1", "T6 2H Holy Staff", "T4 2H Crossbow"];
-
 // Slot type display names (currently unused but kept for future use)
 // const slotTypeNames = {
 //   mainhand: "Main Hand",
@@ -64,7 +63,7 @@ const weaponSearchTips = ["Arctic Staff 8.", "T8 Fire Staff", "Rotcaller 5.1", "
 // } as const;
 
 interface ItemPickerProps {
-  value?: Item | null;
+  value?: Pick<Item, "item_id"> | Item | null;
   onValueChange?: (item: Item | null) => void;
   placeholder?: string;
   slotType?: ItemSlotType;
@@ -91,14 +90,15 @@ interface ItemPickerTriggerProps extends ItemPickerProps {
 export function ItemPicker({
   value,
   onValueChange,
-  placeholder = "Select an item...",
+  placeholder,
   slotType,
   disabled = false,
   className,
-  searchPlaceholder = "Search items...",
-  emptyMessage = "No items found.",
+  searchPlaceholder,
+  emptyMessage,
   maxResults = 20,
 }: ItemPickerProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = useCallback(
@@ -121,20 +121,20 @@ export function ItemPicker({
   const { data: itemDetails } = useGetItemQuery(
     { id: value?.item_id || "" },
     {
-      skip: !value?.item_id || value.localizedNames["EN-US"] !== value.item_id,
+      skip: !value?.item_id,
     },
   );
 
   const displayName = useMemo(() => {
-    if (!value) return placeholder;
+    if (!value) return placeholder || t("raids.itemPicker.placeholder");
 
     // If we fetched item details and it has a proper display name, use it
-    if (itemDetails?.item?.localizedNames?.["EN-US"]) {
-      return itemDetails.item.localizedNames["EN-US"];
+    if (itemDetails?.item) {
+      return getLocalizedName(itemDetails.item);
     }
 
-    return value.localizedNames["EN-US"] || value.item_id;
-  }, [value, placeholder, itemDetails]);
+    return getLocalizedName(value);
+  }, [value, placeholder, itemDetails, t]);
 
   const slotIcon = useMemo(() => {
     if (!slotType) return null;
@@ -189,10 +189,10 @@ export function ItemPicker({
         <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
           <ItemSearchContent
             onSelect={handleSelect}
-            selectedItem={value}
+            selectedItem={value as Item | null}
             slotType={slotType}
-            searchPlaceholder={searchPlaceholder}
-            emptyMessage={emptyMessage}
+            searchPlaceholder={searchPlaceholder || t("raids.itemPicker.searchPlaceholder")}
+            emptyMessage={emptyMessage || t("raids.itemPicker.emptyMessage")}
             maxResults={maxResults}
           />
         </PopoverContent>
@@ -208,12 +208,14 @@ export function ItemPickerDialog({
   value,
   onValueChange,
   slotType,
-  searchPlaceholder = "Search items...",
-  emptyMessage = "No items found.",
+  searchPlaceholder,
+  emptyMessage,
   maxResults = 20,
-  title = "Select Item",
-  description = "Search and select an item from the Albion Online database.",
+  title,
+  description,
 }: ItemPickerDialogProps) {
+  const { t } = useTranslation();
+
   const handleSelect = useCallback(
     (item: Item | null) => {
       onValueChange?.(item);
@@ -228,17 +230,17 @@ export function ItemPickerDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FontAwesomeIcon icon={faSearch} className="h-5 w-5" />
-            {title}
+            {title || t("raids.itemPicker.title")}
           </DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription>{description || t("raids.itemPicker.description")}</DialogDescription>
         </DialogHeader>
 
         <ItemSearchContent
           onSelect={handleSelect}
-          selectedItem={value}
+          selectedItem={value as Item | null}
           slotType={slotType}
-          searchPlaceholder={searchPlaceholder}
-          emptyMessage={emptyMessage}
+          searchPlaceholder={searchPlaceholder || t("raids.itemPicker.searchPlaceholder")}
+          emptyMessage={emptyMessage || t("raids.itemPicker.emptyMessage")}
           maxResults={maxResults}
         />
       </DialogContent>
@@ -251,13 +253,14 @@ export function ItemPickerTrigger({
   value,
   onValueChange,
   slotType,
-  searchPlaceholder = "Search items...",
-  emptyMessage = "No items found.",
+  searchPlaceholder,
+  emptyMessage,
   maxResults = 20,
   onOpenChange,
   triggerClassName,
   children,
 }: ItemPickerTriggerProps & { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenChange = useCallback(
@@ -288,8 +291,8 @@ export function ItemPickerTrigger({
         value={value}
         onValueChange={handleSelect}
         slotType={slotType}
-        searchPlaceholder={searchPlaceholder}
-        emptyMessage={emptyMessage}
+        searchPlaceholder={searchPlaceholder || t("raids.itemPicker.searchPlaceholder")}
+        emptyMessage={emptyMessage || t("raids.itemPicker.emptyMessage")}
         maxResults={maxResults}
       />
     </>
@@ -314,6 +317,7 @@ function ItemSearchContent({
   emptyMessage,
   maxResults,
 }: ItemSearchContentProps) {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
@@ -345,6 +349,8 @@ function ItemSearchContent({
     return data?.items || [];
   }, [data]);
 
+  const weaponSearchTips = t("raids.itemPicker.weaponSearchTips", { returnObjects: true }) as string[];
+
   return (
     <Command className="rounded-lg border shadow-md" shouldFilter={false}>
       <CommandInput placeholder={searchPlaceholder} value={searchTerm} onValueChange={setSearchTerm} className="h-9" />
@@ -352,12 +358,12 @@ function ItemSearchContent({
         {(isLoading || (searchTerm.length >= 2 && debouncedSearchTerm !== searchTerm)) && (
           <div className="text-muted-foreground py-6 text-center text-sm">
             <FontAwesomeIcon icon={faSpinner} className="mr-2 h-4 w-4 animate-spin" />
-            {isLoading ? "Searching items..." : "Searching..."}
+            {isLoading ? t("raids.itemPicker.searching") : t("raids.itemPicker.searchingShort")}
           </div>
         )}
 
         {!!error && (
-          <div className="text-destructive py-6 text-center text-sm">Failed to search items. Please try again.</div>
+          <div className="text-destructive py-6 text-center text-sm">{t("raids.itemPicker.searchError")}</div>
         )}
 
         {!isLoading && !error && items.length === 0 && debouncedSearchTerm.length >= 2 && (
@@ -367,10 +373,10 @@ function ItemSearchContent({
         {!isLoading && !error && searchTerm.length === 0 && items.length === 0 && (
           <CommandTips
             tips={[
-              "Search and select a weapon from the Albion Online database.",
-              'Specify the tier using the game pattern (e.g.: "T8", "8.", "8.1").',
+              t("raids.itemPicker.searchTips"),
+              t("raids.itemPicker.tierPattern"),
               "\n",
-              <b key="examples">Examples:</b>,
+              <b key="examples">{t("raids.itemPicker.examples")}</b>,
               ...weaponSearchTips,
             ]}
           />
@@ -387,9 +393,7 @@ function ItemSearchContent({
               >
                 <AlbionItemIcon item={item.item_id} size="md" />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-medium leading-tight">
-                    {item.localizedNames["EN-US"] || item.item_id}
-                  </div>
+                  <div className="truncate font-medium leading-tight">{getLocalizedName(item)}</div>
                   <div className="text-muted-foreground truncate text-xs">{item.item_id}</div>
                 </div>
                 {selectedItem?.item_id === item.item_id && (

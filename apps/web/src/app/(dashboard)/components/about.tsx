@@ -3,6 +3,7 @@ import type { VariantProps } from "class-variance-authority";
 import { faDiscord, faGithub } from "@fortawesome/free-brands-svg-icons";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -14,6 +15,8 @@ interface Props extends VariantProps<typeof buttonVariants> {
 }
 
 export function AboutButton({ variant, className }: Props) {
+  const { t } = useTranslation();
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -34,7 +37,7 @@ export function AboutButton({ variant, className }: Props) {
 
           <SheetHeader>
             <SheetTitle className="font-title text-3xl font-normal">Albion Raid Manager</SheetTitle>
-            <SheetDescription>About us</SheetDescription>
+            <SheetDescription>{t("common.about")}</SheetDescription>
           </SheetHeader>
 
           <div className="flex grow flex-col items-stretch justify-end gap-4 p-4">

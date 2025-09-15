@@ -2,6 +2,8 @@ import type { Raid } from "@albion-raid-manager/types";
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
+import { useTranslation } from "react-i18next";
+
 import { createCalendarHotkeys, useHotkeys } from "@/hooks/use-hotkeys";
 
 export enum CalendarView {
@@ -54,6 +56,8 @@ interface CalendarProviderProps {
 }
 
 export function CalendarProvider({ children, raids, onRefresh, isRefreshing = false }: CalendarProviderProps) {
+  const { t } = useTranslation();
+
   // State
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<CalendarView>(() => {
@@ -117,6 +121,7 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
     handleDateChange,
     currentDate,
     view,
+    t,
     undefined, // onCreateRaid - can be added later
     onRefresh,
   );

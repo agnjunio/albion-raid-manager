@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -7,6 +8,7 @@ import { AUTH_FLAG_KEY } from "@/lib/auth";
 import { useDiscordCallbackMutation } from "@/store/auth";
 
 export function AuthCallback() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const processedRef = useRef(false);
@@ -21,8 +23,8 @@ export function AuthCallback() {
       const redirectUri = window.location.origin + "/auth/callback";
 
       if (!code) {
-        toast.error("Authentication failed", {
-          description: "No authorization code received from Discord. Please try again.",
+        toast.error(t("toasts.auth.failed"), {
+          description: t("toasts.auth.failedDescription"),
           duration: 5000,
         });
         window.location.href = "/";
@@ -40,8 +42,8 @@ export function AuthCallback() {
         localStorage.removeItem(AUTH_FLAG_KEY);
 
         // Show user-friendly error message
-        toast.error("Authentication failed", {
-          description: "Unable to complete Discord authentication. Please try again.",
+        toast.error(t("toasts.auth.failed"), {
+          description: t("toasts.auth.failedCallbackDescription"),
           duration: 5000,
         });
 

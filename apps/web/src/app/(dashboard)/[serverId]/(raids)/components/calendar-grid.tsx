@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef } from "react";
 
 import { faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { CalendarView, useCalendar } from "@/app/(dashboard)/[serverId]/(raids)/contexts/calendar-context";
+import { getShortWeekdayName } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
 import { RaidEventCard } from "./raid-event-card";
@@ -14,6 +16,7 @@ interface CalendarGridProps {
 
 export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
   const { raids, isRaidFiltered, currentDate, view, setCurrentDate, setView } = useCalendar();
+  const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const hasScrolledToCurrentTimeRef = useRef(false);
 
@@ -172,13 +175,13 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
       <div className="primary-scrollbar h-full overflow-y-auto">
         <div className="bg-border grid min-h-full grid-cols-7 gap-px">
           {/* Month view header */}
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Sun</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Mon</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Tue</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Wed</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Thu</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Fri</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">Sat</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.sun")}</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.mon")}</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.tue")}</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.wed")}</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.thu")}</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.fri")}</div>
+          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.sat")}</div>
 
           {days.map((day, index) => {
             const dayRaids = getRaidsForDay(day);
@@ -202,7 +205,7 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                   <span className={cn("text-sm", isToday && "font-semibold")}>{day.getDate()}</span>
                   {dayRaids.length > 0 && (
                     <span className="text-muted-foreground text-xs">
-                      {dayRaids.length} raid{dayRaids.length !== 1 ? "s" : ""}
+                      {t("calendar.grid.raidCount", { count: dayRaids.length })}
                     </span>
                   )}
                 </div>
@@ -216,7 +219,9 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                     />
                   ))}
                   {dayRaids.length > 3 && (
-                    <div className="text-muted-foreground text-xs">+{dayRaids.length - 3} more</div>
+                    <div className="text-muted-foreground text-xs">
+                      {t("calendar.grid.moreRaids", { count: dayRaids.length - 3 })}
+                    </div>
                   )}
                 </div>
               </div>
@@ -255,7 +260,7 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                   isToday && "bg-primary/35 border-primary/20",
                 )}
               >
-                <div className="text-sm font-semibold">{day.toLocaleDateString("en-US", { weekday: "short" })}</div>
+                <div className="text-sm font-semibold capitalize">{getShortWeekdayName(day)}</div>
                 <div className={cn("mt-1 text-xs", isToday ? "text-primary" : "text-muted-foreground")}>
                   {day.getDate()}
                 </div>
@@ -336,7 +341,7 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
                       ))}
                       {timeSlotRaids.length === 0 && onTimeSlotClick && (
                         <div className="text-muted-foreground/50 text-xs opacity-0 transition-opacity group-hover:opacity-100">
-                          Click to create raid
+                          {t("calendar.grid.clickToCreateRaid")}
                         </div>
                       )}
                     </div>

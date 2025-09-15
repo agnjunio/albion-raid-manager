@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 
 import { faFileImport } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { useRaidContext } from "../contexts/raid-context";
@@ -12,6 +13,7 @@ interface RaidImportDragDropProps {
 }
 
 export function RaidImportDragDrop({ disabled = false }: RaidImportDragDropProps) {
+  const { t } = useTranslation();
   const { raid, handleImportRaidConfiguration } = useRaidContext();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -28,31 +30,34 @@ export function RaidImportDragDrop({ disabled = false }: RaidImportDragDropProps
 
       const validation = validateRaidConfiguration(data);
       if (!validation.isValid) {
-        toast.error("Invalid configuration file", {
-          description: validation.error || "The file format is not valid.",
+        toast.error(t("import.invalidConfiguration"), {
+          description: validation.error || t("import.invalidConfigurationDescription"),
         });
         return;
       }
 
       const configuration = validation.configuration;
       if (!configuration) {
-        toast.error("Invalid configuration file", {
-          description: "The configuration could not be parsed.",
+        toast.error(t("import.invalidConfiguration"), {
+          description: t("import.configurationParseError"),
         });
         return;
       }
 
       if (!canImportToRaid(raid?.contentType || undefined, configuration.contentType)) {
-        toast.error("Content type mismatch", {
-          description: `This configuration is for ${configuration.contentType} raids, but this raid is ${raid?.contentType || "unspecified"}.`,
+        toast.error(t("import.contentTypeMismatch"), {
+          description: t("import.contentTypeMismatchDescription", {
+            configType: configuration.contentType,
+            raidType: raid?.contentType || "unspecified",
+          }),
         });
         return;
       }
 
       await handleImportRaidConfiguration(configuration);
     } catch (error) {
-      toast.error("Failed to import raid configuration", {
-        description: error instanceof Error ? error.message : "An unknown error occurred.",
+      toast.error(t("import.importError"), {
+        description: error instanceof Error ? error.message : t("import.importErrorDescription"),
       });
     } finally {
       setIsImporting(false);
@@ -81,8 +86,8 @@ export function RaidImportDragDrop({ disabled = false }: RaidImportDragDropProps
     if (jsonFile) {
       handleImport(jsonFile);
     } else {
-      toast.error("Invalid file type", {
-        description: "Please drop a JSON configuration file.",
+      toast.error(t("import.invalidFileType"), {
+        description: t("import.invalidFileTypeDescription"),
       });
     }
   };
@@ -113,10 +118,10 @@ export function RaidImportDragDrop({ disabled = false }: RaidImportDragDropProps
           </div>
           <div>
             <p className="text-muted-foreground text-lg font-medium">
-              {isImporting ? "Importing configuration..." : "Import unavailable"}
+              {isImporting ? t("import.importing") : t("import.importUnavailable")}
             </p>
             <p className="text-muted-foreground text-sm">
-              {isImporting ? "Please wait while we apply the configuration" : "Import is disabled for this raid status"}
+              {isImporting ? t("import.importingDescription") : t("import.importDisabled")}
             </p>
           </div>
         </div>
@@ -152,9 +157,9 @@ export function RaidImportDragDrop({ disabled = false }: RaidImportDragDropProps
 
         <div className="space-y-2">
           <p className={`text-lg font-medium transition-colors ${isDragOver ? "text-primary" : "text-foreground"}`}>
-            {isDragOver ? "Drop configuration file here" : "Import Raid Configuration"}
+            {isDragOver ? t("import.dragDropText") : t("import.title")}
           </p>
-          <p className="text-muted-foreground text-sm">Drag & drop a JSON file or click to browse</p>
+          <p className="text-muted-foreground text-sm">{t("import.dragDropSubtext")}</p>
         </div>
       </div>
     </div>

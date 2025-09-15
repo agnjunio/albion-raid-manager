@@ -1,5 +1,7 @@
 import type { RaidRole } from "@albion-raid-manager/types";
 
+import { useTranslation } from "react-i18next";
+
 // Simple role icons and colors
 export const getRoleIcon = (role: RaidRole | "UNASSIGNED") => {
   const icons = {
@@ -33,14 +35,18 @@ export const getRoleColor = (role: RaidRole | "UNASSIGNED") => {
   return colors[role] || colors.UNASSIGNED;
 };
 
-export const ROLE_OPTIONS: { value: RaidRole; label: string }[] = [
-  { value: "TANK", label: "Tank" },
-  { value: "HEALER", label: "Healer" },
-  { value: "SUPPORT", label: "Support" },
-  { value: "RANGED_DPS", label: "Ranged DPS" },
-  { value: "MELEE_DPS", label: "Melee DPS" },
-  { value: "BATTLEMOUNT", label: "Battlemount" },
-];
+export const useRoleOptions = (): { value: RaidRole; label: string }[] => {
+  const { t } = useTranslation();
+
+  return [
+    { value: "TANK", label: t("raidSlot.roles.TANK") },
+    { value: "HEALER", label: t("raidSlot.roles.HEALER") },
+    { value: "SUPPORT", label: t("raidSlot.roles.SUPPORT") },
+    { value: "RANGED_DPS", label: t("raidSlot.roles.RANGED_DPS") },
+    { value: "MELEE_DPS", label: t("raidSlot.roles.MELEE_DPS") },
+    { value: "BATTLEMOUNT", label: t("raidSlot.roles.BATTLEMOUNT") },
+  ];
+};
 
 export interface EditingSlot {
   id: string;

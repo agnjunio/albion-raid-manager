@@ -3,6 +3,7 @@ import type { GetItem, SearchItems } from "@albion-raid-manager/types/api";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 import { apiRTKRequest } from "@/lib/api";
+import { getCurrentLanguage } from "@/lib/locale";
 
 export const itemsApi = createApi({
   reducerPath: "items",
@@ -13,7 +14,10 @@ export const itemsApi = createApi({
       searchItems: builder.query<SearchItems.Response, { query: SearchItems.Query }>({
         query: ({ query }) => ({
           url: "/items/search",
-          params: query,
+          params: {
+            ...query,
+            language: getCurrentLanguage(),
+          },
         }),
         providesTags: (_result, _error, { query }) => [{ type: "Item", id: `search:${query.q}` }],
         keepUnusedDataFor: 315360000, // 1 year

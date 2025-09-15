@@ -1,6 +1,7 @@
 import { getServerPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faCrown, faShield, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,12 +14,13 @@ import { useGetServersQuery } from "@/store/servers";
 
 export function ServerList() {
   const { data, isLoading, isError } = useGetServersQuery();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
       <Card className="w-full max-w-6xl space-y-6">
         <CardContent>
-          <Loading label="Loading servers..." />
+          <Loading label={t("servers.loading")} />
         </CardContent>
       </Card>
     );
@@ -27,7 +29,7 @@ export function ServerList() {
   if (isError || !data) {
     return (
       <div>
-        <PageError error="Failed to load servers. Please try again later." variant="error" />
+        <PageError error={t("servers.loadError")} variant="error" />
       </div>
     );
   }
@@ -49,10 +51,8 @@ export function ServerList() {
           <div className="bg-muted/50 mx-auto mb-4 flex size-12 items-center justify-center rounded-full">
             <FontAwesomeIcon icon={faUsers} className="text-muted-foreground" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold">No servers found</h3>
-          <p className="text-muted-foreground mb-4 text-sm">
-            You don&apos;t have any servers configured yet. Make sure you are a server administrator and try again.
-          </p>
+          <h3 className="mb-2 text-lg font-semibold">{t("servers.noServers")}</h3>
+          <p className="text-muted-foreground mb-4 text-sm">{t("servers.noServersDescription")}</p>
         </div>
       )}
     </div>
@@ -71,6 +71,7 @@ interface ServerCardProps {
 }
 
 function ServerCard({ server }: ServerCardProps) {
+  const { t } = useTranslation();
   const isBotActive = server.bot === true;
   const canSetup = server.admin === true && !isBotActive;
 
@@ -115,13 +116,13 @@ function ServerCard({ server }: ServerCardProps) {
               {server.owner && (
                 <Badge variant="outline" className="text-xs">
                   <FontAwesomeIcon icon={faCrown} className="text-primary mr-1" />
-                  Owner
+                  {t("servers.owner")}
                 </Badge>
               )}
               {server.admin && !server.owner && (
                 <Badge variant="outline" className="text-xs">
                   <FontAwesomeIcon icon={faShield} className="text-secondary mr-1" />
-                  Admin
+                  {t("servers.admin")}
                 </Badge>
               )}
             </div>
@@ -137,12 +138,12 @@ function ServerCard({ server }: ServerCardProps) {
               }`}
             />
             <span className="text-muted-foreground text-sm font-medium">
-              {isBotActive ? "Bot Active" : canSetup ? "Setup Available" : "No Access"}
+              {isBotActive ? t("servers.botActive") : canSetup ? t("servers.setupAvailable") : t("servers.noAccess")}
             </span>
           </div>
           <div className="text-right">
             <div className="text-muted-foreground/70 text-xs">
-              {isBotActive ? "Click to access" : canSetup ? "Click to setup" : "Read only"}
+              {isBotActive ? t("servers.clickToAccess") : canSetup ? t("servers.clickToSetup") : t("servers.readOnly")}
             </div>
           </div>
         </div>

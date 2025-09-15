@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { APIChannel, APIChannelType } from "@albion-raid-manager/types/api";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
@@ -13,6 +14,7 @@ interface Props extends React.ComponentProps<"input"> {
 }
 
 export const ChannelInput = ({ channels, value, onChannelChange, ...props }: Props) => {
+  const { t } = useTranslation();
   const [matchedChannels, setMatchedChannels] = useState<APIChannel[]>(
     channels.filter((channel) => channel.type === APIChannelType.TEXT),
   );
@@ -99,7 +101,7 @@ export const ChannelInput = ({ channels, value, onChannelChange, ...props }: Pro
             hidden: !autoComplete,
           })}
         >
-          <CommandEmpty>No results found</CommandEmpty>
+          <CommandEmpty>{t("channel.noResultsFound")}</CommandEmpty>
           <CommandGroup>
             {matchedChannels.map((channel) => {
               const category = channels.find((c) => c.id === channel.parentId);

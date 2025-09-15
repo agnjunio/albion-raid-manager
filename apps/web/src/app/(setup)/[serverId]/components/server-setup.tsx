@@ -1,11 +1,13 @@
 import { useCallback, useState } from "react";
 
 import { APIErrorType, APIServer, SetupServer } from "@albion-raid-manager/types/api";
+import { useTranslation } from "react-i18next";
 
 import Alert from "@/components/ui/alert";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Stepper } from "@/components/ui/stepper";
 import { isAPIError } from "@/lib/api";
+import { translateError } from "@/lib/error-translations";
 import { useAddServerMutation } from "@/store/servers";
 
 import { Complete, DiscordInvite, ServerInfo, ServerVerification } from "./steps";
@@ -17,17 +19,23 @@ enum CreateStep {
   COMPLETE,
 }
 
-const STEP_LABELS = ["Server Info", "Discord Invite", "Verification", "Complete"];
-
 interface ServerSetupProps {
   server: APIServer;
 }
 
 export function ServerSetup({ server }: ServerSetupProps) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(CreateStep.SERVER_INFO);
   const [error, setError] = useState<string | null>(null);
   const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<SetupServer.Response>();
   const [addServer] = useAddServerMutation();
+
+  const STEP_LABELS = [
+    t("setup.steps.serverInfo"),
+    t("setup.steps.discordInvite"),
+    t("setup.steps.verification"),
+    t("setup.steps.complete"),
+  ];
 
   const handleStartVerification = useCallback(async () => {
     setStep(CreateStep.VERIFICATION);
@@ -39,9 +47,10 @@ export function ServerSetup({ server }: ServerSetupProps) {
 
     const addServerResponse = await addServer({ body });
     if (addServerResponse.error) {
-      setError(
-        isAPIError(addServerResponse.error) ? addServerResponse.error.data : APIErrorType.SERVER_VERIFICATION_FAILED,
-      );
+      const errorType = isAPIError(addServerResponse.error)
+        ? addServerResponse.error.data
+        : APIErrorType.SERVER_VERIFICATION_FAILED;
+      setError(translateError(errorType));
       setStep(CreateStep.DISCORD_INVITE);
       return;
     }
@@ -72,7 +81,7 @@ export function ServerSetup({ server }: ServerSetupProps) {
     <Card className="w-full min-w-[30vw]">
       <CardHeader className="space-y-4">
         {error && <Alert className="p-3">{error}</Alert>}
-        <CardTitle>Server setup</CardTitle>
+        <CardTitle>{t("setup.title")}</CardTitle>
         <Stepper
           currentStep={step + 1}
           totalSteps={Object.keys(CreateStep).length / 2}

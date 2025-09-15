@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react";
 import { SetupServer } from "@albion-raid-manager/types/api";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 
 import { CardContent } from "@/components/ui/card";
@@ -12,6 +13,7 @@ interface CompleteProps {
 }
 
 export function Complete({ addServerResponse }: CompleteProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const link = useMemo(() => `/dashboard/${addServerResponse?.server.id}`, [addServerResponse?.server.id]);
@@ -26,11 +28,11 @@ export function Complete({ addServerResponse }: CompleteProps) {
     <CardContent className="flex flex-col items-center gap-3">
       <FontAwesomeIcon icon={faCheck} size="2xl" className="animate-pulse" />
       <p className="text-muted-foreground text-center text-sm">
-        Verification complete. You will be redirected to the dashboard page. Please{" "}
+        {t("setup.complete.message")}{" "}
         <Link to={link} className="text-primary font-bold">
-          click here
+          {t("setup.complete.clickHere")}
         </Link>{" "}
-        if that doesn&apos;t happen.
+        {t("setup.complete.redirectFallback")}
       </p>
     </CardContent>
   );

@@ -4,6 +4,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { faComment, faGripVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { AlbionItemIcon } from "@/components/albion/item-icon";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ import { RaidSlotActions } from "./raid-slot-actions";
 import { ServerMemberInfo } from "./server-member-info";
 
 export function ListRaidSlotCard({ slot }: { slot: RaidSlot }) {
+  const { t } = useTranslation();
   const { canEditRaidSlot } = useRaidSlotContext();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({ id: slot.id });
 
@@ -64,7 +66,7 @@ export function ListRaidSlotCard({ slot }: { slot: RaidSlot }) {
                 <h4 className="truncate text-base font-medium">{slot.name}</h4>
                 {slot.role && (
                   <Badge variant="outline" className={`px-1.5 py-0.5 text-xs ${getRoleColor(slot.role)}`}>
-                    {slot.role.replace("_", " ")}
+                    {t(`raidSlot.roles.${slot.role}`)}
                   </Badge>
                 )}
 
@@ -97,6 +99,7 @@ export function ListRaidSlotCard({ slot }: { slot: RaidSlot }) {
 }
 
 export function GridRaidSlotCard({ slot }: { slot: RaidSlot }) {
+  const { t } = useTranslation();
   const { canEditRaidSlot } = useRaidSlotContext();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({ id: slot.id });
 
@@ -130,11 +133,11 @@ export function GridRaidSlotCard({ slot }: { slot: RaidSlot }) {
 
             {slot.role ? (
               <Badge variant="outline" className={`text-xs ${getRoleColor(slot.role)}`}>
-                {slot.role.replace("_", " ")}
+                {t(`raidSlot.roles.${slot.role}`)}
               </Badge>
             ) : (
               <Badge variant="outline" className={`text-xs ${getRoleColor("UNASSIGNED")}`}>
-                UNASSIGNED
+                {t("raidSlot.unassigned")}
               </Badge>
             )}
           </div>

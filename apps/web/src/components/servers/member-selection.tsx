@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faCheck, faSearch, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -24,9 +25,10 @@ export function MemberSelection({
   members,
   selectedUserId,
   onSelect,
-  placeholder = "Select a member...",
+  placeholder,
   disabled = false,
 }: MemberSelectionProps) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -71,7 +73,7 @@ export function MemberSelection({
             ) : (
               <>
                 <FontAwesomeIcon icon={faUser} className="text-muted-foreground h-4 w-4" />
-                <span className="text-muted-foreground">{placeholder}</span>
+                <span className="text-muted-foreground">{placeholder || t("raids.memberSelection.placeholder")}</span>
               </>
             )}
           </div>
@@ -102,13 +104,17 @@ export function MemberSelection({
       </PopoverTrigger>
       <PopoverContent className="p-0" align="start">
         <Command shouldFilter={false}>
-          <CommandInput placeholder="Search members..." value={searchValue} onValueChange={setSearchValue} />
+          <CommandInput
+            placeholder={t("raids.memberSelection.searchPlaceholder")}
+            value={searchValue}
+            onValueChange={setSearchValue}
+          />
           <CommandList>
-            <CommandEmpty>No members found.</CommandEmpty>
+            <CommandEmpty>{t("raids.memberSelection.noMembersFound")}</CommandEmpty>
             <CommandGroup>
               <CommandItem value="unassigned" onSelect={() => handleSelect(null)} className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faUser} className="text-muted-foreground h-4 w-4" />
-                <span className="text-muted-foreground">Unassigned</span>
+                <span className="text-muted-foreground">{t("raids.memberSelection.unassigned")}</span>
                 {!selectedUserId && <FontAwesomeIcon icon={faCheck} className="ml-auto h-4 w-4" />}
               </CommandItem>
               {filteredMembers.map((member) => (
@@ -131,6 +137,8 @@ export function MemberSelection({
 }
 
 function MemberInfo({ member }: { member: APIServerMember }) {
+  const { t } = useTranslation();
+
   return (
     <>
       <div className="flex items-center gap-2">
@@ -144,7 +152,7 @@ function MemberInfo({ member }: { member: APIServerMember }) {
       <span className="truncate">{member.nickname || member.username}</span>
       {member.registered && (
         <Badge variant="secondary" className="text-xs">
-          Registered
+          {t("raids.memberSelection.registered")}
         </Badge>
       )}
     </>

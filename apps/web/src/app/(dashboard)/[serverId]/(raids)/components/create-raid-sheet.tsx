@@ -3,7 +3,7 @@ import type { z } from "zod";
 import React, { useState } from "react";
 
 import { APIErrorType, CreateRaid } from "@albion-raid-manager/types/api";
-import { CONTENT_TYPE_INFO, getContentTypeInfo } from "@albion-raid-manager/types/entities";
+import { getContentTypeInfo } from "@albion-raid-manager/types/entities";
 import {
   faCalendar,
   faClock,
@@ -16,6 +16,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -26,12 +27,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { useAllContentTypeTranslations } from "@/hooks/use-content-type-translations";
 import { isAPIError } from "@/lib/api";
+import { translateError } from "@/lib/error-translations";
 import { useCreateRaidMutation } from "@/store/raids";
 
 import { raidFormSchema } from "../schemas";
-
-const DEFAULT_CONTENT_TYPE = CONTENT_TYPE_INFO.filter((contentTypeInfo) => contentTypeInfo.isActive)[0];
 
 interface CreateRaidSheetProps {
   children: React.ReactNode;
@@ -40,16 +41,18 @@ interface CreateRaidSheetProps {
 
 export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetProps) {
   const { serverId } = useParams();
+  const { t } = useTranslation();
   const [createRaid] = useCreateRaidMutation();
   const [isOpen, setIsOpen] = useState(false);
+  const translatedContentTypes = useAllContentTypeTranslations(true); // Only active content types
 
   const form = useForm<z.infer<typeof raidFormSchema>>({
     resolver: zodResolver(raidFormSchema),
     defaultValues: {
       title: "",
-      contentType: DEFAULT_CONTENT_TYPE.type,
+      contentType: translatedContentTypes[0]?.type || "",
       description: "",
-      location: DEFAULT_CONTENT_TYPE.defaultLocation,
+      location: translatedContentTypes[0]?.defaultLocation || "",
       date:
         selectedDateTime ||
         (() => {
@@ -83,20 +86,20 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
     });
 
     if (createRaidResponse.error) {
-      const errorCode = isAPIError(createRaidResponse.error)
+      const errorType = isAPIError(createRaidResponse.error)
         ? createRaidResponse.error.data
         : APIErrorType.INTERNAL_SERVER_ERROR;
 
-      toast.error("Failed to create raid", {
-        description: errorCode,
+      toast.error(t("raids.create.error"), {
+        description: translateError(errorType),
       });
       return;
     }
 
     setIsOpen(false);
     form.reset();
-    toast.success("Raid created successfully", {
-      description: "Your raid has been scheduled and is now visible to participants.",
+    toast.success(t("raids.create.success"), {
+      description: t("raids.create.successDescription"),
     });
   };
 
@@ -112,9 +115,9 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                 <FontAwesomeIcon icon={faPlus} className="text-primary h-6 w-6" />
               </div>
               <div>
-                <SheetTitle className="text-foreground text-2xl font-bold">Create New Raid</SheetTitle>
+                <SheetTitle className="text-foreground text-2xl font-bold">{t("raids.create.title")}</SheetTitle>
                 <SheetDescription className="text-muted-foreground text-base">
-                  Schedule and organize your guild&apos;s next adventure
+                  {t("raids.create.description")}
                 </SheetDescription>
               </div>
             </div>
@@ -137,17 +140,17 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                               <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faShieldAlt} className="text-primary h-4 w-4" />
                               </div>
-                              Raid Title
+                              {t("raids.create.raidTitle")}
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Enter a compelling title for your raid..."
+                                placeholder={t("raids.create.raidTitlePlaceholder")}
                                 className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
                                 {...field}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Choose a clear, descriptive title that will attract participants
+                              {t("raids.create.raidTitleDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -170,7 +173,7 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                               <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faGamepad} className="text-primary h-4 w-4" />
                               </div>
-                              Content Type
+                              {t("raids.create.contentType")}
                             </FormLabel>
                             <Select
                               onValueChange={(value) => {
@@ -182,21 +185,19 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                             >
                               <FormControl>
                                 <SelectTrigger className="text-foreground focus:border-primary/50 h-12 w-full border-2 text-base transition-colors">
-                                  <SelectValue placeholder="Select content type" />
+                                  <SelectValue placeholder={t("raids.create.contentTypePlaceholder")} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {CONTENT_TYPE_INFO.filter((contentTypeInfo) => contentTypeInfo.isActive).map(
-                                  (contentTypeInfo) => (
-                                    <SelectItem key={contentTypeInfo.type} value={contentTypeInfo.type}>
-                                      {contentTypeInfo.displayName}
-                                    </SelectItem>
-                                  ),
-                                )}
+                                {translatedContentTypes.map((contentTypeInfo) => (
+                                  <SelectItem key={contentTypeInfo.type} value={contentTypeInfo.type}>
+                                    {contentTypeInfo.displayName}
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Choose the type of content this raid will focus on
+                              {t("raids.create.contentTypeDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -213,7 +214,7 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                               <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faCalendar} className="text-primary h-4 w-4" />
                               </div>
-                              Start Date & Time
+                              {t("raids.create.startDateTime")}
                             </FormLabel>
                             <FormControl>
                               <DateTimePicker
@@ -226,8 +227,8 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              <FontAwesomeIcon icon={faClock} className="mr-1 h-3 w-3" />
-                              Select the start time for your raid
+                              <FontAwesomeIcon icon={faClock} className="mr-1.5 size-3" />
+                              {t("raids.create.startDateTimeDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -249,17 +250,17 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faLocationDot} className="text-muted-foreground h-4 w-4" />
                               </div>
-                              Location (Optional)
+                              {t("raids.create.location")}
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="e.g., Black Zone, Royal City..."
+                                placeholder={t("raids.create.locationPlaceholder")}
                                 className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
                                 {...field}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Where will the raid take place? This is optional and can be added later.
+                              {t("raids.create.locationDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -281,17 +282,17 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faFileText} className="text-muted-foreground h-4 w-4" />
                               </div>
-                              Description
+                              {t("raids.create.raidDescription")}
                             </FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Provide detailed information about the raid objectives, requirements, and what participants can expect..."
+                                placeholder={t("raids.create.raidDescriptionPlaceholder")}
                                 className="focus:border-primary/50 min-h-[120px] resize-none border-2 text-base leading-relaxed transition-colors"
                                 {...field}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Include objectives, requirements, loot rules, and any special instructions
+                              {t("raids.create.raidDescriptionDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -310,7 +311,7 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                         className="hover:bg-muted flex-1 transition-all duration-200"
                         onClick={() => setIsOpen(false)}
                       >
-                        Cancel
+                        {t("raids.create.cancel")}
                       </Button>
                       <Button
                         type="submit"
@@ -318,7 +319,7 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
                         className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 transition-all duration-200"
                       >
                         <FontAwesomeIcon icon={faPlus} className="mr-2 h-4 w-4" />
-                        Create Raid
+                        {t("raids.create.createRaid")}
                       </Button>
                     </div>
                   </div>

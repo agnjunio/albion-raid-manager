@@ -72,6 +72,7 @@ export namespace RaidService {
               role: null,
               weapon: null,
               userId: null,
+              order: i,
             })),
           });
 
@@ -536,7 +537,6 @@ export namespace RaidService {
         }
       }
 
-      // Update the slot
       const updatedSlot = await tx.raidSlot.update({
         where: { id: slotId },
         data: input,

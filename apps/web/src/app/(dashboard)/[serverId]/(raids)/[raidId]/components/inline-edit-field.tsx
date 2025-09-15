@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { faCheck, faEdit, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ export function InlineEditField({
   displayClassName = "",
   emptyText = "",
 }: InlineEditFieldProps) {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
 
@@ -101,15 +103,15 @@ export function InlineEditField({
           disabled={isLoading}
         />
         <div className="flex justify-between gap-2">
-          {multiline && <p className="text-muted-foreground text-xs">Press Ctrl+Enter to save, Escape to cancel</p>}
+          {multiline && <p className="text-muted-foreground text-xs">{t("inlineEdit.saveHint")}</p>}
           <div className="flex justify-end gap-2">
             <Button size="sm" onClick={handleSave} disabled={isLoading} className="h-8">
               <FontAwesomeIcon icon={faCheck} className="mr-1 h-3 w-3" />
-              {multiline && "Save"}
+              {multiline && t("inlineEdit.save")}
             </Button>
             <Button size="sm" variant="outline" onClick={handleCancel} disabled={isLoading} className="h-8">
               <FontAwesomeIcon icon={faTimes} className="mr-1 h-3 w-3" />
-              {multiline && "Cancel"}
+              {multiline && t("inlineEdit.cancel")}
             </Button>
           </div>
         </div>
@@ -134,7 +136,7 @@ export function InlineEditField({
           <span
             className={`${displayClassName} text-muted-foreground rounded italic transition-colors ${multiline ? "block" : ""}`}
           >
-            {emptyText || "Click to edit"}
+            {emptyText || t("inlineEdit.clickToEdit")}
           </span>
         )}
         <FontAwesomeIcon

@@ -4,6 +4,8 @@ import type { RaidConfiguration } from "@albion-raid-manager/types/entities";
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 
 import { APIServerMember } from "@albion-raid-manager/types/api";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import {
@@ -51,6 +53,8 @@ interface RaidProviderProps {
 }
 
 export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [updateRaid] = useUpdateRaidMutation();
   const [deleteRaid] = useDeleteRaidMutation();
   const [createRaidSlot] = useCreateRaidSlotMutation();
@@ -107,12 +111,14 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
         body: { status },
       }).unwrap();
 
-      toast.success("Raid status updated successfully", {
-        description: `Raid status changed to ${status}`,
+      toast.success(t("toasts.raid.statusUpdated"), {
+        description: t("toasts.raid.statusUpdatedDescription", {
+          status: t(`raids.raidStatus.${status.toLowerCase()}`).toUpperCase(),
+        }),
       });
     } catch {
-      toast.error("Failed to update raid status", {
-        description: "There was an error updating the raid status. Please try again.",
+      toast.error(t("toasts.raid.statusUpdateError"), {
+        description: t("toasts.raid.statusUpdateErrorDescription"),
       });
     }
   };
@@ -127,10 +133,10 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
         body: { note: notes },
       }).unwrap();
 
-      toast.success("Raid notes updated successfully");
+      toast.success(t("toasts.raid.notesUpdated"));
     } catch {
-      toast.error("Failed to update raid notes", {
-        description: "There was an error updating the raid notes. Please try again.",
+      toast.error(t("toasts.raid.notesUpdateError"), {
+        description: t("toasts.raid.notesUpdateErrorDescription"),
       });
     }
   };
@@ -150,12 +156,12 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
         body: updates,
       }).unwrap();
 
-      toast.success("Raid updated successfully", {
-        description: "Your raid details have been updated.",
+      toast.success(t("toasts.raid.updated"), {
+        description: t("toasts.raid.updatedDescription"),
       });
     } catch {
-      toast.error("Failed to update raid", {
-        description: "There was an error updating the raid. Please try again.",
+      toast.error(t("toasts.raid.updateError"), {
+        description: t("toasts.raid.updateErrorDescription"),
       });
     }
   };
@@ -163,7 +169,7 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
   const handleCopyRaidLink = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url);
-    toast.success("Raid link copied to clipboard");
+    toast.success(t("toasts.raid.linkCopied"));
   };
 
   const handleShareRaid = () => {
@@ -183,7 +189,7 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
   const handleDeleteRaid = async () => {
     if (!raid) return;
 
-    if (!window.confirm(`Are you sure you want to delete "${raid.title}"? This action cannot be undone.`)) {
+    if (!window.confirm(t("toasts.confirmations.deleteRaid", { title: raid.title }))) {
       return;
     }
 
@@ -195,15 +201,14 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
         },
       }).unwrap();
 
-      toast.success("Raid deleted successfully", {
-        description: `"${raid?.title}" has been permanently deleted.`,
+      toast.success(t("toasts.raid.deleted"), {
+        description: t("toasts.raid.deletedDescription", { title: raid?.title }),
       });
 
-      // Navigate back to raids list
-      window.location.href = `/dashboard/${serverId}/raids`;
+      navigate(`/dashboard/${serverId}/raids`);
     } catch {
-      toast.error("Failed to delete raid", {
-        description: "There was an error deleting the raid. Please try again.",
+      toast.error(t("toasts.raid.deleteError"), {
+        description: t("toasts.raid.deleteErrorDescription"),
       });
     }
   };
@@ -226,10 +231,10 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
         body: requestBody,
       }).unwrap();
 
-      toast.success("Slot created successfully");
+      toast.success(t("toasts.slot.created"));
     } catch {
-      toast.error("Failed to create slot", {
-        description: "There was an error creating the slot. Please try again.",
+      toast.error(t("toasts.slot.createError"), {
+        description: t("toasts.slot.createErrorDescription"),
       });
     }
   };
@@ -240,10 +245,10 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
         params: { serverId, raidId, slotId },
       }).unwrap();
 
-      toast.success("Slot deleted successfully");
+      toast.success(t("toasts.slot.deleted"));
     } catch {
-      toast.error("Failed to delete slot", {
-        description: "There was an error deleting the slot. Please try again.",
+      toast.error(t("toasts.slot.deleteError"), {
+        description: t("toasts.slot.deleteErrorDescription"),
       });
     }
   };
@@ -263,15 +268,15 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
       }).unwrap();
 
       if (updates.order !== undefined) {
-        toast.success("Slot reordered successfully", {
+        toast.success(t("toasts.slot.reordered"), {
           duration: 1000,
         });
       } else {
-        toast.success("Slot updated successfully");
+        toast.success(t("toasts.slot.updated"));
       }
     } catch {
-      toast.error("Failed to update slot", {
-        description: "There was an error updating the slot. Please try again.",
+      toast.error(t("toasts.slot.updateError"), {
+        description: t("toasts.slot.updateErrorDescription"),
       });
     }
   };
@@ -283,12 +288,14 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
         body: configuration,
       }).unwrap();
 
-      toast.success("Raid configuration imported successfully", {
-        description: `Applied configuration with ${configuration.composition.slots.length} slots.`,
+      toast.success(t("toasts.raid.configurationImported"), {
+        description: t("toasts.raid.configurationImportedDescription", {
+          count: configuration.composition.slots.length,
+        }),
       });
     } catch (error) {
-      toast.error("Failed to import raid configuration", {
-        description: error instanceof Error ? error.message : "An unknown error occurred.",
+      toast.error(t("toasts.raid.configurationImportError"), {
+        description: error instanceof Error ? error.message : t("toasts.raid.configurationImportErrorDescription"),
       });
     }
   };

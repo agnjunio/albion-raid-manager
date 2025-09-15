@@ -1,9 +1,9 @@
 import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
+import { prisma } from "@albion-raid-manager/core/database";
 import { getContentTypeInfo } from "@albion-raid-manager/core/entities";
+import { logger } from "@albion-raid-manager/core/logger";
 import { ServersService } from "@albion-raid-manager/core/services";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { prisma } from "@albion-raid-manager/core/database";
-import { logger } from "@albion-raid-manager/core/logger";
 import { Raid, RaidRole, RaidSlot, RaidStatus, RaidType, Server } from "@albion-raid-manager/types";
 import { Client, Message } from "discord.js";
 
@@ -91,7 +91,8 @@ async function createRaidFromParsedData(
     const slots = [];
     // Only create slots for FIXED raids or if roles are explicitly provided
     if (shouldCreateSlots && parsedData.roles && parsedData.roles.length > 0) {
-      for (const role of parsedData.roles) {
+      for (let i = 0; i < parsedData.roles.length; i++) {
+        const role = parsedData.roles[i];
         // Validate and map the role to a valid RaidRole enum value
         const validRole = mapToValidRaidRole(role.role);
         if (!validRole) {
@@ -107,8 +108,9 @@ async function createRaidFromParsedData(
           name: slotName,
           comment: role.requirements?.join(", "),
           role: validRole,
+          order: i, // Set proper order starting from 0
         });
-        logger.debug("Created slot", { slotName, validRole });
+        logger.debug("Created slot", { slotName, validRole, order: i });
       }
     }
 
@@ -200,9 +202,6 @@ function mapToValidRaidRole(roleValue: string): RaidRole | null {
       }
       if (upperRole.includes("SUPPORT") || upperRole.includes("SUPORTE") || upperRole.includes("CURSED")) {
         return "SUPPORT";
-      }
-      if (upperRole.includes("CALLER") || upperRole.includes("CHAMADOR") || upperRole.includes("LEADER")) {
-        return "CALLER";
       }
       if (upperRole.includes("MOUNT") || upperRole.includes("MONTARIA") || upperRole.includes("CAVALO")) {
         return "BATTLEMOUNT";

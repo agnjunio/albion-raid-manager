@@ -18,6 +18,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { faPlus, faShield } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 
 import { EmptyState } from "@/components/ui/empty-state";
 
@@ -32,6 +33,7 @@ interface RaidCompositionListProps {
 }
 
 export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
+  const { t } = useTranslation();
   const { raid } = useRaidContext();
   const {
     editingSlot,
@@ -85,16 +87,14 @@ export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
     return (
       <EmptyState
         icon={faShield}
-        title="No Raid Slots"
+        title={t("raidSlot.noSlots")}
         description={
-          raid?.type === "FLEX"
-            ? "This flexible raid doesn't have any slots defined yet. Add slots to organize your raid composition."
-            : "This fixed raid doesn't have any slots defined yet."
+          raid?.type === "FLEX" ? t("raidSlot.noSlotsFlexDescription") : t("raidSlot.noSlotsFixedDescription")
         }
         action={
           canEditRaidSlot && canAddRaidSlot
             ? {
-                label: "Add Slot",
+                label: t("raidSlot.addSlot"),
                 onClick: startAddingSlot,
                 icon: faPlus,
               }
@@ -139,7 +139,7 @@ export function RaidCompositionList({ viewMode }: RaidCompositionListProps) {
             <div className="bg-card rounded-lg border px-4 py-2 shadow-lg">
               <div className="flex items-center gap-2">
                 <div className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></div>
-                <span className="text-sm font-medium">Reordering slots...</span>
+                <span className="text-sm font-medium">{t("raidSlot.reorderingSlots")}</span>
               </div>
             </div>
           </div>

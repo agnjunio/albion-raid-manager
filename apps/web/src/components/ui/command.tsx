@@ -62,6 +62,12 @@ function CommandInput({
       return; // Let Command component handle arrow key navigation
     }
 
+    // Allow Home and End keys to work normally for text navigation
+    if (e.key === "Home" || e.key === "End") {
+      e.stopPropagation();
+      return;
+    }
+
     // Allow standard text selection shortcuts to work normally
     if (e.shiftKey || e.ctrlKey || e.metaKey) {
       e.stopPropagation();

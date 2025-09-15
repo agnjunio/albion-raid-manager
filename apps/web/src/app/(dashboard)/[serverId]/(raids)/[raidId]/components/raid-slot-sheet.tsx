@@ -18,6 +18,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
 import { ItemPicker } from "@/components/albion/item-picker";
@@ -29,30 +30,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 
-const stringToItem = (weaponString: string | null): Item | null => {
+const stringToItem = (weaponString: string | null): Pick<Item, "item_id"> | null => {
   if (!weaponString || weaponString.trim() === "") return null;
 
   // For now, return a basic item object with the ID
   // The ItemPicker will fetch the proper display name when it renders
   return {
     item_id: weaponString.trim(),
-    localizedNames: {
-      "EN-US": weaponString.trim(),
-      "DE-DE": weaponString.trim(),
-      "FR-FR": weaponString.trim(),
-      "RU-RU": weaponString.trim(),
-      "PL-PL": weaponString.trim(),
-      "ES-ES": weaponString.trim(),
-      "PT-BR": weaponString.trim(),
-      "IT-IT": weaponString.trim(),
-      "ZH-CN": weaponString.trim(),
-      "KO-KR": weaponString.trim(),
-      "JA-JP": weaponString.trim(),
-      "ZH-TW": weaponString.trim(),
-      "ID-ID": weaponString.trim(),
-      "TR-TR": weaponString.trim(),
-      "AR-SA": weaponString.trim(),
-    },
   };
 };
 
@@ -61,7 +45,7 @@ const itemToString = (item: Item | null): string | null => {
 };
 
 import { useRaidContext } from "../contexts/raid-context";
-import { ROLE_OPTIONS, type EditingSlot } from "../helpers/raid-composition-utils";
+import { useRoleOptions, type EditingSlot } from "../helpers/raid-composition-utils";
 
 type RaidSlotFormData = z.infer<typeof raidSlotSchema>;
 
@@ -80,7 +64,9 @@ interface RaidSlotSheetProps {
 }
 
 export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotSheetProps) {
+  const { t } = useTranslation();
   const { serverMembers } = useRaidContext();
+  const roleOptions = useRoleOptions();
 
   const form = useForm<RaidSlotFormData>({
     resolver: zodResolver(raidSlotSchema),
@@ -131,8 +117,9 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
     onClose();
   };
 
-  const title = mode === "add" ? "Add New Slot" : "Edit Slot";
-  const description = mode === "add" ? "Create a new slot for your raid composition" : "Modify the slot details";
+  const title = mode === "add" ? t("raids.composition.addSlotTitle") : t("raids.composition.editSlotTitle");
+  const description =
+    mode === "add" ? t("raids.composition.addSlotDescription") : t("raids.composition.editSlotDescription");
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -168,17 +155,17 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                               <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faFilePen} className="text-primary h-4 w-4" />
                               </div>
-                              Slot Name
+                              {t("raids.composition.slotName")}
                             </FormLabel>
                             <FormControl>
                               <Input
-                                placeholder="Enter slot name..."
+                                placeholder={t("raids.composition.slotNamePlaceholder")}
                                 className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-colors"
                                 {...field}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              A descriptive name for this slot (e.g., &quot;Main Tank&quot;, &quot;Healer 1&quot;)
+                              {t("raids.composition.slotNameDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -201,16 +188,16 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faShieldAlt} className="text-muted-foreground h-4 w-4" />
                               </div>
-                              Role (Optional)
+                              {t("raids.composition.role")}
                             </FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger className="text-foreground focus:border-primary/50 h-12 w-full border-2 text-base transition-colors">
-                                  <SelectValue placeholder="Select role..." />
+                                  <SelectValue placeholder={t("raids.composition.rolePlaceholder")} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {ROLE_OPTIONS.map((option: { value: RaidRole; label: string }) => (
+                                {roleOptions.map((option: { value: RaidRole; label: string }) => (
                                   <SelectItem key={option.value} value={option.value}>
                                     {option.label}
                                   </SelectItem>
@@ -218,7 +205,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                               </SelectContent>
                             </Select>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Choose the primary role for this slot
+                              {t("raids.composition.roleDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -235,18 +222,18 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faUser} className="text-muted-foreground h-4 w-4" />
                               </div>
-                              Member (Optional)
+                              {t("raids.composition.member")}
                             </FormLabel>
                             <FormControl>
                               <MemberSelection
                                 members={serverMembers}
                                 selectedUserId={field.value}
                                 onSelect={field.onChange}
-                                placeholder="Select a member..."
+                                placeholder={t("raids.composition.memberPlaceholder")}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Assign a specific member to this slot
+                              {t("raids.composition.memberDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -268,21 +255,21 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faHammer} className="text-muted-foreground h-4 w-4" />
                               </div>
-                              Weapon (Optional)
+                              {t("raids.composition.weapon")}
                             </FormLabel>
                             <FormControl>
                               <ItemPicker
                                 value={stringToItem(field.value)}
                                 onValueChange={(item: Item | null) => field.onChange(itemToString(item))}
                                 slotType="mainhand"
-                                placeholder="Select a weapon..."
-                                searchPlaceholder="Search weapons..."
-                                emptyMessage="No weapons found."
+                                placeholder={t("raids.composition.weaponPlaceholder")}
+                                searchPlaceholder={t("raids.composition.weaponSearchPlaceholder")}
+                                emptyMessage={t("raids.composition.weaponEmptyMessage")}
                                 maxResults={20}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Search and select a weapon from the Albion Online database.
+                              {t("raids.composition.weaponDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -304,18 +291,18 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                               <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
                                 <FontAwesomeIcon icon={faComment} className="text-muted-foreground h-4 w-4" />
                               </div>
-                              Comment (Optional)
+                              {t("raids.composition.comment")}
                             </FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Enter slot requirements or notes..."
+                                placeholder={t("raids.composition.commentPlaceholder")}
                                 className="focus:border-primary/50 min-h-[120px] resize-none border-2 text-base leading-relaxed transition-colors"
                                 {...field}
                                 value={field.value || ""}
                               />
                             </FormControl>
                             <FormDescription className="text-muted-foreground mt-2 text-sm">
-                              Add any special requirements or notes for this slot
+                              {t("raids.composition.commentDescription")}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -335,7 +322,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                         onClick={handleCancel}
                       >
                         <FontAwesomeIcon icon={faTimes} className="mr-2 h-4 w-4" />
-                        Cancel
+                        {t("raids.composition.cancel")}
                       </Button>
                       <Button
                         type="submit"
@@ -343,7 +330,7 @@ export function RaidSlotSheet({ isOpen, onClose, mode, slot, onSave }: RaidSlotS
                         className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 transition-all duration-200"
                       >
                         <FontAwesomeIcon icon={faSave} className="mr-2 h-4 w-4" />
-                        {mode === "add" ? "Add Slot" : "Save Changes"}
+                        {mode === "add" ? t("raids.composition.addSlotButton") : t("raids.composition.saveChanges")}
                       </Button>
                     </div>
                   </div>

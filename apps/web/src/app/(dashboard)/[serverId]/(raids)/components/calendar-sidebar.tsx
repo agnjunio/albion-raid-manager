@@ -1,5 +1,6 @@
 import { faFilter, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,11 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { raidStatuses } from "@/lib/constants";
+import { getDateFnsLocale } from "@/lib/locale";
 
 import { useCalendar } from "../contexts/calendar-context";
 
 export function CalendarSidebar() {
   const { raids, currentDate, filters, setCurrentDate, setFilters } = useCalendar();
+  const { t } = useTranslation();
 
   const getRaidStats = () => {
     const total = raids.length;
@@ -71,6 +74,7 @@ export function CalendarSidebar() {
           className="rounded-md border-0 p-2"
           hideNavigation
           footer={false}
+          locale={getDateFnsLocale()}
         />
       </Card>
 
@@ -79,32 +83,32 @@ export function CalendarSidebar() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
-            Raid Statistics
+            {t("calendar.sidebar.raidStatistics")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1">
           <div className="mb-4 flex justify-between text-sm font-semibold">
-            <span>Total Raids</span>
+            <span>{t("calendar.sidebar.totalRaids")}</span>
             <span className="font-medium">{stats.total}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className={raidStatuses.SCHEDULED.textColor}>Scheduled</span>
+            <span className={raidStatuses.SCHEDULED.textColor}>{t("raids.raidStatus.scheduled")}</span>
             <span className="font-medium">{stats.scheduled}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className={raidStatuses.OPEN.textColor}>Open</span>
+            <span className={raidStatuses.OPEN.textColor}>{t("raids.raidStatus.open")}</span>
             <span className="font-medium">{stats.open}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className={raidStatuses.ONGOING.textColor}>Ongoing</span>
+            <span className={raidStatuses.ONGOING.textColor}>{t("raids.raidStatus.ongoing")}</span>
             <span className="font-medium">{stats.ongoing}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className={raidStatuses.FINISHED.textColor}>Finished</span>
+            <span className={raidStatuses.FINISHED.textColor}>{t("raids.raidStatus.finished")}</span>
             <span className="font-medium">{stats.finished}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className={raidStatuses.CANCELLED.textColor}>Cancelled</span>
+            <span className={raidStatuses.CANCELLED.textColor}>{t("raids.raidStatus.cancelled")}</span>
             <span className="font-medium">{stats.cancelled}</span>
           </div>
         </CardContent>
@@ -116,11 +120,11 @@ export function CalendarSidebar() {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-sm font-medium">
               <FontAwesomeIcon icon={faFilter} className="h-4 w-4" />
-              Filters
+              {t("calendar.sidebar.filters")}
             </CardTitle>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearFilters} className="h-6 px-2 text-xs">
-                Clear
+                {t("calendar.sidebar.clear")}
               </Button>
             )}
           </div>
@@ -129,11 +133,11 @@ export function CalendarSidebar() {
           {/* Search */}
           <div className="space-y-2">
             <Label htmlFor="search" className="text-xs">
-              Search raids
+              {t("calendar.sidebar.searchRaids")}
             </Label>
             <Input
               id="search"
-              placeholder="Search by title or description..."
+              placeholder={t("calendar.sidebar.searchPlaceholder")}
               value={filters.search}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="h-8"
@@ -144,21 +148,24 @@ export function CalendarSidebar() {
 
           {/* Status Filter */}
           <div className="space-y-2">
-            <Label className="text-xs">Status</Label>
+            <Label className="text-xs">{t("calendar.sidebar.status")}</Label>
             <div className="space-y-2">
               {Object.entries(raidStatuses).map(([status, statusData]) => {
                 if (status === "ALL") return null;
 
                 return (
-                  <div key={status} className="flex items-center space-x-2">
+                  <div key={status} className="flex items-baseline space-x-2">
                     <Checkbox
                       id={`status-${status}`}
                       checked={filters.status.includes(status)}
                       onCheckedChange={(checked) => handleStatusFilter(status, checked as boolean)}
                     />
-                    <Label htmlFor={`status-${status}`} className="flex cursor-pointer items-center gap-2 text-xs">
-                      <FontAwesomeIcon icon={statusData.icon} className="h-3 w-3" />
-                      {status}
+                    <Label
+                      htmlFor={`status-${status}`}
+                      className="flex cursor-pointer items-center gap-1.5 text-xs uppercase"
+                    >
+                      <FontAwesomeIcon icon={statusData.icon} className="size-3" />
+                      {t(`raids.raidStatus.${status.toLowerCase()}`)}
                     </Label>
                   </div>
                 );
@@ -170,7 +177,7 @@ export function CalendarSidebar() {
 
           {/* Quick Filters */}
           <div className="space-y-2">
-            <Label className="text-xs">Quick Filters</Label>
+            <Label className="text-xs">{t("calendar.sidebar.quickFilters")}</Label>
             <div className="grid grid-cols-2 gap-2">
               <Button
                 variant={isQuickFilterActive(["SCHEDULED", "OPEN"]) ? "primary" : "outline"}
@@ -178,7 +185,7 @@ export function CalendarSidebar() {
                 className="h-7 text-xs"
                 onClick={() => handleQuickFilter(["SCHEDULED", "OPEN"])}
               >
-                Upcoming
+                {t("calendar.sidebar.upcoming")}
               </Button>
               <Button
                 variant={isQuickFilterActive(["ONGOING"]) ? "primary" : "outline"}
@@ -186,7 +193,7 @@ export function CalendarSidebar() {
                 className="h-7 text-xs"
                 onClick={() => handleQuickFilter(["ONGOING"])}
               >
-                Active
+                {t("calendar.sidebar.active")}
               </Button>
               <Button
                 variant={isQuickFilterActive(["FINISHED"]) ? "primary" : "outline"}
@@ -194,7 +201,7 @@ export function CalendarSidebar() {
                 className="h-7 text-xs"
                 onClick={() => handleQuickFilter(["FINISHED"])}
               >
-                Completed
+                {t("calendar.sidebar.completed")}
               </Button>
               <Button
                 variant={isQuickFilterActive(["CANCELLED"]) ? "primary" : "outline"}
@@ -202,7 +209,7 @@ export function CalendarSidebar() {
                 className="h-7 text-xs"
                 onClick={() => handleQuickFilter(["CANCELLED"])}
               >
-                Cancelled
+                {t("calendar.sidebar.cancelled")}
               </Button>
             </div>
           </div>

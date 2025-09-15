@@ -1,0 +1,588 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "settings": "Settings",
+    "about": "About",
+    "theme": "Theme",
+    "language": "Language",
+    "enter": "Enter"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "raids": "Raids",
+    "servers": "Servers",
+    "guilds": "Guilds"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "loginWithDiscord": "Login with Discord",
+    "loginSuccess": "Successfully logged in!",
+    "loginError": "Failed to login. Please try again.",
+    "logoutSuccess": "Successfully logged out!",
+    "unauthorized": "You are not authorized to access this page.",
+    "authenticatedAs": "Authenticated as",
+    "notLoggedIn": "You are not logged in. Please sign in with Discord to continue."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Albion Raid Manager",
+    "selectServer": "Please select a guild or click Setup to start.",
+    "description": "Albion Raid Manager helps you organize and manage your guild activities, track member participation, and schedule raids.",
+    "noServers": "No servers available",
+    "createServer": "Create Server",
+    "sidebar": {
+      "menu": "Menu",
+      "backToDashboard": "Back to dashboard",
+      "owner": "Owner",
+      "admin": "Admin",
+      "unknownServer": "Unknown server",
+      "unknownUser": "Unknown User"
+    }
+  },
+  "raids": {
+    "title": "Raids",
+    "createRaid": "Create Raid",
+    "editRaid": "Edit Raid",
+    "deleteRaid": "Delete Raid",
+    "raidDetails": "Raid Details",
+    "raidComposition": "Raid Composition",
+    "raidStats": "Raid Statistics",
+    "raidNotes": "Raid Notes",
+    "raidActions": "Raid Actions",
+    "noRaids": "No raids found",
+    "upcomingRaids": "Upcoming Raids",
+    "pastRaids": "Past Raids",
+    "create": {
+      "title": "Create New Raid",
+      "description": "Schedule and organize your guild's next adventure",
+      "raidTitle": "Raid Title",
+      "raidTitlePlaceholder": "Enter a compelling title for your raid...",
+      "raidTitleDescription": "Choose a clear, descriptive title that will attract participants",
+      "contentType": "Content Type",
+      "contentTypePlaceholder": "Select content type",
+      "contentTypeDescription": "Choose the type of content this raid will focus on",
+      "startDateTime": "Start Date & Time",
+      "startDateTimeDescription": "Select the start time for your raid",
+      "location": "Location (Optional)",
+      "locationPlaceholder": "e.g., Black Zone, Royal City...",
+      "locationDescription": "Where will the raid take place? This is optional and can be added later.",
+      "raidDescription": "Description",
+      "raidDescriptionPlaceholder": "Provide detailed information about the raid objectives, requirements, and what participants can expect...",
+      "raidDescriptionDescription": "Include objectives, requirements, loot rules, and any special instructions",
+      "cancel": "Cancel",
+      "createRaid": "Create Raid",
+      "success": "Raid created successfully",
+      "successDescription": "Your raid has been scheduled but is not yet visible to participants.",
+      "error": "Failed to create raid"
+    },
+    "details": {
+      "backToRaids": "Back to Raids",
+      "copyLink": "Copy Link",
+      "exportConfig": "Export Config",
+      "delete": "Delete",
+      "raidId": "Raid ID",
+      "descriptionPlaceholder": "Enter raid description...",
+      "noDescription": "No description provided - click to add",
+      "exportSuccess": "Raid configuration exported successfully",
+      "exportSuccessDescription": "The raid configuration has been downloaded as a JSON file.",
+      "exportError": "Failed to export raid configuration",
+      "exportErrorDescription": "An unknown error occurred.",
+      "getRaidError": "Failed to get raid"
+    },
+    "actions": {
+      "title": "Raid Management",
+      "raidCancelled": "Raid Cancelled",
+      "raidCancelledDescription": "This raid has been cancelled and is no longer available for management.",
+      "raidCancelledNote": "Cancelled raids cannot be reopened or modified",
+      "raidCompleted": "Raid Completed",
+      "raidCompletedDescription": "This raid has been finished successfully.",
+      "raidCompletedNote": "Completed raids are read-only and cannot be modified",
+      "openRaid": "Open Raid",
+      "openRaidDescription": "Allow players to join the raid and fill available slots.",
+      "closeRaid": "Close Raid",
+      "closeRaidDescription": "Stop new players from joining while keeping current participants.",
+      "startRaid": "Start Raid",
+      "startRaidDescription": "Mark the raid as currently in progress and notify all participants.",
+      "finishRaid": "Finish Raid",
+      "finishRaidDescription": "Complete the raid and mark it as finished for all participants.",
+      "cancelRaid": "Cancel Raid",
+      "confirmCancel": "Are you sure you want to cancel the raid \"{{title}}\"?\n\nThis action cannot be undone and all participants will be notified.",
+      "actions": "Actions",
+      "configuration": "Configuration",
+      "configurationDescription": "Import a raid configuration from another raid of the same content type. This will replace the current raid's description, notes, location, and slot composition.",
+      "danger": "Danger Zone",
+      "dangerDescription": "Permanently cancel this raid and notify all participants. This action cannot be undone and will remove the raid from all participants' views.",
+      "expand": "Expand",
+      "collapse": "Collapse"
+    },
+    "notes": {
+      "title": "Raid Notes",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "placeholder": "Add notes for this raid...",
+      "noNotes": "No notes yet",
+      "noNotesDescription": "Add notes to keep track of important information about this raid.",
+      "addNotes": "Add Notes"
+    },
+    "composition": {
+      "title": "Raid Composition",
+      "slots": "slots",
+      "addSlot": "Add Slot",
+      "editWarning": "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
+      "addSlotTitle": "Add New Slot",
+      "addSlotDescription": "Create a new slot for your raid composition",
+      "editSlotTitle": "Edit Slot",
+      "editSlotDescription": "Modify the slot details",
+      "slotName": "Slot Name",
+      "slotNamePlaceholder": "Enter slot name...",
+      "slotNameDescription": "A descriptive name for this slot (e.g., \"Main Tank\", \"Healer 1\")",
+      "role": "Role (Optional)",
+      "rolePlaceholder": "Select role...",
+      "roleDescription": "Choose the primary role for this slot",
+      "member": "Member (Optional)",
+      "memberPlaceholder": "Select a member...",
+      "memberDescription": "Assign a specific member to this slot",
+      "weapon": "Weapon (Optional)",
+      "weaponPlaceholder": "Select a weapon...",
+      "weaponSearchPlaceholder": "Search weapons...",
+      "weaponEmptyMessage": "No weapons found.",
+      "weaponDescription": "Search and select a weapon from the Albion Online database.",
+      "comment": "Comment (Optional)",
+      "commentPlaceholder": "Enter slot requirements or notes...",
+      "commentDescription": "Add any special requirements or notes for this slot",
+      "cancel": "Cancel",
+      "addSlotButton": "Add Slot",
+      "saveChanges": "Save Changes"
+    },
+    "memberSelection": {
+      "placeholder": "Select a member...",
+      "searchPlaceholder": "Search members...",
+      "noMembersFound": "No members found.",
+      "unassigned": "Unassigned",
+      "registered": "Registered"
+    },
+    "itemPicker": {
+      "placeholder": "Select an item...",
+      "searchPlaceholder": "Search items...",
+      "emptyMessage": "No items found.",
+      "title": "Select Item",
+      "description": "Search and select an item from the Albion Online database.",
+      "searching": "Searching items...",
+      "searchingShort": "Searching...",
+      "searchError": "Failed to search items. Please try again.",
+      "searchTips": "Search and select a weapon from the Albion Online database.",
+      "tierPattern": "Specify the tier using the game pattern (e.g.: \"T8\", \"8.\", \"8.1\").",
+      "examples": "Examples:",
+      "weaponSearchTips": ["Arctic Staff 8.", "T8 Fire Staff", "Rotcaller 5.1", "T6 2H Holy Staff", "T4 2H Crossbow"]
+    },
+    "raidTypes": {
+      "fixed": "Fixed",
+      "flex": "Flexible"
+    },
+    "raidStatus": {
+      "scheduled": "Scheduled",
+      "open": "Open",
+      "closed": "Closed",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "ongoing": "Ongoing",
+      "finished": "Finished"
+    },
+    "stats": {
+      "participants": "Participants",
+      "contentType": "Content Type",
+      "timeStatus": "Time Status",
+      "location": "Location",
+      "filled": "filled",
+      "meetingPoint": "Meeting point",
+      "noLocationSet": "No location set",
+      "locationPlaceholder": "e.g., Black Zone, Royal City...",
+      "timeStatuses": {
+        "loading": "Loading...",
+        "past": "Past",
+        "startingSoon": "Starting soon",
+        "startingInMinutes": "Starting in {{count}} minutes",
+        "days": "{{count}} days",
+        "hours": "{{count}} hours"
+      }
+    }
+  },
+  "servers": {
+    "title": "Servers",
+    "serverName": "Server Name",
+    "serverId": "Server ID",
+    "memberCount": "Member Count",
+    "raidCount": "Raid Count",
+    "lastActivity": "Last Activity",
+    "noServers": "No servers found",
+    "noServersDescription": "You don't have any servers configured yet. Make sure you are a server administrator and try again.",
+    "createServer": "Create Server",
+    "editServer": "Edit Server",
+    "deleteServer": "Delete Server",
+    "loading": "Loading servers...",
+    "loadError": "Failed to load servers. Please try again later.",
+    "owner": "Owner",
+    "admin": "Admin",
+    "botActive": "Bot Active",
+    "setupAvailable": "Setup Available",
+    "noAccess": "No Access",
+    "clickToAccess": "Click to access",
+    "clickToSetup": "Click to setup",
+    "readOnly": "Read only"
+  },
+  "guilds": {
+    "title": "Guilds",
+    "guildName": "Guild Name",
+    "guildId": "Guild ID",
+    "memberCount": "Member Count",
+    "alliance": "Alliance",
+    "noGuilds": "No guilds found"
+  },
+  "forms": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidDate": "Please enter a valid date",
+    "invalidTime": "Please enter a valid time",
+    "invalidNumber": "Please enter a valid number",
+    "minLength": "Must be at least {{count}} characters",
+    "maxLength": "Must be no more than {{count}} characters",
+    "minValue": "Must be at least {{count}}",
+    "maxValue": "Must be no more than {{count}}"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to perform this action.",
+    "forbidden": "Access denied.",
+    "notFound": "The requested resource was not found.",
+    "serverError": "Server error. Please try again later.",
+    "validation": "Please check your input and try again.",
+    "authenticationFailed": "Authentication failed. Please log in again.",
+    "badRequest": "Invalid request. Please check your input and try again.",
+    "serverAlreadyExists": "This server is already configured.",
+    "internalServerError": "Internal server error. Please try again later.",
+    "notAuthorized": "You are not authorized to perform this action.",
+    "serverVerificationFailed": "Server verification failed. Please make sure the bot is properly invited and try again.",
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "unknown": "An unknown error occurred. Please try again."
+  },
+  "time": {
+    "now": "Now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This Week",
+    "lastWeek": "Last Week",
+    "nextWeek": "Next Week",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "nextMonth": "Next Month",
+    "thisYear": "This Year",
+    "lastYear": "Last Year",
+    "nextYear": "Next Year"
+  },
+  "calendar": {
+    "today": "Today",
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    },
+    "views": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "navigation": {
+      "today": "Today",
+      "newRaid": "New Raid"
+    },
+    "grid": {
+      "raidCount": "{{count}} raid",
+      "raidCount_plural": "{{count}} raids",
+      "moreRaids": "+{{count}} more",
+      "clickToCreateRaid": "Click to create raid"
+    },
+    "sidebar": {
+      "raidStatistics": "Raid Statistics",
+      "totalRaids": "Total Raids",
+      "filters": "Filters",
+      "clear": "Clear",
+      "searchRaids": "Search raids",
+      "searchPlaceholder": "Search by title or description...",
+      "status": "Status",
+      "quickFilters": "Quick Filters",
+      "upcoming": "Upcoming",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "languages": {
+    "en": "English",
+    "pt-BR": "Português (Brasil)"
+  },
+  "setup": {
+    "title": "Server setup",
+    "loadingServer": "Loading server...",
+    "backToDashboard": "Back to dashboard",
+    "steps": {
+      "serverInfo": "Server Info",
+      "discordInvite": "Discord Invite",
+      "verification": "Verification",
+      "complete": "Complete"
+    },
+    "serverInfo": {
+      "description": "This server will be added to your account once you complete the setup process.",
+      "continueButton": "Continue to Discord Invitation"
+    },
+    "discordInvite": {
+      "description": "Click the link below to open Discord and accept the bot invitation to your server.",
+      "openButton": "Open Discord Invitation",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "important": "Important",
+      "permissionsWarning": "Make sure you have admin permissions on the server before accepting the invitation.",
+      "continueButton": "Continue to verification"
+    },
+    "verification": {
+      "loading": "Please wait while we verify your server..."
+    },
+    "complete": {
+      "message": "Verification complete. You will be redirected to the dashboard page. Please",
+      "clickHere": "click here",
+      "redirectFallback": "if that doesn't happen."
+    }
+  },
+  "import": {
+    "title": "Import Raid Configuration",
+    "dragDropText": "Drop configuration file here",
+    "dragDropSubtext": "Drag & drop a JSON file or click to browse",
+    "importing": "Importing configuration...",
+    "importingDescription": "Please wait while we apply the configuration",
+    "importUnavailable": "Import unavailable",
+    "importDisabled": "Import is disabled for this raid status",
+    "invalidFileType": "Invalid file type",
+    "invalidFileTypeDescription": "Please drop a JSON configuration file.",
+    "invalidConfiguration": "Invalid configuration file",
+    "invalidConfigurationDescription": "The file format is not valid.",
+    "configurationParseError": "The configuration could not be parsed.",
+    "contentTypeMismatch": "Content type mismatch",
+    "contentTypeMismatchDescription": "This configuration is for {{configType}} raids, but this raid is {{raidType}}.",
+    "importError": "Failed to import raid configuration",
+    "importErrorDescription": "An unknown error occurred.",
+    "validationError": "Validation error: {{error}}"
+  },
+  "inlineEdit": {
+    "clickToEdit": "Click to edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saveHint": "Press Ctrl+Enter to save, Escape to cancel"
+  },
+  "serverMember": {
+    "unknownMember": "Unknown Member",
+    "available": "Available"
+  },
+  "raidSlot": {
+    "unassigned": "UNASSIGNED",
+    "roles": {
+      "TANK": "Tank",
+      "HEALER": "Healer",
+      "SUPPORT": "Support",
+      "RANGED_DPS": "Ranged DPS",
+      "MELEE_DPS": "Melee DPS",
+      "BATTLEMOUNT": "Battlemount",
+      "CALLER": "Caller"
+    },
+    "noSlots": "No Raid Slots",
+    "noSlotsFlexDescription": "This flexible raid doesn't have any slots defined yet. Add slots to organize your raid composition.",
+    "noSlotsFixedDescription": "This fixed raid doesn't have any slots defined yet.",
+    "addSlot": "Add Slot",
+    "reorderingSlots": "Reordering slots..."
+  },
+  "discord": {
+    "selectRoles": "Select roles",
+    "searchRoles": "Search roles...",
+    "noRolesFound": "No roles found."
+  },
+  "hotkeys": {
+    "title": "Keyboard Shortcuts",
+    "keys": {
+      "ctrl": "Ctrl",
+      "alt": "Alt",
+      "shift": "Shift",
+      "space": "Space",
+      "cmd": "⌘"
+    },
+    "descriptions": {
+      "switchToDayView": "Switch to day view",
+      "switchToWeekView": "Switch to week view",
+      "switchToMonthView": "Switch to month view",
+      "goToPreviousDay": "Go to previous day",
+      "goToPreviousWeek": "Go to previous week",
+      "goToPreviousMonth": "Go to previous month",
+      "goToNextDay": "Go to next day",
+      "goToNextWeek": "Go to next week",
+      "goToNextMonth": "Go to next month",
+      "goToToday": "Go to today",
+      "createNewRaid": "Create new raid",
+      "refreshCalendar": "Refresh calendar"
+    }
+  },
+  "channel": {
+    "noResultsFound": "No results found"
+  },
+  "toasts": {
+    "raid": {
+      "statusUpdated": "Raid status updated successfully",
+      "statusUpdatedDescription": "Raid status changed to {{status}}",
+      "statusUpdateError": "Failed to update raid status",
+      "statusUpdateErrorDescription": "There was an error updating the raid status. Please try again.",
+      "notesUpdated": "Raid notes updated successfully",
+      "notesUpdateError": "Failed to update raid notes",
+      "notesUpdateErrorDescription": "There was an error updating the raid notes. Please try again.",
+      "updated": "Raid updated successfully",
+      "updatedDescription": "Your raid details have been updated.",
+      "updateError": "Failed to update raid",
+      "updateErrorDescription": "There was an error updating the raid. Please try again.",
+      "linkCopied": "Raid link copied to clipboard",
+      "deleted": "Raid deleted successfully",
+      "deletedDescription": "\"{{title}}\" has been permanently deleted.",
+      "deleteError": "Failed to delete raid",
+      "deleteErrorDescription": "There was an error deleting the raid. Please try again.",
+      "configurationImported": "Raid configuration imported successfully",
+      "configurationImportedDescription": "Applied configuration with {{count}} slots.",
+      "configurationImportError": "Failed to import raid configuration",
+      "configurationImportErrorDescription": "An unknown error occurred."
+    },
+    "slot": {
+      "created": "Slot created successfully",
+      "createError": "Failed to create slot",
+      "createErrorDescription": "There was an error creating the slot. Please try again.",
+      "deleted": "Slot deleted successfully",
+      "deleteError": "Failed to delete slot",
+      "deleteErrorDescription": "There was an error deleting the slot. Please try again.",
+      "reordered": "Slot reordered successfully",
+      "updated": "Slot updated successfully",
+      "updateError": "Failed to update slot",
+      "updateErrorDescription": "There was an error updating the slot. Please try again.",
+      "cannotEdit": "Cannot edit slot",
+      "cannotEditDescription": "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
+      "cannotAdd": "Cannot add slot",
+      "cannotAddDescription": "Cannot add more slots. Maximum party size reached or raid is not editable.",
+      "nameRequired": "Slot name is required",
+      "cannotDelete": "Cannot delete slot",
+      "cannotDeleteDescription": "Cannot delete slots. Minimum party size reached or raid is not editable.",
+      "cannotReorder": "Cannot reorder slots",
+      "cannotReorderDescription": "Raid composition can only be edited when the raid is in SCHEDULED, OPEN, or CLOSED status.",
+      "reorderError": "Failed to reorder slots",
+      "reorderErrorDescription": "Please try again."
+    },
+    "auth": {
+      "failed": "Authentication failed",
+      "failedDescription": "No authorization code received from Discord. Please try again.",
+      "failedCallbackDescription": "Unable to complete Discord authentication. Please try again."
+    },
+    "raids": {
+      "loadError": "Failed to load raids",
+      "loadErrorDescription": "There was an error loading raids. Please try again."
+    },
+    "confirmations": {
+      "deleteRaid": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+      "deleteSlot": "Are you sure you want to delete this slot?"
+    }
+  },
+  "contentTypes": {
+    "SOLO_DUNGEON": {
+      "displayName": "Solo Dungeon",
+      "description": "Solo dungeon clearing for farming and loot"
+    },
+    "OPEN_WORLD_FARMING": {
+      "displayName": "Open World Farming",
+      "description": "Open world farming and resource gathering activities"
+    },
+    "GROUP_DUNGEON": {
+      "displayName": "Group Dungeon",
+      "description": "Small group dungeon content for 2-5 players"
+    },
+    "AVALONIAN_DUNGEON": {
+      "displayName": "Avalonian Dungeon",
+      "description": "Avalonian Dungeon content"
+    },
+    "ROADS_OF_AVALON": {
+      "displayName": "Roads of Avalon",
+      "description": "Roads of Avalon content with fights and/or golden chests"
+    },
+    "DEPTHS_DUO": {
+      "displayName": "Depths (Duo)",
+      "description": "Corrupted Dungeons duo content for 2 players"
+    },
+    "DEPTHS_TRIO": {
+      "displayName": "Depths (Trio)",
+      "description": "Corrupted Dungeons trio content for 3 players"
+    },
+    "OPEN_WORLD_GANKING": {
+      "displayName": "Open World Ganking",
+      "description": "Open world ganking and PvP activities"
+    },
+    "FIGHTING_SQUAD": {
+      "displayName": "Fighting Squad",
+      "description": "Organized fighting squad for PvP content"
+    },
+    "ZVZ_CALL_TO_ARMS": {
+      "displayName": "ZvZ Call to Arms",
+      "description": "Zone vs Zone large-scale PvP content"
+    },
+    "HELLGATE_2V2": {
+      "displayName": "Hellgate (2v2)",
+      "description": "Hellgate content for 2 players"
+    },
+    "HELLGATE_5V5": {
+      "displayName": "Hellgate (5v5)",
+      "description": "Hellgate content for 5 players"
+    },
+    "HELLGATE_10V10": {
+      "displayName": "Hellgate (10v10)",
+      "description": "Hellgate content for 10 players"
+    },
+    "MISTS_SOLO": {
+      "displayName": "Mists (Solo)",
+      "description": "Mists content for solo players"
+    },
+    "MISTS_DUO": {
+      "displayName": "Mists (Duo)",
+      "description": "Mists content for 2 players"
+    },
+    "OTHER": {
+      "displayName": "Other",
+      "description": "Other content type"
+    }
+  }
+}

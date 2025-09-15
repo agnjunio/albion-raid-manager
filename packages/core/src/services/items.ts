@@ -71,19 +71,20 @@ export namespace ItemsService {
     );
   }
 
-  export function getLocalizedName(item: Item, language: keyof ItemLocalizations = "EN-US"): string {
+  export function getLocalizedName(item: Item, language: string): string {
     if (Object.keys(item.localizedNames).length === 0) {
       return item.item_id; // Fallback to unique name if no localization
     }
 
-    return item.localizedNames[language] || item.localizedNames["EN-US"] || item.item_id;
+    const languageKey = language.toUpperCase() as keyof ItemLocalizations;
+    return item.localizedNames[languageKey] || item.localizedNames["EN-US"] || item.item_id;
   }
 
   export async function searchItemsByName(
     searchTerm: string,
     filters: ItemSearchFilters = {},
   ): Promise<ItemSearchResult> {
-    const { slotType, limit = 20, offset = 0 } = filters;
+    const { slotType, language = "EN-US", limit = 20, offset = 0 } = filters;
 
     // Validate search term
     if (!searchTerm || searchTerm.trim().length < 2) {
@@ -108,7 +109,7 @@ export namespace ItemsService {
 
           for (const item of items) {
             const itemId = item.item_id;
-            const itemName = getLocalizedName(item, "EN-US");
+            const itemName = getLocalizedName(item, language);
             const searchLower = input.processedTerm.toLowerCase().trim();
 
             // Filter out items that don't match the tier if specified
@@ -208,7 +209,7 @@ export namespace ItemsService {
       },
       {
         cache: "memory",
-        key: CacheKeys.itemSearch(searchTerm, CacheKeys.hashObject(filters)),
+        key: CacheKeys.itemSearch(searchTerm, CacheKeys.hashObject({ ...filters, language })),
       },
     );
   }

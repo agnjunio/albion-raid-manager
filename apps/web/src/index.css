@@ -356,4 +356,8 @@
   .primary-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: var(--primary);
   }
+
+  .capitalize-first::first-letter {
+    text-transform: uppercase;
+  }
 }

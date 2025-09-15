@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { CalendarView } from "@/app/(dashboard)/[serverId]/(raids)/contexts/calendar-context";
 
@@ -58,6 +58,7 @@ export const createCalendarHotkeys = (
   onDateChange: (date: Date) => void,
   currentDate: Date,
   currentView: CalendarView,
+  t: (key: string) => string,
   onCreateRaid?: () => void,
   onRefresh?: () => void,
 ): HotkeyConfig[] => [
@@ -66,19 +67,19 @@ export const createCalendarHotkeys = (
     key: "1",
     ctrlKey: true,
     action: () => onViewChange(CalendarView.DAY),
-    description: "Switch to day view",
+    description: t("hotkeys.descriptions.switchToDayView"),
   },
   {
     key: "2",
     ctrlKey: true,
     action: () => onViewChange(CalendarView.WEEK),
-    description: "Switch to week view",
+    description: t("hotkeys.descriptions.switchToWeekView"),
   },
   {
     key: "3",
     ctrlKey: true,
     action: () => onViewChange(CalendarView.MONTH),
-    description: "Switch to month view",
+    description: t("hotkeys.descriptions.switchToMonthView"),
   },
   // Date navigation - same logic as header arrows
   {
@@ -99,7 +100,12 @@ export const createCalendarHotkeys = (
       }
       onDateChange(newDate);
     },
-    description: `Go to previous ${currentView === CalendarView.DAY ? "day" : currentView === CalendarView.WEEK ? "week" : "month"}`,
+    description:
+      currentView === CalendarView.DAY
+        ? t("hotkeys.descriptions.goToPreviousDay")
+        : currentView === CalendarView.WEEK
+          ? t("hotkeys.descriptions.goToPreviousWeek")
+          : t("hotkeys.descriptions.goToPreviousMonth"),
   },
   {
     key: "ArrowRight",
@@ -119,14 +125,19 @@ export const createCalendarHotkeys = (
       }
       onDateChange(newDate);
     },
-    description: `Go to next ${currentView === CalendarView.DAY ? "day" : currentView === CalendarView.WEEK ? "week" : "month"}`,
+    description:
+      currentView === CalendarView.DAY
+        ? t("hotkeys.descriptions.goToNextDay")
+        : currentView === CalendarView.WEEK
+          ? t("hotkeys.descriptions.goToNextWeek")
+          : t("hotkeys.descriptions.goToNextMonth"),
   },
   // Today
   {
     key: "t",
     ctrlKey: true,
     action: () => onDateChange(new Date()),
-    description: "Go to today",
+    description: t("hotkeys.descriptions.goToToday"),
   },
   // Actions
   ...(onCreateRaid
@@ -135,7 +146,7 @@ export const createCalendarHotkeys = (
           key: "n",
           ctrlKey: true,
           action: onCreateRaid,
-          description: "Create new raid",
+          description: t("hotkeys.descriptions.createNewRaid"),
         },
       ]
     : []),
@@ -145,7 +156,7 @@ export const createCalendarHotkeys = (
           key: "r",
           ctrlKey: true,
           action: onRefresh,
-          description: "Refresh calendar",
+          description: t("hotkeys.descriptions.refreshCalendar"),
         },
       ]
     : []),

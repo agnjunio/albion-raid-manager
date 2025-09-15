@@ -1,5 +1,7 @@
 import type { RaidStatus } from "@albion-raid-manager/types";
 
+import { useTranslation } from "react-i18next";
+
 import { raidStatuses } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +10,8 @@ interface Props {
 }
 
 export function RaidStatusBadge({ status }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div
       className={cn(
@@ -15,7 +19,7 @@ export function RaidStatusBadge({ status }: Props) {
         raidStatuses[status]?.color,
       )}
     >
-      {status}
+      {t(`raids.raidStatus.${status.toLowerCase()}`) || status}
     </div>
   );
 }

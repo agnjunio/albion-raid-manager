@@ -10,6 +10,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,7 @@ function RaidStatusMessage({ icon, title, description, note, iconColor, bgColor 
 
 export function RaidActions() {
   const { raid, canManageRaid, handleUpdateRaidStatus, hasStatus } = useRaidContext();
+  const { t } = useTranslation();
   const [expandedSections, setExpandedSections] = useState({
     actions: false,
     configuration: false,
@@ -52,9 +54,7 @@ export function RaidActions() {
   const handleCancelRaid = () => {
     if (!raid) return;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to cancel the raid "${raid.title}"?\n\nThis action cannot be undone and all participants will be notified.`,
-    );
+    const confirmed = window.confirm(t("raids.actions.confirmCancel", { title: raid.title }));
 
     if (confirmed) {
       handleUpdateRaidStatus("CANCELLED");
@@ -77,25 +77,25 @@ export function RaidActions() {
           <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
             <FontAwesomeIcon icon={faGear} className="text-primary h-5 w-5" />
           </div>
-          Raid Management
+          {t("raids.actions.title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
         {hasStatus("CANCELLED") ? (
           <RaidStatusMessage
             icon={raidStatuses.CANCELLED.icon}
-            title="Raid Cancelled"
-            description="This raid has been cancelled and is no longer available for management."
-            note="Cancelled raids cannot be reopened or modified"
+            title={t("raids.actions.raidCancelled")}
+            description={t("raids.actions.raidCancelledDescription")}
+            note={t("raids.actions.raidCancelledNote")}
             iconColor="text-red-500 dark:text-red-400"
             bgColor="bg-red-50 dark:bg-red-950/30"
           />
         ) : hasStatus("FINISHED") ? (
           <RaidStatusMessage
             icon={raidStatuses.FINISHED.icon}
-            title="Raid Completed"
-            description="This raid has been finished successfully."
-            note="Completed raids are read-only and cannot be modified"
+            title={t("raids.actions.raidCompleted")}
+            description={t("raids.actions.raidCompletedDescription")}
+            note={t("raids.actions.raidCompletedNote")}
             iconColor="text-gray-500 dark:text-gray-400"
             bgColor="bg-gray-50 dark:bg-gray-950/30"
           />
@@ -111,7 +111,7 @@ export function RaidActions() {
                   <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                     <FontAwesomeIcon icon={faPlay} className="text-primary h-4 w-4" />
                   </div>
-                  <span className="font-medium">Raid Actions</span>
+                  <span className="font-medium">{t("raids.actions.actions")}</span>
                 </div>
                 <FontAwesomeIcon
                   icon={expandedSections.actions ? faChevronUp : faChevronDown}
@@ -129,11 +129,9 @@ export function RaidActions() {
                           className={`${raidStatuses.OPEN.color} shadow-sm transition-all duration-200 hover:opacity-90`}
                         >
                           <FontAwesomeIcon icon={faUnlock} className="mr-2 h-3 w-3" />
-                          Open Registration
+                          {t("raids.actions.openRaid")}
                         </Button>
-                        <p className="text-muted-foreground text-xs">
-                          Allow players to join the raid and fill available slots.
-                        </p>
+                        <p className="text-muted-foreground text-xs">{t("raids.actions.openRaidDescription")}</p>
                       </div>
                     )}
                     {hasStatus("OPEN") && (
@@ -144,11 +142,9 @@ export function RaidActions() {
                           className={`${raidStatuses.CLOSED.color} shadow-sm transition-all duration-200 hover:opacity-90`}
                         >
                           <FontAwesomeIcon icon={faLock} className="mr-2 h-3 w-3" />
-                          Close Registration
+                          {t("raids.actions.closeRaid")}
                         </Button>
-                        <p className="text-muted-foreground text-xs">
-                          Stop new players from joining while keeping current participants.
-                        </p>
+                        <p className="text-muted-foreground text-xs">{t("raids.actions.closeRaidDescription")}</p>
                       </div>
                     )}
                     {hasStatus("OPEN", "CLOSED", "FINISHED") && (
@@ -159,11 +155,9 @@ export function RaidActions() {
                           className={`${raidStatuses.ONGOING.color} shadow-sm transition-all duration-200 hover:opacity-90`}
                         >
                           <FontAwesomeIcon icon={raidStatuses.ONGOING.icon} className="mr-2 h-3 w-3" />
-                          Start Raid
+                          {t("raids.actions.startRaid")}
                         </Button>
-                        <p className="text-muted-foreground text-xs">
-                          Mark the raid as currently in progress and notify all participants.
-                        </p>
+                        <p className="text-muted-foreground text-xs">{t("raids.actions.startRaidDescription")}</p>
                       </div>
                     )}
                     {hasStatus("ONGOING") && (
@@ -174,11 +168,9 @@ export function RaidActions() {
                           className={`${raidStatuses.FINISHED.color} shadow-sm transition-all duration-200 hover:opacity-90`}
                         >
                           <FontAwesomeIcon icon={raidStatuses.FINISHED.icon} className="mr-2 h-3 w-3" />
-                          Finish Raid
+                          {t("raids.actions.finishRaid")}
                         </Button>
-                        <p className="text-muted-foreground text-xs">
-                          Complete the raid and mark it as finished for all participants.
-                        </p>
+                        <p className="text-muted-foreground text-xs">{t("raids.actions.finishRaidDescription")}</p>
                       </div>
                     )}
                   </div>
@@ -196,7 +188,7 @@ export function RaidActions() {
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
                     <FontAwesomeIcon icon={faUnlock} className="h-4 w-4 text-blue-500" />
                   </div>
-                  <span className="font-medium">Configuration</span>
+                  <span className="font-medium">{t("raids.actions.configuration")}</span>
                 </div>
                 <FontAwesomeIcon
                   icon={expandedSections.configuration ? faChevronUp : faChevronDown}
@@ -208,8 +200,7 @@ export function RaidActions() {
                   <div className="space-y-3">
                     <div>
                       <p className="text-muted-foreground mb-3 text-xs">
-                        Import a raid configuration from another raid of the same content type. This will replace the
-                        current raid&apos;s description, notes, location, and slot composition.
+                        {t("raids.actions.configurationDescription")}
                       </p>
                       <RaidImportDragDrop disabled={!hasStatus("SCHEDULED", "OPEN", "CLOSED", "ONGOING")} />
                     </div>
@@ -229,7 +220,7 @@ export function RaidActions() {
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">
                       <FontAwesomeIcon icon={raidStatuses.CANCELLED.icon} className="h-4 w-4 text-red-500" />
                     </div>
-                    <span className="font-medium text-red-600 dark:text-red-400">Danger Zone</span>
+                    <span className="font-medium text-red-600 dark:text-red-400">{t("raids.actions.danger")}</span>
                   </div>
                   <FontAwesomeIcon
                     icon={expandedSections.danger ? faChevronUp : faChevronDown}
@@ -239,10 +230,7 @@ export function RaidActions() {
                 {expandedSections.danger && (
                   <div className="border-t border-red-500/20 p-3">
                     <div className="space-y-3">
-                      <p className="text-muted-foreground text-xs">
-                        Permanently cancel this raid and notify all participants. This action cannot be undone and will
-                        remove the raid from all participants&apos; views.
-                      </p>
+                      <p className="text-muted-foreground text-xs">{t("raids.actions.dangerDescription")}</p>
                       <Button
                         onClick={handleCancelRaid}
                         variant="destructive"
@@ -250,7 +238,7 @@ export function RaidActions() {
                         className="shadow-sm transition-all duration-200 hover:opacity-90"
                       >
                         <FontAwesomeIcon icon={raidStatuses.CANCELLED.icon} className="mr-2 h-3 w-3" />
-                        Cancel Raid
+                        {t("raids.actions.cancelRaid")}
                       </Button>
                     </div>
                   </div>
