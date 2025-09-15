@@ -52,7 +52,11 @@ export namespace RaidService {
           status: "SCHEDULED",
         },
         include: {
-          slots: true,
+          slots: {
+            orderBy: {
+              order: "asc",
+            },
+          },
         },
       });
 
@@ -188,7 +192,11 @@ export namespace RaidService {
         where: { id },
         data: input,
         include: {
-          slots: true,
+          slots: {
+            orderBy: {
+              order: "asc",
+            },
+          },
         },
       });
 
@@ -223,7 +231,11 @@ export namespace RaidService {
       const existingRaid = await tx.raid.findUnique({
         where: { id },
         include: {
-          slots: true,
+          slots: {
+            orderBy: {
+              order: "asc",
+            },
+          },
         },
       });
 
@@ -280,7 +292,11 @@ export namespace RaidService {
       const existingRaid = await tx.raid.findUnique({
         where: { id: raidId },
         include: {
-          slots: true,
+          slots: {
+            orderBy: {
+              order: "asc",
+            },
+          },
         },
       });
 
@@ -313,7 +329,11 @@ export namespace RaidService {
           location: configuration.raidData.location,
         },
         include: {
-          slots: true,
+          slots: {
+            orderBy: {
+              order: "asc",
+            },
+          },
         },
       });
 
@@ -333,7 +353,7 @@ export namespace RaidService {
             role: slot.role || null,
             weapon: slot.weapon || null,
             comment: slot.comment || null,
-            order: index,
+            order: slot.order ?? index,
             userId: null,
           })),
         });

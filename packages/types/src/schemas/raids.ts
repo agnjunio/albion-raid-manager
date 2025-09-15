@@ -63,6 +63,7 @@ export const raidConfigurationSchema = z.object({
         role: z.enum(["TANK", "SUPPORT", "HEALER", "RANGED_DPS", "MELEE_DPS", "BATTLEMOUNT"] as const).optional(),
         weapon: z.string().optional(),
         comment: z.string().optional(),
+        order: z.number().int().min(0).optional(),
       }),
     ),
   }),

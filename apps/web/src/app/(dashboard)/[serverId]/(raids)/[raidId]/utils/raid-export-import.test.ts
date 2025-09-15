@@ -68,12 +68,14 @@ describe("Raid Export/Import", () => {
         role: "TANK",
         weapon: "T6_2H_HAMMER@0",
         comment: "Main tank",
+        order: 0,
       });
       expect(config.composition.slots[1]).toEqual({
         name: "Healer Slot",
         role: "HEALER",
         weapon: "T6_2H_HOLYSTAFF@0",
         comment: "Main healer",
+        order: 1,
       });
     });
   });
@@ -82,6 +84,7 @@ describe("Raid Export/Import", () => {
     it("should validate correct configuration", () => {
       const validConfig = {
         version: "1.0.0",
+        exportedAt: "2024-12-31T20:00:00Z",
         contentType: "GROUP_DUNGEON",
         raidData: {
           description: "Test",
@@ -95,6 +98,7 @@ describe("Raid Export/Import", () => {
               role: "TANK",
               weapon: "T6_2H_HAMMER@0",
               comment: "Test comment",
+              order: 0,
             },
           ],
         },
@@ -119,12 +123,13 @@ describe("Raid Export/Import", () => {
 
       const result = validateRaidConfiguration(invalidConfig);
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe("Missing 'contentType' field.");
+      expect(result.error).toContain("contentType: Invalid option");
     });
 
     it("should reject configuration with invalid slots", () => {
       const invalidConfig = {
         version: "1.0.0",
+        exportedAt: "2024-12-31T20:00:00Z",
         contentType: "GROUP_DUNGEON",
         raidData: {
           description: "Test",
@@ -141,7 +146,7 @@ describe("Raid Export/Import", () => {
 
       const result = validateRaidConfiguration(invalidConfig);
       expect(result.isValid).toBe(false);
-      expect(result.error).toBe("Invalid slot: missing or invalid 'name' field.");
+      expect(result.error).toContain("name: Invalid input: expected string, received undefined");
     });
   });
 
@@ -176,6 +181,7 @@ describe("Raid Export/Import", () => {
         role: "TANK",
         weapon: "T6_2H_HAMMER@0",
         comment: "Main tank",
+        order: 0,
       });
     });
   });
@@ -197,12 +203,14 @@ describe("Raid Export/Import", () => {
             role: "TANK",
             weapon: "T6_2H_HAMMER@0",
             comment: "Main tank",
+            order: 0,
           },
           {
             name: "Healer Slot",
             role: "HEALER",
             weapon: "T6_2H_HOLYSTAFF@0",
             comment: "Main healer",
+            order: 1,
           },
         ],
       },
@@ -252,8 +260,8 @@ describe("Raid Export/Import", () => {
         ...validConfiguration,
         composition: {
           slots: [
-            { name: "", role: "TANK" },
-            { name: "Valid Slot", role: "HEALER" },
+            { name: "", role: "TANK", order: 0 },
+            { name: "Valid Slot", role: "HEALER", order: 1 },
           ],
         },
       };
@@ -261,7 +269,7 @@ describe("Raid Export/Import", () => {
       const result = raidConfigurationSchema.safeParse(invalidConfig);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues.some((err) => err.path.includes("composition.slots.0.name"))).toBe(true);
+        expect(result.error.issues.some((err) => err.path.join(".").includes("name"))).toBe(true);
       }
     });
 

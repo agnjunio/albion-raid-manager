@@ -19,6 +19,7 @@ export function exportRaidConfiguration(raid: Raid): RaidConfiguration {
         role: slot.role || undefined,
         weapon: slot.weapon || undefined,
         comment: slot.comment || undefined,
+        order: slot.order,
       })),
     },
   };
@@ -75,6 +76,7 @@ export function applyRaidConfiguration(
     role?: string;
     weapon?: string;
     comment?: string;
+    order?: number;
   }>;
 } {
   return {
