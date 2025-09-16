@@ -244,14 +244,6 @@ export namespace RaidService {
         throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${id}" not found`);
       }
 
-      // Check if raid has participants
-      if (existingRaid.slots && existingRaid.slots.some((slot) => slot.userId)) {
-        throw new ServiceError(
-          ServiceErrorCode.INVALID_STATE,
-          "Cannot delete raid that has participants. Please remove all participants first.",
-        );
-      }
-
       // Delete the raid (slots will be deleted due to cascade)
       await tx.raid.delete({
         where: { id },

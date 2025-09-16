@@ -43,7 +43,7 @@
     "logoutSuccess": "Logout realizado com sucesso!",
     "unauthorized": "Você não está autorizado a acessar esta página.",
     "authenticatedAs": "Autenticado como",
-    "notLoggedIn": "Você não está logado. Por favor, entre com o Discord para continuar."
+    "notLoggedIn": "Você não está autenticado. Por favor, faça login com sua conta do Discord para continuar."
   },
   "dashboard": {
     "title": "Painel",

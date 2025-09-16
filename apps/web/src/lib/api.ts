@@ -31,6 +31,7 @@ export const apiRTKRequest: BaseQueryFn<AxiosRequestConfig> = async (args) => {
   try {
     const response = await apiClient.request(args);
     const data = response.data as APIResponse.Type<unknown>;
+
     if (APIResponse.isError(data)) {
       throw new Error(data.type);
     }

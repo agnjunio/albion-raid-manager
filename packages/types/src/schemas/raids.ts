@@ -57,14 +57,39 @@ export const raidConfigurationSchema = z.object({
     location: z.string().optional(),
   }),
   composition: z.object({
-    slots: z.array(
-      z.object({
-        name: z.string().min(1, "Slot name is required"),
-        role: z.enum(["TANK", "SUPPORT", "HEALER", "RANGED_DPS", "MELEE_DPS", "BATTLEMOUNT"] as const).optional(),
-        weapon: z.string().optional(),
-        comment: z.string().optional(),
-        order: z.number().int().min(0).optional(),
-      }),
-    ),
+    slots: z
+      .array(
+        z.object({
+          name: z.string().min(1, "Slot name is required"),
+          role: z.enum(["TANK", "SUPPORT", "HEALER", "RANGED_DPS", "MELEE_DPS", "BATTLEMOUNT"] as const).optional(),
+          weapon: z.string().optional(),
+          comment: z.string().optional(),
+          order: z.number().int().min(0).optional(),
+        }),
+      )
+      .refine(
+        (slots) => {
+          // Get all orders that are defined (not undefined)
+          const orders = slots.map((slot) => slot.order) as number[];
+          if (orders.some((order) => order === undefined)) return false;
+
+          // Check for duplicates
+          const uniqueOrders = new Set(orders);
+          if (orders.length !== uniqueOrders.size) {
+            return false;
+          }
+
+          // Check if orders are sequential starting from 0
+          if (orders.length > 0) {
+            const sortedOrders = [...orders].sort((a, b) => a - b);
+            return sortedOrders.every((order, index) => order === index);
+          }
+
+          return true;
+        },
+        {
+          message: "Slot orders must be unique and sequential starting from 0 (0, 1, 2, ...)",
+        },
+      ),
   }),
 });
