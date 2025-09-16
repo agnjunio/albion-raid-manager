@@ -621,4 +621,81 @@ export namespace RaidService {
       });
     }
   }
+
+  export async function reorderSlots(
+    raidId: string,
+    slotIds: string[],
+    options: RaidServiceOptions = {},
+  ): Promise<Raid> {
+    const { cache, publisher } = options;
+
+    const raid = await prisma.$transaction(async (tx) => {
+      const raid = await tx.raid.findUnique({
+        where: { id: raidId },
+        include: {
+          slots: {
+            orderBy: { order: "asc" },
+          },
+        },
+      });
+
+      if (!raid) {
+        throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID ${raidId} not found`);
+      }
+
+      const existingSlotIds = raid.slots.map((slot) => slot.id);
+      const invalidSlotIds = slotIds.filter((id) => !existingSlotIds.includes(id));
+
+      if (invalidSlotIds.length > 0) {
+        throw new ServiceError(ServiceErrorCode.INVALID_INPUT, `Invalid slot IDs: ${invalidSlotIds.join(", ")}`);
+      }
+
+      const missingSlotIds = existingSlotIds.filter((id) => !slotIds.includes(id));
+      if (missingSlotIds.length > 0) {
+        throw new ServiceError(ServiceErrorCode.INVALID_INPUT, `Missing slot IDs: ${missingSlotIds.join(", ")}`);
+      }
+
+      for (let i = 0; i < slotIds.length; i++) {
+        await tx.raidSlot.update({
+          where: { id: slotIds[i] },
+          data: { order: i },
+        });
+      }
+
+      const updatedRaid = await tx.raid.findUnique({
+        where: { id: raidId },
+        include: {
+          slots: {
+            orderBy: { order: "asc" },
+          },
+        },
+      });
+
+      if (!updatedRaid) {
+        throw new ServiceError(ServiceErrorCode.INTERNAL_ERROR, "Failed to retrieve updated raid");
+      }
+
+      logger.verbose(`Raid slots reordered for raid ${raidId}`, {
+        raidId,
+        slotCount: slotIds.length,
+        newOrder: slotIds,
+      });
+
+      return updatedRaid;
+    });
+
+    if (cache) {
+      CacheInvalidation.invalidateRaid(cache, raidId, raid.serverId).catch((error) => {
+        logger.warn("Cache invalidation failed", { error, raidId });
+      });
+    }
+
+    if (publisher) {
+      publisher.publishRaidUpdated(raid).catch((error) => {
+        logger.warn("Event publishing failed", { error, raidId });
+      });
+    }
+
+    return raid;
+  }
 }

@@ -1,7 +1,12 @@
 import z from "zod";
 
 import { Raid, RaidSlot } from "../../generated/index";
-import { createRaidBodySchema, raidConfigurationSchema, raidSlotSchema } from "../schemas/raids";
+import {
+  createRaidBodySchema,
+  raidConfigurationSchema,
+  raidSlotSchema,
+  reorderRaidSlotsSchema,
+} from "../schemas/raids";
 import { RaidFilters, UpdateRaidInput } from "../services";
 
 export namespace CreateRaid {
@@ -55,5 +60,11 @@ export namespace DeleteRaidSlot {
 export namespace ImportRaidConfiguration {
   export type Params = { serverId: string; raidId: string };
   export type Body = z.infer<typeof raidConfigurationSchema>;
+  export type Response = { raid: Raid };
+}
+
+export namespace ReorderRaidSlots {
+  export type Params = { serverId: string; raidId: string };
+  export type Body = z.infer<typeof reorderRaidSlotsSchema>;
   export type Response = { raid: Raid };
 }

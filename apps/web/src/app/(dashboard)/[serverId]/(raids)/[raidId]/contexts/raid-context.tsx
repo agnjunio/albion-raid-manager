@@ -14,6 +14,7 @@ import {
   useDeleteRaidSlotMutation,
   useGetRaidQuery,
   useImportRaidConfigurationMutation,
+  useReorderRaidSlotsMutation,
   useUpdateRaidMutation,
   useUpdateRaidSlotMutation,
 } from "@/store/raids";
@@ -31,6 +32,7 @@ interface RaidContextValue {
   handleRaidSlotCreate: (slot: Omit<RaidSlot, "id" | "createdAt" | "joinedAt" | "order">) => void;
   handleRaidSlotDelete: (slotId: string) => void;
   handleRaidSlotUpdate: (slotId: string, updates: Partial<RaidSlot>) => void;
+  handleRaidSlotsReorder: (slotIds: string[]) => void;
   handleShareRaid: () => void;
   handleUpdateRaidNotes: (notes: string) => void;
   handleUpdateRaidStatus: (status: RaidStatus) => void;
@@ -60,6 +62,7 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
   const [createRaidSlot] = useCreateRaidSlotMutation();
   const [updateRaidSlot] = useUpdateRaidSlotMutation();
   const [deleteRaidSlot] = useDeleteRaidSlotMutation();
+  const [reorderRaidSlots] = useReorderRaidSlotsMutation();
   const [importRaidConfiguration] = useImportRaidConfigurationMutation();
 
   // Get raid data - this will automatically update when cache is invalidated
@@ -281,6 +284,23 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
     }
   };
 
+  const handleRaidSlotsReorder = async (slotIds: string[]) => {
+    try {
+      await reorderRaidSlots({
+        params: { serverId, raidId },
+        body: { slotIds },
+      }).unwrap();
+
+      toast.success(t("toasts.slot.reordered"), {
+        duration: 1000,
+      });
+    } catch {
+      toast.error(t("toasts.slot.reorderError"), {
+        description: t("toasts.slot.reorderErrorDescription"),
+      });
+    }
+  };
+
   const handleImportRaidConfiguration = async (configuration: RaidConfiguration) => {
     try {
       await importRaidConfiguration({
@@ -312,6 +332,7 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
     handleRaidSlotCreate,
     handleRaidSlotDelete,
     handleRaidSlotUpdate,
+    handleRaidSlotsReorder,
     handleShareRaid,
     handleUpdateRaidNotes,
     handleUpdateRaidStatus,

@@ -55,7 +55,14 @@ interface RaidSlotProviderProps {
 
 export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
   const { t } = useTranslation();
-  const { raid, handleRaidSlotCreate, handleRaidSlotUpdate, handleRaidSlotDelete, canManageRaid } = useRaidContext();
+  const {
+    raid,
+    handleRaidSlotCreate,
+    handleRaidSlotUpdate,
+    handleRaidSlotDelete,
+    handleRaidSlotsReorder,
+    canManageRaid,
+  } = useRaidContext();
 
   const [editingSlot, setEditingSlot] = useState<EditingSlot | null>(null);
   const [isAddingSlot, setIsAddingSlot] = useState(false);
@@ -185,7 +192,6 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
       return;
     }
 
-    // Sort slots by order to match the UI
     const slots = [...(raid?.slots || [])].sort((a, b) => a.order - b.order);
     const activeIndex = slots.findIndex((slot) => slot.id === activeId);
     const overIndex = slots.findIndex((slot) => slot.id === overId);
@@ -194,18 +200,20 @@ export function RaidSlotProvider({ children }: RaidSlotProviderProps) {
       return;
     }
 
-    // Set loading state
     setIsReordering(true);
 
     try {
-      await handleRaidSlotUpdate(activeId, { order: overIndex });
-    } catch (error) {
-      console.error("Failed to reorder slots:", error);
+      const newSlots = [...slots];
+      const [movedSlot] = newSlots.splice(activeIndex, 1);
+      newSlots.splice(overIndex, 0, movedSlot);
+
+      const slotIds = newSlots.map((slot) => slot.id);
+      await handleRaidSlotsReorder(slotIds);
+    } catch {
       toast.error(t("toasts.slot.reorderError"), {
         description: t("toasts.slot.reorderErrorDescription"),
       });
     } finally {
-      // Clear loading state
       setIsReordering(false);
     }
   };

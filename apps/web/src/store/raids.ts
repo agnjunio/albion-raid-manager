@@ -6,6 +6,7 @@ import type {
   GetRaid,
   GetRaids,
   ImportRaidConfiguration,
+  ReorderRaidSlots,
   UpdateRaid,
   UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
@@ -59,6 +60,17 @@ export const raidsApi = createApi({
         }),
         invalidatesTags: tagHelper.list("raids"),
       }),
+      importRaidConfiguration: builder.mutation<
+        ImportRaidConfiguration.Response,
+        { params: ImportRaidConfiguration.Params; body: ImportRaidConfiguration.Body }
+      >({
+        query: ({ params, body }) => ({
+          url: `/servers/${params.serverId}/raids/${params.raidId}/import`,
+          method: "POST",
+          data: body,
+        }),
+        invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
+      }),
       createRaidSlot: builder.mutation<
         CreateRaidSlot.Response,
         { params: CreateRaidSlot.Params; body: CreateRaidSlot.Body }
@@ -91,13 +103,13 @@ export const raidsApi = createApi({
         }),
         invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
       }),
-      importRaidConfiguration: builder.mutation<
-        ImportRaidConfiguration.Response,
-        { params: ImportRaidConfiguration.Params; body: ImportRaidConfiguration.Body }
+      reorderRaidSlots: builder.mutation<
+        ReorderRaidSlots.Response,
+        { params: ReorderRaidSlots.Params; body: ReorderRaidSlots.Body }
       >({
         query: ({ params, body }) => ({
-          url: `/servers/${params.serverId}/raids/${params.raidId}/import`,
-          method: "POST",
+          url: `/servers/${params.serverId}/raids/${params.raidId}/reorder`,
+          method: "PUT",
           data: body,
         }),
         invalidatesTags: (_result, _error, { params }) => [{ type: "Raid", id: params.raidId }],
@@ -116,4 +128,5 @@ export const {
   useUpdateRaidSlotMutation,
   useDeleteRaidSlotMutation,
   useImportRaidConfigurationMutation,
+  useReorderRaidSlotsMutation,
 } = raidsApi;

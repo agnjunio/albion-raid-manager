@@ -2,6 +2,40 @@ import { Build, GearSlot } from "@albion-raid-manager/types";
 import { CreateBuildInput, ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// Mock dependencies - use automatic mocking when possible
+vi.mock("@albion-raid-manager/core/logger"); // Auto-mocks all exports
+vi.mock("@albion-raid-manager/core/cache/redis"); // Auto-mocks all exports
+// Note: @albion-raid-manager/core/cache/utils is handled by vitest setup
+
+// Custom mock for ServersService with specific behavior
+vi.mock("./servers", () => ({
+  ServersService: {
+    ensureServer: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+// Custom mock for database - need specific structure for Prisma client
+vi.mock("@albion-raid-manager/core/database", () => ({
+  prisma: {
+    $transaction: vi.fn(),
+    build: {
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    buildPiece: {
+      create: vi.fn(),
+      createMany: vi.fn(),
+      findFirst: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+  },
+}));
+
 import { prisma } from "@albion-raid-manager/core/database";
 
 import { BuildService } from "./builds";
@@ -55,17 +89,12 @@ describe("BuildService", () => {
       };
 
       mockPrisma.$transaction.mockImplementation(async (callback: Function) => {
-        const tx = {
-          build: {
-            create: vi.fn().mockResolvedValue(mockBuild),
-            findUnique: vi.fn().mockResolvedValue(mockBuild),
-          },
-          buildPiece: {
-            createMany: vi.fn().mockResolvedValue({ count: 1 }),
-          },
-        };
-        return await callback(tx as any);
+        return await callback(mockPrisma);
       });
+      mockPrisma.build.create.mockResolvedValue(mockBuild);
+      mockPrisma.buildPiece.createMany.mockResolvedValue({ count: 1 });
+      // Mock the second findUnique call that happens after creating pieces
+      mockPrisma.build.findUnique.mockResolvedValue(mockBuild);
 
       // Act
       const result = await BuildService.createBuild(input);
@@ -260,15 +289,11 @@ describe("BuildService", () => {
       };
 
       mockPrisma.$transaction.mockImplementation(async (callback: Function) => {
-        const tx = {
-          build: {
-            findUnique: vi.fn().mockResolvedValue(existingBuild),
-            findFirst: vi.fn().mockResolvedValue(null), // No conflicting build
-            update: vi.fn().mockResolvedValue(updatedBuild),
-          },
-        };
-        return await callback(tx as any);
+        return await callback(mockPrisma);
       });
+      mockPrisma.build.findUnique.mockResolvedValue(existingBuild);
+      mockPrisma.build.findFirst.mockResolvedValue(null); // No conflicting build
+      mockPrisma.build.update.mockResolvedValue(updatedBuild);
 
       // Act
       const result = await BuildService.updateBuild("build123", input);
@@ -280,13 +305,9 @@ describe("BuildService", () => {
     it("should throw error if build not found", async () => {
       // Arrange
       mockPrisma.$transaction.mockImplementation(async (callback: Function) => {
-        const tx = {
-          build: {
-            findUnique: vi.fn().mockResolvedValue(null),
-          },
-        };
-        return await callback(tx as any);
+        return await callback(mockPrisma);
       });
+      mockPrisma.build.findUnique.mockResolvedValue(null);
 
       // Act & Assert
       await expect(BuildService.updateBuild("nonexistent", { name: "New Name" })).rejects.toThrow(
@@ -310,14 +331,10 @@ describe("BuildService", () => {
       };
 
       mockPrisma.$transaction.mockImplementation(async (callback: Function) => {
-        const tx = {
-          build: {
-            findUnique: vi.fn().mockResolvedValue(existingBuild),
-            delete: vi.fn().mockResolvedValue({}),
-          },
-        };
-        return await callback(tx as any);
+        return await callback(mockPrisma);
       });
+      mockPrisma.build.findUnique.mockResolvedValue(existingBuild);
+      mockPrisma.build.delete.mockResolvedValue({});
 
       // Act
       await BuildService.deleteBuild("build123");
@@ -340,13 +357,9 @@ describe("BuildService", () => {
       };
 
       mockPrisma.$transaction.mockImplementation(async (callback: Function) => {
-        const tx = {
-          build: {
-            findUnique: vi.fn().mockResolvedValue(existingBuild),
-          },
-        };
-        return await callback(tx as any);
+        return await callback(mockPrisma);
       });
+      mockPrisma.build.findUnique.mockResolvedValue(existingBuild);
 
       // Act & Assert
       await expect(BuildService.deleteBuild("build123")).rejects.toThrow(
@@ -390,17 +403,11 @@ describe("BuildService", () => {
       };
 
       mockPrisma.$transaction.mockImplementation(async (callback: Function) => {
-        const tx = {
-          build: {
-            findUnique: vi.fn().mockResolvedValue(existingBuild),
-          },
-          buildPiece: {
-            findFirst: vi.fn().mockResolvedValue(null),
-            create: vi.fn().mockResolvedValue(newPiece),
-          },
-        };
-        return await callback(tx as any);
+        return await callback(mockPrisma);
       });
+      mockPrisma.build.findUnique.mockResolvedValue(existingBuild);
+      mockPrisma.buildPiece.findFirst.mockResolvedValue(null);
+      mockPrisma.buildPiece.create.mockResolvedValue(newPiece);
 
       // Act
       const result = await BuildService.addBuildPiece("build123", input);

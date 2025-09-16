@@ -1,5 +1,5 @@
 import { Raid } from "@albion-raid-manager/types";
-import { CreateRaidInput } from "@albion-raid-manager/types/services";
+import { CreateRaidInput, ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { prisma } from "@albion-raid-manager/core/database";
@@ -71,7 +71,11 @@ describe("RaidService", () => {
           status: "SCHEDULED",
         },
         include: {
-          slots: true,
+          slots: {
+            orderBy: {
+              order: "asc",
+            },
+          },
         },
       });
     });
@@ -253,6 +257,136 @@ describe("RaidService", () => {
           date: "asc",
         },
       });
+    });
+  });
+
+  describe("reorderSlots", () => {
+    it("should reorder raid slots successfully", async () => {
+      // Arrange
+      const raidId = "raid123";
+      const slotIds = ["slot3", "slot1", "slot2"]; // New order: slot3 first, slot1 second, slot2 third
+
+      const mockRaid = {
+        id: raidId,
+        title: "Test Raid",
+        slots: [
+          { id: "slot1", order: 0, name: "Slot 1" },
+          { id: "slot2", order: 1, name: "Slot 2" },
+          { id: "slot3", order: 2, name: "Slot 3" },
+        ],
+      };
+
+      const mockUpdatedRaid = {
+        ...mockRaid,
+        slots: [
+          { id: "slot3", order: 0, name: "Slot 3" },
+          { id: "slot1", order: 1, name: "Slot 1" },
+          { id: "slot2", order: 2, name: "Slot 2" },
+        ],
+      };
+
+      mockPrisma.$transaction.mockImplementation(async (callback: any) => {
+        return callback({
+          raid: {
+            findUnique: vi
+              .fn()
+              .mockResolvedValueOnce(mockRaid) // First call to verify raid exists
+              .mockResolvedValueOnce(mockUpdatedRaid), // Second call to return updated raid
+          },
+          raidSlot: {
+            update: vi.fn().mockResolvedValue({}), // Mock slot updates
+          },
+        });
+      });
+
+      // Act
+      const result = await RaidService.reorderSlots(raidId, slotIds);
+
+      // Assert
+      expect(result).toEqual(mockUpdatedRaid);
+      expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1);
+    });
+
+    it("should throw error when raid not found", async () => {
+      // Arrange
+      const raidId = "nonexistent-raid";
+      const slotIds = ["slot1", "slot2"];
+
+      mockPrisma.$transaction.mockImplementation(async (callback: any) => {
+        return callback({
+          raid: {
+            findUnique: vi.fn().mockResolvedValue(null), // Raid not found
+          },
+          raidSlot: {
+            update: vi.fn().mockResolvedValue({}),
+          },
+        });
+      });
+
+      // Act & Assert
+      await expect(RaidService.reorderSlots(raidId, slotIds)).rejects.toThrow(
+        new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID ${raidId} not found`),
+      );
+    });
+
+    it("should throw error when invalid slot IDs provided", async () => {
+      // Arrange
+      const raidId = "raid123";
+      const slotIds = ["slot1", "invalid-slot"]; // One invalid slot ID
+
+      const mockRaid = {
+        id: raidId,
+        slots: [
+          { id: "slot1", order: 0, name: "Slot 1" },
+          { id: "slot2", order: 1, name: "Slot 2" },
+        ],
+      };
+
+      mockPrisma.$transaction.mockImplementation(async (callback: any) => {
+        return callback({
+          raid: {
+            findUnique: vi.fn().mockResolvedValue(mockRaid),
+          },
+          raidSlot: {
+            update: vi.fn().mockResolvedValue({}),
+          },
+        });
+      });
+
+      // Act & Assert
+      await expect(RaidService.reorderSlots(raidId, slotIds)).rejects.toThrow(
+        new ServiceError(ServiceErrorCode.INVALID_INPUT, "Invalid slot IDs: invalid-slot"),
+      );
+    });
+
+    it("should throw error when slot IDs are missing", async () => {
+      // Arrange
+      const raidId = "raid123";
+      const slotIds = ["slot1"]; // Missing slot2
+
+      const mockRaid = {
+        id: raidId,
+        slots: [
+          { id: "slot1", order: 0, name: "Slot 1" },
+          { id: "slot2", order: 1, name: "Slot 2" },
+        ],
+      };
+
+      mockPrisma.$transaction.mockImplementation(async (callback: any) => {
+        return callback({
+          raid: {
+            findUnique: vi.fn().mockResolvedValue(mockRaid),
+          },
+          raidSlot: {
+            update: vi.fn().mockResolvedValue({}),
+          },
+        });
+      });
+
+      // Act & Assert
+      await expect(RaidService.reorderSlots(raidId, slotIds)).rejects.toThrow(
+        new ServiceError(ServiceErrorCode.INVALID_INPUT, "Missing slot IDs: slot2"),
+      );
     });
   });
 });

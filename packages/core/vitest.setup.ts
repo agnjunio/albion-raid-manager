@@ -14,9 +14,6 @@ import {
   createMockUser,
 } from "./src/test-helpers";
 
-// Mock external dependencies that are commonly used across the core package
-// This prevents actual external calls during testing
-
 // Mock the memoize function
 vi.mock("@albion-raid-manager/core/cache/memory", () => ({
   memoize: vi.fn((key, fn) => fn()),
@@ -27,84 +24,87 @@ vi.mock("@albion-raid-manager/core/utils/discord", () => ({
   transformGuild: vi.fn((guild) => guild),
 }));
 
-// Mock Prisma client
-vi.mock("@albion-raid-manager/core/database", () => ({
-  prisma: {
-    $transaction: vi.fn(),
-    server: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    },
-    serverMember: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    },
-    user: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    },
-    raid: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    },
-    raidSlot: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      createMany: vi.fn(),
-      update: vi.fn(),
-      updateMany: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    },
-    session: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    },
-    auditConfig: {
-      findUnique: vi.fn(),
-      findMany: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      upsert: vi.fn(),
-      delete: vi.fn(),
-    },
-    build: {
-      create: vi.fn(),
-      findUnique: vi.fn(),
-      findFirst: vi.fn(),
-      findMany: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
-    buildPiece: {
-      create: vi.fn(),
-      createMany: vi.fn(),
-      findFirst: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
-    },
+// Mock Prisma client with proper mock functions
+const createMockFn = () => vi.fn();
+const createMockPrismaClient = () => ({
+  $transaction: createMockFn(),
+  server: {
+    findUnique: createMockFn(),
+    findMany: createMockFn(),
+    create: createMockFn(),
+    update: createMockFn(),
+    upsert: createMockFn(),
+    delete: createMockFn(),
   },
+  serverMember: {
+    findUnique: createMockFn(),
+    findMany: createMockFn(),
+    create: createMockFn(),
+    update: createMockFn(),
+    upsert: createMockFn(),
+    delete: createMockFn(),
+  },
+  user: {
+    findUnique: createMockFn(),
+    findMany: createMockFn(),
+    create: createMockFn(),
+    update: createMockFn(),
+    upsert: createMockFn(),
+    delete: createMockFn(),
+  },
+  raid: {
+    findUnique: createMockFn(),
+    findMany: createMockFn(),
+    create: createMockFn(),
+    update: createMockFn(),
+    upsert: createMockFn(),
+    delete: createMockFn(),
+  },
+  raidSlot: {
+    findUnique: createMockFn(),
+    findMany: createMockFn(),
+    create: createMockFn(),
+    createMany: createMockFn(),
+    update: createMockFn(),
+    updateMany: createMockFn(),
+    upsert: createMockFn(),
+    delete: createMockFn(),
+  },
+  session: {
+    findUnique: createMockFn(),
+    findMany: createMockFn(),
+    create: createMockFn(),
+    update: createMockFn(),
+    upsert: createMockFn(),
+    delete: createMockFn(),
+  },
+  auditConfig: {
+    findUnique: createMockFn(),
+    findMany: createMockFn(),
+    create: createMockFn(),
+    update: createMockFn(),
+    upsert: createMockFn(),
+    delete: createMockFn(),
+  },
+  build: {
+    create: createMockFn(),
+    findUnique: createMockFn(),
+    findFirst: createMockFn(),
+    findMany: createMockFn(),
+    update: createMockFn(),
+    delete: createMockFn(),
+  },
+  buildPiece: {
+    create: createMockFn(),
+    createMany: createMockFn(),
+    findFirst: createMockFn(),
+    update: createMockFn(),
+    delete: createMockFn(),
+  },
+});
+
+vi.mock("@albion-raid-manager/core/database", () => ({
+  prisma: createMockPrismaClient(),
   RaidStatus: {
     SCHEDULED: "SCHEDULED",
     OPEN: "OPEN",
@@ -235,12 +235,21 @@ vi.mock("axios", () => ({
     post: vi.fn(),
     put: vi.fn(),
     delete: vi.fn(),
+    CancelToken: {
+      source: vi.fn(() => ({
+        token: "mock-cancel-token",
+        cancel: vi.fn(),
+      })),
+    },
     create: vi.fn(() => ({
       get: vi.fn(),
       post: vi.fn(),
       put: vi.fn(),
       delete: vi.fn(),
       interceptors: {
+        request: {
+          use: vi.fn(),
+        },
         response: {
           use: vi.fn(),
         },
@@ -351,6 +360,24 @@ vi.mock("@albion-raid-manager/core/scheduler", () => ({
   sleep: vi.fn().mockResolvedValue(undefined),
 }));
 
+// Mock albion service
+vi.mock("@albion-raid-manager/core/services/albion", () => ({
+  AlbionService: {
+    players: {
+      getPlayer: vi.fn(),
+      searchPlayers: vi.fn(),
+    },
+    guilds: {
+      getGuild: vi.fn(),
+      searchGuilds: vi.fn(),
+    },
+    killboard: {
+      getKills: vi.fn(),
+      getDeaths: vi.fn(),
+    },
+  },
+}));
+
 // Mock cache utils
 vi.mock("@albion-raid-manager/core/cache/utils", () => ({
   CacheKeys: {
@@ -358,6 +385,12 @@ vi.mock("@albion-raid-manager/core/cache/utils", () => ({
     serversByUser: vi.fn((userId) => `servers:user:${userId}`),
     serverMembers: vi.fn((serverId) => `server:${serverId}:members`),
     serverMember: vi.fn((serverId, userId) => `server:${serverId}:member:${userId}`),
+    raidsByServer: vi.fn((serverId, hash) => `raids:server:${serverId}:${hash}`),
+    itemSearch: vi.fn((searchTerm, hash) => `items:search:${searchTerm}:${hash}`),
+    itemDatabase: vi.fn(() => `items:database`),
+    build: vi.fn((buildId) => `build:${buildId}`),
+    buildsByServer: vi.fn((serverId, hash) => `builds:server:${serverId}:${hash}`),
+    hashObject: vi.fn((obj) => JSON.stringify(obj).replace(/[^a-zA-Z0-9]/g, "")),
   },
   withCache: vi.fn((fn) => fn()),
 }));

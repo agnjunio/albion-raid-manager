@@ -36,67 +36,120 @@ alwaysApply: true
 - Framework behavior (React, Express, etc.)
 - Third-party library functionality
 
-## Testing Patterns
+## Vitest Setup Guidelines
 
-### Unit Tests
+**Purpose**: Global mocking for dependencies used across multiple test files.
 
-```typescript
-// ✅ Good - Testing business logic with mocked dependencies
-describe("Raid Creation", () => {
-  it("should validate date format", async () => {
-    const mockInteraction = createMockInteraction({
-      options: { getString: vi.fn(() => "invalid-date") }
-    });
+**✅ Mock in Vitest Setup:**
 
-    await raidCommand.execute(mockInteraction);
+- External dependencies (databases, Redis, HTTP clients)
+- Infrastructure services (logging, configuration, external APIs)
+- Complex objects (Prisma client with nested structure)
+- Utilities used everywhere (cache utilities, common helpers)
 
-    expect(mockInteraction.reply).toHaveBeenCalledWith({
-      content: "Invalid date format. Please use format: YYYY-MM-DD HH:MM",
-      ephemeral: true,
-    });
-  });
-});
+**❌ Don't Mock in Vitest Setup:**
 
-// ❌ Bad - Testing Discord.js functionality
-describe("Discord Interaction", () => {
-  it("should create slash command", () => {
-    const command = new SlashCommandBuilder()
-      .setName("test")
-      .setDescription("test");
+- Business logic services (like `./servers`)
+- Test-specific behavior that needs different behavior per test
+- Local dependencies (relative imports within the same package)
 
-    expect(command.toJSON()).toEqual({...}); // Don't test Discord.js
-  });
-});
-```
-
-### Mocking Strategy
+**Best Practices:**
 
 ```typescript
-// ✅ Good - Mock external dependencies
-vi.mock("@albion-raid-manager/core/database", () => ({
-  prisma: {
-    raid: {
-      create: vi.fn(),
-      findMany: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-  RaidStatus: { OPEN: "OPEN", CLOSED: "CLOSED" },
+// ✅ Use factory functions for complex objects
+const createMockFn = () => vi.fn();
+const createMockPrismaClient = () => ({
+  $transaction: createMockFn(),
+  build: { create: createMockFn(), findUnique: createMockFn(), /* ... */ },
+});
+
+// ✅ Make mocks transparent by default
+vi.mock("@albion-raid-manager/core/cache/utils", () => ({
+  withCache: vi.fn((fn) => fn()), // Just call the function directly
 }));
 
-// ✅ Good - Mock Discord.js interactions
-const mockInteraction = {
-  guild: { id: "guild123", name: "Test Guild" },
-  user: { id: "user123", username: "testuser" },
-  options: {
-    getString: vi.fn(),
-    getInteger: vi.fn(),
-  },
-  reply: vi.fn(),
-} as any;
+// ✅ Group related mocks by domain
+// Database and ORM
+vi.mock("@albion-raid-manager/core/database", () => ({ ... }));
+// External Services
+vi.mock("axios", () => ({ ... }));
 ```
 
-### Test Structure
+## Individual Test Mocking
+
+**CRITICAL: Use explicit vi.mock calls in each test file for dependencies that need mocking**
+
+**NEW PATTERN: Call vi.mock on every dependency that needs a mock in unit tests**
+
+**IMPORTANT: Only mock implementations when strictly needed - don't mock everything by default**
+
+### Mocking Strategies
+
+**Use Automatic Mocking (vi.mock without second parameter):**
+
+```typescript
+// ✅ Good - Auto-mocks all exports of the module
+vi.mock("@albion-raid-manager/core/database");
+vi.mock("@albion-raid-manager/core/logger");
+vi.mock("axios");
+```
+
+**Use Custom Mocking (vi.mock with implementation):**
+
+```typescript
+// ✅ Good - Custom behavior when needed
+vi.mock("./servers", () => ({
+  ServersService: {
+    ensureServer: vi.fn().mockResolvedValue(mockServer),
+  },
+}));
+```
+
+### Integration with Vitest Setup
+
+**Leverage Vitest Setup When Possible:**
+
+```typescript
+// test-file.test.ts
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+// Mock dependencies - use automatic mocking when possible
+vi.mock("@albion-raid-manager/core/logger"); // Auto-mocks all exports
+// Note: @albion-raid-manager/core/cache/utils is handled by vitest setup
+
+// Custom mock only when we need specific behavior
+vi.mock("./servers", () => ({
+  ServersService: {
+    ensureServer: vi.fn().mockResolvedValue(mockServer),
+  },
+}));
+
+import { BuildService } from "./builds";
+```
+
+**Key Principles:**
+
+1. **Don't Override Vitest Setup**: Avoid `vi.mock()` calls for modules already mocked in vitest setup
+2. **Use Automatic Mocking**: Use `vi.mock("@module")` without implementation for simple cases
+3. **Custom Mock When Needed**: Provide custom implementation for complex objects or specific behavior
+
+### When to Mock
+
+**✅ Mock:**
+
+- External services (databases, APIs, Discord.js)
+- Dependencies with side effects (file system, network calls)
+- When testing error conditions (database failures, API errors)
+- When you need to verify interactions (function calls, parameters)
+
+**❌ Don't Mock:**
+
+- Pure utility functions (math operations, string manipulation)
+- Simple data transformations (object mapping, filtering)
+- Constants or enums (unless from external packages)
+- Internal business logic (unless testing integration)
+
+## Test Structure
 
 ```typescript
 describe("Feature Name", () => {
@@ -136,156 +189,30 @@ describe("Feature Name", () => {
 });
 ```
 
-## Testing Tools and Setup
+## Test Helpers and Maintenance
 
-### Vitest Configuration
-
-- Use Vitest for all testing
-- Configure proper TypeScript support
-- Set up test environment variables
-- Use proper mocking utilities
-
-### Global Test Setup (vitest.setup.ts)
-
-**CRITICAL: Move all generic dependencies to `vitest.setup.ts`**
+**Global Test Helpers:**
 
 ```typescript
-// vitest.setup.ts - Global mocks for all tests
-vi.mock("@albion-raid-manager/core/database", () => ({
-  prisma: {
-    server: { findUnique: vi.fn(), upsert: vi.fn(), update: vi.fn() },
-    raid: { findMany: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
-    // ... all database mocks
-  },
-  RaidStatus: { SCHEDULED: "SCHEDULED", OPEN: "OPEN", CLOSED: "CLOSED" },
-  RaidType: { FIXED: "FIXED", FLEX: "FLEX" },
-  // ... all enums
-}));
+// vitest.setup.ts
+import { createMockBuild, createMockRaid, createMockUser } from "./src/test-helpers";
 
-vi.mock("discord.js", () => ({
-  SlashCommandBuilder: vi.fn().mockImplementation(() => ({
-    /* ... */
-  })),
-  EmbedBuilder: vi.fn().mockImplementation(() => ({
-    /* ... */
-  })),
-  // ... all Discord.js mocks
-}));
-
-// Import test helpers and make them globally available
-import {
-  createMockUser,
-  createMockInteraction,
-  createMockRaid,
-  createMockInteractionWithSubcommand,
-  createMockInteractionWithOptions,
-  createMockFutureDate,
-  createMockDateString,
-} from "./src/test-helpers";
-
-global.createMockUser = createMockUser;
-global.createMockInteraction = createMockInteraction;
+// Make helpers globally available
+global.createMockBuild = createMockBuild;
 global.createMockRaid = createMockRaid;
-global.createMockInteractionWithSubcommand = createMockInteractionWithSubcommand;
-global.createMockInteractionWithOptions = createMockInteractionWithOptions;
-global.createMockFutureDate = createMockFutureDate;
-global.createMockDateString = createMockDateString;
-```
+global.createMockUser = createMockUser;
 
-### Test Helpers (test-helpers.ts)
-
-**Create dedicated test helper functions for common scenarios**
-
-```typescript
-// test-helpers.ts - Reusable test utilities
-export const createMockInteractionWithSubcommand = (subcommand: string, options = {}) => {
-  return createMockInteraction({
-    options: {
-      getSubcommand: vi.fn(() => subcommand),
-      getString: vi.fn(),
-      getInteger: vi.fn(),
-      ...options,
-    },
-  });
-};
-
-export const createMockInteractionWithOptions = (optionValues: Record<string, any>) => {
-  return createMockInteraction({
-    options: {
-      getSubcommand: vi.fn(),
-      getString: vi.fn((name: string) => optionValues[name] || null),
-      getInteger: vi.fn((name: string) => optionValues[name] || null),
-    },
-  });
-};
-
-export const createMockFutureDate = (daysFromNow = 1) => {
-  const date = new Date();
-  date.setDate(date.getDate() + daysFromNow);
-  return date;
-};
-
-export const createMockDateString = (date: Date) => {
-  return date.toISOString().split("T")[0] + " 20:00";
-};
-```
-
-### Test File Structure
-
-```typescript
-// test-file.test.ts - Clean, focused tests
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
-// Import after mocking (mocks are in vitest.setup.ts)
-import { RaidStatus, RaidType } from "@albion-raid-manager/core/database";
-import { raidCommand } from "./raid";
-
-describe("Raid Command", () => {
-  let mockPrisma: any;
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockPrisma = vi.mocked(await import("@albion-raid-manager/core/database")).prisma;
-  });
-
-  it("should create raid with valid data", async () => {
-    const futureDate = global.createMockFutureDate(1);
-    const futureDateString = global.createMockDateString(futureDate);
-
-    const mockInteraction = global.createMockInteractionWithOptions({
-      title: "Test Raid",
-      date: futureDateString,
-      type: "FIXED",
-    });
-    mockInteraction.options.getSubcommand = vi.fn(() => "create");
-
-    const mockRaid = global.createMockRaid({ date: futureDate });
-    mockPrisma.raid.create.mockResolvedValue(mockRaid);
-
-    await raidCommand.execute(mockInteraction);
-
-    expect(mockPrisma.raid.create).toHaveBeenCalledWith(expect.any(Object));
-    expect(mockInteraction.reply).toHaveBeenCalled();
-  });
+// Clear mocks between tests
+beforeEach(() => {
+  vi.clearAllMocks();
 });
 ```
 
-### Benefits of Global Setup
+**Maintenance:**
 
-**✅ Advantages:**
-
-- **DRY Principle**: No duplicate mocks across test files
-- **Consistency**: All tests use the same mock implementations
-- **Maintainability**: Update mocks in one place
-- **Performance**: Faster test execution (mocks loaded once)
-- **Clean Tests**: Focus on business logic, not setup
-- **Reusability**: Mock factories available everywhere
-
-**❌ Avoid:**
-
-- **Per-test mocks**: Don't mock the same dependencies in every test file
-- **Inline mocks**: Don't create mocks inside individual tests
-- **Duplicate factories**: Don't recreate the same mock objects repeatedly
+- Update mocks when external APIs change
+- Keep setup synchronized across test files
+- Document complex mock behaviors
 
 ## Test Coverage Guidelines
 
@@ -303,134 +230,6 @@ describe("Raid Command", () => {
 - **Simple getters/setters** (unless they have validation)
 - **External library wrappers** (test your usage, not the library)
 
-## Performance Testing
-
-### When to Performance Test
-
-- **Database queries** with large datasets
-- **API endpoints** with high load
-- **Discord bot** command processing
-- **File processing** operations
-
-### Performance Test Patterns
-
-```typescript
-describe("Performance", () => {
-  it("should process large datasets efficiently", async () => {
-    const startTime = Date.now();
-    const largeDataset = generateLargeDataset(10000);
-
-    await processData(largeDataset);
-
-    const duration = Date.now() - startTime;
-    expect(duration).toBeLessThan(1000); // Should complete in under 1 second
-  });
-});
-```
-
-## Integration Testing
-
-### API Integration Tests
-
-```typescript
-// ✅ Good - Test API endpoints with mocked database
-describe("Raid API", () => {
-  it("should create raid via API", async () => {
-    const mockRaid = createMockRaid();
-    vi.mocked(prisma.raid.create).mockResolvedValue(mockRaid);
-
-    const response = await request(app)
-      .post("/api/guilds/guild123/raids")
-      .send({ title: "Test Raid", date: "2024-12-31T20:00:00Z" });
-
-    expect(response.status).toBe(200);
-    expect(response.body.raid.title).toBe("Test Raid");
-  });
-});
-```
-
-### Bot Integration Tests
-
-```typescript
-// ✅ Good - Test bot commands with mocked Discord
-describe("Bot Commands", () => {
-  it("should handle raid creation command", async () => {
-    const mockInteraction = createMockInteraction();
-    mockInteraction.options.getSubcommand.mockReturnValue("create");
-    mockInteraction.options.getString.mockImplementation((name) => {
-      if (name === "title") return "Test Raid";
-      if (name === "date") return "2024-12-31 20:00";
-      return null;
-    });
-
-    await raidCommand.execute(mockInteraction);
-
-    expect(mockInteraction.reply).toHaveBeenCalled();
-  });
-});
-```
-
-## Test Data Management
-
-### Test Data Patterns
-
-```typescript
-// Use factories for consistent test data
-export const raidFactory = {
-  create: (overrides = {}) => ({
-    id: "raid123",
-    title: "Test Raid",
-    date: new Date("2024-12-31T20:00:00Z"),
-    status: "SCHEDULED",
-    serverId: "guild123",
-    ...overrides,
-  }),
-
-  createMany: (count: number, overrides = {}) =>
-    Array.from({ length: count }, (_, i) => raidFactory.create({ id: `raid${i}`, ...overrides })),
-};
-```
-
-### Database Testing
-
-```typescript
-// ✅ Good - Test database logic with mocked Prisma
-describe("Raid Repository", () => {
-  it("should find raids by status", async () => {
-    const mockRaids = [raidFactory.create({ status: "OPEN" })];
-    vi.mocked(prisma.raid.findMany).mockResolvedValue(mockRaids);
-
-    const result = await findRaidsByStatus("OPEN");
-
-    expect(prisma.raid.findMany).toHaveBeenCalledWith({
-      where: { status: "OPEN" },
-    });
-    expect(result).toEqual(mockRaids);
-  });
-});
-```
-
-## Error Testing
-
-### Error Handling Tests
-
-```typescript
-describe("Error Handling", () => {
-  it("should handle database connection errors", async () => {
-    vi.mocked(prisma.raid.create).mockRejectedValue(new Error("Database connection failed"));
-
-    await expect(createRaid(validRaidData)).rejects.toThrow("Database connection failed");
-  });
-
-  it("should handle invalid input gracefully", async () => {
-    const result = await validateRaidData(invalidData);
-
-    expect(result.success).toBe(false);
-    expect(result.errors).toContain("Invalid date format");
-  });
-});
-```
-
 ## Best Practices Summary
 
 1. **Mock Everything External**: Never test third-party libraries or services
@@ -439,10 +238,12 @@ describe("Error Handling", () => {
 4. **Arrange-Act-Assert**: Structure tests clearly
 5. **Test Edge Cases**: Include boundary conditions and error scenarios
 6. **Keep Tests Fast**: Use mocks to avoid slow external calls
-7. **Maintain Test Data**: Use factories and builders for consistent data
-8. **Test User Scenarios**: Focus on end-user functionality
-9. **Mock at the Right Level**: Mock external dependencies, not internal modules
-10. **Verify Interactions**: Ensure your code calls dependencies correctly
+7. **Use Vitest Setup for Global Mocks**: Put commonly used mocks in vitest setup
+8. **Leverage Automatic Mocking**: Use `vi.mock("@module")` for simple cases
+9. **Custom Mock When Needed**: Provide specific implementations for complex objects
+10. **Use Factory Functions**: Create reusable mock factories for complex objects
+11. **Maintain Test Data**: Use factories and builders for consistent data
+12. **Reset Between Tests**: Clear mocks in beforeEach for test isolation
 
 ---
 

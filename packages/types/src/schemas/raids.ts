@@ -47,6 +47,21 @@ export const raidSlotSchema = z.object({
   order: z.number().int().min(0).optional(),
 });
 
+export const reorderRaidSlotsSchema = z.object({
+  slotIds: z
+    .array(z.string().min(1, "Slot ID cannot be empty"))
+    .min(1, "At least one slot ID is required")
+    .refine(
+      (slotIds) => {
+        const uniqueIds = new Set(slotIds);
+        return slotIds.length === uniqueIds.size;
+      },
+      {
+        message: "Slot IDs must be unique",
+      },
+    ),
+});
+
 export const raidConfigurationSchema = z.object({
   version: z.string().min(1, "Version is required"),
   exportedAt: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid exportedAt format"),

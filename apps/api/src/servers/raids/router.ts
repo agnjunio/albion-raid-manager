@@ -10,11 +10,22 @@ import {
   GetRaid,
   GetRaids,
   ImportRaidConfiguration,
+  ReorderRaidSlots,
   UpdateRaid,
   UpdateRaidSlot,
 } from "@albion-raid-manager/types/api";
-import { createRaidBodySchema, raidConfigurationSchema, raidSlotSchema } from "@albion-raid-manager/types/schemas";
-import { UpdateRaidInput, UpdateRaidSlotInput } from "@albion-raid-manager/types/services";
+import {
+  createRaidBodySchema,
+  raidConfigurationSchema,
+  raidSlotSchema,
+  reorderRaidSlotsSchema,
+} from "@albion-raid-manager/types/schemas";
+import {
+  ServiceError,
+  ServiceErrorCode,
+  UpdateRaidInput,
+  UpdateRaidSlotInput,
+} from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
 import { validateRequest } from "@/request";
@@ -227,6 +238,49 @@ serverRaidsRouter.post(
         res
           .status(500)
           .json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to import raid configuration"));
+      }
+    }
+  },
+);
+
+serverRaidsRouter.put(
+  "/:raidId/reorder",
+  validateRequest({ body: reorderRaidSlotsSchema }),
+  async (
+    req: Request<ReorderRaidSlots.Params, {}, ReorderRaidSlots.Body>,
+    res: Response<APIResponse.Type<ReorderRaidSlots.Response>>,
+  ) => {
+    const { serverId, raidId } = req.params;
+    const { slotIds } = req.body;
+
+    if (!serverId || !raidId) {
+      return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required"));
+    }
+
+    try {
+      const raid = await RaidService.reorderSlots(raidId, slotIds, {
+        publisher: await getRaidEventPublisher(),
+      });
+
+      res.json(APIResponse.Success({ raid }));
+    } catch (error) {
+      logger.error("Failed to reorder raid slots:", { error, raidId, slotIds });
+
+      if (ServiceError.isServiceError(error)) {
+        switch (error.code) {
+          case ServiceErrorCode.NOT_FOUND:
+            return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, error.message));
+          case ServiceErrorCode.INVALID_INPUT:
+            return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, error.message));
+          case ServiceErrorCode.INTERNAL_ERROR:
+            return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, error.message));
+          default:
+            return res
+              .status(500)
+              .json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to reorder raid slots"));
+        }
+      } else {
+        res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to reorder raid slots"));
       }
     }
   },

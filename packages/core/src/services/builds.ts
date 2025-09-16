@@ -16,7 +16,7 @@ import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
 import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
-import { ServersService } from "@albion-raid-manager/core/services/servers";
+import { ServersService } from "@albion-raid-manager/core/services";
 
 export interface BuildServiceOptions {
   cache?: Cache;
