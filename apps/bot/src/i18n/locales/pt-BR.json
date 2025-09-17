@@ -105,46 +105,92 @@
   },
   "notifications": {
     "thread": {
-      "welcome": "Bem-vindo ao thread da raid {{raidTitle}}! 🎯",
-      "purpose": "Este thread é para:",
-      "updates": "• Atualizações e notificações da raid",
-      "changes": "• Mudanças de última hora",
-      "coordination": "• Coordenação e lembretes",
-      "discussion": "• Discussões pós-raid",
-      "note": "Por favor, mantenha as discussões gerais da raid no canal principal."
+      "welcome": "🎉 **Bem-vindo ao thread da raid {{raidTitle}}!** 🎉",
+      "purpose": "🔥 **Este é seu centro de comando para:**",
+      "updates": "📢 **Atualizações ao Vivo** - Notificações e anúncios da raid em tempo real",
+      "changes": "⚡ **Mudanças de Última Hora** - Atualizações importantes e modificações",
+      "coordination": "🎯 **Hub de Coordenação** - Discussões de estratégia e lembretes",
+      "discussion": "💬 **Debriefing Pós-Raid** - Compartilhe experiências e feedback",
+      "note": "💡 **Mantenha as discussões gerais da raid no canal principal para todos verem!**"
     },
     "statusChange": {
-      "title": "🔄 **Atualização de Status da Raid**",
-      "message": "O status da raid \"{{raidTitle}}\" mudou para: **{{newStatus}}**"
+      "title": "🔄 **ATUALIZAÇÃO DE STATUS** 🔄",
+      "open": "🟢 **ABERTA PARA INSCRIÇÕES** - Pronto para se juntar à aventura!",
+      "closed": "🔴 **INSCRIÇÕES FECHADAS** - Raid está lotada ou bloqueada",
+      "ongoing": "🟡 **RAID INICIADA** - A aventura começou!",
+      "cancelled": "❌ **RAID CANCELADA** - Infelizmente, esta raid não acontecerá",
+      "finished": "✅ **RAID CONCLUÍDA** - Ótimo trabalho pessoal!"
     },
     "rosterUpdate": {
-      "title": "👥 **Atualização do Roster**",
-      "message": "Alguém entrou ou saiu da raid!",
-      "signups": "Inscrições atuais: {{current}}/{{total}}"
+      "title": "👥 **ATUALIZAÇÃO DO ROSTER** 👥",
+      "joined": "🎉 **{{username}}** se juntou à raid como **{{slotName}}**!",
+      "left": "👋 **{{username}}** saiu da raid.",
+      "signups": "📊 **Inscrições Atuais:** {{current}}/{{total}} slots preenchidos",
+      "progress": "📈 **Progresso:** {{percentage}}% completo",
+      "almostFull": "🚨 **Quase Lotada!** Apenas {{remaining}} slots restantes!",
+      "full": "🎯 **Raid está LOTADA!** Todos os slots foram preenchidos!",
+      "waitlist": "⏳ **Lista de Espera Disponível** - Junte-se à lista de espera para vagas de backup!"
     },
     "reminder": {
-      "title": "⏰ **Lembrete da Raid**",
-      "message": "A raid \"{{raidTitle}}\" está começando em breve!",
-      "description": "Preparem-se para {{raidTitle}}!"
+      "title": "⏰ **LEMBRETE DA RAID** ⏰",
+      "message": "🚀 **A raid \"{{raidTitle}}\" está começando em breve!**",
+      "description": "⚔️ **Preparem-se para uma aventura épica!** ⚔️",
+      "timeLeft": "⏱️ **Tempo Restante:** {{timeLeft}}",
+      "preparation": "🎒 **Não esqueçam de:**\n• Verificar seu equipamento\n• Revisar a estratégia\n• Entrar no canal de voz\n• Trazer seu melhor jogo!",
+      "excitement": "🔥 **A emoção está crescendo!** 🔥"
     },
     "cancellation": {
-      "title": "❌ **Raid Cancelada**",
-      "message": "A raid \"{{raidTitle}}\" foi cancelada.",
-      "reason": "Nenhum motivo fornecido"
+      "title": "❌ **RAID CANCELADA** ❌",
+      "message": "😔 **A raid \"{{raidTitle}}\" foi cancelada.**",
+      "reason": "📝 **Motivo:** {{reason}}",
+      "defaultReason": "Nenhum motivo específico fornecido",
+      "apology": "🙏 **Pedimos desculpas por qualquer inconveniente.**",
+      "nextTime": "🌟 **Fiquem atentos para futuras raids!**"
     },
     "raidStarting": {
-      "title": "⏰ Raid Começando em Breve!",
-      "message": "@everyone Raid começando em {{minutes}} minutos! 🚀",
-      "description": "**{{raidTitle}}** começa em {{minutes}} minutos!",
-      "location": "Localização",
-      "type": "Tipo",
-      "content": "Conteúdo",
-      "tbd": "A definir"
+      "title": "🚀 **RAID COMEÇANDO AGORA!** 🚀",
+      "message": "@everyone **{{raidTitle}}** está começando em {{minutes}} minutos!",
+      "description": "⚔️ **A aventura começa em {{minutes}} minutos!** ⚔️",
+      "location": "📍 **Localização:** {{location}}",
+      "type": "🎯 **Tipo:** {{type}}",
+      "content": "📋 **Conteúdo:** {{content}}",
+      "tbd": "A definir",
+      "finalCall": "📢 **ÚLTIMA CHAMADA!** Junte-se agora ou perca!",
+      "voiceChannel": "🔊 **Entre no canal de voz:** {{voiceChannel}}",
+      "excitement": "🔥 **VAMOS LÁ!** 🔥"
     },
     "raidCancelled": {
-      "title": "❌ Raid Cancelada",
-      "message": "@everyone A raid foi cancelada.",
-      "description": "A raid foi cancelada."
+      "title": "❌ **RAID CANCELADA** ❌",
+      "message": "@everyone **A raid foi cancelada.**",
+      "description": "😔 **Infelizmente, esta raid não acontecerá.**",
+      "reason": "📝 **Motivo:** {{reason}}",
+      "apology": "🙏 **Pedimos desculpas por qualquer inconveniente.**",
+      "nextTime": "🌟 **Fiquem atentos para futuras raids!**"
+    },
+    "specialEvents": {
+      "firstSignup": {
+        "title": "🎉 **PRIMEIRA INSCRIÇÃO!** 🎉",
+        "message": "🌟 **{{username}}** é o primeiro a se juntar à **{{raidTitle}}**!",
+        "description": "🔥 **A aventura começa com você!** 🔥"
+      },
+      "raidFull": {
+        "title": "🎯 **RAID ESTÁ LOTADA!** 🎯",
+        "message": "🚀 **{{raidTitle}}** está agora completamente lotada!",
+        "description": "⚔️ **Todos os {{total}} slots foram preenchidos!** ⚔️",
+        "waitlist": "⏳ **Junte-se à lista de espera para vagas de backup!**"
+      },
+      "raidAlmostFull": {
+        "title": "🚨 **QUASE LOTADA!** 🚨",
+        "message": "⚡ **{{raidTitle}}** está quase lotada!",
+        "description": "📊 **Apenas {{remaining}} slots restantes!**",
+        "hurry": "🏃‍♂️ **Apresse-se e junte-se antes que seja tarde demais!**"
+      },
+      "raidStartingSoon": {
+        "title": "⏰ **COMEÇANDO EM BREVE!** ⏰",
+        "message": "🚀 **{{raidTitle}}** começa em {{minutes}} minutos!",
+        "description": "⚔️ **Preparem-se para a batalha!** ⚔️",
+        "preparation": "🎒 **Hora das preparações finais!**"
+      }
     }
   },
   "commands": {

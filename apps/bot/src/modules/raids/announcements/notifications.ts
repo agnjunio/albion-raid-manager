@@ -51,17 +51,14 @@ export async function createNotificationThread({ message, raid, context }: Creat
 
 interface ThreadUpdateData {
   newStatus?: string;
-  currentSignups?: number;
-  totalSlots?: number;
   reason?: string;
-  content?: string;
-  embed?: EmbedBuilder;
+  timeLeft?: string;
 }
 
 interface SendThreadUpdateProps {
   discord: Client;
   raidId: string;
-  updateType: "status_change" | "slot_update" | "reminder" | "cancellation" | "general";
+  updateType: "status_change" | "reminder" | "cancellation";
   data?: ThreadUpdateData;
   context: GuildContext;
 }
@@ -99,53 +96,52 @@ export async function sendThreadUpdate({ discord, raidId, updateType, data = {},
   }
 
   try {
-    let content = "";
+    let content: string | undefined;
     let embed: EmbedBuilder | undefined;
 
     switch (updateType) {
-      case "status_change":
-        content = `${t("notifications.statusChange.title")}\n\n${t("notifications.statusChange.message", { raidTitle: raid.title, newStatus: data.newStatus || "Unknown" })}`;
-        embed = new EmbedBuilder()
-          .setColor(getStatusColor(data.newStatus || "Unknown"))
-          .setTitle(`Status: ${data.newStatus || "Unknown"}`)
-          .setTimestamp();
-        break;
+      case "status_change": {
+        const statusKey = (data.newStatus || "Unknown").toLowerCase();
 
-      case "slot_update":
-        content = `${t("notifications.rosterUpdate.title")}\n\n${t("notifications.rosterUpdate.message")}`;
-        embed = new EmbedBuilder()
-          .setColor("#00ff00")
-          .setTitle("Roster Change")
-          .setDescription(
-            t("notifications.rosterUpdate.signups", { current: data.currentSignups, total: data.totalSlots }),
-          )
-          .setTimestamp();
+        embed = new EmbedBuilder().setColor(getStatusColor(data.newStatus || "Unknown")).setTimestamp();
+
+        if (statusKey === "open") {
+          embed.setDescription(t("notifications.statusChange.open"));
+        } else if (statusKey === "closed") {
+          embed.setDescription(t("notifications.statusChange.closed"));
+        } else if (statusKey === "ongoing") {
+          embed.setDescription(t("notifications.statusChange.ongoing"));
+        } else if (statusKey === "cancelled") {
+          embed.setDescription(t("notifications.statusChange.cancelled"));
+        } else if (statusKey === "finished") {
+          embed.setDescription(t("notifications.statusChange.finished"));
+        }
+
         break;
+      }
 
       case "reminder":
         content = `${t("notifications.reminder.title")}\n\n${t("notifications.reminder.message", { raidTitle: raid.title })}`;
-        embed = new EmbedBuilder()
-          .setColor("#ffaa00")
-          .setTitle("Raid Starting Soon")
-          .setDescription(t("notifications.reminder.description", { raidTitle: raid.title }))
-          .setTimestamp();
-        break;
 
-      case "cancellation":
-        content = `${t("notifications.cancellation.title")}\n\n${t("notifications.cancellation.message", { raidTitle: raid.title })}`;
-        embed = new EmbedBuilder()
-          .setColor("#ff0000")
-          .setTitle("Raid Cancelled")
-          .setDescription(data.reason || t("notifications.cancellation.reason"))
-          .setTimestamp();
-        break;
-
-      case "general":
-        content = data.content || "General raid update";
-        if (data.embed) {
-          embed = data.embed;
+        if (data.timeLeft) {
+          content += `\n\n${t("notifications.reminder.timeLeft", { timeLeft: data.timeLeft })}`;
         }
+
+        content += `\n\n${t("notifications.reminder.preparation")}`;
+        content += `\n\n${t("notifications.reminder.excitement")}`;
+
         break;
+
+      case "cancellation": {
+        content = `${t("notifications.cancellation.title")}\n\n${t("notifications.cancellation.message", { raidTitle: raid.title })}`;
+
+        const reason = data.reason || t("notifications.cancellation.defaultReason");
+        content += `\n\n${t("notifications.cancellation.reason", { reason })}`;
+        content += `\n\n${t("notifications.cancellation.apology")}`;
+        content += `\n\n${t("notifications.cancellation.nextTime")}`;
+
+        break;
+      }
     }
 
     const messageOptions: MessageCreateOptions = { content };
@@ -157,13 +153,13 @@ export async function sendThreadUpdate({ discord, raidId, updateType, data = {},
 
     logger.info(`Sent ${updateType} update to thread for raid ${raidId}`, {
       raidId,
-      threadId: raid.announcementThreadId,
+      messageId: raid.announcementMessageId,
       updateType,
     });
   } catch (error) {
     logger.error(`Failed to send ${updateType} update to thread for raid ${raidId}`, {
       raidId,
-      threadId: raid.announcementThreadId,
+      messageId: raid.announcementMessageId,
       updateType,
       error,
     });

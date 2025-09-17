@@ -105,46 +105,92 @@
   },
   "notifications": {
     "thread": {
-      "welcome": "Welcome to the {{raidTitle}} raid thread! 🎯",
-      "purpose": "This thread is for:",
-      "updates": "• Raid updates and notifications",
-      "changes": "• Last-minute changes",
-      "coordination": "• Coordination and reminders",
-      "discussion": "• Post-raid discussions",
-      "note": "Please keep general raid discussions in the main channel."
+      "welcome": "🎉 **Welcome to the {{raidTitle}} raid thread!** 🎉",
+      "purpose": "🔥 **This is your command center for:**",
+      "updates": "📢 **Live Updates** - Real-time raid notifications and announcements",
+      "changes": "⚡ **Last-Minute Changes** - Important updates and modifications",
+      "coordination": "🎯 **Coordination Hub** - Strategy discussions and reminders",
+      "discussion": "💬 **Post-Raid Debrief** - Share experiences and feedback",
+      "note": "💡 **Keep general raid discussions in the main channel for everyone to see!**"
     },
     "statusChange": {
-      "title": "🔄 **Raid Status Update**",
-      "message": "The raid \"{{raidTitle}}\" status has changed to: **{{newStatus}}**"
+      "title": "🔄 **STATUS UPDATE** 🔄",
+      "open": "🟢 **OPEN FOR SIGNUPS** - Ready to join the adventure!",
+      "closed": "🔴 **SIGNUPS CLOSED** - Raid is full or locked",
+      "ongoing": "🟡 **RAID IN PROGRESS** - The adventure has begun!",
+      "cancelled": "❌ **RAID CANCELLED** - Unfortunately, this raid won't happen",
+      "finished": "✅ **RAID COMPLETED** - Great job everyone!"
     },
     "rosterUpdate": {
-      "title": "👥 **Roster Update**",
-      "message": "Someone has joined or left the raid!",
-      "signups": "Current signups: {{current}}/{{total}}"
+      "title": "👥 **ROSTER UPDATE** 👥",
+      "joined": "🎉 **{{username}}** has joined the raid as **{{slotName}}**!",
+      "left": "👋 **{{username}}** has left the raid.",
+      "signups": "📊 **Current Signups:** {{current}}/{{total}} slots filled",
+      "progress": "📈 **Progress:** {{percentage}}% complete",
+      "almostFull": "🚨 **Almost Full!** Only {{remaining}} slots left!",
+      "full": "🎯 **Raid is FULL!** All slots have been taken!",
+      "waitlist": "⏳ **Waitlist Available** - Join the waitlist for backup spots!"
     },
     "reminder": {
-      "title": "⏰ **Raid Reminder**",
-      "message": "The raid \"{{raidTitle}}\" is starting soon!",
-      "description": "Get ready for {{raidTitle}}!"
+      "title": "⏰ **RAID REMINDER** ⏰",
+      "message": "🚀 **The raid \"{{raidTitle}}\" is starting soon!**",
+      "description": "⚔️ **Get ready for an epic adventure!** ⚔️",
+      "timeLeft": "⏱️ **Time Remaining:** {{timeLeft}}",
+      "preparation": "🎒 **Don't forget to:**\n• Check your gear\n• Review the strategy\n• Join the voice channel\n• Bring your A-game!",
+      "excitement": "🔥 **The excitement is building!** 🔥"
     },
     "cancellation": {
-      "title": "❌ **Raid Cancelled**",
-      "message": "The raid \"{{raidTitle}}\" has been cancelled.",
-      "reason": "No reason provided"
+      "title": "❌ **RAID CANCELLED** ❌",
+      "message": "😔 **The raid \"{{raidTitle}}\" has been cancelled.**",
+      "reason": "📝 **Reason:** {{reason}}",
+      "defaultReason": "No specific reason provided",
+      "apology": "🙏 **We apologize for any inconvenience.**",
+      "nextTime": "🌟 **Stay tuned for future raids!**"
     },
     "raidStarting": {
-      "title": "⏰ Raid Starting Soon!",
-      "message": "@everyone Raid starting in {{minutes}} minutes! 🚀",
-      "description": "**{{raidTitle}}** starts in {{minutes}} minutes!",
-      "location": "Location",
-      "type": "Type",
-      "content": "Content",
-      "tbd": "TBD"
+      "title": "🚀 **RAID STARTING NOW!** 🚀",
+      "message": "@everyone **{{raidTitle}}** is starting in {{minutes}} minutes!",
+      "description": "⚔️ **The adventure begins in {{minutes}} minutes!** ⚔️",
+      "location": "📍 **Location:** {{location}}",
+      "type": "🎯 **Type:** {{type}}",
+      "content": "📋 **Content:** {{content}}",
+      "tbd": "TBD",
+      "finalCall": "📢 **FINAL CALL!** Join now or miss out!",
+      "voiceChannel": "🔊 **Join the voice channel:** {{voiceChannel}}",
+      "excitement": "🔥 **LET'S GO!** 🔥"
     },
     "raidCancelled": {
-      "title": "❌ Raid Cancelled",
-      "message": "@everyone The raid has been cancelled.",
-      "description": "The raid has been cancelled."
+      "title": "❌ **RAID CANCELLED** ❌",
+      "message": "@everyone **The raid has been cancelled.**",
+      "description": "😔 **Unfortunately, this raid won't be happening.**",
+      "reason": "📝 **Reason:** {{reason}}",
+      "apology": "🙏 **We apologize for any inconvenience.**",
+      "nextTime": "🌟 **Stay tuned for future raids!**"
+    },
+    "specialEvents": {
+      "firstSignup": {
+        "title": "🎉 **FIRST SIGNUP!** 🎉",
+        "message": "🌟 **{{username}}** is the first to join **{{raidTitle}}**!",
+        "description": "🔥 **The adventure begins with you!** 🔥"
+      },
+      "raidFull": {
+        "title": "🎯 **RAID IS FULL!** 🎯",
+        "message": "🚀 **{{raidTitle}}** is now completely full!",
+        "description": "⚔️ **All {{total}} slots have been taken!** ⚔️",
+        "waitlist": "⏳ **Join the waitlist for backup spots!**"
+      },
+      "raidAlmostFull": {
+        "title": "🚨 **ALMOST FULL!** 🚨",
+        "message": "⚡ **{{raidTitle}}** is almost full!",
+        "description": "📊 **Only {{remaining}} slots left!**",
+        "hurry": "🏃‍♂️ **Hurry up and join before it's too late!**"
+      },
+      "raidStartingSoon": {
+        "title": "⏰ **STARTING SOON!** ⏰",
+        "message": "🚀 **{{raidTitle}}** starts in {{minutes}} minutes!",
+        "description": "⚔️ **Get ready for battle!** ⚔️",
+        "preparation": "🎒 **Final preparations time!**"
+      }
     }
   },
   "commands": {

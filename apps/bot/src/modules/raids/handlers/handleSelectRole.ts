@@ -1,12 +1,12 @@
-import { ensureUser, prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { RaidEvent, RaidEventType } from "@albion-raid-manager/core/redis/index";
+import { RaidService, UsersService } from "@albion-raid-manager/core/services";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { GuildMember } from "discord.js";
 
 import { ClientError, ErrorCodes } from "@/errors";
 import { type InteractionHandlerProps } from "@/modules/modules";
 
-import { createOrUpdateAnnouncement, sendThreadUpdate } from "../announcements";
+import { handleRaidUpdated } from "./handleRaidEvents";
 
 export const handleSelectRole = async ({ discord, interaction, context }: InteractionHandlerProps) => {
   if (!interaction.isStringSelectMenu()) return;
@@ -15,17 +15,11 @@ export const handleSelectRole = async ({ discord, interaction, context }: Intera
   try {
     const raidId = interaction.customId.split(":")[2];
 
-    const raid = await prisma.raid.findUnique({
-      where: { id: raidId },
-      include: {
-        slots: {
-          orderBy: { order: "asc" },
-        },
-      },
-    });
+    const raid = await RaidService.findRaidById(raidId, { slots: true });
 
     if (!raid) throw new Error("Raid not found");
     if (raid.status !== "OPEN") throw new Error("Raid is not open for signups");
+    if (!raid.slots) throw new Error("Raid slots not found");
 
     const slot = interaction.values[0];
 
@@ -35,33 +29,19 @@ export const handleSelectRole = async ({ discord, interaction, context }: Intera
       throw new ClientError(ErrorCodes.SLOT_TAKEN, "Slot already taken, please select another one.");
     }
 
-    const currentSlotId = raid.slots.find((raidSlot) => raidSlot.userId === interaction.user.id)?.id;
-    if (currentSlotId) {
-      await prisma.raidSlot.update({
-        where: {
-          id: currentSlotId,
-        },
-        data: {
-          userId: null,
-        },
-      });
-    }
-
-    const user = await ensureUser({
+    await UsersService.ensureUser(interaction.user.id, {
       id: interaction.user.id,
       username: interaction.user.username,
-      nickname: (interaction.member as GuildMember)?.nickname ?? null,
+      nickname: interaction.user.globalName,
       avatar: interaction.user.avatar,
     });
 
-    await prisma.raidSlot.update({
-      where: {
-        id: slot,
-      },
-      data: {
-        userId: user.id,
-      },
+    await RaidService.updateRaidSlot(slot, {
+      userId: interaction.user.id,
     });
+
+    const updatedRaid = await RaidService.findRaidById(raidId, { slots: true });
+    if (!updatedRaid) throw new Error("Raid not found");
 
     const successMessage = t("raids.signup.success");
     await interaction.update({
@@ -69,8 +49,19 @@ export const handleSelectRole = async ({ discord, interaction, context }: Intera
       components: [],
     });
 
-    createOrUpdateAnnouncement({ discord, raidId: raid.id, serverId: raid.serverId, context });
-    sendThreadUpdate({ discord, raidId: raid.id, updateType: "slot_update", context });
+    const event: RaidEvent = {
+      type: RaidEventType.UPDATED,
+      timestamp: new Date().toISOString(),
+      entityId: raidId,
+      serverId: raid.serverId,
+      data: {
+        raid: updatedRaid,
+        previousRaid: {
+          slots: raid.slots,
+        },
+      },
+    };
+    handleRaidUpdated({ discord, event, context });
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;

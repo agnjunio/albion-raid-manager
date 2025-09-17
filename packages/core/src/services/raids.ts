@@ -419,6 +419,28 @@ export namespace RaidService {
       // Ensure the user exists in our database to satisfy foreign key constraints
       // This handles both normal user creation and fallback cases when Discord API is unavailable
       await ServersService.ensureServerMember(raid.serverId, userId);
+
+      // Check if the user is already assigned to another slot in this raid
+      const existingUserSlot = await prisma.raidSlot.findFirst({
+        where: {
+          raidId,
+          userId,
+        },
+      });
+
+      // If user is assigned to another slot, unassign them from that slot
+      if (existingUserSlot) {
+        await prisma.raidSlot.update({
+          where: { id: existingUserSlot.id },
+          data: { userId: null },
+        });
+
+        logger.verbose(`Unassigned user from existing slot when creating new slot with user assignment`, {
+          userId,
+          unassignedSlotId: existingUserSlot.id,
+          raidId,
+        });
+      }
     }
 
     const updatedRaid = await prisma.raid.update({
@@ -469,25 +491,34 @@ export namespace RaidService {
   ): Promise<RaidSlot> {
     const { cache, publisher } = options;
 
+    const existingSlot = await prisma.raidSlot.findUnique({
+      where: { id: slotId },
+      include: {
+        raid: {
+          include: {
+            slots: true,
+          },
+        },
+      },
+    });
+
+    if (!existingSlot) {
+      throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid slot with ID "${slotId}" not found`);
+    }
+    if (!existingSlot.raid) {
+      throw new ServiceError(ServiceErrorCode.NOT_FOUND, "Raid not found for this slot");
+    }
+
+    const { raid } = existingSlot;
+    if (!raid?.slots) {
+      throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${slotId}" not found`);
+    }
+
+    const previousSlots = [...raid.slots];
     const slot = await prisma.$transaction(async (tx) => {
       // Check if slot exists
-      const existingSlot = await tx.raidSlot.findUnique({
-        where: { id: slotId },
-        include: {
-          raid: true,
-        },
-      });
-
-      if (!existingSlot) {
-        throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid slot with ID "${slotId}" not found`);
-      }
-
-      if (!existingSlot.raid) {
-        throw new ServiceError(ServiceErrorCode.NOT_FOUND, "Raid not found for this slot");
-      }
-
       // Check if raid is in a state where slots can be modified
-      if (!["SCHEDULED", "OPEN", "CLOSED"].includes(existingSlot.raid.status)) {
+      if (!["SCHEDULED", "OPEN", "CLOSED"].includes(raid.status)) {
         throw new ServiceError(
           ServiceErrorCode.INVALID_STATE,
           "Cannot modify slots for raids that have started or finished",
@@ -497,7 +528,31 @@ export namespace RaidService {
       if (input.userId) {
         // Ensure the user exists in our database to satisfy foreign key constraints
         // This handles both normal user creation and fallback cases when Discord API is unavailable
-        await ServersService.ensureServerMember(existingSlot.raid.serverId, input.userId);
+        await ServersService.ensureServerMember(raid.serverId, input.userId);
+
+        // Check if the user is already assigned to another slot in this raid
+        const existingUserSlot = await tx.raidSlot.findFirst({
+          where: {
+            raidId: existingSlot.raidId,
+            userId: input.userId,
+            id: { not: slotId }, // Exclude the current slot being updated
+          },
+        });
+
+        // If user is assigned to another slot, unassign them from that slot
+        if (existingUserSlot) {
+          await tx.raidSlot.update({
+            where: { id: existingUserSlot.id },
+            data: { userId: null },
+          });
+
+          logger.info(`Unassigned user from existing slot when assigning to new slot`, {
+            userId: input.userId,
+            unassignedSlotId: existingUserSlot.id,
+            newSlotId: slotId,
+            raidId: existingSlot.raidId,
+          });
+        }
       }
 
       // If order is specified, handle reordering logic
@@ -561,9 +616,8 @@ export namespace RaidService {
         logger.warn("Cache invalidation failed", { error, raidId: slot.raidId });
       });
     }
-
     if (publisher && slot.raid) {
-      publisher.publishRaidUpdated(slot.raid, { slots: slot.raid.slots }).catch((error) => {
+      publisher.publishRaidUpdated(slot.raid, { slots: previousSlots }).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId: slot.raidId });
       });
     }

@@ -15,7 +15,7 @@ export async function createAlbionItemEmoji(item: string, { discord }: GetApplic
   const name = `${itemId}_${enchantment}`;
 
   try {
-    const image = await fetch(AlbionService.items.getAlbionItemImageUrl(itemId, { quality: 5, enchantment }), {
+    const image = await fetch(AlbionService.items.getAlbionItemImageUrl(itemId, { quality: 4, enchantment }), {
       headers: {
         "Content-Type": "image/png",
       },

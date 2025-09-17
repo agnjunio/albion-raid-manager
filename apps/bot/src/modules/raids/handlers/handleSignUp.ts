@@ -32,12 +32,8 @@ export const handleSignUp = async ({ discord, interaction, context }: Interactio
     const allSlotsTaken = raid.slots.length > 0 && raid.slots.every((slot) => !!slot.userId);
     if (allSlotsTaken) throw new Error("All raid slots are taken");
 
-    const users = await Promise.all(
-      raid.slots.filter((slot) => !!slot.userId).map(async (slot) => discord.users.fetch(slot.userId as string)),
-    );
-
     // Use translator for localized messages
-    const reply = await buildRaidSignupReply(raid, raid.slots, context, users);
+    const reply = await buildRaidSignupReply(raid, { discord, context });
     await interaction.reply(reply);
   } catch (error) {
     if (!interaction.isRepliable()) return;

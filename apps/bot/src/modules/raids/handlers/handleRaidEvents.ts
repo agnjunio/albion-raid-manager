@@ -21,13 +21,11 @@ export async function handleRaidUpdated({ discord, event, context }: RaidEventHa
   const { raid, previousRaid } = event.data;
 
   const statusChanged = previousRaid?.status;
-  const hasSignUps = previousRaid?.slots;
 
   logger.info(`Raid updated: ${raid.id}`, {
     raid,
     previousRaid,
     statusChanged,
-    hasSignUps,
   });
 
   if (raid.status === "SCHEDULED") return;
@@ -53,16 +51,6 @@ export async function handleRaidUpdated({ discord, event, context }: RaidEventHa
         context,
       });
     }
-  }
-
-  if (hasSignUps) {
-    await sendThreadUpdate({
-      discord,
-      raidId: event.entityId,
-      updateType: "slot_update",
-      data: { currentSignups: raid.slots?.filter((slot) => slot.userId).length, totalSlots: raid.slots?.length },
-      context,
-    });
   }
 }
 
