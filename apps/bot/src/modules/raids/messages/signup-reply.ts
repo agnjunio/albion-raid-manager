@@ -8,12 +8,18 @@ import {
   User,
 } from "discord.js";
 
+import { type GuildContext } from "@/modules/guild-context";
+
 import { raids } from "..";
 
-export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User[]): InteractionReplyOptions => {
-  const menu = new StringSelectMenuBuilder()
-    .setCustomId(`${raids.id}:select:${raid.id}`)
-    .setPlaceholder("Select a build");
+export const buildRaidSignupReply = async (
+  raid: Raid,
+  slots: RaidSlot[],
+  context: GuildContext,
+  users?: User[],
+): Promise<InteractionReplyOptions> => {
+  const placeholder = await context.t("raids.signup.selectBuild");
+  const menu = new StringSelectMenuBuilder().setCustomId(`${raids.id}:select:${raid.id}`).setPlaceholder(placeholder);
 
   for (const slot of slots) {
     // Skip if the slot is already taken
@@ -23,7 +29,8 @@ export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User
     if (slot.userId) {
       label += ` - `;
       const user = users?.find((user) => user.id === slot.userId);
-      label += user ? `[${user.displayName}]` : `[Taken]`;
+      const takenText = await context.t("raids.slots.taken");
+      label += user ? `[${user.displayName}]` : `[${takenText}]`;
     }
     const option = new StringSelectMenuOptionBuilder()
       .setValue(`${slot.id}`)
@@ -34,8 +41,12 @@ export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User
 
   const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
 
+  const content = await context.t("raids.signup.content", {
+    description: raid.description || (await context.t("raids.description")),
+  });
+
   return {
-    content: `Signing up for the raid: ${raid.description}. Please select a build.`,
+    content,
     ephemeral: true,
     components: [row],
   };

@@ -9,7 +9,8 @@ import {
   SlashCommandStringOption,
 } from "discord.js";
 
-import { Command } from "@/commands";
+import { Command } from "@/modules/commands";
+import { type GuildContext } from "@/modules/guild-context";
 
 export const configCommand: Command = {
   data: new SlashCommandBuilder()
@@ -52,13 +53,14 @@ export const configCommand: Command = {
         ),
     ) as SlashCommandBuilder,
 
-  execute: async (interaction: Interaction) => {
+  execute: async (interaction: Interaction, context: GuildContext) => {
     if (!interaction.isChatInputCommand()) return;
 
     const guild = interaction.guild;
     if (!guild) {
+      const errorMessage = await context.t("commands.errors.guildOnly");
       await interaction.reply({
-        content: "❌ This command can only be used in a Discord server.",
+        content: errorMessage,
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -67,8 +69,9 @@ export const configCommand: Command = {
     // Check if user has admin permissions
     const member = await guild.members.fetch(interaction.user.id);
     if (!member.permissions.has("Administrator")) {
+      const errorMessage = await context.t("commands.errors.adminRequired");
       await interaction.reply({
-        content: "❌ You need Administrator permissions to configure server settings.",
+        content: errorMessage,
         flags: MessageFlags.Ephemeral,
       });
       return;

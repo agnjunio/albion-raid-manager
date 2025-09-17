@@ -1,32 +1,30 @@
-import { DiscordMessageContext, parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
+import { parseDiscordMessage, ParsedRaidData } from "@albion-raid-manager/ai";
 import { prisma } from "@albion-raid-manager/core/database";
 import { getContentTypeInfo } from "@albion-raid-manager/core/entities";
 import { logger } from "@albion-raid-manager/core/logger";
 import { ServersService } from "@albion-raid-manager/core/services";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { Raid, RaidRole, RaidSlot, RaidStatus, RaidType, Server } from "@albion-raid-manager/types";
-import { Client, Message } from "discord.js";
+import { MessageCreateOptions } from "discord.js";
 
-import { buildRaidCreationConfirmationMessage } from "../messages";
+import { buildRaidCreationConfirmationMessage } from "../messages/creation-confirmation";
 
-export const handleMessageCreate = async ({ message }: { discord: Client; message: Message }) => {
+import { type MessageHandlerProps } from "./index";
+
+export const handleMessageCreate = async ({ message, context }: MessageHandlerProps) => {
+  if (message.author.bot || !message.guild) return;
+
   try {
-    // Skip bot messages and messages without guild
-    if (message.author.bot || !message.guild) return;
-
-    // Check if the guild is enabled for raid parsing
     const server = await ServersService.getServerById(message.guild.id);
     if (!server || message.channel.id !== server.raidAnnouncementChannelId) return;
 
-    // Log the message for debugging
     logger.debug(`Message received in raid channel: #${message.guild.channels.cache.get(message.channel.id)?.name}`, {
       guildId: message.guild.id,
       channelId: message.channel.id,
       authorId: message.author.id,
     });
 
-    // Create context for the message
-    const context: DiscordMessageContext = {
+    const parsedData = await parseDiscordMessage(message.content, {
       guildId: message.guild.id,
       channelId: message.channel.id,
       authorId: message.author.id,
@@ -34,12 +32,8 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
       timestamp: message.createdAt,
       mentions: message.mentions.users.map((user) => user.id),
       attachments: message.attachments.map((attachment) => attachment.url),
-    };
+    });
 
-    // Parse the message
-    const parsedData = await parseDiscordMessage(message.content, context);
-
-    // Check if we should create a raid (confidence threshold)
     if (parsedData.confidence < 0.7) {
       logger.debug("Parsed data confidence too low, skipping raid creation", {
         confidence: parsedData.confidence,
@@ -48,13 +42,10 @@ export const handleMessageCreate = async ({ message }: { discord: Client; messag
       return;
     }
 
-    // Create the raid and get raid data for message building
     const { raid } = await createRaidFromParsedData(server, parsedData);
 
-    // Create confirmation message using the messages module
-    const replyMessage = buildRaidCreationConfirmationMessage(raid, raid.slots || [], parsedData);
-
-    await message.reply(replyMessage);
+    const replyMessage = await buildRaidCreationConfirmationMessage(raid, raid.slots || [], context, parsedData);
+    await message.reply(replyMessage as MessageCreateOptions);
   } catch (error) {
     logger.error(`Failed to handle message: ${getErrorMessage(error)}`, {
       guildId: message.guild?.id,

@@ -1,14 +1,17 @@
 import { ensureUser, prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { Client, GuildMember, Interaction } from "discord.js";
+import { GuildMember } from "discord.js";
 
 import { ClientError, ErrorCodes } from "@/errors";
 
-import { handleAnnouncementCreate } from "./handleAnnouncementCreate";
+import { createOrUpdateAnnouncement } from "../announcements";
 
-export const handleSelectRole = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
+import { type InteractionHandlerProps } from "./index";
+
+export const handleSelectRole = async ({ discord, interaction, context }: InteractionHandlerProps) => {
   if (!interaction.isStringSelectMenu()) return;
+  const { t } = context;
 
   try {
     const raidId = interaction.customId.split(":")[2];
@@ -61,15 +64,17 @@ export const handleSelectRole = async ({ interaction }: { discord: Client; inter
       },
     });
 
+    const successMessage = t("raids.signup.success");
     await interaction.update({
-      content: `You have signed up for the raid! Good luck!`,
+      content: successMessage,
       components: [],
     });
 
-    handleAnnouncementCreate({ discord: interaction.client, raidId: raid.id, serverId: raid.serverId });
+    createOrUpdateAnnouncement({ discord, raidId: raid.id, serverId: raid.serverId, context });
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
+    const { t } = context;
 
     logger.error(`Failed to select build for raid: ${getErrorMessage(error)}`, {
       interaction: interaction.toJSON(),
@@ -78,8 +83,8 @@ export const handleSelectRole = async ({ interaction }: { discord: Client; inter
 
     const content =
       error instanceof ClientError
-        ? `Failed to select build: ${error.message}`
-        : `Failed to select build. Please try again later.`;
+        ? t("raids.errors.selectBuildFailed", { error: error.message })
+        : t("raids.errors.selectBuildGeneric");
     await interaction.update({
       content,
     });

@@ -10,13 +10,18 @@ import {
   MessageEditOptions,
 } from "discord.js";
 
+import { type GuildContext } from "@/modules/guild-context";
+
 import { raids } from "..";
 import { getRaidBanner } from "../helpers";
 
-export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | MessageEditOptions>(
+export const buildRaidAnnouncementMessage = async <T extends MessageCreateOptions | MessageEditOptions>(
   raid: Raid,
   slots: RaidSlot[],
-): T => {
+  context: GuildContext,
+): Promise<T> => {
+  const { t } = context;
+
   const getStatusColor = (status: string) => {
     const statusInfo = RAID_STATUS_INFO[status as keyof typeof RAID_STATUS_INFO];
     const hexColor = statusInfo?.color || "#5865f2";
@@ -44,7 +49,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   const embed = new EmbedBuilder()
     .setColor(getStatusColor(raid.status))
     .setTitle(`${getStatusEmoji(raid.status)} ${raid.title}`)
-    .setDescription(raid.description || "Join this exciting raid adventure!")
+    .setDescription(raid.description || (await t("raids.description")))
     .setImage(getRaidBanner(raid.contentType ?? undefined))
     .setFooter({
       text: `Raid ID: ${raid.id}`,
@@ -53,7 +58,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
 
   // Add raid date and time with better formatting
   embed.addFields({
-    name: "📅 **Date & Time**",
+    name: `📅 **${t("raids.dateTime")}**`,
     value: createDiscordTimestamp(raid.date),
     inline: true,
   });
@@ -61,7 +66,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   // Add content type field with party size info
   if (raid.contentType && raid.contentType !== "OTHER") {
     embed.addFields({
-      name: "🎯 **Content Type**",
+      name: `🎯 **${t("raids.contentType")}**`,
       value: `${contentTypeInfo?.emoji} **${contentTypeInfo?.displayName}**`,
       inline: true,
     });
@@ -70,7 +75,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   // Add location if available
   if (raid.location) {
     embed.addFields({
-      name: "📍 **Location**",
+      name: `📍 **${t("raids.location")}**`,
       value: raid.location,
       inline: true,
     });
@@ -78,18 +83,18 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
 
   // Add raid composition with enhanced display
   if (slots.length > 0) {
-    const compositionText = buildCompositionText(slots, signups, totalSlots);
+    const compositionText = await buildCompositionText(slots, signups, totalSlots, context);
 
     embed.addFields({
-      name: `👥 **Raid Composition** (${filledSlots}/${totalSlots})`,
+      name: `👥 **${t("raids.composition")}** (${filledSlots}/${totalSlots})`,
       value: compositionText,
       inline: false,
     });
 
     // Add progress indicator
     embed.addFields({
-      name: "📊 **Progress**",
-      value: `${progressBar} **${fillPercentage}%** filled`,
+      name: `📊 **${t("raids.progress")}**`,
+      value: `${progressBar} **${fillPercentage}%** ${t("raids.filled")}`,
       inline: false,
     });
   }
@@ -97,7 +102,7 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   // Add note if available with better formatting
   if (raid.note) {
     embed.addFields({
-      name: "📝 **Important Notes**",
+      name: `📝 **${t("raids.notes")}**`,
       value: `\`\`\`\n${raid.note}\n\`\`\``,
       inline: false,
     });
@@ -109,24 +114,24 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   // Add status-specific information
   if (raid.status === "OPEN") {
     const statusMessage = allSlotsTaken
-      ? "🔴 **Raid Full** - All slots are taken, but you can still join the waitlist!"
-      : "🟢 **Open for Signups** - Click the button below to join!";
+      ? `🔴 **${t("raids.statusDetails.full")}** - ${t("raids.statusDetails.fullDescription")}`
+      : `🟢 **${t("raids.statusDetails.open")}** - ${t("raids.statusDetails.openDescription")}`;
 
     embed.addFields({
-      name: "✅ **Status**",
+      name: `✅ **${t("raids.status")}**`,
       value: statusMessage,
       inline: false,
     });
   } else if (raid.status === "CLOSED") {
     embed.addFields({
-      name: "❌ **Status**",
-      value: "🔴 **Signups Closed** - Raid is full or closed for new participants",
+      name: `❌ **${t("raids.status")}**`,
+      value: `🔴 **${t("raids.statusDetails.closed")}** - ${t("raids.statusDetails.closedDescription")}`,
       inline: false,
     });
   } else if (raid.status === "ONGOING") {
     embed.addFields({
-      name: "▶️ **Status**",
-      value: "🟡 **Raid in Progress** - The adventure has begun!",
+      name: `▶️ **${t("raids.status")}**`,
+      value: `🟡 **${t("raids.statusDetails.ongoing")}** - ${t("raids.statusDetails.ongoingDescription")}`,
       inline: false,
     });
   }
@@ -134,20 +139,20 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   // Create enhanced buttons
   const signupButton = new ButtonBuilder()
     .setCustomId(`${raids.id}:signup:${raid.id}`)
-    .setLabel(allSlotsTaken ? "🎯 Full" : "🎯 Sign Up")
+    .setLabel(allSlotsTaken ? `🎯 ${t("raids.buttons.signUpFull")}` : `🎯 ${t("raids.buttons.signUp")}`)
     .setStyle(ButtonStyle.Success)
     .setDisabled(raid.status !== "OPEN" || allSlotsTaken);
 
   const signoutButton = new ButtonBuilder()
     .setCustomId(`${raids.id}:signout:${raid.id}`)
-    .setLabel("❌ Leave")
+    .setLabel(`❌ ${t("raids.buttons.leave")}`)
     .setStyle(ButtonStyle.Danger)
     .setDisabled(raid.status !== "OPEN");
 
   // Add view details button
   const viewDetailsButton = new ButtonBuilder()
     .setCustomId(`${raids.id}:details:${raid.id}`)
-    .setLabel("📋 View Details")
+    .setLabel(`📋 ${t("raids.buttons.viewDetails")}`)
     .setStyle(ButtonStyle.Secondary)
     .setDisabled(false);
 
@@ -171,21 +176,30 @@ function createProgressBar(percentage: number, length: number = 10): string {
 }
 
 // Helper function to build composition text with better formatting
-function buildCompositionText(slots: RaidSlot[], _signups: RaidSlot[], _totalSlots: number): string {
+async function buildCompositionText(
+  slots: RaidSlot[],
+  _signups: RaidSlot[],
+  _totalSlots: number,
+  context: GuildContext,
+): Promise<string> {
+  const { t } = context;
+
   if (slots.length === 0) {
-    return "No slots configured yet.";
+    return t("raids.slots.noSlots");
   }
 
-  const compositionLines = slots.map((slot, index) => {
-    const roleEmoji = getRaidRoleEmoji(slot.role ?? undefined);
-    const slotNumber = (index + 1).toString().padStart(2, "0");
+  const compositionLines = await Promise.all(
+    slots.map(async (slot, index) => {
+      const roleEmoji = getRaidRoleEmoji(slot.role ?? undefined);
+      const slotNumber = (index + 1).toString().padStart(2, "0");
 
-    if (slot.userId) {
-      return `${slotNumber}. ${roleEmoji} **${slot.name}** - <@${slot.userId}>`;
-    } else {
-      return `${slotNumber}. ${roleEmoji} **${slot.name}** - *Available*`;
-    }
-  });
+      if (slot.userId) {
+        return `${slotNumber}. ${roleEmoji} **${slot.name}** - <@${slot.userId}>`;
+      } else {
+        return `${slotNumber}. ${roleEmoji} **${slot.name}** - *${t("raids.slots.available")}*`;
+      }
+    }),
+  );
 
   // Add role summary if there are multiple roles
   const roleCounts = slots.reduce(
@@ -201,5 +215,5 @@ function buildCompositionText(slots: RaidSlot[], _signups: RaidSlot[], _totalSlo
     .map(([role, count]) => `${getRaidRoleEmoji(role as RaidRole)} ${count}`)
     .join(" • ");
 
-  return `${compositionLines.join("\n")}\n\n**Role Summary:** ${roleSummary}`;
+  return `${compositionLines.join("\n")}\n\n**${t("raids.slots.roleSummary")}:** ${roleSummary}`;
 }

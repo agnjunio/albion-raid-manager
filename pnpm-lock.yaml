@@ -138,6 +138,9 @@ importers:
       discord.js:
         specifier: ^14.19.3
         version: 14.22.1
+      i18next:
+        specifier: ^23.15.1
+        version: 23.16.8
       tsx:
         specifier: ^4.20.5
         version: 4.20.5
@@ -2976,6 +2979,9 @@ packages:
 
   i18next-browser-languagedetector@8.2.0:
     resolution: {integrity: sha512-P+3zEKLnOF0qmiesW383vsLdtQVyKtCNA9cjSoKCppTKPQVfKd2W8hbVo5ZhNJKDqeM7BOcvNoKJOjpHh4Js9g==}
+
+  i18next@23.16.8:
+    resolution: {integrity: sha512-06r/TitrM88Mg5FdUXAKL96dJMzgqLE5dv3ryBAra4KCwD9mJ4ndOTS95ZuymIGoE+2hzfdaMak2X11/es7ZWg==}
 
   i18next@25.5.2:
     resolution: {integrity: sha512-lW8Zeh37i/o0zVr+NoCHfNnfvVw+M6FQbRp36ZZ/NyHDJ3NJVpp2HhAUyU9WafL5AssymNoOjMRB48mmx2P6Hw==}
@@ -7282,6 +7288,10 @@ snapshots:
     optional: true
 
   i18next-browser-languagedetector@8.2.0:
+    dependencies:
+      '@babel/runtime': 7.28.4
+
+  i18next@23.16.8:
     dependencies:
       '@babel/runtime': 7.28.4
 

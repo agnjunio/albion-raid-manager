@@ -1,12 +1,14 @@
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { Client, Interaction } from "discord.js";
 
 import { buildRaidSignupReply } from "../messages";
 
+import { type InteractionHandlerProps } from "./index";
 
-export const handleSignup = async ({ discord, interaction }: { discord: Client; interaction: Interaction }) => {
+export const handleSignUp = async ({ discord, interaction, context }: InteractionHandlerProps) => {
+  const { t } = context;
+
   try {
     if (!interaction.isButton()) throw new Error("Invalid interaction type");
 
@@ -34,14 +36,19 @@ export const handleSignup = async ({ discord, interaction }: { discord: Client; 
       raid.slots.filter((slot) => !!slot.userId).map(async (slot) => discord.users.fetch(slot.userId as string)),
     );
 
-    await interaction.reply(buildRaidSignupReply(raid, raid.slots, users));
+    // Use translator for localized messages
+    const reply = await buildRaidSignupReply(raid, raid.slots, context, users);
+    await interaction.reply(reply);
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
 
     logger.error(`Failed to sign up for raid: ${getErrorMessage(error)}`, { interaction: interaction.toJSON(), error });
+
+    // Use translator for error message
+    const errorMessage = await t("raids.errors.signupFailed");
     await interaction.reply({
-      content: `Failed to sign up for the raid. Please try again later.`,
+      content: errorMessage,
       ephemeral: true,
     });
   }

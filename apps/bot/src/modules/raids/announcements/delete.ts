@@ -1,13 +1,13 @@
+import { RaidService } from "@albion-raid-manager/core/index";
 import { logger } from "@albion-raid-manager/core/logger";
-import { RaidService } from "@albion-raid-manager/core/services";
 import { Client } from "discord.js";
 
-interface HandleRaidEventProps {
+interface DeleteAnnouncementProps {
   discord: Client;
   raidId: string;
 }
 
-export async function handleAnnouncementDelete({ discord, raidId }: HandleRaidEventProps) {
+export async function deleteAnnouncement({ discord, raidId }: DeleteAnnouncementProps) {
   const raid = await RaidService.findRaidById(raidId, { server: true });
 
   if (!raid || !raid.announcementMessageId || !raid.server?.raidAnnouncementChannelId) {

@@ -23,6 +23,7 @@
     "@albion-raid-manager/core": "workspace:*",
     "@albion-raid-manager/types": "workspace:*",
     "discord.js": "^14.19.3",
+    "i18next": "^23.15.1",
     "tsx": "^4.20.5"
   }
 }

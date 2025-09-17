@@ -3,15 +3,23 @@ import { logger } from "@albion-raid-manager/core/logger";
 import { RaidService, ServersService } from "@albion-raid-manager/core/services";
 import { Client, MessageCreateOptions, MessageEditOptions } from "discord.js";
 
+import { GuildContext } from "@/modules/guild-context";
+
 import { buildRaidAnnouncementMessage } from "../messages";
 
-interface HandleRaidEventProps {
+interface CreateOrUpdateAnnouncementProps {
   discord: Client;
   raidId: string;
   serverId: string;
+  context: GuildContext;
 }
 
-export async function handleAnnouncementCreate({ discord, raidId, serverId }: HandleRaidEventProps) {
+export async function createOrUpdateAnnouncement({
+  discord,
+  raidId,
+  serverId,
+  context,
+}: CreateOrUpdateAnnouncementProps) {
   const raid = await RaidService.findRaidById(raidId, { slots: true });
 
   if (!raid) {
@@ -34,9 +42,9 @@ export async function handleAnnouncementCreate({ discord, raidId, serverId }: Ha
     const message = await channel.messages.fetch(raid.announcementMessageId);
     if (!message) return;
 
-    await message.edit(buildRaidAnnouncementMessage<MessageEditOptions>(raid, slots));
+    await message.edit(await buildRaidAnnouncementMessage<MessageEditOptions>(raid, slots, context));
   } else {
-    const message = await channel.send(buildRaidAnnouncementMessage<MessageCreateOptions>(raid, slots));
+    const message = await channel.send(await buildRaidAnnouncementMessage<MessageCreateOptions>(raid, slots, context));
     await prisma.raid.update({
       where: { id: raid.id },
       data: { announcementMessageId: message.id },

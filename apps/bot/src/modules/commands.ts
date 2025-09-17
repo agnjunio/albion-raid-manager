@@ -11,18 +11,19 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 
+import { createGuildContext, type GuildContext } from "./guild-context";
 import { type Module } from "./modules";
+
+export type Command = {
+  data: SlashCommandBuilder;
+  execute: (interaction: Interaction, context: GuildContext) => Promise<void>;
+};
 
 if (!config.discord.token || !config.discord.clientId) {
   throw new Error("Please define the DISCORD_TOKEN and DISCORD_CLIENT_ID.");
 }
 
 const rest = new REST().setToken(config.discord.token);
-
-export type Command = {
-  data: SlashCommandBuilder;
-  execute: (interaction: Interaction) => Promise<void>;
-};
 
 export const commands = new Collection<Command["data"]["name"], Command>();
 
@@ -74,7 +75,9 @@ export async function handleCommand(interaction: Interaction) {
   }
 
   try {
-    await command.execute(interaction);
+    // Create guild context for translation support
+    const context = await createGuildContext(interaction.guild);
+    await command.execute(interaction, context);
   } catch (error) {
     logger.error(`handleCommand ~ ${command.data.name} ~ Error:`, { error });
     if (interaction.replied || interaction.deferred) {

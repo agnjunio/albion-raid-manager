@@ -1,7 +1,8 @@
 import { logger } from "@albion-raid-manager/core/logger";
-import { Client, Collection, Events } from "discord.js";
+import { Client, Collection, Events, Interaction } from "discord.js";
 
-import { Command, loadCommands } from "../commands";
+import { deployCommands, handleCommand, loadCommands, type Command } from "./commands";
+import { createGuildContext, type GuildContext } from "./guild-context";
 
 import { MODULES_LIST } from ".";
 
@@ -15,6 +16,7 @@ export type Module = {
   commands: Command[];
   onLoad?: ({ discord }: ModuleParams) => Promise<void>;
   onReady?: ({ discord }: ModuleParams) => Promise<void>;
+  onMessageComponent?: (customId: string, interaction: Interaction, context: GuildContext) => Promise<void>;
 };
 
 export const modules = new Collection<Module["id"], Module>();
@@ -40,6 +42,9 @@ export async function initModules({ discord }: ModuleParams) {
     }
   }
 
+  // Deploy commands if they have been loaded
+  await deployCommands();
+
   // Initialize callbacks
   discord.on(Events.ClientReady, async (discord: Client) => {
     logger.debug("ClientReady");
@@ -53,6 +58,30 @@ export async function initModules({ discord }: ModuleParams) {
         let message = "Unknown error";
         if (error instanceof Error) message = error.message;
         logger.error(`${module.id} ~ onReady error: ${message}`, { error });
+      }
+    }
+  });
+
+  // Handle command interactions
+  discord.on(Events.InteractionCreate, handleCommand);
+
+  // Handle message component interactions
+  discord.on(Events.InteractionCreate, async (interaction: Interaction) => {
+    // Only process guild interactions
+    if (!interaction.guild) return;
+    if (!interaction.isMessageComponent()) return;
+
+    const [moduleId, action] = interaction.customId.split(":");
+
+    // Find the module that handles this interaction
+    const module = modules.get(moduleId);
+    const handler = module?.onMessageComponent;
+    if (handler) {
+      try {
+        const context = await createGuildContext(interaction.guild);
+        await handler(action, interaction, context);
+      } catch (error) {
+        logger.error(`${module.id} ~ onMessageComponent error:`, { error, interaction: interaction.toJSON() });
       }
     }
   });

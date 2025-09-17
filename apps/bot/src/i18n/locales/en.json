@@ -1,0 +1,146 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "settings": "Settings",
+    "about": "About",
+    "theme": "Theme",
+    "language": "Language",
+    "enter": "Enter",
+    "available": "Available",
+    "taken": "Taken",
+    "full": "Full"
+  },
+  "raids": {
+    "title": "Raid",
+    "description": "Join this exciting raid adventure!",
+    "dateTime": "Date & Time",
+    "contentType": "Content Type",
+    "raidSettings": "Raid Settings",
+    "location": "Location",
+    "composition": "Raid Composition",
+    "progress": "Progress",
+    "filled": "filled",
+    "notes": "Important Notes",
+    "signup": {
+      "selectBuild": "Select a build",
+      "content": "Signing up for the raid: {{description}}. Please select a build.",
+      "success": "You have successfully selected your build for the raid!"
+    },
+    "creation": {
+      "successTitle": "✅ Raid Created Successfully",
+      "date": "Date",
+      "status": "Status",
+      "slots": "Slots",
+      "contentType": "Content Type",
+      "location": "Location",
+      "requirements": "Requirements",
+      "slotsList": "Slots"
+    },
+    "status": "Status",
+    "statusDetails": {
+      "open": "Open for Signups",
+      "openDescription": "Click the button below to join!",
+      "full": "Raid Full",
+      "fullDescription": "All slots are taken, but you can still join the waitlist!",
+      "closed": "Signups Closed",
+      "closedDescription": "Raid is full or closed for new participants",
+      "ongoing": "Raid in Progress",
+      "ongoingDescription": "The adventure has begun!"
+    },
+    "buttons": {
+      "signUp": "Sign Up",
+      "signUpFull": "Full",
+      "leave": "Leave",
+      "viewDetails": "View Details"
+    },
+    "slots": {
+      "slot": "Slot",
+      "available": "Available",
+      "taken": "Taken",
+      "roleSummary": "Role Summary",
+      "noSlots": "No slots configured yet."
+    },
+    "errors": {
+      "raidNotFound": "Raid not found",
+      "raidNotOpen": "Raid is not open for signups",
+      "raidFull": "All raid slots are taken",
+      "userNotSigned": "User is not signed up for the raid",
+      "slotTaken": "Slot already taken, please select another one",
+      "invalidInteraction": "Invalid interaction type",
+      "missingRaidId": "Missing raid id",
+      "signupFailed": "Failed to sign up for the raid. Please try again later.",
+      "signoutFailed": "Failed to leave raid. Please try again later.",
+      "selectRoleFailed": "Failed to select build. Please try again later.",
+      "selectBuildFailed": "Failed to select build: {{error}}",
+      "selectBuildGeneric": "Failed to select build. Please try again later.",
+      "signoutGeneric": "Failed to leave raid. Please try again later."
+    },
+    "success": {
+      "signupSuccess": "You have signed up for the raid! Good luck!",
+      "signoutSuccess": "You have left the raid. We hope to see you next time!",
+      "raidCreated": "Raid created successfully!"
+    },
+    "signout": {
+      "success": "You have left the raid. We hope to see you next time!"
+    }
+  },
+  "commands": {
+    "errors": {
+      "guildOnly": "❌ This command can only be used in a Discord server.",
+      "adminRequired": "❌ You need Administrator permissions to manage raids.",
+      "unknownSubcommand": "❌ Unknown subcommand.",
+      "generic": "❌ An error occurred while processing the command."
+    },
+    "raid": {
+      "delete": {
+        "success": "✅ Raid `{{raidId}}` has been deleted successfully.",
+        "failed": "❌ Failed to delete raid. Please try again later.",
+        "notFound": "❌ Raid `{{raidId}}` not found. Please check the raid ID and try again.",
+        "notAuthorized": "❌ You don't have permission to delete this raid."
+      }
+    },
+    "register": {
+      "name": "register",
+      "description": "Register your Albion Online character",
+      "playerId": {
+        "name": "player_id",
+        "description": "Your Albion Online player ID"
+      },
+      "success": "Successfully registered your character!",
+      "error": "Failed to register your character. Please try again later."
+    },
+    "config": {
+      "name": "config",
+      "description": "Configure server settings",
+      "audit": {
+        "name": "audit",
+        "description": "Configure audit channel settings",
+        "channel": {
+          "name": "channel",
+          "description": "Channel for audit logs"
+        },
+        "success": "Audit channel configured successfully!",
+        "error": "Failed to configure audit channel. Please try again later."
+      }
+    }
+  }
+}

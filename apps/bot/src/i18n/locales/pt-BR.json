@@ -1,0 +1,146 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "close": "Fechar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "confirm": "Confirmar",
+    "yes": "Sim",
+    "no": "Não",
+    "ok": "OK",
+    "search": "Pesquisar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "refresh": "Atualizar",
+    "settings": "Configurações",
+    "about": "Sobre",
+    "theme": "Tema",
+    "language": "Idioma",
+    "enter": "Entrar",
+    "available": "Disponível",
+    "taken": "Ocupado",
+    "full": "Lotado"
+  },
+  "raids": {
+    "title": "Raid",
+    "description": "Junte-se a esta emocionante aventura de raid!",
+    "dateTime": "Data e Hora",
+    "contentType": "Tipo de Conteúdo",
+    "raidSettings": "Configurações da Raid",
+    "location": "Localização",
+    "composition": "Composição da Raid",
+    "progress": "Progresso",
+    "filled": "preenchido",
+    "notes": "Notas Importantes",
+    "signup": {
+      "selectBuild": "Selecione uma build",
+      "content": "Inscrevendo-se na raid: {{description}}. Por favor, selecione uma build.",
+      "success": "Você selecionou sua build para a raid com sucesso!"
+    },
+    "creation": {
+      "successTitle": "✅ Raid Criada com Sucesso",
+      "date": "Data",
+      "status": "Status",
+      "slots": "Slots",
+      "contentType": "Tipo de Conteúdo",
+      "location": "Localização",
+      "requirements": "Requisitos",
+      "slotsList": "Slots"
+    },
+    "status": "Status",
+    "statusDetails": {
+      "open": "Aberta para Inscrições",
+      "openDescription": "Clique no botão abaixo para participar!",
+      "full": "Raid Lotada",
+      "fullDescription": "Todos os slots estão ocupados, mas você ainda pode entrar na lista de espera!",
+      "closed": "Inscrições Fechadas",
+      "closedDescription": "A raid está lotada ou fechada para novos participantes",
+      "ongoing": "Raid em Andamento",
+      "ongoingDescription": "A aventura começou!"
+    },
+    "buttons": {
+      "signUp": "Inscrever-se",
+      "signUpFull": "Lotado",
+      "leave": "Sair",
+      "viewDetails": "Ver Detalhes"
+    },
+    "slots": {
+      "slot": "Slot",
+      "available": "Disponível",
+      "taken": "Ocupado",
+      "roleSummary": "Resumo de Funções",
+      "noSlots": "Nenhum slot configurado ainda."
+    },
+    "errors": {
+      "raidNotFound": "Raid não encontrada",
+      "raidNotOpen": "A raid não está aberta para inscrições",
+      "raidFull": "Todos os slots da raid estão ocupados",
+      "userNotSigned": "Usuário não está inscrito na raid",
+      "slotTaken": "Slot já ocupado, por favor selecione outro",
+      "invalidInteraction": "Tipo de interação inválido",
+      "missingRaidId": "ID da raid ausente",
+      "signupFailed": "Falha ao se inscrever na raid. Tente novamente mais tarde.",
+      "signoutFailed": "Falha ao sair da raid. Tente novamente mais tarde.",
+      "selectRoleFailed": "Falha ao selecionar build. Tente novamente mais tarde.",
+      "selectBuildFailed": "Falha ao selecionar build: {{error}}",
+      "selectBuildGeneric": "Falha ao selecionar build. Tente novamente mais tarde.",
+      "signoutGeneric": "Falha ao sair da raid. Tente novamente mais tarde."
+    },
+    "success": {
+      "signupSuccess": "Você se inscreveu na raid! Boa sorte!",
+      "signoutSuccess": "Você saiu da raid. Esperamos vê-lo na próxima vez!",
+      "raidCreated": "Raid criada com sucesso!"
+    },
+    "signout": {
+      "success": "Você saiu da raid. Esperamos vê-lo na próxima vez!"
+    }
+  },
+  "commands": {
+    "errors": {
+      "guildOnly": "❌ Este comando só pode ser usado em um servidor Discord.",
+      "adminRequired": "❌ Você precisa de permissões de Administrador para gerenciar raids.",
+      "unknownSubcommand": "❌ Subcomando desconhecido.",
+      "generic": "❌ Ocorreu um erro ao processar o comando."
+    },
+    "raid": {
+      "delete": {
+        "success": "✅ Raid `{{raidId}}` foi excluída com sucesso.",
+        "failed": "❌ Falha ao excluir raid. Tente novamente mais tarde.",
+        "notFound": "❌ Raid `{{raidId}}` não encontrada. Verifique o ID da raid e tente novamente.",
+        "notAuthorized": "❌ Você não tem permissão para excluir esta raid."
+      }
+    },
+    "register": {
+      "name": "registrar",
+      "description": "Registre seu personagem do Albion Online",
+      "playerId": {
+        "name": "id_jogador",
+        "description": "Seu ID de jogador do Albion Online"
+      },
+      "success": "Personagem registrado com sucesso!",
+      "error": "Falha ao registrar seu personagem. Tente novamente mais tarde."
+    },
+    "config": {
+      "name": "configurar",
+      "description": "Configure as configurações do servidor",
+      "audit": {
+        "name": "auditoria",
+        "description": "Configure as configurações do canal de auditoria",
+        "channel": {
+          "name": "canal",
+          "description": "Canal para logs de auditoria"
+        },
+        "success": "Canal de auditoria configurado com sucesso!",
+        "error": "Falha ao configurar canal de auditoria. Tente novamente mais tarde."
+      }
+    }
+  }
+}

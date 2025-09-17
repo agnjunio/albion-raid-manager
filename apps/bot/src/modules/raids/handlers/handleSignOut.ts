@@ -1,11 +1,15 @@
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { Client, Interaction } from "discord.js";
 
 import { ClientError, ErrorCodes } from "@/errors";
 
-export const handleSignout = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
+import { createOrUpdateAnnouncement } from "../announcements";
+
+import { type InteractionHandlerProps } from "./index";
+
+export const handleSignout = async ({ discord, interaction, context }: InteractionHandlerProps) => {
+  const { t } = context;
   if (!interaction.isButton()) return;
 
   try {
@@ -32,10 +36,13 @@ export const handleSignout = async ({ interaction }: { discord: Client; interact
       data: { userId: null },
     });
 
+    const leaveMessage = await t("raids.signout.success");
     await interaction.reply({
-      content: `You have left the raid. We hope to see you next time!`,
+      content: leaveMessage,
       ephemeral: true,
     });
+
+    createOrUpdateAnnouncement({ discord, raidId: raid.id, serverId: raid.serverId, context });
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;
@@ -47,8 +54,8 @@ export const handleSignout = async ({ interaction }: { discord: Client; interact
 
     const content =
       error instanceof ClientError
-        ? `Failed to leave raid: ${error.message}`
-        : `Failed to leave raid. Please try again later.`;
+        ? await t("raids.errors.signoutFailed", { error: error.message })
+        : await t("raids.errors.signoutGeneric");
     await interaction.reply({
       content,
       ephemeral: true,

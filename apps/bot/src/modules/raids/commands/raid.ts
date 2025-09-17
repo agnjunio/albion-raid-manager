@@ -3,10 +3,11 @@ import { RaidService } from "@albion-raid-manager/core/services";
 import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
-import { Command } from "@/commands";
+import { Command } from "@/modules/commands";
+import { type GuildContext } from "@/modules/guild-context";
 
-import { handleAnnouncementDelete } from "../handlers";
-import { getRaidEventPublisher } from "../helpers/redis";
+import { deleteAnnouncement } from "../announcements";
+import { getRaidEventPublisher } from "../redis";
 
 export const raidCommand: Command = {
   data: new SlashCommandBuilder()
@@ -26,13 +27,14 @@ export const raidCommand: Command = {
         ),
     ) as SlashCommandBuilder,
 
-  execute: async (interaction: Interaction) => {
+  execute: async (interaction: Interaction, context: GuildContext) => {
     if (!interaction.isChatInputCommand()) return;
 
     const guild = interaction.guild;
     if (!guild) {
+      const errorMessage = await context.t("commands.errors.guildOnly");
       await interaction.reply({
-        content: "❌ This command can only be used in a Discord server.",
+        content: errorMessage,
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -41,8 +43,9 @@ export const raidCommand: Command = {
     // Check if user has admin permissions
     const member = await guild.members.fetch(interaction.user.id);
     if (!member.permissions.has("Administrator")) {
+      const errorMessage = await context.t("commands.errors.adminRequired");
       await interaction.reply({
-        content: "❌ You need Administrator permissions to manage raids.",
+        content: errorMessage,
         flags: MessageFlags.Ephemeral,
       });
       return;
@@ -58,14 +61,15 @@ export const raidCommand: Command = {
           const raidId = interaction.options.getString("raid-id", true);
 
           try {
-            await handleAnnouncementDelete({
+            await deleteAnnouncement({
               discord: interaction.client,
               raidId,
             });
             await RaidService.deleteRaid(raidId, { publisher: await getRaidEventPublisher() });
 
+            const successMessage = await context.t("commands.raid.delete.success", { raidId });
             await interaction.editReply({
-              content: `✅ Raid \`${raidId}\` has been deleted successfully.`,
+              content: successMessage,
             });
 
             logger.info(`Raid deleted: ${raidId}`, {
@@ -76,15 +80,15 @@ export const raidCommand: Command = {
           } catch (error) {
             logger.error("Failed to delete raid:", { error });
 
-            let errorMessage = "❌ Failed to delete raid. Please try again later.";
+            let errorMessage = await context.t("commands.raid.delete.failed");
 
             if (ServiceError.isServiceError(error)) {
               switch (error.code) {
                 case ServiceErrorCode.NOT_FOUND:
-                  errorMessage = `❌ Raid \`${raidId}\` not found. Please check the raid ID and try again.`;
+                  errorMessage = await context.t("commands.raid.delete.notFound", { raidId });
                   break;
                 case ServiceErrorCode.NOT_AUTHORIZED:
-                  errorMessage = "❌ You don't have permission to delete this raid.";
+                  errorMessage = await context.t("commands.raid.delete.notAuthorized");
                   break;
               }
             }
@@ -97,16 +101,18 @@ export const raidCommand: Command = {
         }
 
         default: {
+          const errorMessage = await context.t("commands.errors.unknownSubcommand");
           await interaction.editReply({
-            content: "❌ Unknown subcommand.",
+            content: errorMessage,
           });
           break;
         }
       }
     } catch (error) {
       logger.error("Error in raid command:", { error });
+      const errorMessage = await context.t("commands.errors.generic");
       await interaction.editReply({
-        content: "❌ An error occurred while processing the command.",
+        content: errorMessage,
       });
     }
   },

@@ -3,7 +3,8 @@ import { logger } from "@albion-raid-manager/core/logger";
 import { AlbionService } from "@albion-raid-manager/core/services";
 import { Interaction, MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 
-import { Command } from "@/commands";
+import { Command } from "@/modules/commands";
+import { type GuildContext } from "@/modules/guild-context";
 import { sendAuditMessage } from "@/utils/audit";
 import { getGuild, getGuildMember } from "@/utils/discord";
 import { assignRolesBasedOnGuild } from "@/utils/roles";
@@ -21,15 +22,16 @@ export const registerCommand: Command = {
         .setMaxLength(50),
     ) as SlashCommandBuilder,
 
-  execute: async (interaction: Interaction) => {
+  execute: async (interaction: Interaction, context: GuildContext) => {
     if (!interaction.isChatInputCommand()) return;
 
     const username = interaction.options.getString("username", true);
     const userId = interaction.user.id;
 
     if (!interaction.guildId) {
+      const errorMessage = await context.t("commands.errors.guildOnly");
       await interaction.reply({
-        content: "❌ This command can only be used in a Discord server.",
+        content: errorMessage,
         flags: MessageFlags.Ephemeral,
       });
       return;
