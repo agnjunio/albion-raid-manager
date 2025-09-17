@@ -3,10 +3,9 @@ import { logger } from "@albion-raid-manager/core/logger";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 
 import { ClientError, ErrorCodes } from "@/errors";
+import { type InteractionHandlerProps } from "@/modules/modules";
 
 import { createOrUpdateAnnouncement } from "../announcements";
-
-import { type InteractionHandlerProps } from "./index";
 
 export const handleSignout = async ({ discord, interaction, context }: InteractionHandlerProps) => {
   const { t } = context;

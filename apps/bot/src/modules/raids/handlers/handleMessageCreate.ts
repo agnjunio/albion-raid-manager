@@ -7,9 +7,9 @@ import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { Raid, RaidRole, RaidSlot, RaidStatus, RaidType, Server } from "@albion-raid-manager/types";
 import { MessageCreateOptions } from "discord.js";
 
-import { buildRaidCreationConfirmationMessage } from "../messages/creation-confirmation";
+import { type MessageHandlerProps } from "@/modules/modules";
 
-import { type MessageHandlerProps } from "./index";
+import { buildRaidCreationConfirmationMessage } from "../messages/creation-confirmation";
 
 export const handleMessageCreate = async ({ message, context }: MessageHandlerProps) => {
   if (message.author.bot || !message.guild) return;

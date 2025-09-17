@@ -1,7 +1,4 @@
-import { Events, Interaction } from "discord.js";
-
-import { type GuildContext } from "@/modules/guild-context";
-import { type Module } from "@/modules/modules";
+import { InteractionHandlerProps, type Module } from "@/modules/modules";
 
 import { raidCommand } from "./commands/raid";
 import { initRaidEvents } from "./events";
@@ -13,22 +10,22 @@ export const raids: Module = {
   commands: [raidCommand],
   onReady: async ({ discord }) => {
     initRaidEvents({ discord });
-
-    discord.on(Events.MessageCreate, async (message) => handleMessageCreate({ discord, message }));
   },
 
-  onMessageComponent: async (action: string, interaction: Interaction, context: GuildContext) => {
+  onMessageCreate: handleMessageCreate,
+
+  onMessageComponent: async ({ actionId, interaction, context }: InteractionHandlerProps) => {
     const discord = interaction.client;
 
-    switch (action) {
+    switch (actionId) {
       case "signup":
-        return handleSignUp({ discord, interaction, context });
+        return handleSignUp({ discord, actionId, interaction, context });
       case "select":
-        return handleSelectRole({ discord, interaction, context });
+        return handleSelectRole({ discord, actionId, interaction, context });
       case "signout":
-        return handleSignout({ discord, interaction, context });
+        return handleSignout({ discord, actionId, interaction, context });
       default:
-        console.warn(`Unknown action: ${action}`, { interaction: interaction.toJSON() });
+        console.warn(`Unknown action: ${actionId}`, { interaction: interaction.toJSON() });
     }
   },
 };

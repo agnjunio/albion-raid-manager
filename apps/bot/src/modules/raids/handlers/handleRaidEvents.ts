@@ -1,8 +1,7 @@
 import { logger } from "@albion-raid-manager/core/logger";
 
 import { createOrUpdateAnnouncement, deleteAnnouncement, sendThreadUpdate } from "../announcements";
-
-import { type RaidEventHandlerProps } from "./index";
+import { type RaidEventHandlerProps } from "../events";
 
 export async function handleRaidCreated({ discord, event, context }: RaidEventHandlerProps) {
   const { raid } = event.data;

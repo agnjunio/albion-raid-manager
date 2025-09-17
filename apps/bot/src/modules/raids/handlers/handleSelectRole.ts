@@ -4,10 +4,9 @@ import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { GuildMember } from "discord.js";
 
 import { ClientError, ErrorCodes } from "@/errors";
+import { type InteractionHandlerProps } from "@/modules/modules";
 
 import { createOrUpdateAnnouncement, sendThreadUpdate } from "../announcements";
-
-import { type InteractionHandlerProps } from "./index";
 
 export const handleSelectRole = async ({ discord, interaction, context }: InteractionHandlerProps) => {
   if (!interaction.isStringSelectMenu()) return;

@@ -1,5 +1,5 @@
 import { logger } from "@albion-raid-manager/core/logger";
-import { Client, Collection, Events, Interaction } from "discord.js";
+import { Client, Collection, Events, Interaction, Message } from "discord.js";
 
 import { deployCommands, handleCommand, loadCommands, type Command } from "./commands";
 import { createGuildContext, type GuildContext } from "./guild-context";
@@ -10,13 +10,28 @@ export interface ModuleParams {
   discord: Client;
 }
 
+export interface HandlerProps {
+  discord: Client;
+  context: GuildContext;
+}
+
+export interface InteractionHandlerProps extends HandlerProps {
+  actionId: string;
+  interaction: Interaction;
+}
+
+export interface MessageHandlerProps extends HandlerProps {
+  message: Message;
+}
+
 export type Module = {
   id: string;
   enabled: boolean;
   commands: Command[];
   onLoad?: ({ discord }: ModuleParams) => Promise<void>;
   onReady?: ({ discord }: ModuleParams) => Promise<void>;
-  onMessageComponent?: (customId: string, interaction: Interaction, context: GuildContext) => Promise<void>;
+  onMessageCreate?: (props: MessageHandlerProps) => Promise<void>;
+  onMessageComponent?: (props: InteractionHandlerProps) => Promise<void>;
 };
 
 export const modules = new Collection<Module["id"], Module>();
@@ -62,6 +77,18 @@ export async function initModules({ discord }: ModuleParams) {
     }
   });
 
+  // Handle message create
+  discord.on(Events.MessageCreate, async (message: Message) => {
+    for (const module of modules.values()) {
+      const handler = module?.onMessageCreate;
+      if (handler) {
+        if (!message.guild) continue;
+        const context = await createGuildContext(message.guild);
+        await handler({ discord, message, context });
+      }
+    }
+  });
+
   // Handle command interactions
   discord.on(Events.InteractionCreate, handleCommand);
 
@@ -71,7 +98,7 @@ export async function initModules({ discord }: ModuleParams) {
     if (!interaction.guild) return;
     if (!interaction.isMessageComponent()) return;
 
-    const [moduleId, action] = interaction.customId.split(":");
+    const [moduleId, actionId] = interaction.customId.split(":");
 
     // Find the module that handles this interaction
     const module = modules.get(moduleId);
@@ -79,7 +106,7 @@ export async function initModules({ discord }: ModuleParams) {
     if (handler) {
       try {
         const context = await createGuildContext(interaction.guild);
-        await handler(action, interaction, context);
+        await handler({ discord: interaction.client, actionId, interaction, context });
       } catch (error) {
         logger.error(`${module.id} ~ onMessageComponent error:`, { error, interaction: interaction.toJSON() });
       }

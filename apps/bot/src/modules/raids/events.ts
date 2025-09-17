@@ -1,10 +1,15 @@
 import { logger } from "@albion-raid-manager/core/logger";
-import { isRaidEvent, RaidEventSubscriber, Redis } from "@albion-raid-manager/core/redis";
+import { isRaidEvent, RaidEvent, RaidEventSubscriber, Redis } from "@albion-raid-manager/core/redis";
 import { Client } from "discord.js";
 
 import { createGuildContext } from "../guild-context";
+import { HandlerProps } from "../modules";
 
 import { handleRaidCreated, handleRaidDeleted, handleRaidUpdated } from "./handlers";
+
+export interface RaidEventHandlerProps extends HandlerProps {
+  event: RaidEvent;
+}
 
 interface HandleRaidEventsProps {
   discord: Client;

@@ -2,9 +2,9 @@ import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { getErrorMessage } from "@albion-raid-manager/core/utils";
 
-import { buildRaidSignupReply } from "../messages";
+import { type InteractionHandlerProps } from "@/modules/modules";
 
-import { type InteractionHandlerProps } from "./index";
+import { buildRaidSignupReply } from "../messages";
 
 export const handleSignUp = async ({ discord, interaction, context }: InteractionHandlerProps) => {
   const { t } = context;
