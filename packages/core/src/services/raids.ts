@@ -179,15 +179,13 @@ export namespace RaidService {
   ): Promise<Raid> {
     const { cache, publisher } = options;
 
+    const previousRaid = await findRaidById(id);
+
+    if (!previousRaid) {
+      throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${id}" not found`);
+    }
+
     const raid = await prisma.$transaction(async (tx) => {
-      const existingRaid = await tx.raid.findUnique({
-        where: { id },
-      });
-
-      if (!existingRaid) {
-        throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${id}" not found`);
-      }
-
       // Update the raid
       const updatedRaid = await tx.raid.update({
         where: { id },
@@ -216,7 +214,13 @@ export namespace RaidService {
     }
 
     if (publisher) {
-      publisher.publishRaidUpdated(raid).catch((error) => {
+      const previous: Record<string, unknown> = {};
+      for (const key of Object.keys(input)) {
+        const typedKey = key as keyof Raid;
+        previous[typedKey] = previousRaid[typedKey];
+      }
+
+      publisher.publishRaidUpdated(raid, previous).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId: id });
       });
     }
@@ -533,7 +537,13 @@ export namespace RaidService {
         where: { id: slotId },
         data: input,
         include: {
-          raid: true,
+          raid: {
+            include: {
+              slots: {
+                orderBy: { order: "asc" },
+              },
+            },
+          },
         },
       });
 
@@ -553,7 +563,7 @@ export namespace RaidService {
     }
 
     if (publisher && slot.raid) {
-      publisher.publishRaidUpdated(slot.raid).catch((error) => {
+      publisher.publishRaidUpdated(slot.raid, { slots: slot.raid.slots }).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId: slot.raidId });
       });
     }

@@ -1,6 +1,6 @@
 import { logger } from "@albion-raid-manager/core/logger";
 
-import { createOrUpdateAnnouncement, deleteAnnouncement } from "../announcements";
+import { createOrUpdateAnnouncement, deleteAnnouncement, sendThreadUpdate } from "../announcements";
 
 import { type RaidEventHandlerProps } from "./index";
 
@@ -21,15 +21,50 @@ export async function handleRaidCreated({ discord, event, context }: RaidEventHa
 export async function handleRaidUpdated({ discord, event, context }: RaidEventHandlerProps) {
   const { raid, previousRaid } = event.data;
 
+  const statusChanged = previousRaid?.status;
+  const hasSignUps = previousRaid?.slots;
+
   logger.info(`Raid updated: ${raid.id}`, {
     raid,
     previousRaid,
-    statusChanged: previousRaid?.status !== raid.status,
+    statusChanged,
+    hasSignUps,
   });
 
   if (raid.status === "SCHEDULED") return;
 
   await createOrUpdateAnnouncement({ discord, raidId: event.entityId, serverId: event.serverId, context });
+
+  // Send thread notification for status changes
+  if (statusChanged) {
+    if (raid.status === "CANCELLED") {
+      await sendThreadUpdate({
+        discord,
+        raidId: event.entityId,
+        updateType: "cancellation",
+        data: { reason: "The raid has been cancelled." },
+        context,
+      });
+    } else {
+      await sendThreadUpdate({
+        discord,
+        raidId: event.entityId,
+        updateType: "status_change",
+        data: { newStatus: raid.status },
+        context,
+      });
+    }
+  }
+
+  if (hasSignUps) {
+    await sendThreadUpdate({
+      discord,
+      raidId: event.entityId,
+      updateType: "slot_update",
+      data: { currentSignups: raid.slots?.filter((slot) => slot.userId).length, totalSlots: raid.slots?.length },
+      context,
+    });
+  }
 }
 
 export async function handleRaidDeleted({ discord, event }: RaidEventHandlerProps) {
@@ -47,5 +82,5 @@ export async function handleRaidDeleted({ discord, event }: RaidEventHandlerProp
     return;
   }
 
-  deleteAnnouncement({ discord, raidId: entityId });
+  deleteAnnouncement({ discord, serverId, announcementMessageId });
 }

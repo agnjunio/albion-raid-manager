@@ -61,10 +61,22 @@ export const raidCommand: Command = {
           const raidId = interaction.options.getString("raid-id", true);
 
           try {
-            await deleteAnnouncement({
-              discord: interaction.client,
-              raidId,
-            });
+            const raid = await RaidService.findRaidById(raidId);
+            if (!raid) {
+              const errorMessage = await context.t("commands.raid.delete.notFound", { raidId });
+              await interaction.editReply({
+                content: errorMessage,
+              });
+              return;
+            }
+
+            if (raid.announcementMessageId) {
+              await deleteAnnouncement({
+                discord: interaction.client,
+                serverId: guild.id,
+                announcementMessageId: raid.announcementMessageId,
+              });
+            }
             await RaidService.deleteRaid(raidId, { publisher: await getRaidEventPublisher() });
 
             const successMessage = await context.t("commands.raid.delete.success", { raidId });

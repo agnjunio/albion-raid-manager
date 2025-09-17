@@ -103,6 +103,50 @@
       "success": "Você saiu da raid. Esperamos vê-lo na próxima vez!"
     }
   },
+  "notifications": {
+    "thread": {
+      "welcome": "Bem-vindo ao thread da raid {{raidTitle}}! 🎯",
+      "purpose": "Este thread é para:",
+      "updates": "• Atualizações e notificações da raid",
+      "changes": "• Mudanças de última hora",
+      "coordination": "• Coordenação e lembretes",
+      "discussion": "• Discussões pós-raid",
+      "note": "Por favor, mantenha as discussões gerais da raid no canal principal."
+    },
+    "statusChange": {
+      "title": "🔄 **Atualização de Status da Raid**",
+      "message": "O status da raid \"{{raidTitle}}\" mudou para: **{{newStatus}}**"
+    },
+    "rosterUpdate": {
+      "title": "👥 **Atualização do Roster**",
+      "message": "Alguém entrou ou saiu da raid!",
+      "signups": "Inscrições atuais: {{current}}/{{total}}"
+    },
+    "reminder": {
+      "title": "⏰ **Lembrete da Raid**",
+      "message": "A raid \"{{raidTitle}}\" está começando em breve!",
+      "description": "Preparem-se para {{raidTitle}}!"
+    },
+    "cancellation": {
+      "title": "❌ **Raid Cancelada**",
+      "message": "A raid \"{{raidTitle}}\" foi cancelada.",
+      "reason": "Nenhum motivo fornecido"
+    },
+    "raidStarting": {
+      "title": "⏰ Raid Começando em Breve!",
+      "message": "@everyone Raid começando em {{minutes}} minutos! 🚀",
+      "description": "**{{raidTitle}}** começa em {{minutes}} minutos!",
+      "location": "Localização",
+      "type": "Tipo",
+      "content": "Conteúdo",
+      "tbd": "A definir"
+    },
+    "raidCancelled": {
+      "title": "❌ Raid Cancelada",
+      "message": "@everyone A raid foi cancelada.",
+      "description": "A raid foi cancelada."
+    }
+  },
   "commands": {
     "errors": {
       "guildOnly": "❌ Este comando só pode ser usado em um servidor Discord.",

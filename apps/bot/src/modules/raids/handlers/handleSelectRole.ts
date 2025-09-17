@@ -5,7 +5,7 @@ import { GuildMember } from "discord.js";
 
 import { ClientError, ErrorCodes } from "@/errors";
 
-import { createOrUpdateAnnouncement } from "../announcements";
+import { createOrUpdateAnnouncement, sendThreadUpdate } from "../announcements";
 
 import { type InteractionHandlerProps } from "./index";
 
@@ -71,6 +71,7 @@ export const handleSelectRole = async ({ discord, interaction, context }: Intera
     });
 
     createOrUpdateAnnouncement({ discord, raidId: raid.id, serverId: raid.serverId, context });
+    sendThreadUpdate({ discord, raidId: raid.id, updateType: "slot_update", context });
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;

@@ -103,6 +103,50 @@
       "success": "You have left the raid. We hope to see you next time!"
     }
   },
+  "notifications": {
+    "thread": {
+      "welcome": "Welcome to the {{raidTitle}} raid thread! 🎯",
+      "purpose": "This thread is for:",
+      "updates": "• Raid updates and notifications",
+      "changes": "• Last-minute changes",
+      "coordination": "• Coordination and reminders",
+      "discussion": "• Post-raid discussions",
+      "note": "Please keep general raid discussions in the main channel."
+    },
+    "statusChange": {
+      "title": "🔄 **Raid Status Update**",
+      "message": "The raid \"{{raidTitle}}\" status has changed to: **{{newStatus}}**"
+    },
+    "rosterUpdate": {
+      "title": "👥 **Roster Update**",
+      "message": "Someone has joined or left the raid!",
+      "signups": "Current signups: {{current}}/{{total}}"
+    },
+    "reminder": {
+      "title": "⏰ **Raid Reminder**",
+      "message": "The raid \"{{raidTitle}}\" is starting soon!",
+      "description": "Get ready for {{raidTitle}}!"
+    },
+    "cancellation": {
+      "title": "❌ **Raid Cancelled**",
+      "message": "The raid \"{{raidTitle}}\" has been cancelled.",
+      "reason": "No reason provided"
+    },
+    "raidStarting": {
+      "title": "⏰ Raid Starting Soon!",
+      "message": "@everyone Raid starting in {{minutes}} minutes! 🚀",
+      "description": "**{{raidTitle}}** starts in {{minutes}} minutes!",
+      "location": "Location",
+      "type": "Type",
+      "content": "Content",
+      "tbd": "TBD"
+    },
+    "raidCancelled": {
+      "title": "❌ Raid Cancelled",
+      "message": "@everyone The raid has been cancelled.",
+      "description": "The raid has been cancelled."
+    }
+  },
   "commands": {
     "errors": {
       "guildOnly": "❌ This command can only be used in a Discord server.",

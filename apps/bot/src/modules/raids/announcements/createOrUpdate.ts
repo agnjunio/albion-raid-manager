@@ -1,11 +1,13 @@
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { RaidService, ServersService } from "@albion-raid-manager/core/services";
-import { Client, MessageCreateOptions, MessageEditOptions } from "discord.js";
+import { Client, Message, MessageCreateOptions, MessageEditOptions } from "discord.js";
 
 import { GuildContext } from "@/modules/guild-context";
 
 import { buildRaidAnnouncementMessage } from "../messages";
+
+import { createNotificationThread } from "./notifications";
 
 interface CreateOrUpdateAnnouncementProps {
   discord: Client;
@@ -38,16 +40,25 @@ export async function createOrUpdateAnnouncement({
     orderBy: { order: "asc" },
   });
 
+  let message: Message | undefined;
+
   if (raid.announcementMessageId) {
-    const message = await channel.messages.fetch(raid.announcementMessageId);
+    message = await channel.messages.fetch(raid.announcementMessageId);
     if (!message) return;
 
     await message.edit(await buildRaidAnnouncementMessage<MessageEditOptions>(raid, slots, context));
   } else {
-    const message = await channel.send(await buildRaidAnnouncementMessage<MessageCreateOptions>(raid, slots, context));
+    message = await channel.send(await buildRaidAnnouncementMessage<MessageCreateOptions>(raid, slots, context));
+
     await prisma.raid.update({
       where: { id: raid.id },
-      data: { announcementMessageId: message.id },
+      data: {
+        announcementMessageId: message.id,
+      },
     });
+  }
+
+  if (!message.hasThread) {
+    await createNotificationThread({ discord, message, raid, context });
   }
 }
