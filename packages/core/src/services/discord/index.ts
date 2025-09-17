@@ -1,4 +1,5 @@
 import { exchangeCode, refreshToken } from "./auth";
+import { getApplicationEmojis } from "./emojis";
 import { sendMessage } from "./messages";
 import {
   addServerMemberRole,
@@ -15,6 +16,9 @@ export const DiscordService = {
   auth: {
     exchangeCode,
     refreshToken,
+  },
+  emojis: {
+    getApplicationEmojis,
   },
   messages: {
     sendMessage,

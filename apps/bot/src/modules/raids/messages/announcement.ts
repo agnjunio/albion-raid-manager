@@ -5,12 +5,14 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  Client,
   EmbedBuilder,
   MessageCreateOptions,
   MessageEditOptions,
 } from "discord.js";
 
 import { type GuildContext } from "@/modules/guild-context";
+import { getSlotEmoji } from "@/utils/emojis";
 
 import { raids } from "..";
 import { getRaidBanner } from "../helpers";
@@ -18,7 +20,7 @@ import { getRaidBanner } from "../helpers";
 export const buildRaidAnnouncementMessage = async <T extends MessageCreateOptions | MessageEditOptions>(
   raid: Raid,
   slots: RaidSlot[],
-  context: GuildContext,
+  { discord, context }: { discord: Client; context: GuildContext },
 ): Promise<T> => {
   const { t } = context;
 
@@ -83,7 +85,7 @@ export const buildRaidAnnouncementMessage = async <T extends MessageCreateOption
 
   // Add raid composition with enhanced display
   if (slots.length > 0) {
-    const compositionText = await buildCompositionText(slots, signups, totalSlots, context);
+    const compositionText = await buildCompositionText(slots, { discord, context });
 
     embed.addFields({
       name: `👥 **${t("raids.composition")}** (${filledSlots}/${totalSlots})`,
@@ -178,9 +180,7 @@ function createProgressBar(percentage: number, length: number = 10): string {
 // Helper function to build composition text with better formatting
 async function buildCompositionText(
   slots: RaidSlot[],
-  _signups: RaidSlot[],
-  _totalSlots: number,
-  context: GuildContext,
+  { discord, context }: { discord: Client; context: GuildContext },
 ): Promise<string> {
   const { t } = context;
 
@@ -188,18 +188,18 @@ async function buildCompositionText(
     return t("raids.slots.noSlots");
   }
 
-  const compositionLines = await Promise.all(
-    slots.map(async (slot, index) => {
-      const roleEmoji = getRaidRoleEmoji(slot.role ?? undefined);
-      const slotNumber = (index + 1).toString().padStart(2, "0");
+  const compositionLines = [];
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i];
+    const slotNumber = (i + 1).toString().padStart(2, "0");
+    const roleEmoji = await getSlotEmoji(slot, { discord });
 
-      if (slot.userId) {
-        return `${slotNumber}. ${roleEmoji} **${slot.name}** - <@${slot.userId}>`;
-      } else {
-        return `${slotNumber}. ${roleEmoji} **${slot.name}** - *${t("raids.slots.available")}*`;
-      }
-    }),
-  );
+    if (slot.userId) {
+      compositionLines.push(`${slotNumber}. ${roleEmoji} **${slot.name}** - <@${slot.userId}>`);
+    } else {
+      compositionLines.push(`${slotNumber}. ${roleEmoji} **${slot.name}** - *${t("raids.slots.available")}*`);
+    }
+  }
 
   // Add role summary if there are multiple roles
   const roleCounts = slots.reduce(

@@ -7,6 +7,7 @@ import {
   searchAlbionPlayers,
   verifyAlbionPlayer,
 } from "./client";
+import { getAlbionItemImageUrl, getItemIdAndEnchantment } from "./items";
 import { getAllServers, getServer, getServerById, getServerByLiveId, getServerUrl, SERVERS } from "./servers";
 
 export const AlbionService = {
@@ -17,6 +18,10 @@ export const AlbionService = {
   },
   guilds: {
     getAlbionGuild,
+  },
+  items: {
+    getItemIdAndEnchantment,
+    getAlbionItemImageUrl,
   },
   killboard: {
     getAlbionPlayerKillboard,

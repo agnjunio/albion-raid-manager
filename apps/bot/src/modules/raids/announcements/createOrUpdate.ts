@@ -46,9 +46,11 @@ export async function createOrUpdateAnnouncement({
     message = await channel.messages.fetch(raid.announcementMessageId);
     if (!message) return;
 
-    await message.edit(await buildRaidAnnouncementMessage<MessageEditOptions>(raid, slots, context));
+    await message.edit(await buildRaidAnnouncementMessage<MessageEditOptions>(raid, slots, { discord, context }));
   } else {
-    message = await channel.send(await buildRaidAnnouncementMessage<MessageCreateOptions>(raid, slots, context));
+    message = await channel.send(
+      await buildRaidAnnouncementMessage<MessageCreateOptions>(raid, slots, { discord, context }),
+    );
 
     await prisma.raid.update({
       where: { id: raid.id },
