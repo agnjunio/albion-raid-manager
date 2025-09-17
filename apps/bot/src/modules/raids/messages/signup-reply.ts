@@ -16,6 +16,9 @@ export const buildRaidSignupReply = (raid: Raid, slots: RaidSlot[], users?: User
     .setPlaceholder("Select a build");
 
   for (const slot of slots) {
+    // Skip if the slot is already taken
+    if (slot.userId) continue;
+
     let label = slot.name;
     if (slot.userId) {
       label += ` - `;

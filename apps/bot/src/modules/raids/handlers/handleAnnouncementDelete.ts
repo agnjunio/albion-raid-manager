@@ -1,5 +1,5 @@
-import { RaidService } from "@albion-raid-manager/core/services";
 import { logger } from "@albion-raid-manager/core/logger";
+import { RaidService } from "@albion-raid-manager/core/services";
 import { Client } from "discord.js";
 
 interface HandleRaidEventProps {

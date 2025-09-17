@@ -1,5 +1,5 @@
 import { createDiscordTimestamp } from "@albion-raid-manager/core/utils/discord";
-import { type Raid, type RaidSlot } from "@albion-raid-manager/types";
+import { type Raid, type RaidRole, type RaidSlot } from "@albion-raid-manager/types";
 import { getContentTypeInfo, getRaidRoleEmoji, RAID_STATUS_INFO } from "@albion-raid-manager/types/entities";
 import {
   ActionRowBuilder,
@@ -28,6 +28,19 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     return statusInfo?.emoji || "⚔️";
   };
 
+  // Calculate raid statistics
+  const signups = slots.filter((slot) => !!slot.userId);
+  const totalSlots = slots.length;
+  const filledSlots = signups.length;
+  const fillPercentage = totalSlots > 0 ? Math.round((filledSlots / totalSlots) * 100) : 0;
+
+  // Create progress bar
+  const progressBar = createProgressBar(fillPercentage);
+
+  // Get content type info
+  const contentTypeInfo = raid.contentType ? getContentTypeInfo(raid.contentType) : null;
+
+  // Build the main embed
   const embed = new EmbedBuilder()
     .setColor(getStatusColor(raid.status))
     .setTitle(`${getStatusEmoji(raid.status)} ${raid.title}`)
@@ -38,19 +51,18 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     })
     .setTimestamp(new Date(raid.date));
 
-  // Add raid date and time
+  // Add raid date and time with better formatting
   embed.addFields({
-    name: "📅 Date & Time",
+    name: "📅 **Date & Time**",
     value: createDiscordTimestamp(raid.date),
     inline: true,
   });
 
-  // Add content type field if available
+  // Add content type field with party size info
   if (raid.contentType && raid.contentType !== "OTHER") {
-    const contentTypeInfo = getContentTypeInfo(raid.contentType);
     embed.addFields({
-      name: "🎯 Content Type",
-      value: `${contentTypeInfo.emoji} ${contentTypeInfo.displayName}`,
+      name: "🎯 **Content Type**",
+      value: `${contentTypeInfo?.emoji} **${contentTypeInfo?.displayName}**`,
       inline: true,
     });
   }
@@ -58,48 +70,73 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
   // Add location if available
   if (raid.location) {
     embed.addFields({
-      name: "📍 Location",
+      name: "📍 **Location**",
       value: raid.location,
       inline: true,
     });
   }
 
-  // Add note if available
-  if (raid.note) {
-    embed.addFields({
-      name: "📝 Note",
-      value: raid.note,
-      inline: false,
-    });
-  }
-
-  // Build simplified composition display
-  const signups = slots.filter((slot) => !!slot.userId);
-
+  // Add raid composition with enhanced display
   if (slots.length > 0) {
-    const compositionText = slots
-      .map((slot) => {
-        const roleEmoji = getRaidRoleEmoji(slot.role ?? undefined);
-        if (slot.userId) {
-          return `${roleEmoji} **${slot.name}** - <@${slot.userId}>`;
-        } else {
-          return `${roleEmoji} **${slot.name}**`;
-        }
-      })
-      .join("\n");
+    const compositionText = buildCompositionText(slots, signups, totalSlots);
 
     embed.addFields({
-      name: `👥 Raid Composition (${signups.length}/${slots.length})`,
+      name: `👥 **Raid Composition** (${filledSlots}/${totalSlots})`,
       value: compositionText,
       inline: false,
     });
+
+    // Add progress indicator
+    embed.addFields({
+      name: "📊 **Progress**",
+      value: `${progressBar} **${fillPercentage}%** filled`,
+      inline: false,
+    });
   }
 
+  // Add note if available with better formatting
+  if (raid.note) {
+    embed.addFields({
+      name: "📝 **Important Notes**",
+      value: `\`\`\`\n${raid.note}\n\`\`\``,
+      inline: false,
+    });
+  }
+
+  // Check if all slots are taken
+  const allSlotsTaken = slots.length > 0 && slots.every((slot) => !!slot.userId);
+
+  // Add status-specific information
+  if (raid.status === "OPEN") {
+    const statusMessage = allSlotsTaken
+      ? "🔴 **Raid Full** - All slots are taken, but you can still join the waitlist!"
+      : "🟢 **Open for Signups** - Click the button below to join!";
+
+    embed.addFields({
+      name: "✅ **Status**",
+      value: statusMessage,
+      inline: false,
+    });
+  } else if (raid.status === "CLOSED") {
+    embed.addFields({
+      name: "❌ **Status**",
+      value: "🔴 **Signups Closed** - Raid is full or closed for new participants",
+      inline: false,
+    });
+  } else if (raid.status === "ONGOING") {
+    embed.addFields({
+      name: "▶️ **Status**",
+      value: "🟡 **Raid in Progress** - The adventure has begun!",
+      inline: false,
+    });
+  }
+
+  // Create enhanced buttons
   const signupButton = new ButtonBuilder()
     .setCustomId(`${raids.id}:signup:${raid.id}`)
-    .setLabel("🎯 Sign Up")
+    .setLabel(allSlotsTaken ? "🎯 Full" : "🎯 Sign Up")
     .setStyle(ButtonStyle.Success)
-    .setDisabled(raid.status !== "OPEN");
+    .setDisabled(raid.status !== "OPEN" || allSlotsTaken);
 
   const signoutButton = new ButtonBuilder()
     .setCustomId(`${raids.id}:signout:${raid.id}`)
@@ -107,10 +144,62 @@ export const buildRaidAnnouncementMessage = <T extends MessageCreateOptions | Me
     .setStyle(ButtonStyle.Danger)
     .setDisabled(raid.status !== "OPEN");
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(signupButton, signoutButton);
+  // Add view details button
+  const viewDetailsButton = new ButtonBuilder()
+    .setCustomId(`${raids.id}:details:${raid.id}`)
+    .setLabel("📋 View Details")
+    .setStyle(ButtonStyle.Secondary)
+    .setDisabled(false);
+
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(signupButton, signoutButton, viewDetailsButton);
 
   return {
     embeds: [embed],
     components: [row],
   } as unknown as T;
 };
+
+// Helper function to create a visual progress bar
+function createProgressBar(percentage: number, length: number = 10): string {
+  const filled = Math.round((percentage / 100) * length);
+  const empty = length - filled;
+
+  const filledBar = "█".repeat(filled);
+  const emptyBar = "░".repeat(empty);
+
+  return `\`${filledBar}${emptyBar}\``;
+}
+
+// Helper function to build composition text with better formatting
+function buildCompositionText(slots: RaidSlot[], _signups: RaidSlot[], _totalSlots: number): string {
+  if (slots.length === 0) {
+    return "No slots configured yet.";
+  }
+
+  const compositionLines = slots.map((slot, index) => {
+    const roleEmoji = getRaidRoleEmoji(slot.role ?? undefined);
+    const slotNumber = (index + 1).toString().padStart(2, "0");
+
+    if (slot.userId) {
+      return `${slotNumber}. ${roleEmoji} **${slot.name}** - <@${slot.userId}>`;
+    } else {
+      return `${slotNumber}. ${roleEmoji} **${slot.name}** - *Available*`;
+    }
+  });
+
+  // Add role summary if there are multiple roles
+  const roleCounts = slots.reduce(
+    (acc, slot) => {
+      const role = slot.role || "UNKNOWN";
+      acc[role] = (acc[role] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const roleSummary = Object.entries(roleCounts)
+    .map(([role, count]) => `${getRaidRoleEmoji(role as RaidRole)} ${count}`)
+    .join(" • ");
+
+  return `${compositionLines.join("\n")}\n\n**Role Summary:** ${roleSummary}`;
+}

@@ -1,11 +1,11 @@
-import { getErrorMessage } from "@albion-raid-manager/core/utils";
-import { ensureUser, prisma, RaidStatus } from "@albion-raid-manager/core/database";
+import { ensureUser, prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { getErrorMessage } from "@albion-raid-manager/core/utils";
 import { Client, GuildMember, Interaction } from "discord.js";
 
 import { ClientError, ErrorCodes } from "@/errors";
 
-import { raidEvents } from "../events";
+import { handleAnnouncementCreate } from "./handleAnnouncementCreate";
 
 export const handleSelectRole = async ({ interaction }: { discord: Client; interaction: Interaction }) => {
   if (!interaction.isStringSelectMenu()) return;
@@ -16,12 +16,14 @@ export const handleSelectRole = async ({ interaction }: { discord: Client; inter
     const raid = await prisma.raid.findUnique({
       where: { id: raidId },
       include: {
-        slots: true,
+        slots: {
+          orderBy: { order: "asc" },
+        },
       },
     });
 
     if (!raid) throw new Error("Raid not found");
-    if (raid.status !== RaidStatus.OPEN) throw new Error("Raid is not open for signups");
+    if (raid.status !== "OPEN") throw new Error("Raid is not open for signups");
 
     const slot = interaction.values[0];
 
@@ -63,7 +65,8 @@ export const handleSelectRole = async ({ interaction }: { discord: Client; inter
       content: `You have signed up for the raid! Good luck!`,
       components: [],
     });
-    raidEvents.emit("raidSignup", raid, interaction.user);
+
+    handleAnnouncementCreate({ discord: interaction.client, raidId: raid.id, serverId: raid.serverId });
   } catch (error) {
     if (!interaction.isRepliable()) return;
     if (interaction.replied) return;

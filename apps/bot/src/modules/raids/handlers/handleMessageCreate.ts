@@ -132,7 +132,9 @@ async function createRaidFromParsedData(
         },
       },
       include: {
-        slots: true,
+        slots: {
+          orderBy: { order: "asc" },
+        },
       },
     });
 

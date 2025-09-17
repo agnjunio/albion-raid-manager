@@ -1,6 +1,6 @@
-import { RaidService, ServersService } from "@albion-raid-manager/core/services";
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { RaidService, ServersService } from "@albion-raid-manager/core/services";
 import { Client, MessageCreateOptions, MessageEditOptions } from "discord.js";
 
 import { buildRaidAnnouncementMessage } from "../messages";
@@ -27,6 +27,7 @@ export async function handleAnnouncementCreate({ discord, raidId, serverId }: Ha
 
   const slots = await prisma.raidSlot.findMany({
     where: { raidId: raid.id },
+    orderBy: { order: "asc" },
   });
 
   if (raid.announcementMessageId) {

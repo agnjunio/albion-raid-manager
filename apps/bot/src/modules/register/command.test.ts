@@ -1,6 +1,6 @@
+import { ensureUserAndServer, prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { AlbionService } from "@albion-raid-manager/core/services";
-import { ensureUserAndServer, prisma } from "@albion-raid-manager/core/database";
 import { Guild, GuildMember } from "discord.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
