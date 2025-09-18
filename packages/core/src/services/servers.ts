@@ -157,34 +157,6 @@ export namespace ServersService {
     );
   }
 
-  export async function addServerForUser(
-    userId: string,
-    server: Pick<Server, "id" | "name" | "icon">,
-    options: ServersServiceOptions = {},
-  ): Promise<Server> {
-    const { cache } = options;
-
-    const newServer = await prisma.server.create({
-      data: {
-        ...server,
-        members: {
-          create: {
-            userId,
-            adminPermission: true,
-          },
-        },
-      },
-    });
-
-    if (cache) {
-      CacheInvalidation.invalidateUser(cache, userId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, userId });
-      });
-    }
-
-    return newServer;
-  }
-
   export async function ensureServerMember(
     serverId: string,
     userId: string,
@@ -208,16 +180,22 @@ export namespace ServersService {
       serverMember = await prisma.serverMember.upsert({
         where: { serverId_userId: { serverId, userId } },
         update: {
-          adminPermission: data?.adminPermission,
-          raidPermission: data?.raidPermission,
-          compositionPermission: data?.compositionPermission,
+          nickname: data?.nickname,
+          albionPlayerId: data?.albionPlayerId,
+          albionGuildId: data?.albionGuildId,
+          killFame: data?.killFame,
+          deathFame: data?.deathFame,
+          lastUpdated: data?.lastUpdated,
         },
         create: {
           serverId,
           userId,
-          adminPermission: data?.adminPermission,
-          raidPermission: data?.raidPermission,
-          compositionPermission: data?.compositionPermission,
+          nickname: data?.nickname,
+          albionPlayerId: data?.albionPlayerId,
+          albionGuildId: data?.albionGuildId,
+          killFame: data?.killFame,
+          deathFame: data?.deathFame,
+          lastUpdated: data?.lastUpdated,
         },
       });
     }

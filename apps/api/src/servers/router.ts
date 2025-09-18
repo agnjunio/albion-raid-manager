@@ -95,7 +95,12 @@ serverRouter.post(
         await sleep(3000);
         tries++;
 
-        verifiedServer = await DiscordService.servers.getServer(serverId);
+        try {
+          verifiedServer = await DiscordService.servers.getServer(serverId);
+        } catch {
+          continue;
+        }
+
         if (verifiedServer) {
           break;
         }
@@ -109,20 +114,10 @@ serverRouter.post(
           );
       }
 
+      await ServersService.ensureServerMember(verifiedServer.id, req.session.user.id);
+
       res.json(APIResponse.Success({ server: verifiedServer }));
     } catch (error) {
-      // Handle Discord API 404 error when bot is not invited to server
-      if (isAxiosError(error) && error.response?.status === 404) {
-        return res
-          .status(400)
-          .json(
-            APIResponse.Error(
-              APIErrorType.SERVER_VERIFICATION_FAILED,
-              "Bot is not invited to this server. Please invite the bot to the server first.",
-            ),
-          );
-      }
-
       logger.warn("Failed to add server", { error });
       res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to add server"));
     }
@@ -157,13 +152,6 @@ serverRouter.get(
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
-      const member = server.members[0];
-      if (!member || (!member.adminPermission && !member.raidPermission && !member.compositionPermission)) {
-        return res
-          .status(403)
-          .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You don't have permission to view server members"));
-      }
-
       const discordMembers = await DiscordService.servers.getServerMembers(serverId, {
         type: "bot",
         token: config.discord.token,
@@ -183,9 +171,6 @@ serverRouter.get(
             nickname: discordMember.nick || registeredMember?.nickname || null,
             avatar: discordMember.avatar || discordMember.user.avatar,
             roles: discordMember.roles,
-            adminPermission: registeredMember?.adminPermission || false,
-            raidPermission: registeredMember?.raidPermission || false,
-            compositionPermission: registeredMember?.compositionPermission || false,
             registered: registeredMember?.albionPlayerId ? true : false,
             albionPlayerId: registeredMember?.albionPlayerId || null,
             albionGuildId: registeredMember?.albionGuildId || null,

@@ -14,7 +14,6 @@ export const raidPermission = async (req: Request, res: Response, next: NextFunc
   }
 
   const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
-
   if (!server) {
     return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
   }
@@ -22,12 +21,6 @@ export const raidPermission = async (req: Request, res: Response, next: NextFunc
   const member = server.members[0];
   if (!member) {
     return res.status(403).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You are not a member of this server"));
-  }
-
-  if (!member.raidPermission && !member.adminPermission) {
-    return res
-      .status(403)
-      .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You are not authorized to manage raids"));
   }
 
   req.context.server = server;

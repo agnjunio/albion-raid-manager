@@ -53,14 +53,11 @@ model Server {
 }
 
 model ServerMember {
-  server                Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  user                  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  serverId              String
-  userId                String
-  nickname              String?
-  adminPermission       Boolean @default(false)
-  raidPermission        Boolean @default(false)
-  compositionPermission Boolean @default(false)
+  server   Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serverId String
+  userId   String
+  nickname String?
 
   // Albion player data
   albionPlayerId String?

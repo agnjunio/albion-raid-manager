@@ -15,9 +15,6 @@ export type APIServerMember = {
   nickname?: string | null;
   avatar: string | null;
   roles?: string[];
-  adminPermission: boolean;
-  raidPermission: boolean;
-  compositionPermission: boolean;
   registered: boolean;
   albionPlayerId: string | null;
   albionGuildId: string | null;
