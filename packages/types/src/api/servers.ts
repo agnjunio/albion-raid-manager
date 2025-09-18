@@ -56,9 +56,9 @@ export namespace GetServers {
   export type Response = { servers: APIServer[] };
 }
 
-export namespace SetupServer {
+export namespace VerifyServer {
   export type Body = { serverId: string };
-  export type Response = { server: Server };
+  export type Response = { server: APIServer };
 }
 
 export namespace GetServer {

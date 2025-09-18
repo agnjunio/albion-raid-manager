@@ -1,5 +1,5 @@
-import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { ServersService } from "@albion-raid-manager/core/services";
 import { Client, EmbedBuilder, GuildMember } from "discord.js";
 
 /**
@@ -26,13 +26,7 @@ export async function sendAuditMessage(
 ): Promise<void> {
   try {
     // Get server configuration to check if audit channel is configured
-    const server = await prisma.server.findUnique({
-      where: { id: serverId },
-      select: {
-        auditChannelId: true,
-        name: true,
-      },
-    });
+    const server = await ServersService.getServerById(serverId);
 
     if (!server?.auditChannelId) {
       // No audit channel configured, skip silently

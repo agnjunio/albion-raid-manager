@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-import { APIErrorType, APIServer, SetupServer } from "@albion-raid-manager/types/api";
+import { APIErrorType, APIServer, VerifyServer } from "@albion-raid-manager/types/api";
 import { useTranslation } from "react-i18next";
 
 import Alert from "@/components/ui/alert";
@@ -27,7 +27,7 @@ export function ServerSetup({ server }: ServerSetupProps) {
   const { t } = useTranslation();
   const [step, setStep] = useState(CreateStep.SERVER_INFO);
   const [error, setError] = useState<string | null>(null);
-  const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<SetupServer.Response>();
+  const [createGuildSuccessResponse, setCreateGuildSuccessResponse] = useState<VerifyServer.Response>();
   const [addServer] = useAddServerMutation();
 
   const STEP_LABELS = [
@@ -41,7 +41,7 @@ export function ServerSetup({ server }: ServerSetupProps) {
     setStep(CreateStep.VERIFICATION);
     setError(null);
 
-    const body: SetupServer.Body = {
+    const body: VerifyServer.Body = {
       serverId: server.id,
     };
 

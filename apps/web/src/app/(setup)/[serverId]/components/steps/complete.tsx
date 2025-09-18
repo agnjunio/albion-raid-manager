@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 
-import { SetupServer } from "@albion-raid-manager/types/api";
+import { VerifyServer } from "@albion-raid-manager/types/api";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -9,7 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { CardContent } from "@/components/ui/card";
 
 interface CompleteProps {
-  addServerResponse?: SetupServer.Response;
+  addServerResponse?: VerifyServer.Response;
 }
 
 export function Complete({ addServerResponse }: CompleteProps) {

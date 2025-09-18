@@ -30,6 +30,7 @@ model Server {
   members ServerMember[]
   raids   Raid[]
   builds  Build[]
+  active  Boolean        @default(true)
 
   // Permissions configuration
   adminRoles       String[] @default([])

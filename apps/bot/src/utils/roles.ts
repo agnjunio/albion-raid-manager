@@ -1,5 +1,5 @@
-import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { ServersService } from "@albion-raid-manager/core/services";
 import { GuildMember } from "discord.js";
 
 /**
@@ -15,14 +15,7 @@ export async function assignRolesBasedOnGuild(
 ): Promise<void> {
   try {
     // Get server configuration
-    const server = await prisma.server.findUnique({
-      where: { id: serverId },
-      select: {
-        memberRoleId: true,
-        friendRoleId: true,
-        serverGuildId: true,
-      },
-    });
+    const server = await ServersService.getServerById(serverId);
 
     if (!server) {
       logger.warn(`Server configuration not found for server ${serverId}`);

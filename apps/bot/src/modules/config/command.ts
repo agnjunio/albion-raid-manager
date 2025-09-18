@@ -1,5 +1,6 @@
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
+import { ServersService } from "@albion-raid-manager/core/services";
 import {
   Interaction,
   MessageFlags,
@@ -168,16 +169,7 @@ export const configCommand: Command = {
         }
 
         case "view": {
-          const server = await prisma.server.findUnique({
-            where: { id: guild.id },
-            select: {
-              memberRoleId: true,
-              friendRoleId: true,
-              serverGuildId: true,
-              auditChannelId: true,
-              raidAnnouncementChannelId: true,
-            },
-          });
+          const server = await ServersService.getServerById(guild.id);
 
           if (!server) {
             await interaction.editReply({

@@ -1,6 +1,7 @@
 import config from "@albion-raid-manager/core/config";
 import { logger } from "@albion-raid-manager/core/logger";
 import { Redis } from "@albion-raid-manager/core/redis";
+import { ServersService } from "@albion-raid-manager/core/services";
 import { Client, Events, IntentsBitField, Partials } from "discord.js";
 
 import { initModules } from "./modules";
@@ -38,6 +39,16 @@ process.on("uncaughtException", async (error) => {
 discord.on(Events.ShardReady, async (shardId) => {
   process.env.SHARD = shardId.toString();
   logger.info(`Shard online! Bot user: ${discord.user?.tag}. Guild count: ${discord.guilds.cache.size}`);
+});
+
+discord.on(Events.GuildCreate, async (guild) => {
+  await ServersService.ensureServer(guild.id);
+});
+
+discord.on(Events.GuildDelete, async (guild) => {
+  await ServersService.updateServer(guild.id, {
+    active: false,
+  });
 });
 
 discord.on(Events.Debug, (message) => logger.debug(message));

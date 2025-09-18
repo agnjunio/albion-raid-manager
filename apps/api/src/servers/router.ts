@@ -1,5 +1,6 @@
 import config from "@albion-raid-manager/core/config";
 import { logger } from "@albion-raid-manager/core/logger";
+import { sleep } from "@albion-raid-manager/core/scheduler";
 import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
 import {
   APIErrorType,
@@ -9,7 +10,7 @@ import {
   GetServer,
   GetServerMembers,
   GetServers,
-  SetupServer,
+  VerifyServer,
 } from "@albion-raid-manager/types/api";
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
@@ -79,28 +80,36 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
 serverRouter.post(
   "/",
   validateRequest({ body: addServerSchema }),
-  async (req: Request<{}, void, SetupServer.Body>, res: Response<APIResponse.Type<SetupServer.Response>>) => {
+  async (req: Request<{}, void, VerifyServer.Body>, res: Response<APIResponse.Type<VerifyServer.Response>>) => {
+    if (!req.session.user) {
+      return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+    }
+
     try {
       const { serverId } = req.body;
 
-      const discordServer = await DiscordService.servers.getServer(serverId);
+      let tries = 0;
+      let verifiedServer: APIServer | null = null;
 
-      const existingServer = await ServersService.getServerById(serverId);
-      if (existingServer) {
-        return res.json(APIResponse.Success({ server: existingServer }));
+      while (tries < 3) {
+        await sleep(3000);
+        tries++;
+
+        verifiedServer = await DiscordService.servers.getServer(serverId);
+        if (verifiedServer) {
+          break;
+        }
       }
 
-      if (!req.session.user) {
-        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      if (!verifiedServer) {
+        return res
+          .status(404)
+          .json(
+            APIResponse.Error(APIErrorType.SERVER_VERIFICATION_FAILED, "Failed to verify server. Please try again."),
+          );
       }
 
-      const server = await ServersService.createServerForUser(req.session.user.id, {
-        id: serverId,
-        name: discordServer.name,
-        icon: discordServer.icon,
-      });
-
-      res.json(APIResponse.Success({ server }));
+      res.json(APIResponse.Success({ server: verifiedServer }));
     } catch (error) {
       // Handle Discord API 404 error when bot is not invited to server
       if (isAxiosError(error) && error.response?.status === 404) {
