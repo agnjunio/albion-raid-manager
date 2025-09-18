@@ -23,15 +23,19 @@ const logger = createLogger({
 if (!config.logger.pretty) {
   logger.add(new transports.Console());
 } else {
-  const consoleFormat = format.printf(({ level, [Symbol.for("level")]: logLevel, message, timestamp, shard }) => {
-    const printSpace = (count: number) => " ".repeat(Math.max(count, 0));
+  const consoleFormat = format.printf(
+    ({ level, [Symbol.for("level")]: logLevel, message, timestamp, shard, error }) => {
+      const printSpace = (count: number) => " ".repeat(Math.max(count, 0));
 
-    const maxLen = "verbose".length;
-    const count = maxLen - (logLevel as string).length;
-    const spacing = printSpace(count);
-    const shardStr = shard ? `[#${shard}] ` : "";
-    return `${timestamp} [${level}] ${spacing}: ${shardStr}${message}`;
-  });
+      const maxLen = "verbose".length;
+      const count = maxLen - (logLevel as string).length;
+      const spacing = printSpace(count);
+      const shardStr = shard ? `[#${shard}] ` : "";
+      const errorStr = error ? `\n${error instanceof Error ? error.stack : error}` : "";
+
+      return `${timestamp} [${level}] ${spacing}: ${shardStr}${message}${errorStr}`;
+    },
+  );
 
   logger.add(
     new transports.Console({
