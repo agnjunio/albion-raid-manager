@@ -1,4 +1,3 @@
-import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeButton } from "@/components/ui/theme";
 import { useAuth } from "@/lib/auth";
+import { getUserPictureUrl } from "@/lib/discord-utils";
 
 export function Home() {
   const { user, status, signIn } = useAuth();

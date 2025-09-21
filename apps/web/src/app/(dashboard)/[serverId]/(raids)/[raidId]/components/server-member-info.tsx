@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
+import { getUserPictureUrl } from "@/lib/discord-utils";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";

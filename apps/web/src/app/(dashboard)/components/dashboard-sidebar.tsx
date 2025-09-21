@@ -1,13 +1,11 @@
 import { useMemo } from "react";
 
-import { getServerPictureUrl, getUserPictureUrl } from "@albion-raid-manager/core/utils/discord";
 import { APIServer } from "@albion-raid-manager/types/api";
 import {
   faArrowRightFromBracket,
   faCheck,
   faChevronCircleLeft,
   faChevronDown,
-  faCog,
   faCrown,
   faShield,
   IconDefinition,
@@ -40,18 +38,16 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
+import { getServerPictureUrl, getUserPictureUrl } from "@/lib/discord-utils";
+import { useMenu } from "@/lib/menu";
 import { cn } from "@/lib/utils";
 import { useGetServersQuery } from "@/store/servers";
-
-const navigation = [
-  { name: "raids", href: "raids", icon: faShield },
-  { name: "settings", href: "settings", icon: faCog },
-];
 
 export function DashboardSidebar() {
   const { serverId } = useParams<{ serverId: string }>();
   const { data, isLoading } = useGetServersQuery();
   const { t } = useTranslation();
+  const navigation = useMenu();
 
   const servers = useMemo(() => data?.servers.filter((server) => server.bot), [data]);
   const selectedServer = useMemo(() => servers?.find((server) => server.id === serverId), [servers, serverId]);

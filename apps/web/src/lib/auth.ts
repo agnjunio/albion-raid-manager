@@ -2,6 +2,8 @@ import type { User } from "@albion-raid-manager/types";
 
 import { useGetMeQuery, useLogoutMutation } from "@/store/auth";
 
+import { getDiscordOAuthUrl } from "./discord-utils";
+
 export const AUTH_FLAG_KEY = "auth_logged_in";
 export const AUTH_REDIRECT_KEY = "auth_redirect";
 
@@ -24,7 +26,7 @@ export function useAuth(): Auth {
     const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
     const scope = "identify guilds";
     localStorage.setItem(AUTH_REDIRECT_KEY, window.location.pathname);
-    window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+    window.location.href = getDiscordOAuthUrl(clientId, redirectUri, scope);
   };
 
   const signOut = async () => {
