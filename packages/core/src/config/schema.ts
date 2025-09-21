@@ -26,6 +26,7 @@ export const schema = z.object({
     token: z.string().optional(),
     clientId: z.string().optional(),
     clientSecret: z.string().optional(),
+    communityUrl: z.string().url().optional(),
   }),
 
   logger: z.object({

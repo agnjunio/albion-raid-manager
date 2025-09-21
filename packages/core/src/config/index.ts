@@ -30,6 +30,7 @@ const config = schema.safeParse({
     token: process.env.DISCORD_TOKEN,
     clientId: process.env.DISCORD_CLIENT_ID,
     clientSecret: process.env.DISCORD_CLIENT_SECRET,
+    communityUrl: process.env.DISCORD_COMMUNITY_URL,
   },
 
   logger: {

@@ -10,6 +10,13 @@ import { AuthCallback } from "./(auth)/callback/page";
 import { RaidLayout } from "./(dashboard)/[serverId]/(raids)/[raidId]/layout";
 import { RaidPage } from "./(dashboard)/[serverId]/(raids)/[raidId]/page";
 import { RaidsPage } from "./(dashboard)/[serverId]/(raids)/page";
+import { AdministrationPage } from "./(dashboard)/[serverId]/(settings)/administration/page";
+import { ServerSettingsLayout } from "./(dashboard)/[serverId]/(settings)/layout";
+import { LocalizationPage } from "./(dashboard)/[serverId]/(settings)/localization/page";
+import { ServerSettingsPage } from "./(dashboard)/[serverId]/(settings)/page";
+import { PermissionsPage } from "./(dashboard)/[serverId]/(settings)/permissions/page";
+import { RaidsPage as RaidsSettingsPage } from "./(dashboard)/[serverId]/(settings)/raids/page";
+import { RegistrationPage } from "./(dashboard)/[serverId]/(settings)/registration/page";
 import { ServerLayout } from "./(dashboard)/[serverId]/layout";
 import { DashboardLayout } from "./(dashboard)/layout";
 import { DashboardPage } from "./(dashboard)/page";
@@ -32,6 +39,14 @@ export default function App() {
                 <Route path=":raidId" element={<RaidLayout />}>
                   <Route index element={<RaidPage />} />
                 </Route>
+              </Route>
+              <Route path="settings" element={<ServerSettingsLayout />}>
+                <Route index element={<ServerSettingsPage />} />
+                <Route path="administration" element={<AdministrationPage />} />
+                <Route path="permissions" element={<PermissionsPage />} />
+                <Route path="raids" element={<RaidsSettingsPage />} />
+                <Route path="registration" element={<RegistrationPage />} />
+                <Route path="localization" element={<LocalizationPage />} />
               </Route>
               <Route
                 path="*"
