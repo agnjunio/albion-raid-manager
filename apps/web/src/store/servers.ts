@@ -1,5 +1,6 @@
 import {
   GetServer,
+  GetServerChannels,
   GetServerMembers,
   GetServerSettings,
   GetServers,
@@ -36,6 +37,11 @@ export const serversApi = createApi({
       providesTags: (result, _error, { params }) =>
         result ? [{ type: "Server", id: `SETTINGS:${params.serverId}` }] : [],
     }),
+    getServerChannels: builder.query<GetServerChannels.Response, { params: GetServerChannels.Params }>({
+      query: ({ params }) => ({ url: `/servers/${params.serverId}/channels` }),
+      providesTags: (result, _error, { params }) =>
+        result ? [{ type: "Server", id: `CHANNELS:${params.serverId}:LIST` }] : [],
+    }),
   }),
 });
 
@@ -45,4 +51,5 @@ export const {
   useAddServerMutation,
   useGetServerMembersQuery,
   useGetServerSettingsQuery,
+  useGetServerChannelsQuery,
 } = serversApi;

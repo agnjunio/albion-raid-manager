@@ -42,14 +42,14 @@ function SettingsLayoutContent() {
       {/* 2-Column Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Column - Navigation */}
-        <div className="border-border/50 bg-muted/5 hidden w-80 border-r lg:block">
+        <div className="border-border/50 bg-muted/5 hidden w-64 border-r lg:block xl:w-72">
           <SettingsSidebar />
         </div>
 
         {/* Right Column - Content */}
         <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 overflow-auto">
-            <div className="h-full p-4 lg:p-8">
+            <div className="mx-auto mb-4 w-full max-w-4xl p-4 lg:p-8">
               <Outlet />
             </div>
           </div>

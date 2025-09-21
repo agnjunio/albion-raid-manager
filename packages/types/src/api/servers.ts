@@ -1,3 +1,4 @@
+import type { Channel } from "../entities/server-channels";
 import type { Server, ServerSettings } from "../entities/servers";
 
 export type APIServerMember = {
@@ -12,19 +13,6 @@ export type APIServerMember = {
   killFame: number;
   deathFame: number;
   lastUpdated: Date | null;
-};
-
-export enum APIChannelType {
-  TEXT = "TEXT",
-  VOICE = "VOICE",
-  CATEGORY = "CATEGORY",
-}
-
-export type APIChannel = {
-  id: string;
-  name: string;
-  type: APIChannelType;
-  parentId?: string;
 };
 
 export enum APIRoleType {
@@ -62,4 +50,9 @@ export namespace GetServerMembers {
 export namespace GetServerSettings {
   export type Params = { serverId: string };
   export type Response = { settings: ServerSettings };
+}
+
+export namespace GetServerChannels {
+  export type Params = { serverId: string };
+  export type Response = { channels: Channel[] };
 }

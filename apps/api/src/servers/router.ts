@@ -7,12 +7,19 @@ import {
   APIResponse,
   APIServerMember,
   GetServer,
+  GetServerChannels,
   GetServerMembers,
   GetServers,
   GetServerSettings,
   VerifyServer,
 } from "@albion-raid-manager/types/api";
-import { createServerSettings, fromDiscordGuild, Server } from "@albion-raid-manager/types/entities";
+import {
+  Channel,
+  createServerSettings,
+  fromDiscordChannels,
+  fromDiscordGuild,
+  Server,
+} from "@albion-raid-manager/types/entities";
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
@@ -246,3 +253,38 @@ serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
     res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to update server settings"));
   }
 });
+
+serverRouter.get(
+  "/:serverId/channels",
+  async (req: Request<GetServerChannels.Params>, res: Response<APIResponse.Type<GetServerChannels.Response>>) => {
+    try {
+      const { serverId } = req.params;
+
+      if (!req.session.user) {
+        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      }
+
+      // Check if user has access to this server
+      const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
+      if (!server) {
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
+      }
+
+      const discordChannels = await DiscordService.servers.getServerChannels(serverId, {
+        type: "bot",
+        token: config.discord.token,
+      });
+
+      const channels: Channel[] = fromDiscordChannels(discordChannels);
+
+      res.json(APIResponse.Success({ channels }));
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 401) {
+        res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      } else {
+        logger.warn("Failed to get server channels", { error });
+        res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server channels"));
+      }
+    }
+  },
+);

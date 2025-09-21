@@ -1,16 +1,16 @@
 import type { UseFormReturn } from "react-hook-form";
-import type { ServerSettingsFormData } from "../schemas";
 
 import { faClipboardList, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useParams } from "react-router-dom";
 
-import { ServerInfo } from "@/components/discord";
+import { DiscordChannelInput, ServerInfo } from "@/components/discord";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { PageError } from "@/components/ui/page";
 import { Separator } from "@/components/ui/separator";
+
+import { ServerSettingsFormData } from "../schemas";
 
 interface AdministrationSectionProps {
   form: UseFormReturn<ServerSettingsFormData>;
@@ -55,10 +55,11 @@ export function AdministrationSection({ form }: AdministrationSectionProps) {
                 Audit Channel
               </FormLabel>
               <FormControl>
-                <Input
+                <DiscordChannelInput
+                  value={field.value || ""}
+                  onChange={field.onChange}
                   placeholder="Channel ID for audit logs"
                   className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-all duration-200"
-                  {...field}
                 />
               </FormControl>
               <FormDescription className="text-muted-foreground mt-3 text-sm">

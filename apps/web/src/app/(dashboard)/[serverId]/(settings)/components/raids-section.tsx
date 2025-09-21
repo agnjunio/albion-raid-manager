@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
+import { DiscordChannelInput } from "../../../../../components/discord/discord-channel-input";
 import type { ServerSettingsFormData } from "../schemas";
-import { DiscordChannelInput } from "./discord-channel-input";
 
 interface RaidsSectionProps {
   form: UseFormReturn<ServerSettingsFormData>;
@@ -30,7 +30,7 @@ export function RaidsSection({ form }: RaidsSectionProps) {
               </FormLabel>
               <FormControl>
                 <DiscordChannelInput
-                  value={field.value}
+                  value={field.value || ""}
                   onChange={field.onChange}
                   placeholder="Channel ID for raid announcements"
                   className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-all duration-200"
