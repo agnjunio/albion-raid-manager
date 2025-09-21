@@ -1,11 +1,11 @@
 import type { Raid } from "@albion-raid-manager/types";
 
-import { CalendarProvider } from "../contexts/calendar-context";
+import { CalendarProvider, useCalendar } from "../contexts/calendar-context";
 
 import { CalendarGrid } from "./calendar-grid";
 import { CalendarHeader } from "./calendar-header";
 import { CalendarSidebar } from "./calendar-sidebar";
-import { CreateRaidSheet, useTimeSlotClick } from "./create-raid-sheet";
+import { CreateRaidSheet } from "./create-raid-sheet";
 
 interface CalendarPageProps {
   raids: Raid[];
@@ -22,7 +22,7 @@ export function CalendarPage({ raids, onRefresh, isRefreshing = false }: Calenda
 }
 
 function CalendarPageContent() {
-  const { selectedDateTime, handleTimeSlotClick } = useTimeSlotClick();
+  const { selectedTimeSlot } = useCalendar();
 
   return (
     <div className="flex h-full flex-col">
@@ -42,9 +42,9 @@ function CalendarPageContent() {
 
         {/* Calendar Grid with Create Raid Sidebar */}
         <div className="flex-1">
-          <CreateRaidSheet selectedDateTime={selectedDateTime}>
+          <CreateRaidSheet selectedDateTime={selectedTimeSlot}>
             <div className="h-full">
-              <CalendarGrid onTimeSlotClick={handleTimeSlotClick} />
+              <CalendarGrid />
             </div>
           </CreateRaidSheet>
         </div>

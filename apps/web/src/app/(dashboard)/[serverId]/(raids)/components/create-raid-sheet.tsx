@@ -332,20 +332,3 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
     </Sheet>
   );
 }
-
-// Hook to provide time slot click functionality to calendar grid
-export function useTimeSlotClick() {
-  const [selectedDateTime, setSelectedDateTime] = useState<Date | undefined>();
-
-  const handleTimeSlotClick = (date: Date, hour: number) => {
-    const dateTime = new Date(date);
-    dateTime.setHours(hour, 0, 0, 0);
-    setSelectedDateTime(dateTime);
-  };
-
-  return {
-    selectedDateTime,
-    handleTimeSlotClick,
-    setSelectedDateTime,
-  };
-}

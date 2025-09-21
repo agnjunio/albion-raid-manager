@@ -25,12 +25,14 @@ interface CalendarContextValue {
   filters: RaidFilters;
   raids: Raid[];
   isRefreshing: boolean;
+  selectedTimeSlot: Date | undefined;
 
   // Actions
   setCurrentDate: (date: Date) => void;
   setView: (view: CalendarView) => void;
   setFilters: (filters: RaidFilters) => void;
   refresh: () => void;
+  handleTimeSlotClick: (date: Date, hour: number) => void;
 
   // Helper functions
   isRaidFiltered: (raid: Raid) => boolean;
@@ -70,6 +72,7 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
     type: [],
     search: "",
   });
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<Date | undefined>();
 
   // Helper function to check if a raid is filtered out
   const isRaidFiltered = useMemo(() => {
@@ -115,6 +118,12 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
     setFilters(newFilters);
   };
 
+  const handleTimeSlotClick = (date: Date, hour: number) => {
+    const dateTime = new Date(date);
+    dateTime.setHours(hour, 0, 0, 0);
+    setSelectedTimeSlot(dateTime);
+  };
+
   // Set up hotkeys
   const hotkeys = createCalendarHotkeys(
     handleViewChange,
@@ -135,12 +144,14 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
     filters,
     raids,
     isRefreshing,
+    selectedTimeSlot,
 
     // Actions
     setCurrentDate: handleDateChange,
     setView: handleViewChange,
     setFilters: handleFilterChange,
     refresh: onRefresh,
+    handleTimeSlotClick,
 
     // Helper functions
     isRaidFiltered,

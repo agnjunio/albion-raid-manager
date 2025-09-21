@@ -1,39 +1,180 @@
-import { useEffect, useMemo, useRef } from "react";
+import type { Raid } from "@albion-raid-manager/types";
 
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 import { faClock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import { CalendarView, useCalendar } from "@/app/(dashboard)/[serverId]/(raids)/contexts/calendar-context";
 import { getShortWeekdayName } from "@/lib/locale";
 import { cn } from "@/lib/utils";
+import { useUpdateRaidMutation } from "@/store/raids";
 
 import { RaidEventCard } from "./raid-event-card";
 
-interface CalendarGridProps {
-  onTimeSlotClick?: (date: Date, hour: number) => void;
+export function CalendarGrid() {
+  const { view } = useCalendar();
+  const { serverId } = useParams<{ serverId: string }>();
+  const { t } = useTranslation();
+  const [updateRaid] = useUpdateRaidMutation();
+  const [activeRaid, setActiveRaid] = useState<Raid | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveRaid(event.active.data.current?.raid);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveRaid(null);
+    const { active, over } = event;
+
+    if (!active.data.current?.raid || !over?.data.current) {
+      return;
+    }
+
+    const raid = active.data.current.raid;
+    const targetDate = over.data.current.date;
+    const targetHour = over.data.current.hour;
+
+    if (!targetDate) {
+      return;
+    }
+
+    const originalDate = new Date(raid.date);
+    const newDate = new Date(targetDate);
+    newDate.setHours(targetHour ?? originalDate.getHours(), 0, 0, 0);
+
+    if (newDate.getTime() === originalDate.getTime()) {
+      return;
+    }
+
+    try {
+      if (!serverId) {
+        throw new Error("Server ID is required");
+      }
+
+      await updateRaid({
+        params: {
+          serverId,
+          raidId: raid.id,
+        },
+        body: {
+          date: newDate,
+        },
+      }).unwrap();
+
+      toast.success(t("toasts.raid.updated"), {
+        description: t("toasts.raid.dateUpdatedDescription"),
+      });
+    } catch {
+      toast.error(t("toasts.raid.updateError"), {
+        description: t("toasts.raid.dateUpdateErrorDescription"),
+      });
+    }
+  };
+
+  return (
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors}>
+      {view === CalendarView.DAY && <CalendarGridDayAndWeek />}
+      {view === CalendarView.WEEK && <CalendarGridDayAndWeek />}
+      {view === CalendarView.MONTH && <CalendarGridMonth />}
+
+      <DragOverlay>
+        {activeRaid ? (
+          <RaidEventCard
+            raid={activeRaid}
+            variant="time-slot"
+            className="scale-105 cursor-grabbing opacity-90 shadow-lg"
+          />
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
 }
 
-export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
-  const { raids, isRaidFiltered, currentDate, view, setCurrentDate, setView } = useCalendar();
+interface CalendarGridTimeSlotProps {
+  date: Date;
+  hour: number;
+}
+
+function CalendarGridTimeSlot({ date, hour }: CalendarGridTimeSlotProps) {
+  const { handleTimeSlotClick } = useCalendar();
   const { t } = useTranslation();
+  const { raids, isRaidFiltered } = useCalendar();
+  const { setNodeRef, isOver } = useDroppable({
+    id: `${hour}-${date.getDate()}`,
+    data: { date: date.toISOString(), hour },
+  });
+  const isToday = date.toDateString() === new Date().toDateString();
+
+  const timeSlotRaids = useMemo(() => {
+    return raids.filter((raid) => {
+      const raidDate = new Date(raid.date);
+      const raidHour = raidDate.getHours();
+      return (
+        raidDate.getFullYear() === date.getFullYear() &&
+        raidDate.getMonth() === date.getMonth() &&
+        raidDate.getDate() === date.getDate() &&
+        raidHour === hour
+      );
+    });
+  }, [date, hour, raids]);
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "border-border/20 hover:bg-primary/20 border-b p-1 transition-colors",
+        isToday && "bg-foreground/5 border-primary/10",
+        "hover:bg-primary/10 group cursor-pointer",
+        isOver && "bg-primary/20 border-primary/50 ring-primary/30 ring-2",
+      )}
+      onClick={() => handleTimeSlotClick(date, hour)}
+    >
+      <div className="space-y-1">
+        {timeSlotRaids.map((raid) => (
+          <RaidEventCard
+            key={raid.id}
+            raid={raid}
+            variant="time-slot"
+            className={isRaidFiltered(raid) ? "opacity-30" : ""}
+          />
+        ))}
+        {timeSlotRaids.length === 0 && (
+          <div className="text-muted-foreground/50 text-xs opacity-0 transition-opacity group-hover:opacity-100">
+            {t("calendar.grid.clickToCreateRaid")}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CalendarGridDayAndWeek() {
+  const { currentDate, view } = useCalendar();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const hasScrolledToCurrentTimeRef = useRef(false);
 
-  const timeSlots = useMemo(() => {
-    const slots = [];
-    for (let hour = 0; hour < 24; hour++) {
-      slots.push({
-        hour,
-        time: `${hour.toString().padStart(2, "0")}:00`,
-        displayTime:
-          hour === 0 ? "12:00 AM" : hour < 12 ? `${hour}:00 AM` : hour === 12 ? "12:00 PM" : `${hour - 12}:00 PM`,
-      });
-    }
-    return slots;
-  }, []);
-
-  const getDaysForView = () => {
+  const days = useMemo(() => {
     const days = [];
 
     switch (view) {
@@ -51,50 +192,10 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
         }
         break;
       }
-      case CalendarView.MONTH: {
-        const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        const startOfCalendar = new Date(startOfMonth);
-        startOfCalendar.setDate(startOfMonth.getDate() - startOfMonth.getDay());
-
-        for (let i = 0; i < 42; i++) {
-          const day = new Date(startOfCalendar);
-          day.setDate(startOfCalendar.getDate() + i);
-          days.push(day);
-        }
-        break;
-      }
     }
 
     return days;
-  };
-
-  const getRaidsForDay = (date: Date) => {
-    return raids.filter((raid) => {
-      const raidDate = new Date(raid.date);
-      return (
-        raidDate.getFullYear() === date.getFullYear() &&
-        raidDate.getMonth() === date.getMonth() &&
-        raidDate.getDate() === date.getDate()
-      );
-    });
-  };
-
-  const getRaidsForTimeSlot = (date: Date, hour: number) => {
-    const dayRaids = getRaidsForDay(date);
-    return dayRaids.filter((raid) => {
-      const raidDate = new Date(raid.date);
-      const raidHour = raidDate.getHours();
-      // Include raids that start in this hour or span into this hour
-      return raidHour === hour;
-    });
-  };
-
-  const handleDayClick = (day: Date) => {
-    setCurrentDate(day);
-    setView(CalendarView.WEEK);
-  };
-
-  const days = getDaysForView();
+  }, [view, currentDate]);
 
   const currentTime = useMemo(() => {
     const currentTime = new Date();
@@ -124,9 +225,22 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
     };
   }, [view, currentDate, days]);
 
+  const hourSlots = useMemo(() => {
+    const slots = [];
+    for (let hour = 0; hour < 24; hour++) {
+      slots.push({
+        hour,
+        time: `${hour.toString().padStart(2, "0")}:00`,
+        displayTime:
+          hour === 0 ? "12:00 AM" : hour < 12 ? `${hour}:00 AM` : hour === 12 ? "12:00 PM" : `${hour - 12}:00 PM`,
+      });
+    }
+    return slots;
+  }, []);
+
   // Auto-scroll to current time on mount for non-month views
   useEffect(() => {
-    if (view === CalendarView.MONTH || !scrollContainerRef.current || !currentTime.shouldShow) {
+    if (!scrollContainerRef.current || !currentTime.shouldShow) {
       // Reset the scroll flag when view changes or when we shouldn't show current time
       hasScrolledToCurrentTimeRef.current = false;
       return;
@@ -170,68 +284,6 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
     return () => clearTimeout(timeoutId);
   }, [view, currentTime]);
 
-  if (view === CalendarView.MONTH) {
-    return (
-      <div className="primary-scrollbar h-full overflow-y-auto">
-        <div className="bg-border grid min-h-full grid-cols-7 gap-px">
-          {/* Month view header */}
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.sun")}</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.mon")}</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.tue")}</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.wed")}</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.thu")}</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.fri")}</div>
-          <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.sat")}</div>
-
-          {days.map((day, index) => {
-            const dayRaids = getRaidsForDay(day);
-            const isCurrentMonth = day.getMonth() === currentDate.getMonth();
-            const isToday = day.toDateString() === new Date().toDateString();
-
-            return (
-              <div
-                key={index}
-                className={cn(
-                  "bg-background hover:bg-primary/25 min-h-31 cursor-pointer p-2 transition-colors",
-                  !isCurrentMonth && "text-muted-foreground",
-                  isToday && "bg-foreground/5 ring-primary ring-1",
-                )}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDayClick(day);
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <span className={cn("text-sm", isToday && "font-semibold")}>{day.getDate()}</span>
-                  {dayRaids.length > 0 && (
-                    <span className="text-muted-foreground text-xs">
-                      {t("calendar.grid.raidCount", { count: dayRaids.length })}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-1 space-y-1">
-                  {dayRaids.slice(0, 3).map((raid) => (
-                    <RaidEventCard
-                      key={raid.id}
-                      raid={raid}
-                      variant="compact"
-                      className={`text-xs ${isRaidFiltered(raid) ? "opacity-30" : ""}`}
-                    />
-                  ))}
-                  {dayRaids.length > 3 && (
-                    <div className="text-muted-foreground text-xs">
-                      {t("calendar.grid.moreRaids", { count: dayRaids.length - 3 })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       ref={scrollContainerRef}
@@ -272,7 +324,7 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
 
       {/* Calendar content */}
       <div className="relative w-full">
-        {timeSlots.map((slot) => {
+        {hourSlots.map((slot) => {
           const isCurrentHour = slot.hour === currentTime.currentHour;
           const shouldShowCurrentTime = currentTime.shouldShow && isCurrentHour;
 
@@ -316,40 +368,121 @@ export function CalendarGrid({ onTimeSlotClick }: CalendarGridProps = {}) {
               </div>
 
               {/* Day cells */}
-              {days.map((day, dayIndex) => {
-                const timeSlotRaids = getRaidsForTimeSlot(day, slot.hour);
-                const isToday = day.toDateString() === new Date().toDateString();
-
-                return (
-                  <div
-                    key={`${slot.hour}-${dayIndex}`}
-                    className={cn(
-                      "border-border/20 hover:bg-primary/20 border-b p-1 transition-colors",
-                      isToday && "bg-foreground/5 border-primary/10",
-                      onTimeSlotClick && "hover:bg-primary/10 group cursor-pointer",
-                    )}
-                    onClick={() => onTimeSlotClick?.(day, slot.hour)}
-                  >
-                    <div className="space-y-1">
-                      {timeSlotRaids.map((raid) => (
-                        <RaidEventCard
-                          key={raid.id}
-                          raid={raid}
-                          variant="time-slot"
-                          className={isRaidFiltered(raid) ? "opacity-30" : ""}
-                        />
-                      ))}
-                      {timeSlotRaids.length === 0 && onTimeSlotClick && (
-                        <div className="text-muted-foreground/50 text-xs opacity-0 transition-opacity group-hover:opacity-100">
-                          {t("calendar.grid.clickToCreateRaid")}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              {days.map((day, dayIndex) => (
+                <CalendarGridTimeSlot key={`${slot.hour}-${dayIndex}`} date={day} hour={slot.hour} />
+              ))}
             </div>
           );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CalendarGridDaySlot({ day }: { day: Date }) {
+  const { raids, isRaidFiltered, currentDate, setCurrentDate, setView } = useCalendar();
+  const { t } = useTranslation();
+  const { setNodeRef, isOver } = useDroppable({
+    id: `${day.getDate()}`,
+    data: { date: day.toISOString() },
+  });
+
+  const getRaidsForDay = useCallback(
+    (date: Date) => {
+      return raids.filter((raid) => {
+        const raidDate = new Date(raid.date);
+        return (
+          raidDate.getFullYear() === date.getFullYear() &&
+          raidDate.getMonth() === date.getMonth() &&
+          raidDate.getDate() === date.getDate()
+        );
+      });
+    },
+    [raids],
+  );
+
+  const handleDayClick = (day: Date) => {
+    setCurrentDate(day);
+    setView(CalendarView.WEEK);
+  };
+
+  const dayRaids = getRaidsForDay(day);
+  const isCurrentMonth = day.getMonth() === currentDate.getMonth();
+  const isToday = day.toDateString() === new Date().toDateString();
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "bg-background hover:bg-primary/25 min-h-31 cursor-pointer p-2 transition-colors",
+        !isCurrentMonth && "text-muted-foreground",
+        isToday && "bg-foreground/5 ring-primary ring-1",
+        isOver && "bg-primary/20 border-primary/50 ring-primary/30 ring-2",
+      )}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleDayClick(day);
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <span className={cn("text-sm", isToday && "font-semibold")}>{day.getDate()}</span>
+        {dayRaids.length > 0 && (
+          <span className="text-muted-foreground text-xs">
+            {t("calendar.grid.raidCount", { count: dayRaids.length })}
+          </span>
+        )}
+      </div>
+      <div className="mt-1 space-y-1">
+        {dayRaids.slice(0, 3).map((raid) => (
+          <RaidEventCard
+            key={raid.id}
+            raid={raid}
+            variant="compact"
+            className={`text-xs ${isRaidFiltered(raid) ? "opacity-30" : ""}`}
+          />
+        ))}
+        {dayRaids.length > 3 && (
+          <div className="text-muted-foreground text-xs">
+            {t("calendar.grid.moreRaids", { count: dayRaids.length - 3 })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CalendarGridMonth() {
+  const { t } = useTranslation();
+  const { currentDate } = useCalendar();
+
+  const days = useMemo(() => {
+    const days = [];
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const startOfCalendar = new Date(startOfMonth);
+    startOfCalendar.setDate(startOfMonth.getDate() - startOfMonth.getDay());
+
+    for (let i = 0; i < 42; i++) {
+      const day = new Date(startOfCalendar);
+      day.setDate(startOfCalendar.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  }, [currentDate]);
+
+  return (
+    <div className="primary-scrollbar h-full overflow-y-auto">
+      <div className="bg-border grid min-h-full grid-cols-7 gap-px">
+        {/* Month view header */}
+        <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.sun")}</div>
+        <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.mon")}</div>
+        <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.tue")}</div>
+        <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.wed")}</div>
+        <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.thu")}</div>
+        <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.fri")}</div>
+        <div className="bg-primary/30 p-2 text-center text-sm font-medium">{t("calendar.days.sat")}</div>
+
+        {days.map((day, index) => {
+          return <CalendarGridDaySlot key={index} day={day} />;
         })}
       </div>
     </div>

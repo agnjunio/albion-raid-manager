@@ -1,5 +1,6 @@
 import type { Raid } from "@albion-raid-manager/types";
 
+import { useDraggable } from "@dnd-kit/core";
 import { faMapMarkerAlt, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
@@ -15,6 +16,13 @@ interface RaidEventCardProps {
 }
 
 export function RaidEventCard({ raid, variant = "default", className }: RaidEventCardProps) {
+  const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
+    id: raid.id,
+    data: {
+      raid,
+    },
+  });
+
   const formatTime = (date: Date) => {
     return new Date(date).toLocaleTimeString("en-US", {
       hour: "numeric",
@@ -38,10 +46,14 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
     return (
       <Link
         to={raid.id}
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
         className={cn(
-          "hover:bg-accent/50 block rounded border-l-4 transition-colors",
+          "hover:bg-accent/50 block cursor-pointer rounded border-l-4 transition-colors active:ring-0",
           raidStatuses[raid.status]?.color,
           getVariantStyles(),
+          isDragging && "opacity-0",
           className,
         )}
       >
@@ -55,10 +67,14 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
     return (
       <Link
         to={raid.id}
+        ref={setNodeRef}
+        {...listeners}
+        {...attributes}
         className={cn(
-          "bg-muted/50 hover:bg-accent/50 block rounded border-l-4 shadow-sm transition-colors",
+          "bg-muted/50 hover:bg-accent/50 block cursor-pointer rounded border-l-4 shadow-sm transition-colors active:ring-0",
           raidStatuses[raid.status]?.color,
           getVariantStyles(),
+          isDragging && "opacity-0",
           className,
         )}
       >
@@ -79,10 +95,14 @@ export function RaidEventCard({ raid, variant = "default", className }: RaidEven
   return (
     <Link
       to={raid.id}
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       className={cn(
-        "block rounded-lg border transition-all hover:shadow-md",
+        "block cursor-pointer rounded-lg border transition-all hover:shadow-md active:ring-0",
         raidStatuses[raid.status]?.color,
         getVariantStyles(),
+        isDragging && "opacity-0",
         className,
       )}
     >
