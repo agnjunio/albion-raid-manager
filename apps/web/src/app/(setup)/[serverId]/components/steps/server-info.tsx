@@ -1,9 +1,7 @@
 import { APIServer } from "@albion-raid-manager/types/api";
-import { faCrown, faShield } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 
-import { Badge } from "@/components/ui/badge";
+import { ServerInfoCard } from "@/components/discord";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 
@@ -18,32 +16,7 @@ export function ServerInfo({ server, onNext }: ServerInfoProps) {
   return (
     <CardContent className="space-y-4">
       <div className="flex justify-center text-center">
-        <div className="bg-muted/70 hover:bg-muted rounded-lg px-5 py-4">
-          <div className="flex select-none items-center gap-4">
-            {server.icon && (
-              <img
-                src={`https://cdn.discordapp.com/icons/${server.id}/${server.icon}.png`}
-                alt={`${server.name} icon`}
-                className="h-12 w-12 rounded-full"
-              />
-            )}
-            <div className="text-left">
-              <p className="text-sm font-medium">{server.name}</p>
-              {server.owner && (
-                <Badge variant="outline" size="xs">
-                  <FontAwesomeIcon icon={faCrown} className="text-primary mr-1 size-3" />
-                  {t("servers.owner")}
-                </Badge>
-              )}
-              {!server.owner && server.admin && (
-                <Badge variant="outline" size="xs">
-                  <FontAwesomeIcon icon={faShield} className="text-secondary mr-1 size-3" />
-                  {t("servers.admin")}
-                </Badge>
-              )}
-            </div>
-          </div>
-        </div>
+        <ServerInfoCard server={server} />
       </div>
 
       <p className="text-muted-foreground text-center text-xs">{t("setup.serverInfo.description")}</p>

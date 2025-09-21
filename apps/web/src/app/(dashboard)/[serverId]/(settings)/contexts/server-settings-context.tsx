@@ -46,7 +46,6 @@ export function ServerSettingsProvider({ children }: ServerSettingsProviderProps
   const [formData, setFormData] = useState<ServerSettingsFormData | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Use RTK Query hook for server settings
   const {
     data: serverSettingsData,
     isLoading,

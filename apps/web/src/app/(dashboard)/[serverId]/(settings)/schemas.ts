@@ -6,7 +6,7 @@ export const serverSettingsSchema = z.object({
     .string()
     .min(1, { message: "Server name is required" })
     .max(100, { message: "Server name should not exceed 100 characters" }),
-  icon: z.string().url({ message: "Icon must be a valid URL" }).optional().or(z.literal("")),
+  icon: z.string().optional().or(z.literal("")),
 
   // Permissions
   adminRoles: z

@@ -3,10 +3,13 @@ import type { ServerSettingsFormData } from "../schemas";
 
 import { faClipboardList, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useParams } from "react-router-dom";
 
+import { ServerInfo } from "@/components/discord";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PageError } from "@/components/ui/page";
 import { Separator } from "@/components/ui/separator";
 
 interface AdministrationSectionProps {
@@ -14,29 +17,26 @@ interface AdministrationSectionProps {
 }
 
 export function AdministrationSection({ form }: AdministrationSectionProps) {
+  const { serverId } = useParams();
+
+  if (!serverId) return <PageError error="Server ID is required" />;
+
   return (
     <Card className="border-border/50 shadow-sm">
-      <CardContent className="space-y-8 p-6">
-        <div className="space-y-3">
-          <div className="text-foreground mb-4 flex items-center gap-3 text-lg font-semibold">
+      <CardContent className="space-y-8 p-8">
+        <div className="space-y-4">
+          <div className="text-foreground mb-6 flex items-center gap-3 text-lg font-semibold">
             <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
               <FontAwesomeIcon icon={faTag} className="text-primary h-4 w-4" />
             </div>
-            Server Information
+            Server Administration
           </div>
-          <div className="bg-muted/30 border-border/50 rounded-lg border p-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-sm font-medium">Server Name</span>
-                <span className="text-foreground font-medium">{form.getValues("name") || "Not set"}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground text-sm font-medium">Server Icon</span>
-                <span className="text-foreground font-medium">{form.getValues("icon") ? "Configured" : "Not set"}</span>
-              </div>
-            </div>
+
+          <div className="flex justify-center">
+            <ServerInfo serverId={serverId} />
           </div>
-          <p className="text-muted-foreground text-sm">
+
+          <p className="text-muted-foreground text-center text-sm">
             Server information is managed by Discord and cannot be changed here
           </p>
         </div>
