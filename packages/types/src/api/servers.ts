@@ -1,4 +1,5 @@
 import { Server } from "../../generated/index";
+import type { ServerSettings } from "../entities/servers";
 
 export type APIServer = {
   id: string;
@@ -66,4 +67,9 @@ export namespace GetServer {
 export namespace GetServerMembers {
   export type Params = { serverId: string };
   export type Response = { members: APIServerMember[] };
+}
+
+export namespace GetServerSettings {
+  export type Params = { serverId: string };
+  export type Response = { settings: ServerSettings };
 }

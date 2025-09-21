@@ -10,8 +10,10 @@ import {
   GetServer,
   GetServerMembers,
   GetServers,
+  GetServerSettings,
   VerifyServer,
 } from "@albion-raid-manager/types/api";
+import { createServerSettings } from "@albion-raid-manager/types/entities";
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
@@ -192,3 +194,78 @@ serverRouter.get(
     }
   },
 );
+
+serverRouter.get(
+  "/:serverId/settings",
+  async (req: Request<GetServerSettings.Params>, res: Response<APIResponse.Type<GetServerSettings.Response>>) => {
+    try {
+      const { serverId } = req.params;
+
+      if (!req.session.user) {
+        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      }
+
+      const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
+      if (!server) {
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
+      }
+
+      const settings = createServerSettings(server);
+
+      res.json(APIResponse.Success({ settings }));
+    } catch (error) {
+      logger.warn("Failed to get server settings", { error });
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server settings"));
+    }
+  },
+);
+
+serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
+  try {
+    const { serverId } = req.params;
+
+    if (!req.session.user) {
+      return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+    }
+
+    // Check if user has access to this server
+    const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
+    if (!server) {
+      return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
+    }
+
+    const {
+      name,
+      icon,
+      adminRoles,
+      raidRoles,
+      compositionRoles,
+      raidAnnouncementChannelId,
+      serverGuildId,
+      memberRoleId,
+      friendRoleId,
+      auditChannelId,
+      language,
+    } = req.body;
+
+    // Update server settings
+    await ServersService.updateServer(serverId, {
+      name,
+      icon,
+      adminRoles,
+      raidRoles,
+      compositionRoles,
+      raidAnnouncementChannelId,
+      serverGuildId,
+      memberRoleId,
+      friendRoleId,
+      auditChannelId,
+      language,
+    });
+
+    res.json(APIResponse.Success({ message: "Server settings updated successfully" }));
+  } catch (error) {
+    logger.warn("Failed to update server settings", { error });
+    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to update server settings"));
+  }
+});
