@@ -21,10 +21,10 @@ export const CacheKeys = {
   usersByServer: (serverId: string): string => `users:server:${serverId}`,
 
   // Server cache keys
-  server: (id: string): string => `server:${id}`,
+  serversByUser: (userId: string, include?: string): string => `servers:user:${userId}${include ? `:${include}` : ""}`,
+  server: (id: string, include?: string): string => `server:${id}${include ? `:${include}` : ""}`,
   serverMembers: (serverId: string): string => `server:${serverId}:members`,
   serverMember: (serverId: string, userId: string): string => `server:${serverId}:member:${userId}`,
-  serversByUser: (userId: string): string => `servers:user:${userId}`,
   serverConfig: (serverId: string): string => `server:${serverId}:config`,
 
   // Raid cache keys

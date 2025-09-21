@@ -1,5 +1,3 @@
-export * from "discord-api-types/v10";
-
 export type DiscordServiceOptions = {
   type?: "user" | "bot";
   token?: string;

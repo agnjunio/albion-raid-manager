@@ -17,6 +17,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "discord-api-types": "^0.38.26",
     "zod": "^4.1.8"
   }
 }

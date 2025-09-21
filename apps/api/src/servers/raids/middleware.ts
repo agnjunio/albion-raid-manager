@@ -13,12 +13,12 @@ export const raidPermission = async (req: Request, res: Response, next: NextFunc
     return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "User not authenticated"));
   }
 
-  const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
+  const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
   if (!server) {
     return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
   }
 
-  const member = server.members[0];
+  const member = server.members.find((m) => m.userId === req.session.user?.id);
   if (!member) {
     return res.status(403).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You are not a member of this server"));
   }

@@ -348,11 +348,6 @@ vi.mock("@albion-raid-manager/core/utils/discord", () => ({
   getAuthorization: vi.fn((type, token) => `${type === "user" ? "Bearer" : "Bot"} ${token}`),
   hasPermissions: vi.fn(() => true),
   transformChannel: vi.fn((channel) => channel),
-  transformGuild: vi.fn((guild) => ({
-    ...guild,
-    admin: false,
-    owner: undefined,
-  })),
 }));
 
 // Mock scheduler

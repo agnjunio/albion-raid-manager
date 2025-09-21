@@ -1,15 +1,10 @@
-import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType, PermissionFlagsBits } from "discord-api-types/v10";
+import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType } from "discord-api-types/v10";
 
 import { memoize } from "@albion-raid-manager/core/cache/memory";
 import config from "@albion-raid-manager/core/config";
 import { sleep } from "@albion-raid-manager/core/scheduler";
 import { getMilliseconds } from "@albion-raid-manager/core/utils";
-import {
-  getAuthorization,
-  hasPermissions,
-  transformChannel,
-  transformGuild,
-} from "@albion-raid-manager/core/utils/discord";
+import { getAuthorization, transformChannel } from "@albion-raid-manager/core/utils/discord";
 
 import { discordApiClient } from "./client";
 import { DiscordServiceOptions } from "./types";
@@ -18,7 +13,7 @@ type GetUserGuildsOptions = DiscordServiceOptions & {
   admin?: boolean;
 };
 
-export async function getServers({ admin, type = "bot", token = config.discord.token }: GetUserGuildsOptions) {
+export async function getServers({ type = "bot", token = config.discord.token }: GetUserGuildsOptions) {
   const servers = await memoize<APIGuild[]>(
     `discord.${type}.${token}.guilds`,
     async () => {
@@ -52,12 +47,7 @@ export async function getServers({ admin, type = "bot", token = config.discord.t
     },
   );
 
-  return servers
-    .filter((server) => {
-      if (!admin) return true;
-      return hasPermissions(server.permissions, [PermissionFlagsBits.Administrator]);
-    })
-    .map(transformGuild);
+  return servers;
 }
 
 export async function getServer(
@@ -81,7 +71,7 @@ export async function getServer(
       timeout: getMilliseconds(1, "days"),
     },
   );
-  return transformGuild(server);
+  return server;
 }
 
 export async function getServerChannels(

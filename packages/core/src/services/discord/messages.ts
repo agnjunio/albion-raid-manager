@@ -1,6 +1,8 @@
+import { APIMessage } from "discord-api-types/v10";
+
 import config from "@albion-raid-manager/core/config";
 import { getAuthorization } from "@albion-raid-manager/core/utils/discord";
-import { APIMessage } from "discord-api-types/v10";
+
 import { discordApiClient } from "./client";
 import { DiscordServiceOptions } from "./types";
 

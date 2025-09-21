@@ -1,15 +1,7 @@
 import { User } from "@albion-raid-manager/types";
-import { APIServer } from "@albion-raid-manager/types/api";
-import { APIGuild, APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
+import { APIGuildChannel, APIUser, ChannelType } from "discord-api-types/v10";
 
 export const DISCORD_CDN_URL = `https://cdn.discordapp.com`;
-export const PERMISSIONS: {
-  [permission: string]: bigint;
-} = {
-  ADMINISTRATOR: BigInt(1 << 3), // 0x00000008
-  MANAGE_GUILD: BigInt(1 << 5), // 0x00000020
-  MANAGE_ROLES: BigInt(1 << 28), // 0x10000000
-};
 
 export const getDiscordOAuthUrl = (clientId: string, redirectUri: string) =>
   `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20guilds`;
@@ -36,11 +28,6 @@ export const getServerInviteUrl = (clientId: string, serverId?: string) => {
   return `https://discord.com/oauth2/authorize?client_id=${clientId}&scope=bot&permissions=8${serverParam}`;
 };
 
-export function hasPermissions(permissions: string | bigint = 0n, requiredPermissions: bigint[]): boolean {
-  const permissionBits = BigInt(permissions);
-  return requiredPermissions.every((perm) => (permissionBits & perm) !== 0n);
-}
-
 export function transformUser(user: APIUser): User {
   return {
     id: user.id,
@@ -49,26 +36,6 @@ export function transformUser(user: APIUser): User {
     avatar: user.avatar ?? null,
     defaultServerId: null,
   };
-}
-
-export function transformGuild(guild: APIGuild): APIServer {
-  const transformedGuild = {
-    id: guild.id,
-    name: guild.name,
-    icon: guild.icon,
-    owner: guild.owner,
-    admin: false,
-  };
-
-  if (guild.owner) {
-    transformedGuild.owner = guild.owner;
-  }
-
-  if (guild.permissions) {
-    transformedGuild.admin = hasPermissions(guild.permissions, [PERMISSIONS.ADMINISTRATOR]);
-  }
-
-  return transformedGuild;
 }
 
 export function transformChannel(channel: APIGuildChannel<ChannelType>) {

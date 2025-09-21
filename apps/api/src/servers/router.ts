@@ -5,7 +5,6 @@ import { DiscordService, ServersService } from "@albion-raid-manager/core/servic
 import {
   APIErrorType,
   APIResponse,
-  APIServer,
   APIServerMember,
   GetServer,
   GetServerMembers,
@@ -13,7 +12,7 @@ import {
   GetServerSettings,
   VerifyServer,
 } from "@albion-raid-manager/types/api";
-import { createServerSettings } from "@albion-raid-manager/types/entities";
+import { createServerSettings, fromDiscordGuild, Server } from "@albion-raid-manager/types/entities";
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
@@ -35,40 +34,16 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
 
-    const [botServers, adminServers] = await Promise.all([
-      ServersService.getServersForUser(req.session.user.id),
-      DiscordService.servers.getServers({
-        type: "user",
-        token: req.session.accessToken,
-        admin: true,
-      }),
-    ]);
+    const servers = await ServersService.getServersForUser(req.session.user.id, {
+      accessToken: req.session.accessToken,
+      admin: true,
+    });
 
-    const servers = new Map<string, APIServer>();
-
-    for (const server of adminServers) {
-      servers.set(server.id, {
-        ...server,
-        admin: true,
-        bot: botServers.some((botServer) => botServer.id === server.id),
-      });
-    }
-
-    for (const server of botServers) {
-      if (servers.has(server.id)) continue;
-      servers.set(server.id, {
-        ...server,
-        admin: false,
-        bot: true,
-        icon: server.icon ?? null,
-      });
-    }
-
-    if (!adminServers) {
+    if (!servers) {
       return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get servers"));
     }
 
-    res.json(APIResponse.Success({ servers: Array.from(servers.values()) }));
+    res.json(APIResponse.Success({ servers }));
   } catch (error) {
     if (isAxiosError(error) && error.response?.status === 401) {
       res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
@@ -91,14 +66,18 @@ serverRouter.post(
       const { serverId } = req.body;
 
       let tries = 0;
-      let verifiedServer: APIServer | null = null;
+      let verifiedServer: Server | null = null;
 
       while (tries < 3) {
         await sleep(3000);
         tries++;
 
         try {
-          verifiedServer = await DiscordService.servers.getServer(serverId);
+          const discordServer = await DiscordService.servers.getServer(serverId, {
+            type: "bot",
+            token: req.session.accessToken,
+          });
+          verifiedServer = fromDiscordGuild(discordServer);
         } catch {
           continue;
         }
@@ -149,7 +128,7 @@ serverRouter.get(
       }
 
       // Check if user has access to this server
-      const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
+      const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
       if (!server) {
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
@@ -205,7 +184,7 @@ serverRouter.get(
         return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
       }
 
-      const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
+      const server = await ServersService.getServerById(serverId);
       if (!server) {
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
@@ -228,8 +207,7 @@ serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
 
-    // Check if user has access to this server
-    const server = await ServersService.getServerWithMember(serverId, req.session.user.id);
+    const server = await ServersService.getServerById(serverId);
     if (!server) {
       return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
     }
@@ -248,7 +226,6 @@ serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
       language,
     } = req.body;
 
-    // Update server settings
     await ServersService.updateServer(serverId, {
       name,
       icon,

@@ -1,10 +1,12 @@
+import { APIEmoji } from "discord-api-types/v10";
+
 import { memoize } from "@albion-raid-manager/core/cache/memory";
 import config from "@albion-raid-manager/core/config";
 import { getAuthorization } from "@albion-raid-manager/core/utils/discord";
 import { getMilliseconds } from "@albion-raid-manager/core/utils/time";
 
 import { discordApiClient } from "./client";
-import { APIEmoji, DiscordServiceOptions } from "./types";
+import { DiscordServiceOptions } from "./types";
 
 interface GetApplicationEmojisOptions extends DiscordServiceOptions {}
 

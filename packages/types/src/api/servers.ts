@@ -1,14 +1,4 @@
-import { Server } from "../../generated/index";
-import type { ServerSettings } from "../entities/servers";
-
-export type APIServer = {
-  id: string;
-  name: string;
-  icon: string | null;
-  owner?: boolean;
-  admin: boolean;
-  bot?: boolean;
-};
+import type { Server, ServerSettings } from "../entities/servers";
 
 export type APIServerMember = {
   id: string;
@@ -51,12 +41,12 @@ export type APIRole = {
 };
 
 export namespace GetServers {
-  export type Response = { servers: APIServer[] };
+  export type Response = { servers: Server[] };
 }
 
 export namespace VerifyServer {
   export type Body = { serverId: string };
-  export type Response = { server: APIServer };
+  export type Response = { server: Server };
 }
 
 export namespace GetServer {
