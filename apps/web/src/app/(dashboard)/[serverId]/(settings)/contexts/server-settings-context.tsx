@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { apiClient } from "@/lib/api";
+import { useGetServerSettingsQuery } from "@/store/servers";
 
 interface ServerSettingsContextValue {
   // Server data
@@ -41,29 +42,24 @@ interface ServerSettingsProviderProps {
 
 export function ServerSettingsProvider({ children }: ServerSettingsProviderProps) {
   const { serverId } = useParams();
-  const [server, setServer] = useState<ServerSettingsFormData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<ServerSettingsFormData | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
+  // Use RTK Query hook for server settings
+  const {
+    data: serverSettingsData,
+    isLoading,
+    error,
+    refetch: refetchServerSettings,
+  } = useGetServerSettingsQuery({ params: { serverId: serverId || "" } }, { skip: !serverId });
+
+  const server = serverSettingsData?.settings as ServerSettingsFormData | null;
+
   const loadServerSettings = useCallback(async () => {
     if (!serverId) return;
-
-    setIsLoading(true);
-    try {
-      const response = await apiClient.get(`/servers/${serverId}/settings`);
-      const settings = response.data.data.settings as ServerSettingsFormData;
-
-      setServer(settings);
-      setFormData(settings);
-    } catch (error) {
-      console.error("Failed to load server settings", { error });
-      toast.error("Failed to load server settings");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [serverId]);
+    await refetchServerSettings();
+  }, [serverId, refetchServerSettings]);
 
   const saveServerSettings = async (data: ServerSettingsFormData) => {
     if (!serverId) return;
@@ -72,7 +68,8 @@ export function ServerSettingsProvider({ children }: ServerSettingsProviderProps
     try {
       await apiClient.put(`/servers/${serverId}/settings`, data);
 
-      setServer((prev) => (prev ? { ...prev, ...data } : data));
+      // Refetch server settings to get updated data
+      await refetchServerSettings();
       setFormData(data);
       setHasUnsavedChanges(false);
 
@@ -92,10 +89,13 @@ export function ServerSettingsProvider({ children }: ServerSettingsProviderProps
     }
   };
 
-  // Load server settings on mount
+  // Handle RTK Query errors
   useEffect(() => {
-    loadServerSettings();
-  }, [loadServerSettings]);
+    if (error) {
+      console.error("Failed to load server settings", { error });
+      toast.error("Failed to load server settings");
+    }
+  }, [error]);
 
   // Track form changes
   useEffect(() => {
