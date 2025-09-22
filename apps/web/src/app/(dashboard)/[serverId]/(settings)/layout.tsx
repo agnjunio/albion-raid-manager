@@ -1,18 +1,21 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { SettingsPageHeader } from "./components/settings-page-header";
 import { SettingsSidebar } from "./components/settings-sidebar";
 import { SettingsStickyFooter } from "./components/settings-sticky-footer";
 import { ServerSettingsProvider, useServerSettings } from "./contexts/server-settings-context";
-import { settingsPageInfo } from "./utils/page-info";
+import { getSettingsPageInfo } from "./utils/page-info";
 
 function SettingsLayoutContent() {
   const location = useLocation();
+  const { t } = useTranslation();
   const { formData, saveServerSettings, resetForm } = useServerSettings();
 
   // Get current page from pathname
   const currentPage = location.pathname.split("/").pop() || "administration";
+  const settingsPageInfo = getSettingsPageInfo(t);
   const pageInfo = settingsPageInfo[currentPage as keyof typeof settingsPageInfo] || settingsPageInfo.administration;
 
   const handleSave = async () => {

@@ -587,5 +587,131 @@
       "displayName": "Other",
       "description": "Other content type"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "configuration": "Configuration",
+    "loadingSettings": "Loading settings...",
+    "needHelp": "Need help?",
+    "joinDiscord": "Join our Discord community",
+    "navigation": {
+      "administration": {
+        "name": "Administration",
+        "description": "Server info & audit"
+      },
+      "permissions": {
+        "name": "Permissions",
+        "description": "Role-based access"
+      },
+      "raids": {
+        "name": "Raids",
+        "description": "Raid configuration"
+      },
+      "registration": {
+        "name": "Registration",
+        "description": "User registration"
+      },
+      "localization": {
+        "name": "Localization",
+        "description": "Language settings"
+      }
+    },
+    "pages": {
+      "administration": {
+        "title": "Server Administration",
+        "description": "Manage server information and audit settings"
+      },
+      "permissions": {
+        "title": "Permissions",
+        "description": "Configure role-based access control"
+      },
+      "raids": {
+        "title": "Raid Settings",
+        "description": "Configure raid management settings"
+      },
+      "registration": {
+        "title": "User Registration",
+        "description": "Manage user registration and role assignment"
+      },
+      "localization": {
+        "title": "Localization",
+        "description": "Configure language and regional settings"
+      }
+    },
+    "permissions": {
+      "adminRoles": {
+        "title": "Admin Roles",
+        "placeholder": "Role IDs separated by commas (e.g., 123456789,987654321)",
+        "description": "Discord role IDs that have admin access to all features",
+        "count": "{{count}} role configured",
+        "count_plural": "{{count}} roles configured"
+      },
+      "raidRoles": {
+        "title": "Raid Roles",
+        "placeholder": "Role IDs separated by commas",
+        "description": "Roles that can create and manage raids"
+      },
+      "compositionRoles": {
+        "title": "Composition Roles",
+        "placeholder": "Role IDs separated by commas",
+        "description": "Roles that can manage raid compositions and builds"
+      }
+    },
+    "administration": {
+      "serverAdministration": "Server Administration",
+      "serverInfoDescription": "Server information is managed by Discord and cannot be changed here",
+      "auditChannel": {
+        "title": "Audit Channel",
+        "placeholder": "Channel ID for audit logs",
+        "description": "Channel where audit logs for all bot activities will be posted"
+      }
+    },
+    "localization": {
+      "language": {
+        "title": "Language",
+        "placeholder": "Select a language",
+        "description": "Choose the default language for bot responses and server messages"
+      },
+      "languageSupport": {
+        "title": "Language Support",
+        "description": "Changing the language will affect all bot commands, responses, and automated messages. This setting applies to the entire server and can be updated at any time."
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch",
+        "pt": "Português"
+      }
+    },
+    "raids": {
+      "announcementChannel": {
+        "title": "Raid Announcement Channel",
+        "placeholder": "Channel ID for raid announcements",
+        "description": "Channel where raid announcements and notifications will be posted"
+      }
+    },
+    "registration": {
+      "albionGuildId": {
+        "title": "Albion Guild ID",
+        "placeholder": "Enter your Albion Online guild ID",
+        "description": "The guild ID from Albion Online that this server represents"
+      },
+      "memberRoleId": {
+        "title": "Member Role ID",
+        "placeholder": "Discord role ID for guild members",
+        "description": "Discord role that will be assigned to verified guild members"
+      },
+      "auditChannelId": {
+        "title": "Registration Audit Channel",
+        "placeholder": "Channel ID for registration audit logs",
+        "description": "Channel where user registration and role assignment logs will be posted"
+      },
+      "friendRoleId": {
+        "title": "Friend Role",
+        "placeholder": "Discord role ID for friends/allies",
+        "description": "Role assigned to friends and allies"
+      }
+    }
   }
 }

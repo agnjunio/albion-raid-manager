@@ -13,30 +13,32 @@ export interface SettingsPageInfo {
   icon: IconDefinition;
 }
 
-export const settingsPageInfo: Record<string, SettingsPageInfo> = {
-  administration: {
-    title: "Administration",
-    description: "View server information and configure audit logging",
-    icon: faGears,
-  },
-  permissions: {
-    title: "Permissions",
-    description: "Manage role-based access control and permissions",
-    icon: faShield,
-  },
-  raids: {
-    title: "Raid Settings",
-    description: "Configure raid-related settings and preferences",
-    icon: faShieldAlt,
-  },
-  registration: {
-    title: "User Registration",
-    description: "Set up user registration, role assignments, and audit logging",
-    icon: faUserPlus,
-  },
-  localization: {
-    title: "Localization",
-    description: "Set language and regional preferences",
-    icon: faGlobe,
-  },
-};
+export function getSettingsPageInfo(t: (key: string) => string): Record<string, SettingsPageInfo> {
+  return {
+    administration: {
+      title: t("settings.pages.administration.title"),
+      description: t("settings.pages.administration.description"),
+      icon: faGears,
+    },
+    permissions: {
+      title: t("settings.pages.permissions.title"),
+      description: t("settings.pages.permissions.description"),
+      icon: faShield,
+    },
+    raids: {
+      title: t("settings.pages.raids.title"),
+      description: t("settings.pages.raids.description"),
+      icon: faShieldAlt,
+    },
+    registration: {
+      title: t("settings.pages.registration.title"),
+      description: t("settings.pages.registration.description"),
+      icon: faUserPlus,
+    },
+    localization: {
+      title: t("settings.pages.localization.title"),
+      description: t("settings.pages.localization.description"),
+      icon: faGlobe,
+    },
+  };
+}

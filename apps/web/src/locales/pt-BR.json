@@ -592,5 +592,131 @@
       "displayName": "Outro",
       "description": "Outro tipo de conteúdo"
     }
+  },
+  "settings": {
+    "title": "Configurações",
+    "configuration": "Configuração",
+    "loadingSettings": "Carregando configurações...",
+    "needHelp": "Precisa de ajuda?",
+    "joinDiscord": "Junte-se à nossa comunidade do Discord",
+    "navigation": {
+      "administration": {
+        "name": "Administração",
+        "description": "Informações do servidor e auditoria"
+      },
+      "permissions": {
+        "name": "Permissões",
+        "description": "Controle de acesso baseado em cargos"
+      },
+      "raids": {
+        "name": "Raids",
+        "description": "Configuração de raids"
+      },
+      "registration": {
+        "name": "Registro",
+        "description": "Registro de usuários"
+      },
+      "localization": {
+        "name": "Localização",
+        "description": "Configurações de idioma"
+      }
+    },
+    "pages": {
+      "administration": {
+        "title": "Administração do Servidor",
+        "description": "Gerencie informações do servidor e configurações de auditoria"
+      },
+      "permissions": {
+        "title": "Permissões",
+        "description": "Configure o controle de acesso baseado em funções"
+      },
+      "raids": {
+        "title": "Configurações de Raid",
+        "description": "Configure as configurações de gerenciamento de raids"
+      },
+      "registration": {
+        "title": "Registro de Usuários",
+        "description": "Gerencie o registro de usuários e atribuição de funções"
+      },
+      "localization": {
+        "title": "Localização",
+        "description": "Configure idioma e configurações regionais"
+      }
+    },
+    "permissions": {
+      "adminRoles": {
+        "title": "Funções de Administrador",
+        "placeholder": "IDs de funções separados por vírgulas (ex: 123456789,987654321)",
+        "description": "IDs de funções do Discord que têm acesso de administrador a todos os recursos",
+        "count": "{{count}} função configurada",
+        "count_plural": "{{count}} funções configuradas"
+      },
+      "raidRoles": {
+        "title": "Funções de Raid",
+        "placeholder": "IDs de funções separados por vírgulas",
+        "description": "Funções que podem criar e gerenciar raids"
+      },
+      "compositionRoles": {
+        "title": "Funções de Composição",
+        "placeholder": "IDs de funções separados por vírgulas",
+        "description": "Funções que podem gerenciar composições de raid e builds"
+      }
+    },
+    "administration": {
+      "serverAdministration": "Administração do Servidor",
+      "serverInfoDescription": "As informações do servidor são gerenciadas pelo Discord e não podem ser alteradas aqui",
+      "auditChannel": {
+        "title": "Canal de Auditoria",
+        "placeholder": "Clique para buscar um canal",
+        "description": "Canal onde os logs de auditoria de todas as atividades do bot serão publicados"
+      }
+    },
+    "localization": {
+      "language": {
+        "title": "Idioma",
+        "placeholder": "Selecione um idioma",
+        "description": "Escolha o idioma padrão para respostas do bot e mensagens do servidor"
+      },
+      "languageSupport": {
+        "title": "Suporte a Idiomas",
+        "description": "Alterar o idioma afetará todos os comandos do bot, respostas e mensagens automatizadas. Esta configuração se aplica a todo o servidor e pode ser atualizada a qualquer momento."
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español",
+        "fr": "Français",
+        "de": "Deutsch",
+        "pt": "Português"
+      }
+    },
+    "raids": {
+      "announcementChannel": {
+        "title": "Canal de Anúncios de Raid",
+        "placeholder": "ID do canal para anúncios de raids",
+        "description": "Canal onde os anúncios e notificações de raids serão publicados"
+      }
+    },
+    "registration": {
+      "albionGuildId": {
+        "title": "ID da Guilda do Albion",
+        "placeholder": "Digite o ID da sua guilda do Albion Online",
+        "description": "O ID da guilda do Albion Online que este servidor representa"
+      },
+      "memberRoleId": {
+        "title": "ID da Função de Membro",
+        "placeholder": "ID da função do Discord para membros da guilda",
+        "description": "Função do Discord que será atribuída a membros verificados da guilda"
+      },
+      "auditChannelId": {
+        "title": "Canal de Auditoria de Registro",
+        "placeholder": "ID do canal para logs de auditoria de registro",
+        "description": "Canal onde os logs de registro de usuários e atribuição de funções serão publicados"
+      },
+      "friendRoleId": {
+        "title": "Função de Amigo",
+        "placeholder": "ID da função do Discord para amigos/aliados",
+        "description": "Função atribuída a amigos e aliados"
+      }
+    }
   }
 }

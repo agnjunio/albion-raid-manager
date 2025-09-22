@@ -1,5 +1,6 @@
 import { faBullhorn } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { DiscordChannelInput } from "@/components/discord";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { useServerSettings } from "../contexts/server-settings-context";
 import { useSettingsForm } from "../hooks/use-settings-form";
 
 export function RaidsPage() {
+  const { t } = useTranslation();
   const { isLoading } = useServerSettings();
   const form = useSettingsForm();
 
@@ -30,19 +32,18 @@ export function RaidsPage() {
                   <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                     <FontAwesomeIcon icon={faBullhorn} className="text-primary h-4 w-4" />
                   </div>
-                  Raid Announcement Channel
+                  {t("settings.raids.announcementChannel.title")}
                 </FormLabel>
                 <FormControl>
                   <DiscordChannelInput
                     value={field.value || ""}
                     onChange={field.onChange}
-                    placeholder="Channel ID for raid announcements"
+                    placeholder={t("settings.raids.announcementChannel.placeholder")}
                     className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-all duration-200"
                   />
                 </FormControl>
                 <FormDescription className="text-muted-foreground mt-2 text-sm">
-                  Discord channel where raid announcements will be posted. You can find the channel ID by right-clicking
-                  on a channel and selecting "Copy ID" (Developer Mode must be enabled).
+                  {t("settings.raids.announcementChannel.description")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>

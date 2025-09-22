@@ -1,5 +1,6 @@
 import { faClipboardList, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
 import { DiscordChannelInput, ServerInfo } from "@/components/discord";
@@ -11,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useSettingsForm } from "../hooks/use-settings-form";
 
 export function AdministrationPage() {
+  const { t } = useTranslation();
   const form = useSettingsForm();
   const { serverId } = useParams();
 
@@ -25,7 +27,7 @@ export function AdministrationPage() {
               <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                 <FontAwesomeIcon icon={faTag} className="text-primary h-4 w-4" />
               </div>
-              Server Administration
+              {t("settings.administration.serverAdministration")}
             </div>
 
             <div className="flex justify-center">
@@ -33,7 +35,7 @@ export function AdministrationPage() {
             </div>
 
             <p className="text-muted-foreground text-center text-sm">
-              Server information is managed by Discord and cannot be changed here
+              {t("settings.administration.serverInfoDescription")}
             </p>
           </div>
 
@@ -48,18 +50,18 @@ export function AdministrationPage() {
                   <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                     <FontAwesomeIcon icon={faClipboardList} className="text-primary h-4 w-4" />
                   </div>
-                  Audit Channel
+                  {t("settings.administration.auditChannel.title")}
                 </FormLabel>
                 <FormControl>
                   <DiscordChannelInput
                     value={field.value || ""}
                     onChange={field.onChange}
-                    placeholder="Channel ID for audit logs"
+                    placeholder={t("settings.administration.auditChannel.placeholder")}
                     className="focus:border-primary/50 h-12 border-2 text-base font-medium transition-all duration-200"
                   />
                 </FormControl>
                 <FormDescription className="text-muted-foreground mt-3 text-sm">
-                  Channel where audit logs for all bot activities will be posted
+                  {t("settings.administration.auditChannel.description")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>

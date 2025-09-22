@@ -1,5 +1,6 @@
 import { faGlobe, faLanguage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -8,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useSettingsForm } from "../hooks/use-settings-form";
 
 export function LocalizationPage() {
+  const { t } = useTranslation();
   const form = useSettingsForm();
 
   return (
@@ -23,49 +25,49 @@ export function LocalizationPage() {
                   <div className="from-primary/20 to-primary/10 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br shadow-sm">
                     <FontAwesomeIcon icon={faLanguage} className="text-primary h-5 w-5" />
                   </div>
-                  Language
+                  {t("settings.localization.language.title")}
                 </FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className="focus:border-primary/50 h-14 border-2 text-lg font-medium shadow-lg transition-all duration-300 hover:scale-[1.01]">
-                      <SelectValue placeholder="Select a language" />
+                      <SelectValue placeholder={t("settings.localization.language.placeholder")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="shadow-xl">
                     <SelectItem value="en" className="py-3 text-base">
                       <div className="flex items-center gap-3">
                         <span className="text-lg">🇺🇸</span>
-                        English
+                        {t("settings.localization.languages.en")}
                       </div>
                     </SelectItem>
                     <SelectItem value="es" className="py-3 text-base">
                       <div className="flex items-center gap-3">
                         <span className="text-lg">🇪🇸</span>
-                        Español
+                        {t("settings.localization.languages.es")}
                       </div>
                     </SelectItem>
                     <SelectItem value="fr" className="py-3 text-base">
                       <div className="flex items-center gap-3">
                         <span className="text-lg">🇫🇷</span>
-                        Français
+                        {t("settings.localization.languages.fr")}
                       </div>
                     </SelectItem>
                     <SelectItem value="de" className="py-3 text-base">
                       <div className="flex items-center gap-3">
                         <span className="text-lg">🇩🇪</span>
-                        Deutsch
+                        {t("settings.localization.languages.de")}
                       </div>
                     </SelectItem>
                     <SelectItem value="pt" className="py-3 text-base">
                       <div className="flex items-center gap-3">
                         <span className="text-lg">🇵🇹</span>
-                        Português
+                        {t("settings.localization.languages.pt")}
                       </div>
                     </SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription className="text-muted-foreground mt-4 text-base">
-                  Choose the default language for bot responses and server messages
+                  {t("settings.localization.language.description")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -79,10 +81,11 @@ export function LocalizationPage() {
                 <FontAwesomeIcon icon={faGlobe} className="text-muted-foreground h-4 w-4" />
               </div>
               <div>
-                <h4 className="text-foreground mb-2 font-semibold">Language Support</h4>
+                <h4 className="text-foreground mb-2 font-semibold">
+                  {t("settings.localization.languageSupport.title")}
+                </h4>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Changing the language will affect all bot commands, responses, and automated messages. This setting
-                  applies to the entire server and can be updated at any time.
+                  {t("settings.localization.languageSupport.description")}
                 </p>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,11 +48,13 @@ export function SettingsLoading() {
 }
 
 export function SettingsSpinner() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex items-center justify-center py-12">
       <div className="flex flex-col items-center gap-4">
         <FontAwesomeIcon icon={faSpinner} className="text-primary h-8 w-8 animate-spin" />
-        <p className="text-muted-foreground text-sm">Loading settings...</p>
+        <p className="text-muted-foreground text-sm">{t("settings.loadingSettings")}</p>
       </div>
     </div>
   );
