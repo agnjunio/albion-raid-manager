@@ -78,9 +78,6 @@ export function DiscordChannelInput({
     }
   };
 
-  const isChannelId = value && value.match(/^\d{17,19}$/);
-  const isInputReadOnly = !isChannelId;
-
   return (
     <div className="space-y-2">
       <Popover open={open} onOpenChange={setOpen}>
@@ -93,9 +90,9 @@ export function DiscordChannelInput({
               placeholder={placeholder}
               className={`pointer-events-none pl-10 pr-20 ${className}`}
               disabled={disabled}
-              readOnly={isInputReadOnly}
+              readOnly
             />
-            <div className="absolute left-3 top-1/2 -translate-y-1/2">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2">
               {isLoading ? (
                 <FontAwesomeIcon icon={faSpinner} className="text-muted-foreground h-4 w-4 animate-spin" />
               ) : selectedChannel ? (
