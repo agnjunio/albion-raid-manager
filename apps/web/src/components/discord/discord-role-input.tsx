@@ -72,44 +72,6 @@ export function DiscordRoleInput({
     onChange(value.filter((roleId) => roleId !== roleIdToRemove));
   };
 
-  const getRoleIcon = (role: Role) => {
-    if (!role) {
-      return faDiscord;
-    }
-
-    if (role.id === serverId) {
-      return faUsers;
-    }
-
-    if (hasPermissions(role.permissions, [PERMISSIONS.ADMINISTRATOR])) {
-      return faCrown;
-    }
-
-    return faDiscord;
-  };
-
-  const getRoleColor = (role: Role) => {
-    if (!role || role.color === undefined || role.color === null || role.color === 0) {
-      return undefined;
-    }
-
-    try {
-      const colorNum = Number(role.color);
-      if (isNaN(colorNum) || colorNum <= 0) {
-        return undefined;
-      }
-
-      const hexColor = colorNum.toString(16).padStart(6, "0");
-      if (hexColor === "000000") {
-        return undefined; // Don't show black color dots
-      }
-
-      return `#${hexColor}`;
-    } catch {
-      return undefined;
-    }
-  };
-
   const canAddMore = singleRole ? value.length === 0 : !maxRoles || value.length < maxRoles;
 
   return (
@@ -125,11 +87,31 @@ export function DiscordRoleInput({
                   className="focus:border-primary/50 pointer-events-none h-12 border-2 pl-12 pr-20 transition-all duration-200"
                   disabled={disabled || !canAddMore}
                   readOnly
-                  value=""
+                  value={singleRole && value.length > 0 ? " " : ""}
                 />
-                <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                <div className="absolute left-4 right-0 top-1/2 -translate-y-1/2">
                   {isLoading ? (
                     <FontAwesomeIcon icon={faSpinner} className="text-muted-foreground h-4 w-4 animate-spin" />
+                  ) : singleRole && value.length > 0 ? (
+                    <>
+                      <div className="group absolute left-0 right-3 top-1/2 flex h-6 -translate-y-1/2 items-center justify-between rounded-lg">
+                        <RoleBadge role={roles.find((r) => r.id === value[0])} />
+
+                        <Button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveRole(value[0]);
+                          }}
+                          disabled={disabled}
+                          variant="ghost"
+                          size="icon"
+                          className="hover:bg-destructive/15 hover:text-destructive h-7 w-7 opacity-0 transition-all duration-200 group-hover:opacity-100"
+                        >
+                          <FontAwesomeIcon icon={faX} className="size-3" />
+                        </Button>
+                      </div>
+                    </>
                   ) : (
                     <div className="bg-primary/10 flex h-6 w-6 items-center justify-center rounded-lg">
                       <FontAwesomeIcon icon={faDiscord} className="text-primary h-3 w-3" />
@@ -178,25 +160,7 @@ export function DiscordRoleInput({
                         disabled={!singleRole && value.includes(role.id)}
                         className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors"
                       >
-                        <div className="relative">
-                          <div className="bg-muted/50 flex h-7 w-7 items-center justify-center rounded-lg">
-                            <FontAwesomeIcon icon={getRoleIcon(role)} className="text-muted-foreground h-4 w-4" />
-                            {getRoleColor(role) && (
-                              <div
-                                className="border-background absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 shadow-sm"
-                                style={{ backgroundColor: getRoleColor(role) }}
-                              />
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex min-w-0 flex-1 flex-col">
-                          <span className="text-foreground truncate text-sm font-medium">{role.name}</span>
-                        </div>
-                        {!singleRole && value.includes(role.id) && (
-                          <div className="bg-primary/10 text-primary flex h-5 w-5 items-center justify-center rounded-full">
-                            <FontAwesomeIcon icon={faUsers} className="h-2 w-2" />
-                          </div>
-                        )}
+                        <RoleBadge role={role} />
                       </CommandItem>
                     ))}
                   </CommandGroup>
@@ -208,7 +172,7 @@ export function DiscordRoleInput({
       </div>
 
       {/* Selected roles */}
-      {value.length > 0 && (
+      {value.length > 0 && !singleRole && (
         <Card className="border-border/50 from-background to-muted/20 bg-gradient-to-br shadow-sm">
           <CardContent className="px-4">
             <div className="space-y-3">
@@ -217,7 +181,9 @@ export function DiscordRoleInput({
                   <FontAwesomeIcon icon={faUsers} className="text-primary h-3 w-3" />
                 </div>
                 <span className="text-foreground text-sm font-medium">
-                  {t("discord.roleInput.selectedRoles")} ({value.length})
+                  {singleRole
+                    ? t("discord.roleInput.selectedRole")
+                    : `${t("discord.roleInput.selectedRoles")} (${value.length})`}
                 </span>
               </div>
 
@@ -234,32 +200,14 @@ export function DiscordRoleInput({
                       }}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <div className="bg-background/80 border-border/50 flex h-8 w-8 items-center justify-center rounded-full border shadow-sm">
-                              <FontAwesomeIcon
-                                icon={role ? getRoleIcon(role) : faDiscord}
-                                className="text-muted-foreground h-4 w-4"
-                              />
-                              {role && getRoleColor(role) && (
-                                <div
-                                  className="border-background absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 shadow-sm"
-                                  style={{ backgroundColor: getRoleColor(role) }}
-                                />
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col">
-                            <span className="text-foreground text-sm font-medium">
-                              {role?.name || (isLoading ? t("discord.roleInput.loadingRole") : roleId)}
-                            </span>
-                          </div>
-                        </div>
+                        <RoleBadge role={role} />
 
                         <Button
                           type="button"
-                          onClick={() => handleRemoveRole(roleId)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveRole(roleId);
+                          }}
                           disabled={disabled}
                           variant="ghost"
                           size="icon"
@@ -286,6 +234,74 @@ export function DiscordRoleInput({
           {value.length}/{maxRoles} {t("discord.roleInput.rolesSelected")}
         </p>
       )}
+    </div>
+  );
+}
+
+function RoleBadge({ role }: { role?: Role }) {
+  const { serverId } = useParams();
+  const { isLoading } = useGetServerRolesQuery({ params: { serverId: serverId || "" } }, { skip: !serverId });
+  const { t } = useTranslation();
+
+  const getRoleIcon = (role?: Role) => {
+    if (!role) {
+      return faDiscord;
+    }
+
+    if (role.id === serverId) {
+      return faUsers;
+    }
+
+    if (hasPermissions(role.permissions, [PERMISSIONS.ADMINISTRATOR])) {
+      return faCrown;
+    }
+
+    return faDiscord;
+  };
+
+  const getRoleColor = (role?: Role) => {
+    if (!role || role.color === undefined || role.color === null || role.color === 0) {
+      return undefined;
+    }
+
+    try {
+      const colorNum = Number(role.color);
+      if (isNaN(colorNum) || colorNum <= 0) {
+        return undefined;
+      }
+
+      const hexColor = colorNum.toString(16).padStart(6, "0");
+      if (hexColor === "000000") {
+        return undefined; // Don't show black color dots
+      }
+
+      return `#${hexColor}`;
+    } catch {
+      return undefined;
+    }
+  };
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative">
+        <div className="bg-background/80 border-border/50 flex h-8 w-8 items-center justify-center rounded-full border shadow-sm">
+          <div className="flex items-center gap-2">
+            <FontAwesomeIcon icon={getRoleIcon(role)} className="text-muted-foreground h-4 w-4" />
+          </div>
+          {role && getRoleColor(role) && (
+            <div
+              className="border-background absolute -right-0.5 -top-0.5 size-3 rounded-full border-2 shadow-sm"
+              style={{ backgroundColor: getRoleColor(role) }}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col">
+        <span className="text-foreground text-sm font-medium">
+          {role?.name || (isLoading ? t("discord.roleInput.loadingRole") : role?.id)}
+        </span>
+      </div>
     </div>
   );
 }

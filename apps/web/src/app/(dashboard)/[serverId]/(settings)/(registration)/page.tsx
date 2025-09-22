@@ -8,11 +8,11 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
-import { useSettingsForm } from "../hooks/use-settings-form";
+import { useServerSettings } from "../contexts/server-settings-context";
 
 export function RegistrationPage() {
   const { t } = useTranslation();
-  const form = useSettingsForm();
+  const { form } = useServerSettings();
 
   return (
     <div className="space-y-6">

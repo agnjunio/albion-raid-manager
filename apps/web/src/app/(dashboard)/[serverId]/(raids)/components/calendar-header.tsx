@@ -1,6 +1,7 @@
 import { faChevronLeft, faChevronRight, faCog, faPlus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
+import { Link, useParams } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { HotkeysHelp } from "@/components/ui/hotkeys-help";
@@ -15,6 +16,7 @@ import { CreateRaidSheet } from "./create-raid-sheet";
 export function CalendarHeader() {
   const { currentDate, view, isRefreshing, hotkeys, setCurrentDate, setView, refresh } = useCalendar();
   const { t } = useTranslation();
+  const { serverId } = useParams<{ serverId: string }>();
 
   const formatDateRange = (date: Date, view: CalendarView) => {
     const language = getCurrentLanguage();
@@ -138,7 +140,7 @@ export function CalendarHeader() {
       {/* Right side - Controls */}
       <div className="flex items-center gap-1">
         <Select value={view} onValueChange={setView}>
-          <SelectTrigger className="hover:bg-muted h-8 w-24 border-0 shadow-none">
+          <SelectTrigger className="hover:bg-muted h-8 border-0 shadow-none">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -158,9 +160,11 @@ export function CalendarHeader() {
           <FontAwesomeIcon icon={faRefresh} className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
         </Button>
 
-        <Button variant="ghost" size="icon" className="hover:bg-muted h-8 w-8">
-          <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
-        </Button>
+        <Link to={`/dashboard/${serverId}/settings/raids`} tabIndex={-1}>
+          <Button variant="ghost" size="icon" className="hover:bg-muted hidden h-8 w-8 lg:flex">
+            <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
+          </Button>
+        </Link>
 
         <HotkeysHelp hotkeys={hotkeys} />
 

@@ -438,6 +438,7 @@
       "failedToLoad": "Failed to load roles",
       "noRolesFound": "No roles found.",
       "selectedRoles": "Selected Roles",
+      "selectedRole": "Selected Role",
       "loadingRole": "Loading...",
       "selected": "selected",
       "rolesSelected": "roles selected"

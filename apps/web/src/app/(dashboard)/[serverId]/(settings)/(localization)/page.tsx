@@ -6,11 +6,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-import { useSettingsForm } from "../hooks/use-settings-form";
+import { useServerSettings } from "../contexts/server-settings-context";
 
 export function LocalizationPage() {
   const { t, i18n } = useTranslation();
-  const form = useSettingsForm();
+  const { form } = useServerSettings();
 
   // Get available languages from i18n configuration
   const availableLanguages = (i18n.options.supportedLngs as string[])?.filter((lng: string) => lng !== "cimode") || [
@@ -57,10 +57,7 @@ export function LocalizationPage() {
                           <SelectItem key={language.code} value={language.code} className="py-3">
                             <div className="flex w-full items-center gap-3">
                               <span className="text-lg">{language.flag}</span>
-                              <div>
-                                <div className="font-medium">{language.name}</div>
-                                <div className="text-muted-foreground text-xs">{language.native}</div>
-                              </div>
+                              <div className="font-medium">{language.native}</div>
                               {field.value === language.code && (
                                 <FontAwesomeIcon icon={faCheck} className="text-primary ml-auto h-4 w-4" />
                               )}

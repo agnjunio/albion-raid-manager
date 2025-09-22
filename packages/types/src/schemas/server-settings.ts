@@ -60,7 +60,5 @@ export const serverSettingsSchema = z.object({
     .or(z.literal("")),
 
   // Localization
-  language: z.enum(["en", "es", "fr", "de", "pt"]).default("en"),
+  language: z.string().default("en"),
 });
-
-export type ServerSettingsFormData = z.infer<typeof serverSettingsSchema>;

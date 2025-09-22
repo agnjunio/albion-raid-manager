@@ -8,12 +8,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 
 import { SettingsLoading } from "../components/settings-loading";
 import { useServerSettings } from "../contexts/server-settings-context";
-import { useSettingsForm } from "../hooks/use-settings-form";
 
 export function RaidsPage() {
   const { t } = useTranslation();
-  const { isLoading } = useServerSettings();
-  const form = useSettingsForm();
+  const { isLoading, form } = useServerSettings();
 
   if (isLoading) {
     return <SettingsLoading />;

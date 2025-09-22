@@ -443,6 +443,7 @@
       "failedToLoad": "Falha ao carregar cargos",
       "noRolesFound": "Nenhum cargo encontrado.",
       "selectedRoles": "Cargos Selecionados",
+      "selectedRole": "Cargo Selecionado",
       "loadingRole": "Carregando...",
       "selected": "selecionado",
       "rolesSelected": "cargos selecionados"

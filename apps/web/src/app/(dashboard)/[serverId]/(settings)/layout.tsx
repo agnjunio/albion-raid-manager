@@ -11,7 +11,7 @@ import { getSettingsPageInfo } from "./utils/page-info";
 function SettingsLayoutContent() {
   const location = useLocation();
   const { t } = useTranslation();
-  const { formData, saveServerSettings, resetForm } = useServerSettings();
+  const { saveServerSettings, resetForm, isSaving, hasUnsavedChanges } = useServerSettings();
 
   // Get current page from pathname
   const currentPage = location.pathname.split("/").pop() || "administration";
@@ -19,8 +19,8 @@ function SettingsLayoutContent() {
   const pageInfo = settingsPageInfo[currentPage as keyof typeof settingsPageInfo] || settingsPageInfo.administration;
 
   const handleSave = async () => {
-    if (formData) {
-      await saveServerSettings(formData);
+    if (hasUnsavedChanges && !isSaving) {
+      await saveServerSettings();
     }
   };
 

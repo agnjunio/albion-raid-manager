@@ -9,11 +9,11 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { PageError } from "@/components/ui/page";
 import { Separator } from "@/components/ui/separator";
 
-import { useSettingsForm } from "../hooks/use-settings-form";
+import { useServerSettings } from "../contexts/server-settings-context";
 
 export function AdministrationPage() {
   const { t } = useTranslation();
-  const form = useSettingsForm();
+  const { form } = useServerSettings();
   const { serverId } = useParams();
 
   if (!serverId) return <PageError error="Server ID is required" />;

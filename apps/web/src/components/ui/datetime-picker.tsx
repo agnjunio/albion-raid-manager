@@ -321,7 +321,7 @@ export function Calendar({
                   props.onMonthChange?.(newDate);
                 }}
               >
-                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 capitalize">
+                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground h-auto min-h-0 w-fit gap-1 border-none bg-transparent p-0 capitalize shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -340,7 +340,7 @@ export function Calendar({
                   props.onMonthChange?.(newDate);
                 }}
               >
-                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0">
+                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground h-auto min-h-0 w-fit gap-1 border-none bg-transparent p-0 shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -411,7 +411,7 @@ const TimePeriodSelect = React.forwardRef<HTMLButtonElement, PeriodSelectorProps
         <Select defaultValue={period} onValueChange={(value: Period) => handleValueChange(value)}>
           <SelectTrigger
             ref={ref}
-            className="focus:bg-accent focus:text-accent-foreground w-[65px]"
+            className="focus:bg-accent focus:text-accent-foreground h-auto min-h-0 w-[65px] bg-transparent shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
             onKeyDown={handleKeyDown}
           >
             <SelectValue />
