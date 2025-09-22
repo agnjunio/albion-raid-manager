@@ -7,6 +7,7 @@ import {
   getServerChannels,
   getServerMember,
   getServerMembers,
+  getServerRoles,
   getServers,
   removeServerMemberRole,
 } from "./servers";
@@ -33,6 +34,7 @@ export const DiscordService = {
     getServerChannels,
     getServerMembers,
     getServerMember,
+    getServerRoles,
     addServerMemberRole,
     removeServerMemberRole,
   },

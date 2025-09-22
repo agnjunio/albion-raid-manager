@@ -94,6 +94,26 @@ export async function getServerChannels(
   );
 }
 
+export async function getServerRoles(
+  serverId: string,
+  { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
+) {
+  return memoize(
+    `discord.${type}.${token}.guilds.${serverId}.roles`,
+    async () => {
+      const res = await discordApiClient.get(`/guilds/${serverId}/roles`, {
+        headers: {
+          Authorization: getAuthorization(type, token),
+        },
+      });
+      return res.data;
+    },
+    {
+      timeout: getMilliseconds(30, "seconds"),
+    },
+  );
+}
+
 export async function leaveServer(
   serverId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},

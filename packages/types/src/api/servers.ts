@@ -1,4 +1,5 @@
 import type { Channel } from "../entities/server-channels";
+import type { Role } from "../entities/server-roles";
 import type { Server, ServerSettings } from "../entities/servers";
 
 export type APIServerMember = {
@@ -13,19 +14,6 @@ export type APIServerMember = {
   killFame: number;
   deathFame: number;
   lastUpdated: Date | null;
-};
-
-export enum APIRoleType {
-  ROLE = "ROLE",
-  EMOJI = "EMOJI",
-}
-
-export type APIRole = {
-  id: string;
-  name: string;
-  type: APIRoleType;
-  color?: number;
-  position: number;
 };
 
 export namespace GetServers {
@@ -55,4 +43,9 @@ export namespace GetServerSettings {
 export namespace GetServerChannels {
   export type Params = { serverId: string };
   export type Response = { channels: Channel[] };
+}
+
+export namespace GetServerRoles {
+  export type Params = { serverId: string };
+  export type Response = { roles: Role[] };
 }

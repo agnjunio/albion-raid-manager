@@ -1,4 +1,4 @@
-import { faGlobe, faLanguage } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faGlobe, faRobot } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 
@@ -9,89 +9,89 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useSettingsForm } from "../hooks/use-settings-form";
 
 export function LocalizationPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const form = useSettingsForm();
 
-  return (
-    <Form {...form}>
-      <Card className="border-border/50 from-background to-muted/10 bg-gradient-to-br shadow-xl">
-        <CardContent className="space-y-8 p-6">
-          <FormField
-            control={form.control}
-            name="language"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-foreground mb-6 flex items-center gap-4 text-xl font-semibold">
-                  <div className="from-primary/20 to-primary/10 flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br shadow-sm">
-                    <FontAwesomeIcon icon={faLanguage} className="text-primary h-5 w-5" />
-                  </div>
-                  {t("settings.localization.language.title")}
-                </FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="focus:border-primary/50 h-14 border-2 text-lg font-medium shadow-lg transition-all duration-300 hover:scale-[1.01]">
-                      <SelectValue placeholder={t("settings.localization.language.placeholder")} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="shadow-xl">
-                    <SelectItem value="en" className="py-3 text-base">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">🇺🇸</span>
-                        {t("settings.localization.languages.en")}
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="es" className="py-3 text-base">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">🇪🇸</span>
-                        {t("settings.localization.languages.es")}
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="fr" className="py-3 text-base">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">🇫🇷</span>
-                        {t("settings.localization.languages.fr")}
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="de" className="py-3 text-base">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">🇩🇪</span>
-                        {t("settings.localization.languages.de")}
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="pt" className="py-3 text-base">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">🇵🇹</span>
-                        {t("settings.localization.languages.pt")}
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription className="text-muted-foreground mt-4 text-base">
-                  {t("settings.localization.language.description")}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+  // Get available languages from i18n configuration
+  const availableLanguages = (i18n.options.supportedLngs as string[])?.filter((lng: string) => lng !== "cimode") || [
+    "en",
+  ];
 
-          {/* Additional Info Card */}
-          <div className="border-border/50 bg-muted/30 rounded-xl border p-6">
-            <div className="flex items-start gap-4">
-              <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
-                <FontAwesomeIcon icon={faGlobe} className="text-muted-foreground h-4 w-4" />
-              </div>
-              <div>
-                <h4 className="text-foreground mb-2 font-semibold">
-                  {t("settings.localization.languageSupport.title")}
-                </h4>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {t("settings.localization.languageSupport.description")}
-                </p>
+  const languages = availableLanguages.map((code: string) => {
+    switch (code) {
+      case "en":
+        return { code, name: t("settings.localization.languages.en"), flag: "🇺🇸", native: "English" };
+      case "pt-BR":
+        return { code, name: t("settings.localization.languages.pt"), flag: "🇧🇷", native: "Português" };
+      default:
+        return { code, name: code.toUpperCase(), flag: "🌐", native: code };
+    }
+  });
+
+  return (
+    <div className="space-y-6">
+      <Form {...form}>
+        <Card className="border-border/50 shadow-xl">
+          <CardContent className="space-y-4 px-8 py-6">
+            <FormField
+              control={form.control}
+              name="language"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-foreground mb-3 flex items-center gap-3 text-lg font-semibold">
+                    <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                      <FontAwesomeIcon icon={faGlobe} className="text-primary h-4 w-4" />
+                    </div>
+                    {t("settings.localization.language.title")}
+                  </FormLabel>
+                  <FormDescription className="text-muted-foreground mt-2 text-sm">
+                    {t("settings.localization.language.description")}
+                  </FormDescription>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger className="focus:border-primary/50 h-12 border-2 transition-all duration-200">
+                        <SelectValue placeholder={t("settings.localization.language.placeholder")} />
+                      </SelectTrigger>
+                      <SelectContent className="shadow-xl">
+                        {languages.map((language: { code: string; name: string; flag: string; native: string }) => (
+                          <SelectItem key={language.code} value={language.code} className="py-3">
+                            <div className="flex w-full items-center gap-3">
+                              <span className="text-lg">{language.flag}</span>
+                              <div>
+                                <div className="font-medium">{language.name}</div>
+                                <div className="text-muted-foreground text-xs">{language.native}</div>
+                              </div>
+                              {field.value === language.code && (
+                                <FontAwesomeIcon icon={faCheck} className="text-primary ml-auto h-4 w-4" />
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Bot Language Notice */}
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+              <div className="flex items-center gap-3">
+                <FontAwesomeIcon icon={faRobot} className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                <div className="text-left">
+                  <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                    {t("settings.localization.botOnly.title")}
+                  </h3>
+                  <p className="text-xs text-amber-700 dark:text-amber-300">
+                    {t("settings.localization.botOnly.description")}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </Form>
+          </CardContent>
+        </Card>
+      </Form>
+    </div>
   );
 }

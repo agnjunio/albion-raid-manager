@@ -1,17 +1,18 @@
-import { APIGuild, APIRole } from "discord-api-types/v10";
+import { APIGuild } from "discord-api-types/v10";
 
 import { Server as DBServer } from "@albion-raid-manager/types";
 
 import { hasPermissions, PERMISSIONS } from "../discord";
 
 import { Channel } from "./server-channels";
+import { Role } from "./server-roles";
 
 export type Server = DBServer & {
   owner?: boolean;
   admin?: boolean;
   bot?: boolean;
   channels?: Channel[];
-  roles?: APIRole[];
+  roles?: Role[];
 };
 
 export function fromDiscordGuild(guild: APIGuild): Server {

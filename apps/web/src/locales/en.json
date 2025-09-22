@@ -430,7 +430,18 @@
   "discord": {
     "selectRoles": "Select roles",
     "searchRoles": "Search roles...",
-    "noRolesFound": "No roles found."
+    "noRolesFound": "No roles found.",
+    "roleInput": {
+      "placeholder": "Select roles...",
+      "searchPlaceholder": "Search roles...",
+      "loading": "Loading roles...",
+      "failedToLoad": "Failed to load roles",
+      "noRolesFound": "No roles found.",
+      "selectedRoles": "Selected Roles",
+      "loadingRole": "Loading...",
+      "selected": "selected",
+      "rolesSelected": "roles selected"
+    }
   },
   "hotkeys": {
     "title": "Keyboard Shortcuts",
@@ -639,6 +650,8 @@
       }
     },
     "permissions": {
+      "title": "Permissions",
+      "description": "Configure role-based permissions for server management",
       "adminRoles": {
         "title": "Admin Roles",
         "placeholder": "Role IDs separated by commas (e.g., 123456789,987654321)",
@@ -658,6 +671,8 @@
       }
     },
     "administration": {
+      "title": "Administration",
+      "description": "Manage server administration settings and audit logging",
       "serverAdministration": "Server Administration",
       "serverInfoDescription": "Server information is managed by Discord and cannot be changed here",
       "auditChannel": {
@@ -667,6 +682,8 @@
       }
     },
     "localization": {
+      "title": "Localization",
+      "description": "Configure language and regional settings for your Discord server",
       "language": {
         "title": "Language",
         "placeholder": "Select a language",
@@ -682,9 +699,15 @@
         "fr": "Français",
         "de": "Deutsch",
         "pt": "Português"
+      },
+      "botOnly": {
+        "title": "Discord Bot Only",
+        "description": "This setting only affects the Discord bot's responses and messages. It does not change the website interface language."
       }
     },
     "raids": {
+      "title": "Raids",
+      "description": "Configure raid management and announcement settings",
       "announcementChannel": {
         "title": "Raid Announcement Channel",
         "placeholder": "Channel ID for raid announcements",
@@ -692,6 +715,8 @@
       }
     },
     "registration": {
+      "title": "Registration",
+      "description": "Configure user registration and role assignment settings",
       "albionGuildId": {
         "title": "Albion Guild ID",
         "placeholder": "Enter your Albion Online guild ID",

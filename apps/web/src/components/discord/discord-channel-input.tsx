@@ -84,7 +84,7 @@ export function DiscordChannelInput({
         <PopoverTrigger asChild>
           <div className="relative">
             <Input
-              value={selectedChannel ? `${selectedChannel.name}` : value}
+              value={selectedChannel ? `${selectedChannel.name}` : isLoading ? "Loading..." : value}
               onChange={handleInputChange}
               onFocus={handleInputFocus}
               placeholder={placeholder}

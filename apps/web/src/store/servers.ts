@@ -2,6 +2,7 @@ import {
   GetServer,
   GetServerChannels,
   GetServerMembers,
+  GetServerRoles,
   GetServerSettings,
   GetServers,
   VerifyServer,
@@ -42,6 +43,11 @@ export const serversApi = createApi({
       providesTags: (result, _error, { params }) =>
         result ? [{ type: "Server", id: `CHANNELS:${params.serverId}:LIST` }] : [],
     }),
+    getServerRoles: builder.query<GetServerRoles.Response, { params: GetServerRoles.Params }>({
+      query: ({ params }) => ({ url: `/servers/${params.serverId}/roles` }),
+      providesTags: (result, _error, { params }) =>
+        result ? [{ type: "Server", id: `ROLES:${params.serverId}:LIST` }] : [],
+    }),
   }),
 });
 
@@ -52,4 +58,5 @@ export const {
   useGetServerMembersQuery,
   useGetServerSettingsQuery,
   useGetServerChannelsQuery,
+  useGetServerRolesQuery,
 } = serversApi;

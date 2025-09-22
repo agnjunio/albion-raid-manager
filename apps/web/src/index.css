@@ -411,4 +411,16 @@
   .capitalize-first::first-letter {
     text-transform: uppercase;
   }
+
+  /* Role selection animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }

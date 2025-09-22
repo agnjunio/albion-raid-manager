@@ -9,6 +9,7 @@ import {
   GetServer,
   GetServerChannels,
   GetServerMembers,
+  GetServerRoles,
   GetServers,
   GetServerSettings,
   VerifyServer,
@@ -18,6 +19,8 @@ import {
   createServerSettings,
   fromDiscordChannels,
   fromDiscordGuild,
+  fromDiscordRoles,
+  Role,
   Server,
 } from "@albion-raid-manager/types/entities";
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
@@ -284,6 +287,40 @@ serverRouter.get(
       } else {
         logger.warn("Failed to get server channels", { error });
         res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server channels"));
+      }
+    }
+  },
+);
+
+serverRouter.get(
+  "/:serverId/roles",
+  async (req: Request<GetServerRoles.Params>, res: Response<APIResponse.Type<GetServerRoles.Response>>) => {
+    try {
+      const { serverId } = req.params;
+
+      if (!req.session.user) {
+        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      }
+
+      // Check if user has access to this server
+      const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
+      if (!server) {
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
+      }
+
+      const discordRoles = await DiscordService.servers.getServerRoles(serverId, {
+        token: config.discord.token,
+      });
+
+      const roles: Role[] = fromDiscordRoles(discordRoles);
+
+      res.json(APIResponse.Success({ roles }));
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 401) {
+        res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+      } else {
+        logger.warn("Failed to get server roles", { error });
+        res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get server roles"));
       }
     }
   },

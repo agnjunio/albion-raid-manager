@@ -433,9 +433,20 @@
     "reorderingSlots": "Reordenando slots..."
   },
   "discord": {
-    "selectRoles": "Selecionar funções",
-    "searchRoles": "Pesquisar funções...",
-    "noRolesFound": "Nenhuma função encontrada."
+    "selectRoles": "Selecionar cargos",
+    "searchRoles": "Pesquisar cargos...",
+    "noRolesFound": "Nenhum cargo encontrado.",
+    "roleInput": {
+      "placeholder": "Selecionar cargos...",
+      "searchPlaceholder": "Pesquisar cargos...",
+      "loading": "Carregando cargos...",
+      "failedToLoad": "Falha ao carregar cargos",
+      "noRolesFound": "Nenhum cargo encontrado.",
+      "selectedRoles": "Cargos Selecionados",
+      "loadingRole": "Carregando...",
+      "selected": "selecionado",
+      "rolesSelected": "cargos selecionados"
+    }
   },
   "hotkeys": {
     "title": "Atalhos do Teclado",
@@ -644,25 +655,29 @@
       }
     },
     "permissions": {
+      "title": "Permissões",
+      "description": "Configure permissões baseadas em cargos para gerenciamento do servidor",
       "adminRoles": {
-        "title": "Funções de Administrador",
-        "placeholder": "IDs de funções separados por vírgulas (ex: 123456789,987654321)",
-        "description": "IDs de funções do Discord que têm acesso de administrador a todos os recursos",
-        "count": "{{count}} função configurada",
-        "count_plural": "{{count}} funções configuradas"
+        "title": "Cargos de Administrador",
+        "placeholder": "Clique para buscar",
+        "description": "Cargos do Discord que têm acesso de administrador a todos os recursos",
+        "count": "{{count}} cargo configurado",
+        "count_plural": "{{count}} cargos configurados"
       },
       "raidRoles": {
-        "title": "Funções de Raid",
-        "placeholder": "IDs de funções separados por vírgulas",
-        "description": "Funções que podem criar e gerenciar raids"
+        "title": "Cargos de Raid",
+        "placeholder": "Clique para buscar",
+        "description": "Cargos que podem criar e gerenciar raids"
       },
       "compositionRoles": {
-        "title": "Funções de Composição",
-        "placeholder": "IDs de funções separados por vírgulas",
-        "description": "Funções que podem gerenciar composições de raid e builds"
+        "title": "Cargos de Composição",
+        "placeholder": "Clique para buscar",
+        "description": "Cargos que podem gerenciar composições de raid e builds"
       }
     },
     "administration": {
+      "title": "Administração",
+      "description": "Gerencie configurações de administração do servidor e logs de auditoria",
       "serverAdministration": "Administração do Servidor",
       "serverInfoDescription": "As informações do servidor são gerenciadas pelo Discord e não podem ser alteradas aqui",
       "auditChannel": {
@@ -672,6 +687,8 @@
       }
     },
     "localization": {
+      "title": "Localização",
+      "description": "Configure idioma e configurações regionais para seu servidor Discord",
       "language": {
         "title": "Idioma",
         "placeholder": "Selecione um idioma",
@@ -687,9 +704,15 @@
         "fr": "Français",
         "de": "Deutsch",
         "pt": "Português"
+      },
+      "botOnly": {
+        "title": "Apenas Bot Discord",
+        "description": "Esta configuração afeta apenas as respostas e mensagens do bot Discord. Não altera o idioma da interface do site."
       }
     },
     "raids": {
+      "title": "Raids",
+      "description": "Configure configurações de gerenciamento de raids e anúncios",
       "announcementChannel": {
         "title": "Canal de Anúncios de Raid",
         "placeholder": "ID do canal para anúncios de raids",
@@ -697,25 +720,27 @@
       }
     },
     "registration": {
+      "title": "Registro",
+      "description": "Configure configurações de registro de usuários e atribuição de cargos",
       "albionGuildId": {
         "title": "ID da Guilda do Albion",
         "placeholder": "Digite o ID da sua guilda do Albion Online",
         "description": "O ID da guilda do Albion Online que este servidor representa"
       },
       "memberRoleId": {
-        "title": "ID da Função de Membro",
-        "placeholder": "ID da função do Discord para membros da guilda",
-        "description": "Função do Discord que será atribuída a membros verificados da guilda"
+        "title": "ID do Cargo de Membro",
+        "placeholder": "ID do cargo do Discord para membros da guilda",
+        "description": "Cargo do Discord que será atribuído a membros verificados da guilda"
       },
       "auditChannelId": {
         "title": "Canal de Auditoria de Registro",
         "placeholder": "ID do canal para logs de auditoria de registro",
-        "description": "Canal onde os logs de registro de usuários e atribuição de funções serão publicados"
+        "description": "Canal onde os logs de registro de usuários e atribuição de cargos serão publicados"
       },
       "friendRoleId": {
-        "title": "Função de Amigo",
-        "placeholder": "ID da função do Discord para amigos/aliados",
-        "description": "Função atribuída a amigos e aliados"
+        "title": "Cargo de Amigo",
+        "placeholder": "ID do cargo do Discord para amigos/aliados",
+        "description": "Cargo atribuído a amigos e aliados"
       }
     }
   }
