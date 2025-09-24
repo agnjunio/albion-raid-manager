@@ -225,28 +225,26 @@ serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
     const {
       name,
       icon,
+      auditChannelId,
       adminRoles,
-      raidRoles,
-      compositionRoles,
+      callerRoles,
       raidAnnouncementChannelId,
       serverGuildId,
       memberRoleId,
       friendRoleId,
-      auditChannelId,
       language,
     } = req.body;
 
     await ServersService.updateServer(serverId, {
       name,
       icon,
+      auditChannelId,
       adminRoles,
-      raidRoles,
-      compositionRoles,
+      callerRoles,
       raidAnnouncementChannelId,
       serverGuildId,
       memberRoleId,
       friendRoleId,
-      auditChannelId,
       language,
     });
 

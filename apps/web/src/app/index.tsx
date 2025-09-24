@@ -12,7 +12,6 @@ import { RaidPage } from "./(dashboard)/[serverId]/(raids)/[raidId]/page";
 import { RaidsPage } from "./(dashboard)/[serverId]/(raids)/page";
 import { AdministrationPage } from "./(dashboard)/[serverId]/(settings)/(administration)/page";
 import { LocalizationPage } from "./(dashboard)/[serverId]/(settings)/(localization)/page";
-import { PermissionsPage } from "./(dashboard)/[serverId]/(settings)/(permissions)/page";
 import { RaidsPage as RaidsSettingsPage } from "./(dashboard)/[serverId]/(settings)/(raids)/page";
 import { RegistrationPage } from "./(dashboard)/[serverId]/(settings)/(registration)/page";
 import { ServerSettingsLayout } from "./(dashboard)/[serverId]/(settings)/layout";
@@ -43,7 +42,6 @@ export default function App() {
               <Route path="settings" element={<ServerSettingsLayout />}>
                 <Route index element={<ServerSettingsPage />} />
                 <Route path="administration" element={<AdministrationPage />} />
-                <Route path="permissions" element={<PermissionsPage />} />
                 <Route path="raids" element={<RaidsSettingsPage />} />
                 <Route path="registration" element={<RegistrationPage />} />
                 <Route path="localization" element={<LocalizationPage />} />

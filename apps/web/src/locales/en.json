@@ -24,7 +24,10 @@
     "about": "About",
     "theme": "Theme",
     "language": "Language",
-    "enter": "Enter"
+    "enter": "Enter",
+    "available": "Available",
+    "taken": "Taken",
+    "full": "Full"
   },
   "navigation": {
     "home": "Home",
@@ -611,10 +614,6 @@
         "name": "Administration",
         "description": "Server info & audit"
       },
-      "permissions": {
-        "name": "Permissions",
-        "description": "Role-based access"
-      },
       "raids": {
         "name": "Raids",
         "description": "Raid configuration"
@@ -630,45 +629,20 @@
     },
     "pages": {
       "administration": {
-        "title": "Server Administration",
+        "title": "Server Settings",
         "description": "Manage server information and audit settings"
-      },
-      "permissions": {
-        "title": "Permissions",
-        "description": "Configure role-based access control"
       },
       "raids": {
         "title": "Raid Settings",
         "description": "Configure raid management settings"
       },
       "registration": {
-        "title": "User Registration",
+        "title": "Registration Settings",
         "description": "Manage user registration and role assignment"
       },
       "localization": {
-        "title": "Localization",
+        "title": "Localization Settings",
         "description": "Configure language and regional settings"
-      }
-    },
-    "permissions": {
-      "title": "Permissions",
-      "description": "Configure role-based permissions for server management",
-      "adminRoles": {
-        "title": "Admin Roles",
-        "placeholder": "Role IDs separated by commas (e.g., 123456789,987654321)",
-        "description": "Discord role IDs that have admin access to all features",
-        "count": "{{count}} role configured",
-        "count_plural": "{{count}} roles configured"
-      },
-      "raidRoles": {
-        "title": "Raid Roles",
-        "placeholder": "Role IDs separated by commas",
-        "description": "Roles that can create and manage raids"
-      },
-      "compositionRoles": {
-        "title": "Composition Roles",
-        "placeholder": "Role IDs separated by commas",
-        "description": "Roles that can manage raid compositions and builds"
       }
     },
     "administration": {
@@ -680,6 +654,11 @@
         "title": "Audit Channel",
         "placeholder": "Channel ID for audit logs",
         "description": "Channel where audit logs for all bot activities will be posted"
+      },
+      "adminRoles": {
+        "title": "Admin Roles",
+        "placeholder": "Click to search",
+        "description": "Roles that have admin access to all features and can change the server settings"
       }
     },
     "localization": {
@@ -713,6 +692,11 @@
         "title": "Raid Announcement Channel",
         "placeholder": "Channel ID for raid announcements",
         "description": "Channel where raid announcements and notifications will be posted"
+      },
+      "callerRoles": {
+        "title": "Caller Roles",
+        "placeholder": "Click to search",
+        "description": "Roles that can create and manage raids"
       }
     },
     "registration": {

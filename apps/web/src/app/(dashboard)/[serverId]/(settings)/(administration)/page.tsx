@@ -1,9 +1,9 @@
-import { faClipboardList, faTag } from "@fortawesome/free-solid-svg-icons";
+import { faClipboardList, faCrown, faTag } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
-import { DiscordChannelInput, ServerInfo } from "@/components/discord";
+import { DiscordChannelInput, DiscordRoleArrayInput, ServerInfo } from "@/components/discord";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { PageError } from "@/components/ui/page";
@@ -63,6 +63,35 @@ export function AdministrationPage() {
                   </FormControl>
                   <FormDescription className="text-muted-foreground mt-3 text-sm">
                     {t("settings.administration.auditChannel.description")}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Separator className="via-border bg-gradient-to-r from-transparent to-transparent" />
+
+            <FormField
+              control={form.control}
+              name="adminRoles"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-foreground mb-4 flex items-center gap-3 text-lg font-semibold">
+                    <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                      <FontAwesomeIcon icon={faCrown} className="text-primary h-4 w-4" />
+                    </div>
+                    {t("settings.administration.adminRoles.title")}
+                  </FormLabel>
+                  <FormControl>
+                    <DiscordRoleArrayInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={t("settings.administration.adminRoles.placeholder")}
+                      className="focus:border-primary/50"
+                    />
+                  </FormControl>
+                  <FormDescription className="text-muted-foreground mt-3 text-sm">
+                    {t("settings.administration.adminRoles.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

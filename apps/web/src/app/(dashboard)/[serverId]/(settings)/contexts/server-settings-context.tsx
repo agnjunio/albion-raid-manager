@@ -64,21 +64,18 @@ export function ServerSettingsProvider({ children }: ServerSettingsProviderProps
       name: "",
       icon: "",
 
-      // Permissions
+      // Admin Configuration
+      auditChannelId: "",
       adminRoles: [],
-      raidRoles: [],
-      compositionRoles: [],
 
       // Raids Configuration
       raidAnnouncementChannelId: "",
+      callerRoles: [],
 
       // Registration Configuration
       serverGuildId: "",
       memberRoleId: "",
       friendRoleId: "",
-
-      // Audit Configuration
-      auditChannelId: "",
 
       // Localization
       language: "en",

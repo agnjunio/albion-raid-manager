@@ -10,14 +10,13 @@ export function createServerSettings(server: Server): ServerSettings {
   return {
     name: server.name,
     icon: server.icon || "",
+    auditChannelId: server.auditChannelId || "",
     adminRoles: server.adminRoles || [],
-    raidRoles: server.raidRoles || [],
-    compositionRoles: server.compositionRoles || [],
+    callerRoles: server.callerRoles || [],
     raidAnnouncementChannelId: server.raidAnnouncementChannelId || "",
     serverGuildId: server.serverGuildId || "",
     memberRoleId: server.memberRoleId || "",
     friendRoleId: server.friendRoleId || "",
-    auditChannelId: server.auditChannelId || "",
     language: server.language || "en",
   };
 }

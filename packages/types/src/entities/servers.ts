@@ -24,8 +24,7 @@ export function fromDiscordGuild(guild: APIGuild): Server {
     admin: false,
     active: true,
     adminRoles: [],
-    raidRoles: [],
-    compositionRoles: [],
+    callerRoles: [],
   };
 
   if (guild.permissions) {

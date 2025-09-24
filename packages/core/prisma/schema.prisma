@@ -32,21 +32,18 @@ model Server {
   builds  Build[]
   active  Boolean        @default(true)
 
-  // Permissions configuration
-  adminRoles       String[] @default([])
-  raidRoles        String[] @default([])
-  compositionRoles String[] @default([])
+  // Admin configuration
+  auditChannelId String?
+  adminRoles     String[] @default([])
 
   // Raids configuration
   raidAnnouncementChannelId String?
+  callerRoles               String[] @default([])
 
   // Registration configuration
   serverGuildId String?
   memberRoleId  String?
   friendRoleId  String?
-
-  // Audit configuration
-  auditChannelId String?
 
   // Localization configuration
   language String?

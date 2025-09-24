@@ -1,4 +1,4 @@
-import { faGlobe, faInfoCircle, faShield, faShieldAlt, faUserPlus } from "@fortawesome/free-solid-svg-icons";
+import { faGlobe, faInfoCircle, faShieldAlt, faUserPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 import { NavLink, useParams } from "react-router-dom";
@@ -15,12 +15,6 @@ export function SettingsSidebar() {
       href: "administration",
       icon: faInfoCircle,
       description: t("settings.navigation.administration.description"),
-    },
-    {
-      name: t("settings.navigation.permissions.name"),
-      href: "permissions",
-      icon: faShield,
-      description: t("settings.navigation.permissions.description"),
     },
     {
       name: t("settings.navigation.raids.name"),

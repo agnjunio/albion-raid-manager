@@ -24,7 +24,10 @@
     "about": "Sobre",
     "theme": "Tema",
     "language": "Idioma",
-    "enter": "Entrar"
+    "enter": "Entrar",
+    "available": "Disponível",
+    "taken": "Ocupado",
+    "full": "Lotado"
   },
   "navigation": {
     "home": "Início",
@@ -424,7 +427,8 @@
       "SUPPORT": "Support",
       "RANGED_DPS": "Ranged DPS",
       "MELEE_DPS": "Melee DPS",
-      "BATTLEMOUNT": "Battlemount"
+      "BATTLEMOUNT": "Battlemount",
+      "CALLER": "Caller"
     },
     "noSlots": "Nenhum Slot de Raid",
     "noSlotsFlexDescription": "Esta raid flexível ainda não tem slots definidos. Adicione slots para organizar a composição da sua raid.",
@@ -616,10 +620,6 @@
         "name": "Administração",
         "description": "Informações do servidor e auditoria"
       },
-      "permissions": {
-        "name": "Permissões",
-        "description": "Controle de acesso baseado em cargos"
-      },
       "raids": {
         "name": "Raids",
         "description": "Configuração de raids"
@@ -638,10 +638,6 @@
         "title": "Administração do Servidor",
         "description": "Gerencie informações do servidor e configurações de auditoria"
       },
-      "permissions": {
-        "title": "Permissões",
-        "description": "Configure o controle de acesso baseado em funções"
-      },
       "raids": {
         "title": "Configurações de Raid",
         "description": "Configure as configurações de gerenciamento de raids"
@@ -655,27 +651,6 @@
         "description": "Configure idioma e configurações regionais"
       }
     },
-    "permissions": {
-      "title": "Permissões",
-      "description": "Configure permissões baseadas em cargos para gerenciamento do servidor",
-      "adminRoles": {
-        "title": "Cargos de Administrador",
-        "placeholder": "Clique para buscar",
-        "description": "Cargos do Discord que têm acesso de administrador a todos os recursos",
-        "count": "{{count}} cargo configurado",
-        "count_plural": "{{count}} cargos configurados"
-      },
-      "raidRoles": {
-        "title": "Cargos de Raid",
-        "placeholder": "Clique para buscar",
-        "description": "Cargos que podem criar e gerenciar raids"
-      },
-      "compositionRoles": {
-        "title": "Cargos de Composição",
-        "placeholder": "Clique para buscar",
-        "description": "Cargos que podem gerenciar composições de raid e builds"
-      }
-    },
     "administration": {
       "title": "Administração",
       "description": "Gerencie configurações de administração do servidor e logs de auditoria",
@@ -685,6 +660,11 @@
         "title": "Canal de Auditoria",
         "placeholder": "Clique para buscar um canal",
         "description": "Canal onde os logs de auditoria de todas as atividades do bot serão publicados"
+      },
+      "adminRoles": {
+        "title": "Cargos de Administrador",
+        "placeholder": "Clique para buscar",
+        "description": "Cargos do Discord que têm acesso de administrador a todos os recursos"
       }
     },
     "localization": {
@@ -718,6 +698,11 @@
         "title": "Canal de Anúncios de Raid",
         "placeholder": "ID do canal para anúncios de raids",
         "description": "Canal onde os anúncios e notificações de raids serão publicados"
+      },
+      "callerRoles": {
+        "title": "Cargos de Caller",
+        "placeholder": "Clique para buscar",
+        "description": "Cargos que podem criar e gerenciar raids"
       }
     },
     "registration": {
