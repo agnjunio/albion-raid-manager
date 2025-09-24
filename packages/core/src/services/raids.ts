@@ -17,6 +17,7 @@ import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
 import { prisma, Prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 
+import { PermissionsService } from "./permissions";
 import { ServersService } from "./servers";
 
 export interface RaidServiceOptions {
@@ -28,11 +29,16 @@ export interface RaidServiceOptions {
 export namespace RaidService {
   const DEFAULT_CACHE_TTL = 60;
 
-  export async function createRaid(input: CreateRaidInput, options: RaidServiceOptions = {}): Promise<Raid> {
+  export async function createRaid(
+    input: CreateRaidInput,
+    userId: string,
+    options: RaidServiceOptions = {},
+  ): Promise<Raid> {
     const { title, description, date, contentType, location, serverId } = input;
     const { cache, publisher } = options;
 
     await ServersService.ensureServer(serverId);
+    await PermissionsService.requireAdminOrCallerRoles(serverId, userId, { cache });
 
     const contentTypeInfo = getContentTypeInfo(contentType);
     const raidType = contentTypeInfo.raidType;
@@ -175,6 +181,7 @@ export namespace RaidService {
   export async function updateRaid(
     id: string,
     input: UpdateRaidInput,
+    userId: string,
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
     const { cache, publisher } = options;
@@ -184,6 +191,8 @@ export namespace RaidService {
     if (!previousRaid) {
       throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${id}" not found`);
     }
+
+    await PermissionsService.requireAdminOrCallerRoles(previousRaid.serverId, userId, { cache });
 
     const raid = await prisma.$transaction(async (tx) => {
       // Update the raid
@@ -228,12 +237,20 @@ export namespace RaidService {
     return raid;
   }
 
-  export async function deleteRaid(id: string, options: RaidServiceOptions = {}): Promise<void> {
+  export async function deleteRaid(id: string, userId: string, options: RaidServiceOptions = {}): Promise<void> {
     const { cache, publisher } = options;
 
+    // First, get the raid to check permissions
+    const existingRaid = await findRaidById(id);
+    if (!existingRaid) {
+      throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${id}" not found`);
+    }
+
+    await PermissionsService.requireAdminOrCallerRoles(existingRaid.serverId, userId, { cache });
+
     const raid = await prisma.$transaction(async (tx) => {
-      // Check if raid exists
-      const existingRaid = await tx.raid.findUnique({
+      // Check if raid exists (we already checked above, but doing it again for safety)
+      const raidToDelete = await tx.raid.findUnique({
         where: { id },
         include: {
           slots: {
@@ -244,7 +261,7 @@ export namespace RaidService {
         },
       });
 
-      if (!existingRaid) {
+      if (!raidToDelete) {
         throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${id}" not found`);
       }
 
@@ -255,11 +272,11 @@ export namespace RaidService {
 
       logger.info(`Raid deleted: ${id}`, {
         raidId: id,
-        serverId: existingRaid.serverId,
-        title: existingRaid.title,
+        serverId: raidToDelete.serverId,
+        title: raidToDelete.title,
       });
 
-      return existingRaid;
+      return raidToDelete;
     });
 
     if (cache) {
@@ -396,9 +413,10 @@ export namespace RaidService {
 
   export async function createRaidSlot(
     input: CreateRaidSlotInput & { raidId: string },
+    userId: string,
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { raidId, name, role, comment, weapon, buildId, order, userId } = input;
+    const { raidId, name, role, comment, weapon, buildId, order, userId: slotUserId } = input;
     const { cache, publisher } = options;
 
     // Verify the raid exists and is in a state where slots can be modified
@@ -408,6 +426,8 @@ export namespace RaidService {
       throw new ServiceError(ServiceErrorCode.NOT_FOUND, "Raid not found");
     }
 
+    await PermissionsService.requireAdminOrCallerRoles(raid.serverId, userId, { cache });
+
     if (!["SCHEDULED", "OPEN", "CLOSED"].includes(raid.status)) {
       throw new ServiceError(
         ServiceErrorCode.INVALID_STATE,
@@ -415,16 +435,16 @@ export namespace RaidService {
       );
     }
 
-    if (userId) {
+    if (slotUserId) {
       // Ensure the user exists in our database to satisfy foreign key constraints
       // This handles both normal user creation and fallback cases when Discord API is unavailable
-      await ServersService.ensureServerMember(raid.serverId, userId);
+      await ServersService.ensureServerMember(raid.serverId, slotUserId);
 
       // Check if the user is already assigned to another slot in this raid
       const existingUserSlot = await prisma.raidSlot.findFirst({
         where: {
           raidId,
-          userId,
+          userId: slotUserId,
         },
       });
 
@@ -436,7 +456,7 @@ export namespace RaidService {
         });
 
         logger.verbose(`Unassigned user from existing slot when creating new slot with user assignment`, {
-          userId,
+          userId: slotUserId,
           unassignedSlotId: existingUserSlot.id,
           raidId,
         });
@@ -453,7 +473,7 @@ export namespace RaidService {
             comment,
             weapon,
             buildId,
-            userId,
+            userId: slotUserId,
             order: order ?? (raid.slots?.length || 0),
           },
         },
@@ -487,6 +507,7 @@ export namespace RaidService {
   export async function updateRaidSlot(
     slotId: string,
     input: UpdateRaidSlotInput,
+    userId: string,
     options: RaidServiceOptions = {},
   ): Promise<RaidSlot> {
     const { cache, publisher } = options;
@@ -513,6 +534,8 @@ export namespace RaidService {
     if (!raid?.slots) {
       throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID "${slotId}" not found`);
     }
+
+    await PermissionsService.requireAdminOrCallerRoles(raid.serverId, userId, { cache });
 
     const previousSlots = [...raid.slots];
     const slot = await prisma.$transaction(async (tx) => {
@@ -625,34 +648,52 @@ export namespace RaidService {
     return slot;
   }
 
-  export async function deleteRaidSlot(slotId: string, options: RaidServiceOptions = {}): Promise<void> {
+  export async function deleteRaidSlot(
+    slotId: string,
+    userId: string,
+    options: RaidServiceOptions = {},
+  ): Promise<void> {
     const { cache, publisher } = options;
 
     let raidId: string;
     let _serverId: string;
 
+    // First, get the slot to check permissions
+    const existingSlot = await prisma.raidSlot.findUnique({
+      where: { id: slotId },
+      include: { raid: true },
+    });
+
+    if (!existingSlot || !existingSlot.raid) {
+      throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid slot with ID "${slotId}" not found`);
+    }
+
+    await PermissionsService.requireAdminOrCallerRoles(existingSlot.raid.serverId, userId, {
+      cache,
+    });
+
     const slot = await prisma.$transaction(async (tx) => {
-      // Check if slot exists
-      const existingSlot = await tx.raidSlot.findUnique({
+      // Check if slot exists (we already checked above, but doing it again for safety)
+      const slotToDelete = await tx.raidSlot.findUnique({
         where: { id: slotId },
         include: {
           raid: true,
         },
       });
 
-      if (!existingSlot) {
+      if (!slotToDelete) {
         throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid slot with ID "${slotId}" not found`);
       }
 
-      if (!existingSlot.raid || !existingSlot.raidId) {
+      if (!slotToDelete.raid || !slotToDelete.raidId) {
         throw new ServiceError(ServiceErrorCode.NOT_FOUND, "Raid not found for this slot");
       }
 
-      raidId = existingSlot.raidId;
-      _serverId = existingSlot.raid.serverId;
+      raidId = slotToDelete.raidId;
+      _serverId = slotToDelete.raid.serverId;
 
       // Check if raid is in a state where slots can be modified
-      if (!["SCHEDULED", "OPEN", "CLOSED"].includes(existingSlot.raid.status)) {
+      if (!["SCHEDULED", "OPEN", "CLOSED"].includes(slotToDelete.raid.status)) {
         throw new ServiceError(
           ServiceErrorCode.INVALID_STATE,
           "Cannot modify slots for raids that have started or finished",
@@ -666,11 +707,11 @@ export namespace RaidService {
 
       logger.info(`Raid slot deleted: ${slotId}`, {
         slotId,
-        raidId: existingSlot.raidId,
-        slotName: existingSlot.name,
+        raidId: slotToDelete.raidId,
+        slotName: slotToDelete.name,
       });
 
-      return existingSlot;
+      return slotToDelete;
     });
 
     if (cache && slot.raidId && slot.raid?.serverId) {

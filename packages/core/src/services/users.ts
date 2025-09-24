@@ -1,4 +1,5 @@
 import { User } from "@albion-raid-manager/types";
+import { APIUser } from "discord-api-types/v10";
 
 import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
 import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
@@ -6,7 +7,7 @@ import config from "@albion-raid-manager/core/config";
 import { prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 import { Cache } from "@albion-raid-manager/core/redis";
-import { APIUser, DiscordService } from "@albion-raid-manager/core/services/discord";
+import { DiscordService } from "@albion-raid-manager/core/services/discord";
 
 export interface UsersServiceOptions {
   cache?: Cache;

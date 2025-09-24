@@ -43,4 +43,8 @@ export const CacheKeys = {
   itemsBySlot: (slotType: string): string => `items:slot:${slotType}`,
   itemSearch: (searchTerm: string, filters?: string): string =>
     `items:search:${searchTerm}${filters ? `:${filters}` : ""}`,
+
+  // Permission cache keys
+  permissions: (serverId: string, userId: string, type: "admin" | "caller"): string =>
+    `permissions:${serverId}:${userId}:${type}`,
 } as const;

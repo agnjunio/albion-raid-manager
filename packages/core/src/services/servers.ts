@@ -12,6 +12,7 @@ import { Prisma, prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 
 import { DiscordService } from "./discord";
+import { PermissionsService } from "./permissions";
 import { UsersService } from "./users";
 
 interface ServerIncludeOptions {
@@ -324,9 +325,12 @@ export namespace ServersService {
   export async function updateServer(
     serverId: string,
     input: Prisma.ServerUpdateInput,
+    userId: string,
     options: ServersServiceOptions = {},
   ) {
     const { cache } = options;
+
+    await PermissionsService.requireAdminRoles(serverId, userId, { cache });
 
     const server = await prisma.server.update({
       where: { id: serverId },
@@ -338,6 +342,12 @@ export namespace ServersService {
         logger.warn("Cache invalidation failed", { error, serverId });
       });
     }
+
+    logger.info("Server settings updated", {
+      serverId,
+      userId,
+      updates: input,
+    });
 
     return server;
   }
