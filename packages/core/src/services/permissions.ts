@@ -52,7 +52,7 @@ export namespace PermissionsService {
         }
 
         // Get user's Discord member data from the server
-        const member = await DiscordService.servers.getServerMember(serverId, userId, {
+        const member = await DiscordService.getGuildMember(serverId, userId, {
           type: "bot",
           token: config.discord.token,
         });

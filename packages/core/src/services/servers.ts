@@ -57,7 +57,7 @@ export namespace ServersService {
 
     // If the server doesn't exist and data is not provided, try to fetch data from Discord
     if (!server && !data) {
-      const discordServer = await DiscordService.servers.getServer(serverId, {
+      const discordServer = await DiscordService.getGuild(serverId, {
         type: "bot",
         token: config.discord.token,
       });
@@ -119,7 +119,7 @@ export namespace ServersService {
         })) as Server;
 
         if (include.accessToken) {
-          const discordServer = await DiscordService.servers.getServer(serverId, {
+          const discordServer = await DiscordService.getGuild(serverId, {
             type: "bot",
             token: include.accessToken,
           });
@@ -164,7 +164,7 @@ export namespace ServersService {
 
         let adminServersPromise: Promise<APIGuild[]> = Promise.resolve([]);
         if (include?.accessToken) {
-          adminServersPromise = DiscordService.servers.getServers({
+          adminServersPromise = DiscordService.getGuilds({
             type: "user",
             token: include.accessToken,
             admin: true,
@@ -324,8 +324,8 @@ export namespace ServersService {
 
   export async function updateServer(
     serverId: string,
-    input: Prisma.ServerUpdateInput,
     userId: string,
+    input: Prisma.ServerUpdateInput,
     options: ServersServiceOptions = {},
   ) {
     const { cache } = options;
@@ -350,5 +350,68 @@ export namespace ServersService {
     });
 
     return server;
+  }
+
+  export async function ensureServerWithAccessToken(
+    serverId: string,
+    accessToken: string,
+    options: ServersServiceOptions = {},
+  ) {
+    const discordGuild = await DiscordService.getGuild(serverId, {
+      type: "user",
+      token: accessToken,
+    });
+
+    if (!discordGuild) {
+      throw new Error("Failed to get Discord guild");
+    }
+
+    return await ensureServer(
+      serverId,
+      {
+        name: discordGuild.name,
+        icon: discordGuild.icon,
+      },
+      options,
+    );
+  }
+
+  export async function getDiscordGuildMembers(serverId: string, _options: ServersServiceOptions = {}) {
+    try {
+      return await DiscordService.getGuildMembers(serverId, {
+        type: "bot",
+        token: config.discord.token,
+      });
+    } catch (error) {
+      logger.error("Failed to get Discord guild members:", { error, serverId });
+      throw error;
+    }
+  }
+
+  export async function getDiscordGuildChannels(serverId: string, _options: ServersServiceOptions = {}) {
+    try {
+      return await DiscordService.getGuildChannels(serverId, {
+        type: "bot",
+        token: config.discord.token,
+      });
+    } catch (error) {
+      logger.error("Failed to get Discord guild channels:", { error, serverId });
+      throw error;
+    }
+  }
+
+  /**
+   * Get Discord guild roles
+   */
+  export async function getDiscordGuildRoles(serverId: string, _options: ServersServiceOptions = {}) {
+    try {
+      return await DiscordService.getGuildRoles(serverId, {
+        type: "bot",
+        token: config.discord.token,
+      });
+    } catch (error) {
+      logger.error("Failed to get Discord guild roles:", { error, serverId });
+      throw error;
+    }
   }
 }

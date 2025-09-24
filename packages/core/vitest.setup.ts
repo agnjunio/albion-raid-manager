@@ -298,30 +298,44 @@ vi.mock("@albion-raid-manager/core/services/discord/client", () => ({
 }));
 
 // Mock Discord service functions
-vi.mock("@albion-raid-manager/core/services/discord/servers", () => ({
-  getServers: vi.fn(),
-  getServer: vi.fn(),
-  getServerChannels: vi.fn(),
-  leaveServer: vi.fn(),
-  getServerMembers: vi.fn(),
-  getServerMember: vi.fn(),
-  addServerMemberRole: vi.fn(),
-  removeServerMemberRole: vi.fn(),
+vi.mock("@albion-raid-manager/core/services/discord/guilds", () => ({
+  getGuilds: vi.fn(),
+  getGuild: vi.fn(),
+  getGuildChannels: vi.fn(),
+  leaveGuild: vi.fn(),
+  getGuildMembers: vi.fn(),
+  getGuildMember: vi.fn(),
+  addGuildMemberRole: vi.fn(),
+  removeGuildMemberRole: vi.fn(),
 }));
 
 // Mock Discord service index
 vi.mock("@albion-raid-manager/core/services/discord", () => ({
   DiscordService: {
-    servers: {
-      getServers: vi.fn(),
-      getServer: vi.fn(),
-      getServerChannels: vi.fn(),
-      leaveServer: vi.fn(),
-      getServerMembers: vi.fn(),
-      getServerMember: vi.fn(),
-      addServerMemberRole: vi.fn(),
-      removeServerMemberRole: vi.fn(),
-    },
+    // Auth functions
+    exchangeCode: vi.fn(),
+    refreshToken: vi.fn(),
+
+    // Emoji functions
+    getApplicationEmojis: vi.fn(),
+
+    // Message functions
+    sendMessage: vi.fn(),
+
+    // User functions
+    getCurrentUser: vi.fn(),
+    getUser: vi.fn(),
+
+    // Guild functions (renamed from servers)
+    getGuilds: vi.fn(),
+    getGuild: vi.fn(),
+    getGuildChannels: vi.fn(),
+    getGuildMembers: vi.fn(),
+    getGuildMember: vi.fn(),
+    getGuildRoles: vi.fn(),
+    addGuildMemberRole: vi.fn(),
+    removeGuildMemberRole: vi.fn(),
+    leaveGuild: vi.fn(),
   },
 }));
 

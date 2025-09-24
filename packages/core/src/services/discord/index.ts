@@ -1,43 +1,44 @@
 import { exchangeCode, refreshToken } from "./auth";
 import { getApplicationEmojis } from "./emojis";
-import { sendMessage } from "./messages";
 import {
-  addServerMemberRole,
-  getServer,
-  getServerChannels,
-  getServerMember,
-  getServerMembers,
-  getServerRoles,
-  getServers,
-  removeServerMemberRole,
-} from "./servers";
+  addGuildMemberRole,
+  getGuild,
+  getGuildChannels,
+  getGuildMember,
+  getGuildMembers,
+  getGuildRoles,
+  getGuilds,
+  leaveGuild,
+  removeGuildMemberRole,
+} from "./guilds";
+import { sendMessage } from "./messages";
 import { getCurrentUser, getUser } from "./users";
 
 export const DiscordService = {
-  auth: {
-    exchangeCode,
-    refreshToken,
-  },
-  emojis: {
-    getApplicationEmojis,
-  },
-  messages: {
-    sendMessage,
-  },
-  users: {
-    getCurrentUser,
-    getUser,
-  },
-  servers: {
-    getServers,
-    getServer,
-    getServerChannels,
-    getServerMembers,
-    getServerMember,
-    getServerRoles,
-    addServerMemberRole,
-    removeServerMemberRole,
-  },
+  // Auth functions
+  exchangeCode,
+  refreshToken,
+
+  // Emoji functions
+  getApplicationEmojis,
+
+  // Message functions
+  sendMessage,
+
+  // User functions
+  getCurrentUser,
+  getUser,
+
+  // Guild functions (renamed from servers)
+  getGuilds,
+  getGuild,
+  getGuildChannels,
+  getGuildMembers,
+  getGuildMember,
+  getGuildRoles,
+  addGuildMemberRole,
+  removeGuildMemberRole,
+  leaveGuild,
 };
 
 export * from "./types";

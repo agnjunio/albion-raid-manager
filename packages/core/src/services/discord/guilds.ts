@@ -13,7 +13,7 @@ type GetUserGuildsOptions = DiscordServiceOptions & {
   admin?: boolean;
 };
 
-export async function getServers({ type = "bot", token = config.discord.token }: GetUserGuildsOptions) {
+export async function getGuilds({ type = "bot", token = config.discord.token }: GetUserGuildsOptions) {
   const servers = await memoize<APIGuild[]>(
     `discord.${type}.${token}.guilds`,
     async () => {
@@ -50,14 +50,14 @@ export async function getServers({ type = "bot", token = config.discord.token }:
   return servers;
 }
 
-export async function getServer(
-  serverId: string,
+export async function getGuild(
+  guildId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
 ) {
-  const server = await memoize<APIGuild>(
-    `discord.${type}.${token}.guilds.${serverId}`,
+  const guild = await memoize<APIGuild>(
+    `discord.${type}.${token}.guilds.${guildId}`,
     async () => {
-      const res = await discordApiClient.get<APIGuild>(`/guilds/${serverId}`, {
+      const res = await discordApiClient.get<APIGuild>(`/guilds/${guildId}`, {
         headers: {
           Authorization: getAuthorization(type, token),
         },
@@ -71,17 +71,17 @@ export async function getServer(
       timeout: getMilliseconds(1, "days"),
     },
   );
-  return server;
+  return guild;
 }
 
-export async function getServerChannels(
-  serverId: string,
+export async function getGuildChannels(
+  guildId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
 ) {
   return memoize(
-    `discord.${type}.${token}.guilds.${serverId}.channels`,
+    `discord.${type}.${token}.guilds.${guildId}.channels`,
     async () => {
-      const res = await discordApiClient.get<APIGuildChannel<ChannelType.GuildText>[]>(`/guilds/${serverId}/channels`, {
+      const res = await discordApiClient.get<APIGuildChannel<ChannelType.GuildText>[]>(`/guilds/${guildId}/channels`, {
         headers: {
           Authorization: getAuthorization(type, token),
         },
@@ -94,14 +94,14 @@ export async function getServerChannels(
   );
 }
 
-export async function getServerRoles(
-  serverId: string,
+export async function getGuildRoles(
+  guildId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
 ) {
   return memoize(
-    `discord.${type}.${token}.guilds.${serverId}.roles`,
+    `discord.${type}.${token}.guilds.${guildId}.roles`,
     async () => {
-      const res = await discordApiClient.get(`/guilds/${serverId}/roles`, {
+      const res = await discordApiClient.get(`/guilds/${guildId}/roles`, {
         headers: {
           Authorization: getAuthorization(type, token),
         },
@@ -114,11 +114,11 @@ export async function getServerRoles(
   );
 }
 
-export async function leaveServer(
-  serverId: string,
+export async function leaveGuild(
+  guildId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
 ) {
-  const res = await discordApiClient.delete(`/users/@me/guilds/${serverId}`, {
+  const res = await discordApiClient.delete(`/users/@me/guilds/${guildId}`, {
     headers: {
       Authorization: getAuthorization(type, token),
     },
@@ -126,7 +126,7 @@ export async function leaveServer(
   return res.data;
 }
 
-export async function getServerMembers(
+export async function getGuildMembers(
   guildId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
 ) {
@@ -149,7 +149,7 @@ export async function getServerMembers(
   );
 }
 
-export async function getServerMember(
+export async function getGuildMember(
   guildId: string,
   userId: string,
   { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
@@ -170,7 +170,7 @@ export async function getServerMember(
   );
 }
 
-export const addServerMemberRole = async (
+export const addGuildMemberRole = async (
   guildId: string,
   memberId: string,
   roleId: string,
@@ -186,7 +186,7 @@ export const addServerMemberRole = async (
   return res.data;
 };
 
-export const removeServerMemberRole = async (
+export const removeGuildMemberRole = async (
   guildId: string,
   memberId: string,
   roleId: string,

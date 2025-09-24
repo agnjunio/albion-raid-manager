@@ -36,7 +36,7 @@ export namespace UsersService {
 
     // If the user doesn't exist and data is not provided, try to fetch data from Discord
     if (!user && !data) {
-      let discordUser: APIUser = await DiscordService.users.getUser(userId, {
+      let discordUser: APIUser = await DiscordService.getUser(userId, {
         type: "bot",
         token: config.discord.token,
       });
@@ -86,5 +86,46 @@ export namespace UsersService {
         ttl: cacheTtl,
       },
     );
+  }
+
+  export async function ensureUserWithAccessToken(accessToken: string, options: UsersServiceOptions = {}) {
+    // Get current user info from Discord using access token
+    const discordUser = await DiscordService.getCurrentUser({
+      type: "user",
+      token: accessToken,
+    });
+
+    if (!discordUser) {
+      throw new Error("Failed to get Discord user");
+    }
+
+    // Ensure user exists with the Discord data
+    return await ensureUser(
+      discordUser.id,
+      {
+        username: discordUser.username,
+        nickname: discordUser.global_name ?? null,
+        avatar: discordUser.avatar ?? null,
+      },
+      options,
+    );
+  }
+
+  export async function exchangeDiscordCode(code: string, redirectUri: string, _options: UsersServiceOptions = {}) {
+    try {
+      return await DiscordService.exchangeCode(code, redirectUri);
+    } catch (error) {
+      logger.error("Failed to exchange Discord code:", { error, code: code.slice(0, 10) + "..." });
+      throw error;
+    }
+  }
+
+  export async function refreshDiscordToken(refreshToken: string, _options: UsersServiceOptions = {}) {
+    try {
+      return await DiscordService.refreshToken(refreshToken);
+    } catch (error) {
+      logger.error("Failed to refresh Discord token:", { error, refreshToken: refreshToken.slice(0, 10) + "..." });
+      throw error;
+    }
   }
 }

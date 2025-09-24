@@ -17,9 +17,7 @@ const mockPrisma = {
 };
 
 const mockDiscordService = {
-  servers: {
-    getServerMember: vi.fn(),
-  },
+  getGuildMember: vi.fn(),
 };
 
 const mockConfig = {
@@ -65,7 +63,7 @@ describe("PermissionsService", () => {
         adminRoles: [adminRoleId],
       });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: [adminRoleId, "333333333333333333"],
       });
 
@@ -78,7 +76,7 @@ describe("PermissionsService", () => {
         where: { id: serverId },
         select: { adminRoles: true },
       });
-      expect(mockDiscordService.servers.getServerMember).toHaveBeenCalledWith(serverId, userId, {
+      expect(mockDiscordService.getGuildMember).toHaveBeenCalledWith(serverId, userId, {
         type: "bot",
         token: "test-token",
       });
@@ -90,7 +88,7 @@ describe("PermissionsService", () => {
         callerRoles: [callerRoleId],
       });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: [callerRoleId, "333333333333333333"],
       });
 
@@ -111,7 +109,7 @@ describe("PermissionsService", () => {
         adminRoles: [adminRoleId],
       });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: ["333333333333333333", "444444444444444444"],
       });
 
@@ -133,7 +131,7 @@ describe("PermissionsService", () => {
 
       // Assert
       expect(result).toBe(false);
-      expect(mockDiscordService.servers.getServerMember).not.toHaveBeenCalled();
+      expect(mockDiscordService.getGuildMember).not.toHaveBeenCalled();
     });
 
     it("should return false when server is not found", async () => {
@@ -145,7 +143,7 @@ describe("PermissionsService", () => {
 
       // Assert
       expect(result).toBe(false);
-      expect(mockDiscordService.servers.getServerMember).not.toHaveBeenCalled();
+      expect(mockDiscordService.getGuildMember).not.toHaveBeenCalled();
     });
 
     it("should return false when Discord member is not found", async () => {
@@ -154,7 +152,7 @@ describe("PermissionsService", () => {
         adminRoles: [adminRoleId],
       });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue(null);
+      mockDiscordService.getGuildMember.mockResolvedValue(null);
 
       // Act
       const result = await PermissionsService.hasRole(serverId, userId, "admin");
@@ -171,7 +169,7 @@ describe("PermissionsService", () => {
         adminRoles: [adminRoleId],
       });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: [adminRoleId],
       });
 
@@ -185,7 +183,7 @@ describe("PermissionsService", () => {
         adminRoles: [adminRoleId],
       });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: ["333333333333333333"],
       });
 
@@ -206,7 +204,7 @@ describe("PermissionsService", () => {
         adminRoles: [adminRoleId],
       });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: [adminRoleId],
       });
 
@@ -224,7 +222,7 @@ describe("PermissionsService", () => {
           callerRoles: [callerRoleId],
         });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: [callerRoleId],
       });
 
@@ -242,7 +240,7 @@ describe("PermissionsService", () => {
           callerRoles: [callerRoleId],
         });
 
-      mockDiscordService.servers.getServerMember.mockResolvedValue({
+      mockDiscordService.getGuildMember.mockResolvedValue({
         roles: ["333333333333333333"],
       });
 

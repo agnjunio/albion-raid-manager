@@ -1,7 +1,5 @@
-import { ensureUser } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
-import { DiscordService } from "@albion-raid-manager/core/services";
-import { transformUser } from "@albion-raid-manager/core/utils/discord";
+import { UsersService } from "@albion-raid-manager/core/services";
 import { APIErrorType, APIResponse, GetMeResponse } from "@albion-raid-manager/types/api";
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
@@ -13,16 +11,15 @@ export const authRouter: Router = Router();
 
 authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<GetMeResponse>>) => {
   const get = async () => {
-    const discordUser = await DiscordService.users.getCurrentUser({
-      type: "user",
-      token: req.session.accessToken,
-    });
-    const user = await ensureUser({
-      id: discordUser.id,
-      username: discordUser.username,
-      nickname: discordUser.global_name ?? null,
-      avatar: discordUser.avatar ?? null,
-    });
+    if (!req.session.accessToken) {
+      throw new Error("No access token available");
+    }
+
+    const user = await UsersService.ensureUserWithAccessToken(req.session.accessToken);
+
+    if (!user) {
+      throw new Error("Failed to ensure user exists");
+    }
 
     res.json(APIResponse.Success({ user }));
   };
@@ -38,7 +35,7 @@ authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<
 
     if (req.session.refreshToken) {
       try {
-        const { access_token, refresh_token } = await DiscordService.auth.refreshToken(req.session.refreshToken);
+        const { access_token, refresh_token } = await UsersService.refreshDiscordToken(req.session.refreshToken);
         req.session.accessToken = access_token;
         req.session.refreshToken = refresh_token;
         await get();
@@ -62,20 +59,17 @@ authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<
 authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type>) => {
   try {
     const { code, redirectUri } = discordCallbackSchema.parse(req.body);
-    const { access_token, refresh_token } = await DiscordService.auth.exchangeCode(code, redirectUri);
+    const { access_token, refresh_token } = await UsersService.exchangeDiscordCode(code, redirectUri);
 
-    const discordUser = await DiscordService.users.getCurrentUser({
-      type: "user",
-      token: access_token,
-    });
+    const user = await UsersService.ensureUserWithAccessToken(access_token);
 
-    if (!discordUser) {
+    if (!user) {
       return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
     }
 
     req.session.accessToken = access_token;
     req.session.refreshToken = refresh_token;
-    req.session.user = transformUser(discordUser);
+    req.session.user = user;
 
     res.sendStatus(200);
   } catch (error) {

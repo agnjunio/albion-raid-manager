@@ -1,5 +1,4 @@
-import { DiscordService } from "@albion-raid-manager/core/services";
-import { transformUser } from "@albion-raid-manager/core/utils/discord";
+import { UsersService } from "@albion-raid-manager/core/services";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
 import { NextFunction, Request, Response } from "express";
 
@@ -13,12 +12,12 @@ export const auth = async (req: Request, res: Response<APIResponse.Type>, next: 
   }
 
   if (!req.session.user) {
-    const discordUser = await DiscordService.users.getCurrentUser({ type: "user", token: req.session.accessToken });
-    if (!discordUser) {
+    const user = await UsersService.ensureUserWithAccessToken(req.session.accessToken);
+    if (!user) {
       return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
     }
 
-    req.session.user = transformUser(discordUser);
+    req.session.user = user;
   }
 
   next();

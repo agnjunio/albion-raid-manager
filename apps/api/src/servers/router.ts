@@ -1,7 +1,6 @@
-import config from "@albion-raid-manager/core/config";
 import { logger } from "@albion-raid-manager/core/logger";
 import { sleep } from "@albion-raid-manager/core/scheduler";
-import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
+import { ServersService } from "@albion-raid-manager/core/services";
 import {
   APIErrorType,
   APIResponse,
@@ -18,7 +17,6 @@ import {
   Channel,
   createServerSettings,
   fromDiscordChannels,
-  fromDiscordGuild,
   fromDiscordRoles,
   Role,
   Server,
@@ -68,7 +66,7 @@ serverRouter.post(
   "/",
   validateRequest({ body: addServerSchema }),
   async (req: Request<{}, void, VerifyServer.Body>, res: Response<APIResponse.Type<VerifyServer.Response>>) => {
-    if (!req.session.user) {
+    if (!req.session.user || !req.session.accessToken) {
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
 
@@ -83,11 +81,7 @@ serverRouter.post(
         tries++;
 
         try {
-          const discordServer = await DiscordService.servers.getServer(serverId, {
-            type: "bot",
-            token: req.session.accessToken,
-          });
-          verifiedServer = fromDiscordGuild(discordServer);
+          verifiedServer = await ServersService.ensureServerWithAccessToken(serverId, req.session.accessToken);
         } catch {
           continue;
         }
@@ -143,10 +137,7 @@ serverRouter.get(
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
-      const discordMembers = await DiscordService.servers.getServerMembers(serverId, {
-        type: "bot",
-        token: config.discord.token,
-      });
+      const discordMembers = await ServersService.getDiscordGuildMembers(serverId);
       const registeredMembers = await ServersService.getServerMembers(serverId);
       const registeredMembersMap = new Map(registeredMembers.map((member) => [member.userId, member]));
 
@@ -235,7 +226,7 @@ serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
       language,
     } = req.body;
 
-    await ServersService.updateServer(serverId, {
+    await ServersService.updateServer(serverId, req.session.user.id, {
       name,
       icon,
       auditChannelId,
@@ -271,10 +262,7 @@ serverRouter.get(
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
-      const discordChannels = await DiscordService.servers.getServerChannels(serverId, {
-        type: "bot",
-        token: config.discord.token,
-      });
+      const discordChannels = await ServersService.getDiscordGuildChannels(serverId);
 
       const channels: Channel[] = fromDiscordChannels(discordChannels);
 
@@ -306,9 +294,7 @@ serverRouter.get(
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
 
-      const discordRoles = await DiscordService.servers.getServerRoles(serverId, {
-        token: config.discord.token,
-      });
+      const discordRoles = await ServersService.getDiscordGuildRoles(serverId);
 
       const roles: Role[] = fromDiscordRoles(discordRoles);
 
