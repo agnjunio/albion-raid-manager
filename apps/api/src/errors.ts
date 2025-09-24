@@ -6,8 +6,7 @@ export const errors = (error: Error, req: Request, res: Response, _next: NextFun
   const message = error.message || "Internal Server Error";
 
   logger.error("API Error:", {
-    message: error.message,
-    stack: error.stack,
+    error,
     method: req.method,
     path: req.path,
     params: req.params,

@@ -4,12 +4,13 @@ import { APIErrorType, APIResponse, GetMeResponse } from "@albion-raid-manager/t
 import { isAxiosError } from "axios";
 import { Request, Response, Router } from "express";
 
-import { auth } from "./middleware";
+import { isAuthenticated } from "@/middleware";
+
 import { discordCallbackSchema } from "./schemas";
 
 export const authRouter: Router = Router();
 
-authRouter.get("/me", auth, async (req: Request, res: Response<APIResponse.Type<GetMeResponse>>) => {
+authRouter.get("/me", isAuthenticated, async (req: Request, res: Response<APIResponse.Type<GetMeResponse>>) => {
   const get = async () => {
     if (!req.session.accessToken) {
       throw new Error("No access token available");

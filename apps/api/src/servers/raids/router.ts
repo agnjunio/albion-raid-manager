@@ -28,14 +28,15 @@ import {
 } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
-import { validateRequest } from "@/request";
+import { isAuthenticated, isServerMember } from "@/middleware";
+import { getUserIdFromRequest, validateRequest } from "@/request";
 
-import { raidPermission } from "./middleware";
 import { getRaidEventPublisher } from "./redis";
 
 export const serverRaidsRouter: Router = Router({ mergeParams: true });
 
-serverRaidsRouter.use(raidPermission);
+serverRaidsRouter.use(isAuthenticated);
+serverRaidsRouter.use(isServerMember);
 
 serverRaidsRouter.post(
   "/",
@@ -58,6 +59,7 @@ serverRaidsRouter.post(
         maxPlayers,
       },
       {
+        userId: getUserIdFromRequest(req),
         publisher: await getRaidEventPublisher(),
       },
     );
@@ -117,7 +119,10 @@ serverRaidsRouter.put(
     }
 
     const updates = req.body as UpdateRaidInput;
-    const raid = await RaidService.updateRaid(raidId, updates, { publisher: await getRaidEventPublisher() });
+    const raid = await RaidService.updateRaid(raidId, updates, {
+      userId: getUserIdFromRequest(req),
+      publisher: await getRaidEventPublisher(),
+    });
 
     res.json(APIResponse.Success({ raid }));
   },
@@ -130,7 +135,10 @@ serverRaidsRouter.delete("/:raidId", async (req: Request<{ serverId: string; rai
     throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
   }
 
-  await RaidService.deleteRaid(raidId, { publisher: await getRaidEventPublisher() });
+  await RaidService.deleteRaid(raidId, {
+    userId: getUserIdFromRequest(req),
+    publisher: await getRaidEventPublisher(),
+  });
 
   res.json(APIResponse.Success({ message: "Raid deleted successfully" }));
 });
@@ -156,7 +164,10 @@ serverRaidsRouter.post(
           userId: userId || undefined,
           weapon: weapon ?? undefined,
         },
-        { publisher: await getRaidEventPublisher() },
+        {
+          userId: getUserIdFromRequest(req),
+          publisher: await getRaidEventPublisher(),
+        },
       );
 
       res.json(APIResponse.Success({ raid }));
@@ -177,7 +188,10 @@ serverRaidsRouter.put(
     const updates = req.body as UpdateRaidSlotInput;
 
     try {
-      const raidSlot = await RaidService.updateRaidSlot(slotId, updates, { publisher: await getRaidEventPublisher() });
+      const raidSlot = await RaidService.updateRaidSlot(slotId, updates, {
+        userId: getUserIdFromRequest(req),
+        publisher: await getRaidEventPublisher(),
+      });
       res.json(APIResponse.Success({ raidSlot }));
     } catch (error) {
       logger.error("Failed to update raid slot:", { error });
@@ -192,7 +206,10 @@ serverRaidsRouter.delete(
     const { slotId } = req.params;
 
     try {
-      await RaidService.deleteRaidSlot(slotId, { publisher: await getRaidEventPublisher() });
+      await RaidService.deleteRaidSlot(slotId, {
+        userId: getUserIdFromRequest(req),
+        publisher: await getRaidEventPublisher(),
+      });
       res.json(APIResponse.Success({ message: "Slot deleted successfully" }));
     } catch (error) {
       logger.error("Failed to delete raid slot:", { error });
@@ -259,6 +276,7 @@ serverRaidsRouter.put(
 
     try {
       const raid = await RaidService.reorderSlots(raidId, slotIds, {
+        userId: getUserIdFromRequest(req),
         publisher: await getRaidEventPublisher(),
       });
 

@@ -332,9 +332,6 @@ export namespace ServersService {
     }
   }
 
-  /**
-   * Get Discord guild roles
-   */
   export async function getDiscordGuildRoles(serverId: string, _options: ServersServiceOptions = {}) {
     try {
       return await DiscordService.getGuildRoles(serverId, {

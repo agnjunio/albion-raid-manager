@@ -27,14 +27,14 @@ import { isAxiosError } from "axios";
 import { APIGuild } from "discord-api-types/v10";
 import { Request, Response, Router } from "express";
 
-import { auth } from "@/auth/middleware";
+import { isAuthenticated, isServerMember } from "@/middleware";
 import { validateRequest } from "@/request";
 
 import { serverRaidsRouter } from "./raids/router";
 
 export const serverRouter: Router = Router();
 
-serverRouter.use(auth);
+serverRouter.use(isAuthenticated);
 
 serverRouter.use("/:serverId/raids", serverRaidsRouter);
 
@@ -44,42 +44,29 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
 
-    const botServers = await ServersService.getServersForUser(req.session.user.id);
-
-    let adminServers: APIGuild[] = [];
+    let discordServers: APIGuild[] = [];
     if (req.session.accessToken) {
       try {
-        adminServers = await DiscordService.getGuilds({
+        discordServers = await DiscordService.getGuilds({
           type: "user",
           token: req.session.accessToken,
-          admin: true,
         });
       } catch (error) {
-        logger.warn("Failed to get admin servers from Discord", { error });
+        logger.warn("Failed to get servers from Discord", { error });
       }
     }
-
     const servers = new Map<string, Server>();
 
-    for (const server of adminServers) {
+    for (const server of discordServers) {
+      const isBotInstalled = await ServersService.getServerById(server.id);
       servers.set(server.id, {
         ...fromDiscordGuild(server),
-        bot: botServers.some((botServer) => botServer.id === server.id),
-      });
-    }
-
-    for (const server of botServers) {
-      if (servers.has(server.id)) continue;
-      servers.set(server.id, {
-        ...server,
-        admin: false,
-        bot: true,
-        icon: server.icon ?? null,
+        bot: !!isBotInstalled,
       });
     }
 
     const filteredServers = Array.from(servers.values()).filter((server) => {
-      return server.admin || server.owner;
+      return server.admin || server.owner || server.bot;
     });
 
     res.json(APIResponse.Success({ servers: filteredServers }));
@@ -140,56 +127,50 @@ serverRouter.post(
   },
 );
 
-serverRouter.get("/:serverId", async (req: Request, res: Response<APIResponse.Type<GetServer.Response>>) => {
-  try {
-    const { serverId } = req.params;
-
-    const dbServer = await ServersService.getServerById(serverId);
-
-    if (!dbServer) {
-      return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
-    }
-
-    let server = dbServer;
-    if (req.session.accessToken) {
-      try {
-        const discordServer = await DiscordService.getGuild(serverId, {
-          type: "user",
-          token: req.session.accessToken,
-        });
-
-        if (discordServer) {
-          server = {
-            ...dbServer,
-            ...fromDiscordGuild(discordServer),
-          };
-        }
-      } catch (error) {
-        logger.warn("Failed to enrich server with Discord data", { error, serverId });
+serverRouter.get(
+  "/:serverId",
+  isServerMember,
+  async (req: Request, res: Response<APIResponse.Type<GetServer.Response>>) => {
+    try {
+      const { serverId } = req.params;
+      const dbServer = req.context.server;
+      if (!dbServer) {
+        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
       }
-    }
 
-    res.json(APIResponse.Success({ server }));
-  } catch (error) {
-    logger.warn("Failed to get server", { error });
-    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
-  }
-});
+      let server = dbServer;
+      if (req.session.accessToken) {
+        try {
+          const discordServer = await DiscordService.getGuild(serverId, {
+            type: "user",
+            token: req.session.accessToken,
+          });
+
+          if (discordServer) {
+            server = {
+              ...dbServer,
+              ...fromDiscordGuild(discordServer),
+            };
+          }
+        } catch (error) {
+          logger.warn("Failed to enrich server with Discord data", { error, serverId });
+        }
+      }
+
+      res.json(APIResponse.Success({ server }));
+    } catch (error) {
+      logger.warn("Failed to get server", { error });
+      res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
+    }
+  },
+);
 
 serverRouter.get(
   "/:serverId/members",
+  isServerMember,
   async (req: Request, res: Response<APIResponse.Type<GetServerMembers.Response>>) => {
     try {
       const { serverId } = req.params;
-
-      if (!req.session.user) {
-        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
-      }
-
-      const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
-      if (!server) {
-        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-      }
 
       const discordMembers = await ServersService.getDiscordGuildMembers(serverId);
       const registeredMembers = await ServersService.getServerMembers(serverId);
@@ -231,19 +212,13 @@ serverRouter.get(
 
 serverRouter.get(
   "/:serverId/settings",
+  isServerMember,
   async (req: Request<GetServerSettings.Params>, res: Response<APIResponse.Type<GetServerSettings.Response>>) => {
     try {
-      const { serverId } = req.params;
-
-      if (!req.session.user) {
-        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
-      }
-
-      const server = await ServersService.getServerById(serverId);
+      const server = req.context.server;
       if (!server) {
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
       }
-
       const settings = createServerSettings(server);
 
       res.json(APIResponse.Success({ settings }));
@@ -254,18 +229,9 @@ serverRouter.get(
   },
 );
 
-serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
+serverRouter.put("/:serverId/settings", isServerMember, async (req: Request, res: Response) => {
   try {
     const { serverId } = req.params;
-
-    if (!req.session.user) {
-      return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
-    }
-
-    const server = await ServersService.getServerById(serverId);
-    if (!server) {
-      return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-    }
 
     const {
       name,
@@ -280,6 +246,9 @@ serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
       language,
     } = req.body;
 
+    if (!req.session.user) {
+      return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
+    }
     await ServersService.updateServer(serverId, req.session.user.id, {
       name,
       icon,
@@ -302,19 +271,10 @@ serverRouter.put("/:serverId/settings", async (req: Request, res: Response) => {
 
 serverRouter.get(
   "/:serverId/channels",
+  isServerMember,
   async (req: Request<GetServerChannels.Params>, res: Response<APIResponse.Type<GetServerChannels.Response>>) => {
     try {
       const { serverId } = req.params;
-
-      if (!req.session.user) {
-        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
-      }
-
-      // Check if user has access to this server
-      const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
-      if (!server) {
-        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-      }
 
       const discordChannels = await ServersService.getDiscordGuildChannels(serverId);
 
@@ -334,19 +294,10 @@ serverRouter.get(
 
 serverRouter.get(
   "/:serverId/roles",
+  isServerMember,
   async (req: Request<GetServerRoles.Params>, res: Response<APIResponse.Type<GetServerRoles.Response>>) => {
     try {
       const { serverId } = req.params;
-
-      if (!req.session.user) {
-        return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
-      }
-
-      // Check if user has access to this server
-      const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
-      if (!server) {
-        return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
-      }
 
       const discordRoles = await ServersService.getDiscordGuildRoles(serverId);
 

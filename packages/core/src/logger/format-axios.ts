@@ -1,9 +1,7 @@
 import { AxiosError } from "axios";
 import winston from "winston";
 
-interface FilteredAxiosError {
-  name: string;
-  message: string;
+class FilteredAxiosError extends Error {
   code?: string;
   status?: number;
   statusText?: string;
@@ -12,6 +10,17 @@ interface FilteredAxiosError {
   timeout?: number;
   responseData?: unknown;
   headers?: Record<string, unknown>;
+
+  constructor(error: AxiosError) {
+    super(error.message);
+    this.code = error.code;
+    this.status = error.response?.status;
+    this.statusText = error.response?.statusText;
+    this.url = error.config?.url;
+    this.method = error.config?.method?.toUpperCase();
+    this.timeout = error.config?.timeout;
+    this.stack = error.stack;
+  }
 }
 
 /**
@@ -30,17 +39,8 @@ function filterAxiosError(error: unknown): unknown {
 
   const axiosError = error as AxiosError;
 
-  // Create a filtered version of the error
-  const filteredError: FilteredAxiosError = {
-    name: axiosError.name,
-    message: axiosError.message,
-    code: axiosError.code,
-    status: axiosError.response?.status,
-    statusText: axiosError.response?.statusText,
-    url: axiosError.config?.url,
-    method: axiosError.config?.method?.toUpperCase(),
-    timeout: axiosError.config?.timeout,
-  };
+  // Create a filtered version of the error as a plain object
+  const filteredError = new FilteredAxiosError(axiosError);
 
   // Only include response data for specific status codes that might be useful
   const usefulStatusCodes = [400, 401, 403, 404, 422, 429, 500, 502, 503, 504];
@@ -70,17 +70,12 @@ function filterAxiosError(error: unknown): unknown {
 
 /**
  * Winston format for filtering axios errors
- * This format automatically filters axios errors in log messages
+ * This format automatically filters axios errors in the error property
  */
 export const formatAxios = winston.format((info) => {
   // Filter axios errors in the error object
-  if (info.error) {
+  if (info.error && (info.error as Record<string, unknown>).isAxiosError) {
     info.error = filterAxiosError(info.error);
-  }
-
-  // Filter axios errors in the message if it's an object
-  if (info.message && typeof info.message === "object") {
-    info.message = filterAxiosError(info.message);
   }
 
   return info;

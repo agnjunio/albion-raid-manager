@@ -285,6 +285,7 @@
     "validation": "Please check your input and try again.",
     "authenticationFailed": "Authentication failed. Please log in again.",
     "badRequest": "Invalid request. Please check your input and try again.",
+    "botNotInstalled": "The bot is not installed on this server. Please install the bot first.",
     "serverAlreadyExists": "This server is already configured.",
     "internalServerError": "Internal server error. Please try again later.",
     "notAuthorized": "You are not authorized to perform this action.",

@@ -36,6 +36,19 @@ export namespace PermissionsService {
 
     return withCache(
       async () => {
+        // For admin type, first check if user has Discord Administrator permission
+        if (type === "admin") {
+          const hasDiscordAdmin = await DiscordService.hasAdministratorPermission(serverId, userId, {
+            type: "bot",
+            token: config.discord.token,
+          });
+
+          if (hasDiscordAdmin) {
+            logger.debug("User has Discord Administrator permission", { serverId, userId });
+            return true;
+          }
+        }
+
         // Get server role configuration based on type
         const server = await prisma.server.findUnique({
           where: { id: serverId },

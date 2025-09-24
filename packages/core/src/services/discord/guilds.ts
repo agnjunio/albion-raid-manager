@@ -1,7 +1,9 @@
-import { APIGuild, APIGuildChannel, APIGuildMember, ChannelType } from "discord-api-types/v10";
+import { hasPermissions, PERMISSIONS } from "@albion-raid-manager/types/discord";
+import { APIGuild, APIGuildChannel, APIGuildMember, APIRole, ChannelType } from "discord-api-types/v10";
 
 import { memoize } from "@albion-raid-manager/core/cache/memory";
 import config from "@albion-raid-manager/core/config";
+import { logger } from "@albion-raid-manager/core/logger";
 import { sleep } from "@albion-raid-manager/core/scheduler";
 import { getMilliseconds } from "@albion-raid-manager/core/utils";
 import { getAuthorization, transformChannel } from "@albion-raid-manager/core/utils/discord";
@@ -201,3 +203,43 @@ export const removeGuildMemberRole = async (
   });
   return res.data;
 };
+
+export async function hasAdministratorPermission(
+  guildId: string,
+  userId: string,
+  { type = "bot", token = config.discord.token }: DiscordServiceOptions = {},
+): Promise<boolean> {
+  try {
+    const member = await getGuildMember(guildId, userId, { type, token });
+    if (!member) {
+      return false;
+    }
+
+    const guild = await getGuild(guildId, { type, token });
+    if (!guild) {
+      return false;
+    }
+    if (guild.owner_id === userId) {
+      return true;
+    }
+
+    // Check if user has Administrator permission through roles
+    // Note: Discord API doesn't directly provide permission calculations
+    // We need to check if any of the user's roles have Administrator permission
+    const roles = await getGuildRoles(guildId, { type, token });
+
+    if (!roles || !member.roles) {
+      return false;
+    }
+
+    const adminRoles = roles.filter((role: APIRole) => hasPermissions(role.permissions, [PERMISSIONS.ADMINISTRATOR]));
+    const hasAdminRole = member.roles.some((roleId: string) =>
+      adminRoles.some((adminRole: APIRole) => adminRole.id === roleId),
+    );
+
+    return hasAdminRole;
+  } catch (error) {
+    logger.error("Failed to check Administrator permission:", { error, guildId, userId });
+    return false;
+  }
+}

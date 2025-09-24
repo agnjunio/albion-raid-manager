@@ -11,8 +11,14 @@ export const PERMISSIONS: {
   MANAGE_ROLES: BigInt(1 << 28), // 0x10000000
 };
 
-export const getDiscordOAuthUrl = (clientId: string, redirectUri: string, scope: string = "identify%20guilds") =>
-  `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+export const getDiscordOAuthUrl = (
+  clientId: string,
+  redirectUri: string,
+  scopes: string[] = ["identify", "guilds", "guilds.members.read"],
+) => {
+  const scope = encodeURI(scopes.join("+"));
+  return `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+};
 
 export const getUserPictureUrl = (id: string, avatar?: string | null) => {
   if (avatar) return `${DISCORD_CDN_URL}/avatars/${id}/${avatar}.png`;

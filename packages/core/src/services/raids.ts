@@ -24,18 +24,19 @@ export interface RaidServiceOptions {
   cache?: Cache;
   cacheTtl?: number;
   publisher?: RaidEventPublisher | null;
+  userId?: string;
 }
 
 export namespace RaidService {
   const DEFAULT_CACHE_TTL = 60;
 
-  export async function createRaid(
-    input: CreateRaidInput,
-    userId: string,
-    options: RaidServiceOptions = {},
-  ): Promise<Raid> {
+  export async function createRaid(input: CreateRaidInput, options: RaidServiceOptions = {}): Promise<Raid> {
     const { title, description, date, contentType, location, serverId } = input;
-    const { cache, publisher } = options;
+    const { userId, cache, publisher } = options;
+
+    if (!userId) {
+      throw new ServiceError(ServiceErrorCode.NOT_AUTHORIZED, "User ID is required");
+    }
 
     await ServersService.ensureServer(serverId);
     await PermissionsService.requireAdminOrCallerRoles(serverId, userId, { cache });
@@ -181,10 +182,13 @@ export namespace RaidService {
   export async function updateRaid(
     id: string,
     input: UpdateRaidInput,
-    userId: string,
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { cache, publisher } = options;
+    const { userId, cache, publisher } = options;
+
+    if (!userId) {
+      throw new ServiceError(ServiceErrorCode.NOT_AUTHORIZED, "User ID is required");
+    }
 
     const previousRaid = await findRaidById(id);
 
@@ -237,8 +241,12 @@ export namespace RaidService {
     return raid;
   }
 
-  export async function deleteRaid(id: string, userId: string, options: RaidServiceOptions = {}): Promise<void> {
-    const { cache, publisher } = options;
+  export async function deleteRaid(id: string, options: RaidServiceOptions = {}): Promise<void> {
+    const { userId, cache, publisher } = options;
+
+    if (!userId) {
+      throw new ServiceError(ServiceErrorCode.NOT_AUTHORIZED, "User ID is required");
+    }
 
     // First, get the raid to check permissions
     const existingRaid = await findRaidById(id);
@@ -413,11 +421,14 @@ export namespace RaidService {
 
   export async function createRaidSlot(
     input: CreateRaidSlotInput & { raidId: string },
-    userId: string,
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
     const { raidId, name, role, comment, weapon, buildId, order, userId: slotUserId } = input;
-    const { cache, publisher } = options;
+    const { userId, cache, publisher } = options;
+
+    if (!userId) {
+      throw new ServiceError(ServiceErrorCode.NOT_AUTHORIZED, "User ID is required");
+    }
 
     // Verify the raid exists and is in a state where slots can be modified
     const raid = await findRaidById(raidId, { slots: true });
@@ -507,10 +518,13 @@ export namespace RaidService {
   export async function updateRaidSlot(
     slotId: string,
     input: UpdateRaidSlotInput,
-    userId: string,
     options: RaidServiceOptions = {},
   ): Promise<RaidSlot> {
-    const { cache, publisher } = options;
+    const { userId, cache, publisher } = options;
+
+    if (!userId) {
+      throw new ServiceError(ServiceErrorCode.NOT_AUTHORIZED, "User ID is required");
+    }
 
     const existingSlot = await prisma.raidSlot.findUnique({
       where: { id: slotId },
@@ -648,12 +662,12 @@ export namespace RaidService {
     return slot;
   }
 
-  export async function deleteRaidSlot(
-    slotId: string,
-    userId: string,
-    options: RaidServiceOptions = {},
-  ): Promise<void> {
-    const { cache, publisher } = options;
+  export async function deleteRaidSlot(slotId: string, options: RaidServiceOptions = {}): Promise<void> {
+    const { userId, cache, publisher } = options;
+
+    if (!userId) {
+      throw new ServiceError(ServiceErrorCode.NOT_AUTHORIZED, "User ID is required");
+    }
 
     let raidId: string;
     let _serverId: string;
@@ -732,7 +746,19 @@ export namespace RaidService {
     slotIds: string[],
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { cache, publisher } = options;
+    const { userId, cache, publisher } = options;
+
+    if (!userId) {
+      throw new ServiceError(ServiceErrorCode.NOT_AUTHORIZED, "User ID is required");
+    }
+
+    // First, get the raid to check permissions
+    const existingRaid = await findRaidById(raidId);
+    if (!existingRaid) {
+      throw new ServiceError(ServiceErrorCode.NOT_FOUND, `Raid with ID ${raidId} not found`);
+    }
+
+    await PermissionsService.requireAdminOrCallerRoles(existingRaid.serverId, userId, { cache });
 
     const raid = await prisma.$transaction(async (tx) => {
       const raid = await tx.raid.findUnique({

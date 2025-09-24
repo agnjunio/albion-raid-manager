@@ -1,4 +1,4 @@
-import { APIUser } from "discord-api-types/v10";
+import { APIGuildMember, APIUser } from "discord-api-types/v10";
 
 import { memoize } from "@albion-raid-manager/core/cache/memory";
 import config from "@albion-raid-manager/core/config";
@@ -21,6 +21,26 @@ export async function getCurrentUser({ type = "bot", token = config.discord.toke
     },
     {
       timeout: getMilliseconds(1, "days"),
+    },
+  );
+}
+
+export async function getCurrentUserGuildMember(
+  guildId: string,
+  { type = "bot", token = config.discord.token }: DiscordServiceOptions,
+) {
+  return memoize<APIGuildMember>(
+    `discord.users.${type}.${token}.${guildId}.guildMember`,
+    async () => {
+      const res = await discordApiClient.get<APIGuildMember>(`/users/@me/guilds/${guildId}/member`, {
+        headers: {
+          Authorization: getAuthorization(type, token),
+        },
+      });
+      return res.data;
+    },
+    {
+      timeout: getMilliseconds(5, "minutes"),
     },
   );
 }

@@ -1,6 +1,7 @@
 import type { Channel } from "../entities/server-channels";
 import type { Role } from "../entities/server-roles";
-import type { Server, ServerSettings } from "../entities/servers";
+import type { ServerSettings } from "../entities/server-settings";
+import type { Server } from "../entities/servers";
 
 export type APIServerMember = {
   id: string;

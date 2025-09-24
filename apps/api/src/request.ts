@@ -37,3 +37,17 @@ export const validateRequest = (options: ValidationOptions) => {
     }
   };
 };
+
+export function getUserIdFromRequest(req: Request): string {
+  // Try context.member first (more reliable for server operations)
+  if (req.context.member?.userId) {
+    return req.context.member.userId;
+  }
+
+  // Fallback to session user
+  if (req.session.user?.id) {
+    return req.session.user.id;
+  }
+
+  throw new Error("User not authenticated");
+}

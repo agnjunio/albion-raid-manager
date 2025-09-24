@@ -62,7 +62,7 @@ import { parseDiscordMessage, validateDiscordMessage } from "@albion-raid-manage
 const isValid = await validateDiscordMessage("Anyone up for a raid?");
 if (isValid) {
   const parsedData = await parseDiscordMessage(message);
-  console.log(parsedData);
+  logger.log(parsedData);
 }
 ```
 
@@ -75,7 +75,7 @@ import { parseDiscordMessage, validateDiscordMessage } from "@albion-raid-manage
 const isValid = await validateDiscordMessage("Anyone up for a raid?");
 if (isValid) {
   const parsedData = await parseDiscordMessage(message);
-  console.log(parsedData);
+  logger.log(parsedData);
 }
 ```
 
@@ -204,9 +204,9 @@ const testMessages = [
 for (const message of testMessages) {
   try {
     const result = await parser.parseMessage(message);
-    console.log(`Success: ${result.title} (confidence: ${result.confidence})`);
+    logger.log(`Success: ${result.title} (confidence: ${result.confidence})`);
   } catch (error) {
-    console.log(`Failed: ${error.message}`);
+    logger.log(`Failed: ${error.message}`);
   }
 }
 ```

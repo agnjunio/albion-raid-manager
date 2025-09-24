@@ -10,14 +10,16 @@ export function translateError(errorType: APIErrorType): string {
       return t("errors.authenticationFailed");
     case APIErrorType.BAD_REQUEST:
       return t("errors.badRequest");
-    case APIErrorType.SERVER_ALREADY_EXISTS:
-      return t("errors.serverAlreadyExists");
+    case APIErrorType.BOT_NOT_INSTALLED:
+      return t("errors.botNotInstalled");
     case APIErrorType.INTERNAL_SERVER_ERROR:
       return t("errors.internalServerError");
     case APIErrorType.NOT_AUTHORIZED:
       return t("errors.notAuthorized");
     case APIErrorType.NOT_FOUND:
       return t("errors.notFound");
+    case APIErrorType.SERVER_ALREADY_EXISTS:
+      return t("errors.serverAlreadyExists");
     case APIErrorType.SERVER_VERIFICATION_FAILED:
       return t("errors.serverVerificationFailed");
     case APIErrorType.SESSION_EXPIRED:

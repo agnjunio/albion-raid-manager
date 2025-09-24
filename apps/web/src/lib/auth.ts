@@ -24,9 +24,8 @@ export function useAuth(): Auth {
   const signIn = () => {
     const clientId = import.meta.env.VITE_DISCORD_CLIENT_ID;
     const redirectUri = encodeURIComponent(`${window.location.origin}/auth/callback`);
-    const scope = "identify guilds";
     localStorage.setItem(AUTH_REDIRECT_KEY, window.location.pathname);
-    window.location.href = getDiscordOAuthUrl(clientId, redirectUri, scope);
+    window.location.href = getDiscordOAuthUrl(clientId, redirectUri);
   };
 
   const signOut = async () => {

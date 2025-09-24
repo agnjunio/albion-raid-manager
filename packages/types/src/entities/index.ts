@@ -3,6 +3,7 @@ export * from "./raid-configuration";
 export * from "./raid-role-info";
 export * from "./raid-status-info";
 export * from "./server-channels";
+export * from "./server-members";
 export * from "./server-roles";
 export * from "./server-settings";
 export * from "./servers";

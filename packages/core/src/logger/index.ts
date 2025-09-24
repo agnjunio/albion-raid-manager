@@ -8,7 +8,7 @@ import { formatAxios } from "./format-axios";
 
 const logger = createLogger({
   level: config.logger.level,
-  format: format.combine(formatAxios(), format.timestamp(), format.errors({ stack: true }), format.json()),
+  format: format.combine(format.timestamp(), formatAxios(), format.errors({ stack: true }), format.json()),
   defaultMeta: {
     get service() {
       return config.service.name;
@@ -31,7 +31,7 @@ if (!config.logger.pretty) {
       const count = maxLen - (logLevel as string).length;
       const spacing = printSpace(count);
       const shardStr = shard ? `[#${shard}] ` : "";
-      const errorStr = error ? `\n${error instanceof Error ? error.stack : error}` : "";
+      const errorStr = error ? `\n${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}` : "";
 
       return `${timestamp} [${level}] ${spacing}: ${shardStr}${message}${errorStr}`;
     },

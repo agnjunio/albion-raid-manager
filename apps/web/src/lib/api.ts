@@ -5,6 +5,18 @@ import axios, { isAxiosError, type AxiosError, type AxiosRequestConfig, type Axi
 
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// Utility function to redirect from server-specific routes to dashboard
+function redirectToDashboard() {
+  const currentPath = window.location.pathname;
+  const isServerRoute =
+    currentPath.startsWith("/dashboard/") && currentPath !== "/dashboard" && currentPath.split("/").length > 2;
+
+  if (isServerRoute) {
+    // Redirect to dashboard home (outside of server-specific routes)
+    window.location.href = "/dashboard";
+  }
+}
+
 // Internal client - not exported
 export const apiClient = axios.create({
   baseURL,
@@ -22,6 +34,23 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !noRedirect.includes(window.location.pathname)) {
       window.location.href = "/";
     }
+
+    // Handle 403 Forbidden errors with NOT_AUTHORIZED type
+    if (error.response?.status === 403) {
+      const responseData = error.response.data as APIResponse.Error;
+      if (responseData?.type === APIErrorType.NOT_AUTHORIZED) {
+        redirectToDashboard();
+      }
+    }
+
+    // Handle 404 Not Found errors with BOT_NOT_INSTALLED type
+    if (error.response?.status === 404) {
+      const responseData = error.response.data as APIResponse.Error;
+      if (responseData?.type === APIErrorType.BOT_NOT_INSTALLED) {
+        redirectToDashboard();
+      }
+    }
+
     return Promise.reject(error);
   },
 );
@@ -33,6 +62,14 @@ export const apiRTKRequest: BaseQueryFn<AxiosRequestConfig> = async (args) => {
     const data = response.data as APIResponse.Type<unknown>;
 
     if (APIResponse.isError(data)) {
+      // Handle NOT_AUTHORIZED errors from RTK Query
+      if (data.type === APIErrorType.NOT_AUTHORIZED) {
+        redirectToDashboard();
+      }
+      // Handle BOT_NOT_INSTALLED errors from RTK Query
+      if (data.type === APIErrorType.BOT_NOT_INSTALLED) {
+        redirectToDashboard();
+      }
       throw new Error(data.type);
     }
 

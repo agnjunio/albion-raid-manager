@@ -8,11 +8,12 @@ import {
   getGuildMembers,
   getGuildRoles,
   getGuilds,
+  hasAdministratorPermission,
   leaveGuild,
   removeGuildMemberRole,
 } from "./guilds";
 import { sendMessage } from "./messages";
-import { getCurrentUser, getUser } from "./users";
+import { getCurrentUser, getCurrentUserGuildMember, getUser } from "./users";
 
 export const DiscordService = {
   // Auth functions
@@ -27,6 +28,8 @@ export const DiscordService = {
 
   // User functions
   getCurrentUser,
+  getCurrentUserGuildMember,
+
   getUser,
 
   // Guild functions (renamed from servers)
@@ -36,6 +39,7 @@ export const DiscordService = {
   getGuildMembers,
   getGuildMember,
   getGuildRoles,
+  hasAdministratorPermission,
   addGuildMemberRole,
   removeGuildMemberRole,
   leaveGuild,

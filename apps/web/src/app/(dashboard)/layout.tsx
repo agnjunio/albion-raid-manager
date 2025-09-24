@@ -18,6 +18,7 @@ export function DashboardLayout() {
   const isServerRoute =
     location.pathname.startsWith("/dashboard/") &&
     location.pathname !== "/dashboard" &&
+    location.pathname !== "/dashboard/" &&
     location.pathname.split("/").length > 2;
 
   return (
