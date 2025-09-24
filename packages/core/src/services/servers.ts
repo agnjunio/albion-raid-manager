@@ -1,9 +1,8 @@
 import type { Cache } from "@albion-raid-manager/core/redis";
 
 import { ServerMember } from "@albion-raid-manager/types";
-import { fromDiscordGuild, Server } from "@albion-raid-manager/types/entities";
+import { Server } from "@albion-raid-manager/types/entities";
 import { ServiceError, ServiceErrorCode } from "@albion-raid-manager/types/services";
-import { APIGuild } from "discord-api-types/v10";
 
 import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
 import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
@@ -14,11 +13,6 @@ import { logger } from "@albion-raid-manager/core/logger";
 import { DiscordService } from "./discord";
 import { PermissionsService } from "./permissions";
 import { UsersService } from "./users";
-
-interface ServerIncludeOptions {
-  accessToken?: string;
-  admin?: boolean;
-}
 
 export interface ServersServiceOptions {
   cache?: Cache;
@@ -100,40 +94,18 @@ export namespace ServersService {
     return server;
   }
 
-  export async function getServerById(
-    serverId: string,
-    include: ServerIncludeOptions = {},
-    options: ServersServiceOptions = {},
-  ): Promise<Server | null> {
+  export async function getServerById(serverId: string, options: ServersServiceOptions = {}): Promise<Server | null> {
     const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
-    const includeKey = CacheKeys.hashObject(include);
-    const cacheKey = CacheKeys.server(serverId, includeKey);
+    const cacheKey = CacheKeys.server(serverId);
 
     return withCache(
-      async () => {
-        let server = (await prisma.server.findUnique({
+      () =>
+        prisma.server.findUnique({
           where: {
             id: serverId,
             active: true,
           },
-        })) as Server;
-
-        if (include.accessToken) {
-          const discordServer = await DiscordService.getGuild(serverId, {
-            type: "bot",
-            token: include.accessToken,
-          });
-
-          if (discordServer) {
-            server = {
-              ...server,
-              ...fromDiscordGuild(discordServer),
-            };
-          }
-        }
-
-        return server;
-      },
+        }),
       {
         cache,
         key: cacheKey,
@@ -142,60 +114,20 @@ export namespace ServersService {
     );
   }
 
-  export async function getServersForUser(
-    userId: string,
-    include: ServerIncludeOptions = {},
-    options: ServersServiceOptions = {},
-  ) {
+  export async function getServersForUser(userId: string, options: ServersServiceOptions = {}): Promise<Server[]> {
     const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
-    const includeKey = CacheKeys.hashObject(include);
-    const cacheKey = CacheKeys.serversByUser(userId, includeKey);
+    const cacheKey = CacheKeys.serversByUser(userId);
 
     return withCache<Server[]>(
-      async () => {
-        const botServersPromise = prisma.server.findMany({
+      () =>
+        prisma.server.findMany({
           where: {
             members: {
               some: { userId },
             },
             active: true,
           },
-        });
-
-        let adminServersPromise: Promise<APIGuild[]> = Promise.resolve([]);
-        if (include?.accessToken) {
-          adminServersPromise = DiscordService.getGuilds({
-            type: "user",
-            token: include.accessToken,
-            admin: true,
-          });
-        }
-
-        const [botServers, adminServers] = await Promise.all([botServersPromise, adminServersPromise]);
-
-        const servers = new Map<string, Server>();
-        for (const server of adminServers) {
-          servers.set(server.id, {
-            ...fromDiscordGuild(server),
-            bot: botServers.some((botServer) => botServer.id === server.id),
-          });
-        }
-
-        for (const server of botServers) {
-          if (servers.has(server.id)) continue;
-          servers.set(server.id, {
-            ...server,
-            admin: false,
-            bot: true,
-            icon: server.icon ?? null,
-          });
-        }
-
-        return Array.from(servers.values()).filter((server) => {
-          if (!include.admin) return true;
-          return server.admin || server.owner;
-        });
-      },
+        }),
       {
         cache,
         key: cacheKey,

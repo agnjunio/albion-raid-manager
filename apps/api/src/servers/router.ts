@@ -1,6 +1,6 @@
 import { logger } from "@albion-raid-manager/core/logger";
 import { sleep } from "@albion-raid-manager/core/scheduler";
-import { ServersService } from "@albion-raid-manager/core/services";
+import { DiscordService, ServersService } from "@albion-raid-manager/core/services";
 import {
   APIErrorType,
   APIResponse,
@@ -17,12 +17,14 @@ import {
   Channel,
   createServerSettings,
   fromDiscordChannels,
+  fromDiscordGuild,
   fromDiscordRoles,
   Role,
   Server,
 } from "@albion-raid-manager/types/entities";
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
+import { APIGuild } from "discord-api-types/v10";
 import { Request, Response, Router } from "express";
 
 import { auth } from "@/auth/middleware";
@@ -42,16 +44,45 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
 
-    const servers = await ServersService.getServersForUser(req.session.user.id, {
-      accessToken: req.session.accessToken,
-      admin: true,
-    });
+    const botServers = await ServersService.getServersForUser(req.session.user.id);
 
-    if (!servers) {
-      return res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR, "Failed to get servers"));
+    let adminServers: APIGuild[] = [];
+    if (req.session.accessToken) {
+      try {
+        adminServers = await DiscordService.getGuilds({
+          type: "user",
+          token: req.session.accessToken,
+          admin: true,
+        });
+      } catch (error) {
+        logger.warn("Failed to get admin servers from Discord", { error });
+      }
     }
 
-    res.json(APIResponse.Success({ servers }));
+    const servers = new Map<string, Server>();
+
+    for (const server of adminServers) {
+      servers.set(server.id, {
+        ...fromDiscordGuild(server),
+        bot: botServers.some((botServer) => botServer.id === server.id),
+      });
+    }
+
+    for (const server of botServers) {
+      if (servers.has(server.id)) continue;
+      servers.set(server.id, {
+        ...server,
+        admin: false,
+        bot: true,
+        icon: server.icon ?? null,
+      });
+    }
+
+    const filteredServers = Array.from(servers.values()).filter((server) => {
+      return server.admin || server.owner;
+    });
+
+    res.json(APIResponse.Success({ servers: filteredServers }));
   } catch (error) {
     if (isAxiosError(error) && error.response?.status === 401) {
       res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
@@ -110,15 +141,39 @@ serverRouter.post(
 );
 
 serverRouter.get("/:serverId", async (req: Request, res: Response<APIResponse.Type<GetServer.Response>>) => {
-  const { serverId } = req.params;
+  try {
+    const { serverId } = req.params;
 
-  const server = await ServersService.getServerById(serverId);
+    const dbServer = await ServersService.getServerById(serverId);
 
-  if (!server) {
-    return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
+    if (!dbServer) {
+      return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
+    }
+
+    let server = dbServer;
+    if (req.session.accessToken) {
+      try {
+        const discordServer = await DiscordService.getGuild(serverId, {
+          type: "user",
+          token: req.session.accessToken,
+        });
+
+        if (discordServer) {
+          server = {
+            ...dbServer,
+            ...fromDiscordGuild(discordServer),
+          };
+        }
+      } catch (error) {
+        logger.warn("Failed to enrich server with Discord data", { error, serverId });
+      }
+    }
+
+    res.json(APIResponse.Success({ server }));
+  } catch (error) {
+    logger.warn("Failed to get server", { error });
+    res.status(500).json(APIResponse.Error(APIErrorType.INTERNAL_SERVER_ERROR));
   }
-
-  res.json(APIResponse.Success({ server }));
 });
 
 serverRouter.get(
@@ -131,7 +186,6 @@ serverRouter.get(
         return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
       }
 
-      // Check if user has access to this server
       const server = await ServersService.getServerWithServerMember(serverId, req.session.user.id);
       if (!server) {
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Server not found"));
