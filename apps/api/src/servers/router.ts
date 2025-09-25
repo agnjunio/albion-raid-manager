@@ -56,14 +56,17 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
       }
     }
     const servers = new Map<string, Server>();
+    const isBotInstalledMap = await ServersService.hasServersByIds(
+      discordServers.map((server) => server.id),
+      {
+        cache: req.context.cache,
+      },
+    );
 
     for (const server of discordServers) {
-      const isBotInstalled = await ServersService.getServerById(server.id, {
-        cache: req.context.cache,
-      });
       servers.set(server.id, {
         ...fromDiscordGuild(server),
-        bot: !!isBotInstalled,
+        bot: !!isBotInstalledMap.get(server.id),
       });
     }
 

@@ -93,6 +93,37 @@ export namespace ServersService {
     return server;
   }
 
+  export async function hasServersByIds(
+    serverIds: string[],
+    options: ServersServiceOptions = {},
+  ): Promise<Map<string, boolean>> {
+    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+    const cacheKey = CacheKeys.serversByIds(serverIds);
+
+    return withCache(
+      async () => {
+        const servers = await prisma.server.findMany({
+          where: { id: { in: serverIds } },
+          select: { id: true, active: true },
+        });
+
+        const hasServers = new Map<string, boolean>();
+        for (const serverId of serverIds) {
+          hasServers.set(
+            serverId,
+            servers.some((server) => server.id === serverId && server.active),
+          );
+        }
+        return hasServers;
+      },
+      {
+        cache,
+        key: cacheKey,
+        ttl: cacheTtl,
+      },
+    );
+  }
+
   export async function getServerById(serverId: string, options: ServersServiceOptions = {}): Promise<Server | null> {
     const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
     const cacheKey = CacheKeys.server(serverId);

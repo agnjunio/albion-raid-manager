@@ -22,6 +22,7 @@ export const CacheKeys = {
 
   // Server cache keys
   serversByUser: (userId: string, include?: string): string => `servers:user:${userId}${include ? `:${include}` : ""}`,
+  serversByIds: (serverIds: string[]): string => `servers:ids:${serverIds.sort().join(",")}`,
   server: (id: string, include?: string): string => `server:${id}${include ? `:${include}` : ""}`,
   serverMembers: (serverId: string): string => `server:${serverId}:members`,
   serverMember: (serverId: string, userId: string): string => `server:${serverId}:member:${userId}`,

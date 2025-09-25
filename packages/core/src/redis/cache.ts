@@ -25,6 +25,46 @@ export class RedisCache implements Cache {
     return `${this.defaultPrefix}:${key}`;
   }
 
+  private serialize<T>(value: T): string {
+    // Handle Map objects specially
+    if (value instanceof Map) {
+      const mapData = {
+        __type: "Map",
+        entries: Array.from(value.entries()),
+      };
+      return JSON.stringify(mapData);
+    }
+
+    // Handle Set objects specially
+    if (value instanceof Set) {
+      const setData = {
+        __type: "Set",
+        values: Array.from(value),
+      };
+      return JSON.stringify(setData);
+    }
+
+    // Use standard JSON.stringify for other types
+    return JSON.stringify(value);
+  }
+
+  private deserialize<T>(value: string): T {
+    const parsed = JSON.parse(value);
+
+    // Handle Map objects
+    if (parsed && typeof parsed === "object" && parsed.__type === "Map") {
+      return new Map(parsed.entries) as T;
+    }
+
+    // Handle Set objects
+    if (parsed && typeof parsed === "object" && parsed.__type === "Set") {
+      return new Set(parsed.values) as T;
+    }
+
+    // Return parsed object for other types
+    return parsed as T;
+  }
+
   async get<T>(key: string): Promise<T | null> {
     try {
       const fullKey = this.getKey(key);
@@ -34,7 +74,7 @@ export class RedisCache implements Cache {
         return null;
       }
 
-      return JSON.parse(value) as T;
+      return this.deserialize(value) as T;
     } catch (error) {
       logger.error("Failed to get value from cache:", { key, error });
       return null;
@@ -46,7 +86,7 @@ export class RedisCache implements Cache {
       const fullKey = this.getKey(key);
       const cacheTtl = ttl || this.defaultTtl;
 
-      await this.client.setEx(fullKey, cacheTtl, JSON.stringify(value));
+      await this.client.setEx(fullKey, cacheTtl, this.serialize(value));
     } catch (error) {
       logger.error("Failed to set value in cache:", { key, error });
     }
