@@ -55,6 +55,7 @@
     "description": "O Albion Raid Manager ajuda você a organizar e gerenciar as atividades da sua guilda, acompanhar a participação dos membros e agendar raids.",
     "noServers": "Nenhum servidor disponível",
     "createServer": "Criar Servidor",
+    "loadingServer": "Carregando servidor...",
     "sidebar": {
       "menu": "Menu",
       "backToDashboard": "Voltar ao painel",

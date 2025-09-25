@@ -9,11 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getCurrentLanguage } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
+import { useServerContext } from "../../context";
 import { CalendarView, useCalendar } from "../contexts/calendar-context";
 
 import { CreateRaidSheet } from "./create-raid-sheet";
 
 export function CalendarHeader() {
+  const { hasCallerPermission } = useServerContext();
   const { currentDate, view, isRefreshing, hotkeys, setCurrentDate, setView, refresh } = useCalendar();
   const { t } = useTranslation();
   const { serverId } = useParams<{ serverId: string }>();
@@ -168,12 +170,14 @@ export function CalendarHeader() {
 
         <HotkeysHelp hotkeys={hotkeys} />
 
-        <CreateRaidSheet>
-          <Button className="h-8 gap-1 px-3 text-sm font-normal">
-            <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("calendar.navigation.newRaid")}</span>
-          </Button>
-        </CreateRaidSheet>
+        {hasCallerPermission && (
+          <CreateRaidSheet>
+            <Button className="h-8 gap-1 px-3 text-sm font-normal">
+              <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("calendar.navigation.newRaid")}</span>
+            </Button>
+          </CreateRaidSheet>
+        )}
       </div>
     </div>
   );

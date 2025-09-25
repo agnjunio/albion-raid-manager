@@ -55,6 +55,7 @@
     "description": "Albion Raid Manager helps you organize and manage your guild activities, track member participation, and schedule raids.",
     "noServers": "No servers available",
     "createServer": "Create Server",
+    "loadingServer": "Loading server...",
     "sidebar": {
       "menu": "Menu",
       "backToDashboard": "Back to dashboard",
