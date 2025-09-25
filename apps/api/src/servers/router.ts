@@ -141,29 +141,9 @@ serverRouter.get(
   isServerMember,
   async (req: Request, res: Response<APIResponse.Type<GetServer.Response>>) => {
     try {
-      const { serverId } = req.params;
-      const dbServer = req.context.server;
-      if (!dbServer) {
+      const server = req.context.server;
+      if (!server) {
         return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND));
-      }
-
-      let server = dbServer;
-      if (req.session.accessToken) {
-        try {
-          const discordServer = await DiscordService.getGuild(serverId, {
-            type: "user",
-            token: req.session.accessToken,
-          });
-
-          if (discordServer) {
-            server = {
-              ...dbServer,
-              ...fromDiscordGuild(discordServer),
-            };
-          }
-        } catch (error) {
-          logger.warn("Failed to enrich server with Discord data", { error, serverId });
-        }
       }
 
       res.json(APIResponse.Success({ server }));

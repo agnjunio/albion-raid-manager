@@ -31,9 +31,11 @@ export class CacheInvalidation {
       CacheKeys.serverMembers(serverId),
       CacheKeys.serverConfig(serverId),
       CacheKeys.usersByServer(serverId),
+      CacheKeys.raidsByServer(serverId),
+      CacheKeys.buildsByServer(serverId),
     ];
 
-    const patterns = [`server:${serverId}:*`, `raids:server:${serverId}*`, `builds:server:${serverId}*`];
+    const patterns = [`server:${serverId}:*`, `raids:server:${serverId}:*`, `builds:server:${serverId}:*`];
 
     await Promise.all([
       ...specificKeys.map((key) => cache.delete(key)),
@@ -52,7 +54,8 @@ export class CacheInvalidation {
 
     // If serverId is provided, also invalidate server-specific raid caches
     if (serverId) {
-      operations.push(cache.deletePattern(CacheKeys.raidsByServer(serverId, "*")));
+      operations.push(cache.delete(CacheKeys.raidsByServer(serverId)));
+      operations.push(cache.deletePattern(`raids:server:${serverId}:*`));
     }
 
     await Promise.all(operations);
@@ -64,7 +67,8 @@ export class CacheInvalidation {
    * @param serverId - Server ID to invalidate raids for
    */
   static async invalidateServerRaids(cache: Cache, serverId: string): Promise<void> {
-    await cache.deletePattern(CacheKeys.raidsByServer(serverId, "*"));
+    await cache.delete(CacheKeys.raidsByServer(serverId));
+    await cache.deletePattern(`raids:server:${serverId}:*`);
   }
 
   /**
@@ -99,6 +103,7 @@ export class CacheInvalidation {
    * @param serverId - Server ID to invalidate builds for
    */
   static async invalidateServerBuilds(cache: Cache, serverId: string): Promise<void> {
-    await cache.deletePattern(CacheKeys.buildsByServer(serverId, "*"));
+    await cache.delete(CacheKeys.buildsByServer(serverId));
+    await cache.deletePattern(`builds:server:${serverId}:*`);
   }
 }

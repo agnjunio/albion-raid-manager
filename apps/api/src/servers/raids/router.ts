@@ -79,9 +79,7 @@ serverRaidsRouter.get(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID is required");
     }
 
-    const raids = await RaidService.findRaidsByServer(serverId, filters, {
-      cache: req.context.cache,
-    });
+    const raids = await RaidService.findRaidsByServer(serverId, filters);
 
     res.json(APIResponse.Success({ raids }));
   },
@@ -97,15 +95,9 @@ serverRaidsRouter.get(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
     }
 
-    const raid = await RaidService.findRaidById(
-      raidId,
-      {
-        slots: Boolean(slots),
-      },
-      {
-        cache: req.context.cache,
-      },
-    );
+    const raid = await RaidService.findRaidById(raidId, {
+      slots: Boolean(slots),
+    });
 
     if (!raid) {
       return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Raid not found"));

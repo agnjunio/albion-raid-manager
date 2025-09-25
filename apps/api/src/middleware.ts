@@ -34,6 +34,11 @@ export const isAuthenticated = async (req: Request, res: Response<APIResponse.Ty
  * Middleware that validates server membership and sets server context
  */
 export const isServerMember = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.context.server) {
+    next();
+    return;
+  }
+
   const { serverId } = req.params;
   if (!serverId) {
     return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID is required"));
@@ -48,7 +53,7 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
       .json(APIResponse.Error(APIErrorType.BOT_NOT_INSTALLED, "Bot is not installed on this server"));
   }
 
-  if (!req.session?.user?.id) {
+  if (!req.session?.user?.id || !req.session.accessToken) {
     return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "User not authenticated"));
   }
 
@@ -67,6 +72,11 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
     admin: hasAdminPermission,
     caller: hasCallerPermission,
   };
+
+  if (req.context.member) {
+    next();
+    return;
+  }
 
   let discordMember;
   try {
