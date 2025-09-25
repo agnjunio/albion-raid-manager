@@ -17,7 +17,9 @@ export const isAuthenticated = async (req: Request, res: Response<APIResponse.Ty
   }
 
   if (!req.session.user) {
-    const user = await UsersService.ensureUserWithAccessToken(req.session.accessToken);
+    const user = await UsersService.ensureUserWithAccessToken(req.session.accessToken, {
+      cache: req.context.cache,
+    });
     if (!user) {
       return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));
     }
@@ -37,7 +39,9 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
     return res.status(400).json(APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID is required"));
   }
 
-  const server = await ServersService.getServerById(serverId);
+  const server = await ServersService.getServerById(serverId, {
+    cache: req.context.cache,
+  });
   if (!server) {
     return res
       .status(404)
@@ -50,8 +54,12 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
 
   const userId = req.session.user.id;
   const [hasAdminPermission, hasCallerPermission] = await Promise.all([
-    PermissionsService.hasRole(serverId, userId, "admin"),
-    PermissionsService.hasRole(serverId, userId, "caller"),
+    PermissionsService.hasRole(serverId, userId, "admin", {
+      cache: req.context.cache,
+    }),
+    PermissionsService.hasRole(serverId, userId, "caller", {
+      cache: req.context.cache,
+    }),
   ]);
 
   req.context.server = {
@@ -99,7 +107,9 @@ export const hasAdminPermission = async (req: Request, res: Response, next: Next
     return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "User not authenticated"));
   }
 
-  const hasAdminPermission = await PermissionsService.hasRole(server.id, member.userId, "admin");
+  const hasAdminPermission = await PermissionsService.hasRole(server.id, member.userId, "admin", {
+    cache: req.context.cache,
+  });
   if (!hasAdminPermission) {
     return res
       .status(403)
@@ -123,7 +133,9 @@ export const hasCallerPermission = async (req: Request, res: Response, next: Nex
     return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "User not authenticated"));
   }
 
-  const hasCallerPermission = await PermissionsService.hasRole(server.id, member.userId, "caller");
+  const hasCallerPermission = await PermissionsService.hasRole(server.id, member.userId, "caller", {
+    cache: req.context.cache,
+  });
   if (hasCallerPermission) {
     return res
       .status(403)

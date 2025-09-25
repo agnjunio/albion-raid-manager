@@ -1,5 +1,7 @@
 import type { Cache } from "@albion-raid-manager/core/redis";
 
+import { logger } from "@albion-raid-manager/core/logger";
+
 import { memoize } from "../memory";
 
 export interface CacheOptions {
@@ -42,6 +44,7 @@ export async function withCache<T>(queryFn: () => Promise<T>, options: CacheOpti
   // Try to get from cache first
   const cached = await cache.get<T>(key);
   if (cached !== null) {
+    logger.debug(`Cache hit: ${key}`);
     return cached;
   }
 

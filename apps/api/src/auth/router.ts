@@ -16,7 +16,9 @@ authRouter.get("/me", isAuthenticated, async (req: Request, res: Response<APIRes
       throw new Error("No access token available");
     }
 
-    const user = await UsersService.ensureUserWithAccessToken(req.session.accessToken);
+    const user = await UsersService.ensureUserWithAccessToken(req.session.accessToken, {
+      cache: req.context.cache,
+    });
 
     if (!user) {
       throw new Error("Failed to ensure user exists");
@@ -36,7 +38,9 @@ authRouter.get("/me", isAuthenticated, async (req: Request, res: Response<APIRes
 
     if (req.session.refreshToken) {
       try {
-        const { access_token, refresh_token } = await UsersService.refreshDiscordToken(req.session.refreshToken);
+        const { access_token, refresh_token } = await UsersService.refreshDiscordToken(req.session.refreshToken, {
+          cache: req.context.cache,
+        });
         req.session.accessToken = access_token;
         req.session.refreshToken = refresh_token;
         await get();
@@ -60,9 +64,13 @@ authRouter.get("/me", isAuthenticated, async (req: Request, res: Response<APIRes
 authRouter.post("/callback", async (req: Request, res: Response<APIResponse.Type>) => {
   try {
     const { code, redirectUri } = discordCallbackSchema.parse(req.body);
-    const { access_token, refresh_token } = await UsersService.exchangeDiscordCode(code, redirectUri);
+    const { access_token, refresh_token } = await UsersService.exchangeDiscordCode(code, redirectUri, {
+      cache: req.context.cache,
+    });
 
-    const user = await UsersService.ensureUserWithAccessToken(access_token);
+    const user = await UsersService.ensureUserWithAccessToken(access_token, {
+      cache: req.context.cache,
+    });
 
     if (!user) {
       return res.status(401).json(APIResponse.Error(APIErrorType.AUTHENTICATION_FAILED));

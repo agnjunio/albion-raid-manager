@@ -58,7 +58,9 @@ serverRouter.get("/", async (req: Request, res: Response<APIResponse.Type<GetSer
     const servers = new Map<string, Server>();
 
     for (const server of discordServers) {
-      const isBotInstalled = await ServersService.getServerById(server.id);
+      const isBotInstalled = await ServersService.getServerById(server.id, {
+        cache: req.context.cache,
+      });
       servers.set(server.id, {
         ...fromDiscordGuild(server),
         bot: !!isBotInstalled,
@@ -99,7 +101,9 @@ serverRouter.post(
         tries++;
 
         try {
-          verifiedServer = await ServersService.ensureServerWithAccessToken(serverId, req.session.accessToken);
+          verifiedServer = await ServersService.ensureServerWithAccessToken(serverId, req.session.accessToken, {
+            cache: req.context.cache,
+          });
         } catch {
           continue;
         }
@@ -117,7 +121,9 @@ serverRouter.post(
           );
       }
 
-      await ServersService.ensureServerMember(verifiedServer.id, req.session.user.id);
+      await ServersService.ensureServerMember(verifiedServer.id, req.session.user.id, undefined, {
+        cache: req.context.cache,
+      });
 
       res.json(APIResponse.Success({ server: verifiedServer }));
     } catch (error) {
@@ -172,8 +178,12 @@ serverRouter.get(
     try {
       const { serverId } = req.params;
 
-      const discordMembers = await ServersService.getDiscordGuildMembers(serverId);
-      const registeredMembers = await ServersService.getServerMembers(serverId);
+      const discordMembers = await ServersService.getDiscordGuildMembers(serverId, {
+        cache: req.context.cache,
+      });
+      const registeredMembers = await ServersService.getServerMembers(serverId, {
+        cache: req.context.cache,
+      });
       const registeredMembersMap = new Map(registeredMembers.map((member) => [member.userId, member]));
 
       const members: APIServerMember[] = discordMembers
@@ -249,18 +259,24 @@ serverRouter.put("/:serverId/settings", isServerMember, hasAdminPermission, asyn
     if (!req.session.user) {
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
-    await ServersService.updateServer(serverId, {
-      name,
-      icon,
-      auditChannelId,
-      adminRoles,
-      callerRoles,
-      raidAnnouncementChannelId,
-      serverGuildId,
-      memberRoleId,
-      friendRoleId,
-      language,
-    });
+    await ServersService.updateServer(
+      serverId,
+      {
+        name,
+        icon,
+        auditChannelId,
+        adminRoles,
+        callerRoles,
+        raidAnnouncementChannelId,
+        serverGuildId,
+        memberRoleId,
+        friendRoleId,
+        language,
+      },
+      {
+        cache: req.context.cache,
+      },
+    );
 
     res.json(APIResponse.Success({ message: "Server settings updated successfully" }));
   } catch (error) {
@@ -276,7 +292,9 @@ serverRouter.get(
     try {
       const { serverId } = req.params;
 
-      const discordChannels = await ServersService.getDiscordGuildChannels(serverId);
+      const discordChannels = await ServersService.getDiscordGuildChannels(serverId, {
+        cache: req.context.cache,
+      });
 
       const channels: Channel[] = fromDiscordChannels(discordChannels);
 
@@ -299,7 +317,9 @@ serverRouter.get(
     try {
       const { serverId } = req.params;
 
-      const discordRoles = await ServersService.getDiscordGuildRoles(serverId);
+      const discordRoles = await ServersService.getDiscordGuildRoles(serverId, {
+        cache: req.context.cache,
+      });
 
       const roles: Role[] = fromDiscordRoles(discordRoles);
 

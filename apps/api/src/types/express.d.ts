@@ -1,3 +1,5 @@
+import type { Cache } from "@albion-raid-manager/core/redis";
+
 import { Server, ServerMember } from "@albion-raid-manager/types/entities";
 
 declare global {
@@ -6,6 +8,7 @@ declare global {
       context: {
         server?: Server;
         member?: ServerMember;
+        cache?: Cache;
       };
     }
   }
