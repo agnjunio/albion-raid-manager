@@ -8,9 +8,10 @@ import { Channel } from "./server-channels";
 import { Role } from "./server-roles";
 
 export type Server = DBServer & {
+  bot?: boolean;
   owner?: boolean;
   admin?: boolean;
-  bot?: boolean;
+  caller?: boolean;
   channels?: Channel[];
   roles?: Role[];
 };

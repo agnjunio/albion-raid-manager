@@ -27,7 +27,7 @@ import { isAxiosError } from "axios";
 import { APIGuild } from "discord-api-types/v10";
 import { Request, Response, Router } from "express";
 
-import { isAuthenticated, isServerMember } from "@/middleware";
+import { hasAdminPermission, isAuthenticated, isServerMember } from "@/middleware";
 import { validateRequest } from "@/request";
 
 import { serverRaidsRouter } from "./raids/router";
@@ -229,7 +229,7 @@ serverRouter.get(
   },
 );
 
-serverRouter.put("/:serverId/settings", isServerMember, async (req: Request, res: Response) => {
+serverRouter.put("/:serverId/settings", isServerMember, hasAdminPermission, async (req: Request, res: Response) => {
   try {
     const { serverId } = req.params;
 
@@ -249,7 +249,7 @@ serverRouter.put("/:serverId/settings", isServerMember, async (req: Request, res
     if (!req.session.user) {
       return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED));
     }
-    await ServersService.updateServer(serverId, req.session.user.id, {
+    await ServersService.updateServer(serverId, {
       name,
       icon,
       auditChannelId,

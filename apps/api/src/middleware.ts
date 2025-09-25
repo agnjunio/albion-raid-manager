@@ -44,13 +44,21 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
       .json(APIResponse.Error(APIErrorType.BOT_NOT_INSTALLED, "Bot is not installed on this server"));
   }
 
-  req.context.server = server;
-
   if (!req.session?.user?.id) {
     return res.status(401).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "User not authenticated"));
   }
 
   const userId = req.session.user.id;
+  const [hasAdminPermission, hasCallerPermission] = await Promise.all([
+    PermissionsService.hasRole(serverId, userId, "admin"),
+    PermissionsService.hasRole(serverId, userId, "caller"),
+  ]);
+
+  req.context.server = {
+    ...server,
+    admin: hasAdminPermission,
+    caller: hasCallerPermission,
+  };
 
   let discordMember;
   try {
@@ -61,10 +69,12 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
     if (!discordMember) {
       return res
         .status(403)
-        .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You are not a member of this server"));
+        .json(APIResponse.Error(APIErrorType.NOT_SERVER_MEMBER, "You are not a member of this server"));
     }
   } catch {
-    return res.status(403).json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You are not a member of this server"));
+    return res
+      .status(403)
+      .json(APIResponse.Error(APIErrorType.NOT_SERVER_MEMBER, "You are not a member of this server"));
   }
 
   const member = await ServersService.ensureServerMember(serverId, userId);
@@ -114,7 +124,7 @@ export const hasCallerPermission = async (req: Request, res: Response, next: Nex
   }
 
   const hasCallerPermission = await PermissionsService.hasRole(server.id, member.userId, "caller");
-  if (!hasCallerPermission) {
+  if (hasCallerPermission) {
     return res
       .status(403)
       .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You do not have the caller permission."));

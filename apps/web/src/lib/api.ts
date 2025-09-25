@@ -17,6 +17,13 @@ function redirectToDashboard() {
   }
 }
 
+// Shared function to handle specific error types that require dashboard redirection
+function handleAPIErrorType(apiErrorType: APIErrorType) {
+  if (apiErrorType === APIErrorType.NOT_SERVER_MEMBER || apiErrorType === APIErrorType.BOT_NOT_INSTALLED) {
+    redirectToDashboard();
+  }
+}
+
 // Internal client - not exported
 export const apiClient = axios.create({
   baseURL,
@@ -35,19 +42,10 @@ apiClient.interceptors.response.use(
       window.location.href = "/";
     }
 
-    // Handle 403 Forbidden errors with NOT_AUTHORIZED type
-    if (error.response?.status === 403) {
-      const responseData = error.response.data as APIResponse.Error;
-      if (responseData?.type === APIErrorType.NOT_AUTHORIZED) {
-        redirectToDashboard();
-      }
-    }
-
-    // Handle 404 Not Found errors with BOT_NOT_INSTALLED type
-    if (error.response?.status === 404) {
-      const responseData = error.response.data as APIResponse.Error;
-      if (responseData?.type === APIErrorType.BOT_NOT_INSTALLED) {
-        redirectToDashboard();
+    if ([403, 404].includes(error.response?.status || 0)) {
+      const responseData = error.response?.data as APIResponse.Error;
+      if (responseData?.type) {
+        handleAPIErrorType(responseData.type);
       }
     }
 
@@ -62,14 +60,7 @@ export const apiRTKRequest: BaseQueryFn<AxiosRequestConfig> = async (args) => {
     const data = response.data as APIResponse.Type<unknown>;
 
     if (APIResponse.isError(data)) {
-      // Handle NOT_AUTHORIZED errors from RTK Query
-      if (data.type === APIErrorType.NOT_AUTHORIZED) {
-        redirectToDashboard();
-      }
-      // Handle BOT_NOT_INSTALLED errors from RTK Query
-      if (data.type === APIErrorType.BOT_NOT_INSTALLED) {
-        redirectToDashboard();
-      }
+      handleAPIErrorType(data.type);
       throw new Error(data.type);
     }
 

@@ -28,8 +28,8 @@ import {
 } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
-import { isAuthenticated, isServerMember } from "@/middleware";
-import { getUserIdFromRequest, validateRequest } from "@/request";
+import { hasCallerPermission, isAuthenticated, isServerMember } from "@/middleware";
+import { validateRequest } from "@/request";
 
 import { getRaidEventPublisher } from "./redis";
 
@@ -40,6 +40,7 @@ serverRaidsRouter.use(isServerMember);
 
 serverRaidsRouter.post(
   "/",
+  hasCallerPermission,
   validateRequest({ body: createRaidBodySchema }),
   async (
     req: Request<CreateRaid.Params, {}, CreateRaid.Body>,
@@ -59,7 +60,6 @@ serverRaidsRouter.post(
         maxPlayers,
       },
       {
-        userId: getUserIdFromRequest(req),
         publisher: await getRaidEventPublisher(),
       },
     );
@@ -108,6 +108,7 @@ serverRaidsRouter.get(
 
 serverRaidsRouter.put(
   "/:raidId",
+  hasCallerPermission,
   async (
     req: Request<UpdateRaid.Params, {}, UpdateRaid.Body>,
     res: Response<APIResponse.Type<UpdateRaid.Response>>,
@@ -120,7 +121,6 @@ serverRaidsRouter.put(
 
     const updates = req.body as UpdateRaidInput;
     const raid = await RaidService.updateRaid(raidId, updates, {
-      userId: getUserIdFromRequest(req),
       publisher: await getRaidEventPublisher(),
     });
 
@@ -128,23 +128,27 @@ serverRaidsRouter.put(
   },
 );
 
-serverRaidsRouter.delete("/:raidId", async (req: Request<{ serverId: string; raidId: string }>, res: Response) => {
-  const { serverId, raidId } = req.params;
+serverRaidsRouter.delete(
+  "/:raidId",
+  hasCallerPermission,
+  async (req: Request<{ serverId: string; raidId: string }>, res: Response) => {
+    const { serverId, raidId } = req.params;
 
-  if (!serverId || !raidId) {
-    throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
-  }
+    if (!serverId || !raidId) {
+      throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
+    }
 
-  await RaidService.deleteRaid(raidId, {
-    userId: getUserIdFromRequest(req),
-    publisher: await getRaidEventPublisher(),
-  });
+    await RaidService.deleteRaid(raidId, {
+      publisher: await getRaidEventPublisher(),
+    });
 
-  res.json(APIResponse.Success({ message: "Raid deleted successfully" }));
-});
+    res.json(APIResponse.Success({ message: "Raid deleted successfully" }));
+  },
+);
 
 serverRaidsRouter.post(
   "/:raidId/slots",
+  hasCallerPermission,
   validateRequest({ body: raidSlotSchema }),
   async (
     req: Request<CreateRaidSlot.Params, {}, CreateRaidSlot.Body>,
@@ -165,7 +169,6 @@ serverRaidsRouter.post(
           weapon: weapon ?? undefined,
         },
         {
-          userId: getUserIdFromRequest(req),
           publisher: await getRaidEventPublisher(),
         },
       );
@@ -180,6 +183,7 @@ serverRaidsRouter.post(
 
 serverRaidsRouter.put(
   "/:raidId/slots/:slotId",
+  hasCallerPermission,
   async (
     req: Request<UpdateRaidSlot.Params, {}, RaidSlot>,
     res: Response<APIResponse.Type<UpdateRaidSlot.Response>>,
@@ -189,7 +193,6 @@ serverRaidsRouter.put(
 
     try {
       const raidSlot = await RaidService.updateRaidSlot(slotId, updates, {
-        userId: getUserIdFromRequest(req),
         publisher: await getRaidEventPublisher(),
       });
       res.json(APIResponse.Success({ raidSlot }));
@@ -202,12 +205,12 @@ serverRaidsRouter.put(
 
 serverRaidsRouter.delete(
   "/:raidId/slots/:slotId",
+  hasCallerPermission,
   async (req: Request<DeleteRaidSlot.Params>, res: Response<APIResponse.Type<DeleteRaidSlot.Response>>) => {
     const { slotId } = req.params;
 
     try {
       await RaidService.deleteRaidSlot(slotId, {
-        userId: getUserIdFromRequest(req),
         publisher: await getRaidEventPublisher(),
       });
       res.json(APIResponse.Success({ message: "Slot deleted successfully" }));
@@ -220,6 +223,7 @@ serverRaidsRouter.delete(
 
 serverRaidsRouter.post(
   "/:raidId/import",
+  hasCallerPermission,
   validateRequest({ body: raidConfigurationSchema }),
   async (
     req: Request<ImportRaidConfiguration.Params, {}, ImportRaidConfiguration.Body>,
@@ -262,6 +266,7 @@ serverRaidsRouter.post(
 
 serverRaidsRouter.put(
   "/:raidId/reorder",
+  hasCallerPermission,
   validateRequest({ body: reorderRaidSlotsSchema }),
   async (
     req: Request<ReorderRaidSlots.Params, {}, ReorderRaidSlots.Body>,
@@ -276,7 +281,6 @@ serverRaidsRouter.put(
 
     try {
       const raid = await RaidService.reorderSlots(raidId, slotIds, {
-        userId: getUserIdFromRequest(req),
         publisher: await getRaidEventPublisher(),
       });
 
