@@ -136,7 +136,7 @@ export const hasCallerPermission = async (req: Request, res: Response, next: Nex
   const hasCallerPermission = await PermissionsService.hasRole(server.id, member.userId, "caller", {
     cache: req.context.cache,
   });
-  if (hasCallerPermission) {
+  if (!hasCallerPermission) {
     return res
       .status(403)
       .json(APIResponse.Error(APIErrorType.NOT_AUTHORIZED, "You do not have the caller permission."));

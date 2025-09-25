@@ -15,7 +15,7 @@ export class RedisCache implements Cache {
   private defaultTtl: number;
   private defaultPrefix: string;
 
-  constructor(client: RedisClientType, defaultTtl = 300, defaultPrefix = "albion") {
+  constructor(client: RedisClientType, defaultTtl = 300, defaultPrefix = "albion-raid-manager") {
     this.client = client;
     this.defaultTtl = defaultTtl;
     this.defaultPrefix = defaultPrefix;
