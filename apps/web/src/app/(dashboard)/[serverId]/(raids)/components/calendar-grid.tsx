@@ -23,6 +23,8 @@ import { getShortWeekdayName } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 import { useUpdateRaidMutation } from "@/store/raids";
 
+import { useServerContext } from "../../context";
+
 import { RaidEventCard } from "./raid-event-card";
 
 export function CalendarGrid() {
@@ -117,6 +119,7 @@ interface CalendarGridTimeSlotProps {
 }
 
 function CalendarGridTimeSlot({ date, hour }: CalendarGridTimeSlotProps) {
+  const { hasCallerPermission } = useServerContext();
   const { handleTimeSlotClick } = useCalendar();
   const { t } = useTranslation();
   const { raids, isRaidFiltered } = useCalendar();
@@ -159,7 +162,7 @@ function CalendarGridTimeSlot({ date, hour }: CalendarGridTimeSlotProps) {
             className={isRaidFiltered(raid) ? "opacity-30" : ""}
           />
         ))}
-        {timeSlotRaids.length === 0 && (
+        {timeSlotRaids.length === 0 && hasCallerPermission && (
           <div className="text-muted-foreground/50 text-xs opacity-0 transition-opacity group-hover:opacity-100">
             {t("calendar.grid.clickToCreateRaid")}
           </div>

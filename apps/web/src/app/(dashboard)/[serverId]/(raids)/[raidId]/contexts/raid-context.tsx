@@ -20,6 +20,8 @@ import {
 } from "@/store/raids";
 import { useGetServerMembersQuery } from "@/store/servers";
 
+import { useServerContext } from "../../../context";
+
 interface RaidContextValue {
   raid: Raid | undefined;
   isLoading: boolean;
@@ -55,6 +57,7 @@ interface RaidProviderProps {
 }
 
 export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) {
+  const { hasCallerPermission } = useServerContext();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [updateRaid] = useUpdateRaidMutation();
@@ -99,7 +102,7 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
   // Get raid data - will be undefined during loading or on error
   const raid = raidData?.raid;
 
-  const canManageRaid = true; // TODO: Use the permission system to determine if the user has permission to edit raid
+  const canManageRaid = hasCallerPermission;
   const isFlexRaid = raid?.type === "FLEX";
   const currentSlotCount = raid?.slots?.length || 0;
   const maxSlots = raid?.maxPlayers || 0;

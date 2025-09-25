@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next";
 
 import { createCalendarHotkeys, useHotkeys } from "@/hooks/use-hotkeys";
 
+import { useServerContext } from "../../context";
+
 export enum CalendarView {
   DAY = "day",
   WEEK = "week",
@@ -59,6 +61,7 @@ interface CalendarProviderProps {
 
 export function CalendarProvider({ children, raids, onRefresh, isRefreshing = false }: CalendarProviderProps) {
   const { t } = useTranslation();
+  const { hasCallerPermission } = useServerContext();
 
   // State
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -119,6 +122,10 @@ export function CalendarProvider({ children, raids, onRefresh, isRefreshing = fa
   };
 
   const handleTimeSlotClick = (date: Date, hour: number) => {
+    if (!hasCallerPermission) {
+      return;
+    }
+
     const dateTime = new Date(date);
     dateTime.setHours(hour, 0, 0, 0);
     setSelectedTimeSlot(dateTime);

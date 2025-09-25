@@ -42,13 +42,15 @@ function CalendarPageContent() {
 
         {/* Calendar Grid with Create Raid Sidebar */}
         <div className="flex-1">
-          <CreateRaidSheet selectedDateTime={selectedTimeSlot}>
-            <div className="h-full">
-              <CalendarGrid />
-            </div>
-          </CreateRaidSheet>
+          <div className="h-full">
+            <CalendarGrid />
+          </div>
         </div>
       </div>
+
+      <CreateRaidSheet selectedDateTime={selectedTimeSlot}>
+        <div className="hidden" />
+      </CreateRaidSheet>
     </div>
   );
 }

@@ -69,6 +69,7 @@ export function CreateRaidSheet({ children, selectedDateTime }: CreateRaidSheetP
   React.useEffect(() => {
     if (selectedDateTime) {
       form.setValue("date", selectedDateTime);
+      setIsOpen(true);
     }
   }, [selectedDateTime, form]);
 
