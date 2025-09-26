@@ -25,8 +25,16 @@ import { downloadRaidConfiguration, exportRaidConfiguration } from "./utils/raid
 export function RaidPage() {
   const { serverId } = useParams();
   const { t } = useTranslation();
-  const { raid, isLoading, error, handleCopyRaidLink, handleDeleteRaid, handleUpdateRaid, canManageRaid } =
-    useRaidContext();
+  const {
+    raid,
+    isLoading,
+    error,
+    handleCopyRaidLink,
+    handleDeleteRaid,
+    handleUpdateRaid,
+    canManageRaid,
+    canDeleteRaid,
+  } = useRaidContext();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -92,7 +100,7 @@ export function RaidPage() {
                   <FontAwesomeIcon icon={faDownload} className="mr-2 h-4 w-4" />
                   {t("raids.details.exportConfig")}
                 </Button>
-                {canManageRaid && (
+                {canDeleteRaid && (
                   <Button
                     onClick={handleDeleteRaid}
                     variant="destructive"

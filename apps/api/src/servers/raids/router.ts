@@ -28,7 +28,7 @@ import {
 } from "@albion-raid-manager/types/services";
 import { Request, Response, Router } from "express";
 
-import { hasCallerPermission, isAuthenticated, isServerMember } from "@/middleware";
+import { hasAdminPermission, hasCallerPermission, isAuthenticated, isServerMember } from "@/middleware";
 import { validateRequest } from "@/request";
 
 import { getRaidEventPublisher } from "./redis";
@@ -140,7 +140,7 @@ serverRaidsRouter.put(
 
 serverRaidsRouter.delete(
   "/:raidId",
-  hasCallerPermission,
+  hasAdminPermission,
   async (req: Request<{ serverId: string; raidId: string }>, res: Response) => {
     const { serverId, raidId } = req.params;
 

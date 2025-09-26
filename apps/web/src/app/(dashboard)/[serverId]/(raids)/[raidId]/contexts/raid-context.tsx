@@ -40,6 +40,7 @@ interface RaidContextValue {
   handleUpdateRaidStatus: (status: RaidStatus) => void;
   handleUpdateRaid: (updates: { title?: string; description?: string; date?: Date; location?: string }) => void;
   canManageRaid: boolean;
+  canDeleteRaid: boolean;
   isFlexRaid: boolean;
   currentSlotCount: number;
   maxSlots: number;
@@ -57,7 +58,7 @@ interface RaidProviderProps {
 }
 
 export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) {
-  const { hasCallerPermission } = useServerContext();
+  const { hasAdminPermission, hasCallerPermission } = useServerContext();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [updateRaid] = useUpdateRaidMutation();
@@ -103,6 +104,7 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
   const raid = raidData?.raid;
 
   const canManageRaid = hasCallerPermission;
+  const canDeleteRaid = hasAdminPermission;
   const isFlexRaid = raid?.type === "FLEX";
   const currentSlotCount = raid?.slots?.length || 0;
   const maxSlots = raid?.maxPlayers || 0;
@@ -341,6 +343,7 @@ export function RaidProvider({ children, serverId, raidId }: RaidProviderProps) 
     handleUpdateRaidStatus,
     handleUpdateRaid,
     canManageRaid,
+    canDeleteRaid,
     isFlexRaid,
     currentSlotCount,
     maxSlots,
