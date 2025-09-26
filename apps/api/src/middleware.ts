@@ -95,7 +95,9 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
       .json(APIResponse.Error(APIErrorType.NOT_SERVER_MEMBER, "You are not a member of this server"));
   }
 
-  const member = await ServersService.ensureServerMember(serverId, userId);
+  const member = await ServersService.ensureServerMember(serverId, userId, undefined, {
+    cache: req.context.cache,
+  });
   if (member) {
     req.context.member = fromDiscordMember(discordMember, member);
   }
