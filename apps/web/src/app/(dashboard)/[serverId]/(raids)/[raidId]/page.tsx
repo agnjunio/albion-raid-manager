@@ -62,7 +62,7 @@ export function RaidPage() {
   };
 
   return (
-    <Page className="items-center pb-20">
+    <Page className="dark:bg-background/90 items-center pb-20">
       <div className="flex max-w-7xl flex-col gap-6">
         {/* Raid Header with integrated back button */}
         <Card>

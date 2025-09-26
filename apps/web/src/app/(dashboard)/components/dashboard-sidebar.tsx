@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { APIServer } from "@albion-raid-manager/types/api";
+import { Server } from "@albion-raid-manager/types/entities";
 import {
   faArrowRightFromBracket,
   faCheck,
@@ -39,21 +39,24 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { getServerPictureUrl, getUserPictureUrl } from "@/lib/discord-utils";
-import { useMenu } from "@/lib/menu";
 import { cn } from "@/lib/utils";
 import { useGetServersQuery } from "@/store/servers";
+
+import { useServerContext } from "../[serverId]/context";
+import { useMenu } from "../contexts/menu-context";
 
 export function DashboardSidebar() {
   const { serverId } = useParams<{ serverId: string }>();
   const { data, isLoading } = useGetServersQuery();
   const { t } = useTranslation();
-  const navigation = useMenu();
+  const { hasAdminPermission } = useServerContext();
+  const navigation = useMenu(hasAdminPermission);
 
   const servers = useMemo(() => data?.servers.filter((server) => server.bot), [data]);
   const selectedServer = useMemo(() => servers?.find((server) => server.id === serverId), [servers, serverId]);
 
   return (
-    <Sidebar collapsible="icon" variant="sidebar">
+    <Sidebar collapsible="icon" variant="sidebar" className="dark:bg-background/80">
       <SidebarHeader>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -120,7 +123,7 @@ export function DashboardSidebar() {
 }
 
 interface ServerInfoProps {
-  server?: APIServer;
+  server?: Server;
   icon?: IconDefinition;
   isLoading?: boolean;
 }
@@ -138,7 +141,7 @@ export function ServerInfo({ server, icon, isLoading }: ServerInfoProps) {
       );
     }
 
-    if (server?.admin && !server.owner) {
+    if (server?.admin && !server?.owner) {
       return (
         <Badge variant="outline" size="xs">
           <FontAwesomeIcon icon={faShield} className="text-secondary mr-1 size-3" />

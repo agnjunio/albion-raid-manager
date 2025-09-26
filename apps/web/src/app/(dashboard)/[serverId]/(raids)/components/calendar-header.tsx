@@ -15,7 +15,7 @@ import { CalendarView, useCalendar } from "../contexts/calendar-context";
 import { CreateRaidSheet } from "./create-raid-sheet";
 
 export function CalendarHeader() {
-  const { hasCallerPermission } = useServerContext();
+  const { hasAdminPermission, hasCallerPermission } = useServerContext();
   const { currentDate, view, isRefreshing, hotkeys, setCurrentDate, setView, refresh } = useCalendar();
   const { t } = useTranslation();
   const { serverId } = useParams<{ serverId: string }>();
@@ -162,11 +162,13 @@ export function CalendarHeader() {
           <FontAwesomeIcon icon={faRefresh} className={cn("h-4 w-4", isRefreshing && "animate-spin")} />
         </Button>
 
-        <Link to={`/dashboard/${serverId}/settings/raids`} tabIndex={-1}>
-          <Button variant="ghost" size="icon" className="hover:bg-muted hidden h-8 w-8 lg:flex">
-            <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
-          </Button>
-        </Link>
+        {hasAdminPermission && (
+          <Link to={`/dashboard/${serverId}/settings/raids`} tabIndex={-1}>
+            <Button variant="ghost" size="icon" className="hover:bg-muted hidden h-8 w-8 lg:flex">
+              <FontAwesomeIcon icon={faCog} className="h-4 w-4" />
+            </Button>
+          </Link>
+        )}
 
         <HotkeysHelp hotkeys={hotkeys} />
 

@@ -1,6 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+
+import { useServerContext } from "../context";
 
 import { SettingsPageHeader } from "./components/settings-page-header";
 import { SettingsSidebar } from "./components/settings-sidebar";
@@ -11,7 +13,13 @@ import { getSettingsPageInfo } from "./utils/page-info";
 function SettingsLayoutContent() {
   const location = useLocation();
   const { t } = useTranslation();
+  const { hasAdminPermission } = useServerContext();
   const { saveServerSettings, resetForm, isSaving, hasUnsavedChanges } = useServerSettings();
+
+  // Redirect users without admin permissions to raids page
+  if (!hasAdminPermission) {
+    return <Navigate to="../raids" replace />;
+  }
 
   // Get current page from pathname
   const currentPage = location.pathname.split("/").pop() || "administration";
