@@ -16,7 +16,7 @@ export function AdministrationPage() {
   const { form } = useServerSettings();
   const { serverId } = useParams();
 
-  if (!serverId) return <PageError error="Server ID is required" />;
+  if (!serverId) return <PageError error={t("common.serverIdRequired")} />;
 
   return (
     <div className="space-y-6">

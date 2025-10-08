@@ -27,7 +27,15 @@
     "enter": "Entrar",
     "available": "Disponível",
     "taken": "Ocupado",
-    "full": "Lotado"
+    "full": "Lotado",
+    "saving": "Salvando...",
+    "unsavedChanges": "Alterações Não Salvas",
+    "unknownUser": "Usuário desconhecido",
+    "pageNotFound": "Página não encontrada",
+    "serverIdRequired": "ID do servidor é obrigatório",
+    "loadingRaids": "Carregando raids...",
+    "authenticating": "Autenticando...",
+    "authenticationProcessMessage": "Aguarde enquanto concluímos o processo de autenticação."
   },
   "navigation": {
     "home": "Início",
@@ -98,7 +106,7 @@
       "cancel": "Cancelar",
       "createRaid": "Criar Raid",
       "success": "Raid criada com sucesso",
-      "successDescription": "Sua raid foi agendada e mas ainda não está visível para os participantes.",
+      "successDescription": "Sua raid foi agendada com sucesso.",
       "error": "Falha ao criar raid"
     },
     "details": {
@@ -292,6 +300,7 @@
     "validation": "Verifique sua entrada e tente novamente.",
     "authenticationFailed": "Falha na autenticação. Por favor, faça login novamente.",
     "badRequest": "Solicitação inválida. Verifique sua entrada e tente novamente.",
+    "botNotInstalled": "O bot não está instalado neste servidor. Por favor, instale o bot primeiro.",
     "serverAlreadyExists": "Este servidor já está configurado.",
     "internalServerError": "Erro interno do servidor. Tente novamente mais tarde.",
     "notAuthorized": "Você não está autorizado a realizar esta ação.",
@@ -492,8 +501,10 @@
       "notesUpdateErrorDescription": "Houve um erro ao atualizar as notas da raid. Tente novamente.",
       "updated": "Raid atualizada com sucesso",
       "updatedDescription": "Os detalhes da sua raid foram atualizados.",
+      "dateUpdatedDescription": "A data da raid foi atualizada.",
       "updateError": "Falha ao atualizar raid",
       "updateErrorDescription": "Houve um erro ao atualizar a raid. Tente novamente.",
+      "dateUpdateErrorDescription": "Houve um erro ao atualizar a data da raid. Tente novamente.",
       "linkCopied": "Link da raid copiado para a área de transferência",
       "deleted": "Raid excluída com sucesso",
       "deletedDescription": "\"{{title}}\" foi permanentemente excluída.",
@@ -638,6 +649,10 @@
       "administration": {
         "title": "Administração do Servidor",
         "description": "Gerencie informações do servidor e configurações de auditoria"
+      },
+      "permissions": {
+        "title": "Permissões",
+        "description": "Gerencie permissões de usuário e controle de acesso"
       },
       "raids": {
         "title": "Configurações de Raid",

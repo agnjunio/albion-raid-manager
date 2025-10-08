@@ -52,13 +52,13 @@ export function AuthCallback() {
     };
 
     handleCallback();
-  }, [searchParams, discordCallback, navigate]);
+  }, [searchParams, discordCallback, navigate, t]);
 
   return (
     <div className="flex h-screen items-center justify-center">
       <div className="text-center">
-        <h1 className="text-2xl font-bold">Authenticating...</h1>
-        <p className="text-muted-foreground">Please wait while we complete the authentication process.</p>
+        <h1 className="text-2xl font-bold">{t("common.authenticating")}</h1>
+        <p className="text-muted-foreground">{t("common.authenticationProcessMessage")}</p>
       </div>
     </div>
   );

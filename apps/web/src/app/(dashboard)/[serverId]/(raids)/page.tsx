@@ -33,7 +33,7 @@ export function RaidsPage() {
   }, [error, refetch, t]);
 
   if (isLoading) {
-    return <PageLoading label="Loading raids..." />;
+    return <PageLoading label={t("common.loadingRaids")} />;
   }
 
   return <CalendarPage raids={data?.raids || []} onRefresh={refetch} isRefreshing={status === "pending"} />;

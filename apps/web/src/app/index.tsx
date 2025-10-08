@@ -1,4 +1,5 @@
 import { faFileCircleExclamation } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { PageError } from "@/components/ui/page";
@@ -21,6 +22,11 @@ import { DashboardLayout } from "./(dashboard)/layout";
 import { DashboardPage } from "./(dashboard)/page";
 import { ServerSetupPage } from "./(setup)/[serverId]/page";
 import { Home } from "./home";
+
+function PageNotFound() {
+  const { t } = useTranslation();
+  return <PageError icon={faFileCircleExclamation} error={t("common.pageNotFound")} className="px-10 py-4" />;
+}
 
 export default function App() {
   return (
@@ -46,10 +52,7 @@ export default function App() {
                 <Route path="registration" element={<RegistrationPage />} />
                 <Route path="localization" element={<LocalizationPage />} />
               </Route>
-              <Route
-                path="*"
-                element={<PageError icon={faFileCircleExclamation} error="Page not found" className="px-10 py-4" />}
-              />
+              <Route path="*" element={<PageNotFound />} />
             </Route>
           </Route>
           <Route path="/setup/:serverId" element={<ServerSetupPage />} />

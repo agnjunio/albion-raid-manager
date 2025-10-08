@@ -27,7 +27,15 @@
     "enter": "Enter",
     "available": "Available",
     "taken": "Taken",
-    "full": "Full"
+    "full": "Full",
+    "saving": "Saving...",
+    "unsavedChanges": "Unsaved Changes",
+    "unknownUser": "Unknown user",
+    "pageNotFound": "Page not found",
+    "serverIdRequired": "Server ID is required",
+    "loadingRaids": "Loading raids...",
+    "authenticating": "Authenticating...",
+    "authenticationProcessMessage": "Please wait while we complete the authentication process."
   },
   "navigation": {
     "home": "Home",
@@ -487,8 +495,10 @@
       "notesUpdateErrorDescription": "There was an error updating the raid notes. Please try again.",
       "updated": "Raid updated successfully",
       "updatedDescription": "Your raid details have been updated.",
+      "dateUpdatedDescription": "Raid date has been updated.",
       "updateError": "Failed to update raid",
       "updateErrorDescription": "There was an error updating the raid. Please try again.",
+      "dateUpdateErrorDescription": "There was an error updating the raid date. Please try again.",
       "linkCopied": "Raid link copied to clipboard",
       "deleted": "Raid deleted successfully",
       "deletedDescription": "\"{{title}}\" has been permanently deleted.",
@@ -633,6 +643,10 @@
       "administration": {
         "title": "Server Settings",
         "description": "Manage server information and audit settings"
+      },
+      "permissions": {
+        "title": "Permissions",
+        "description": "Manage user permissions and access control"
       },
       "raids": {
         "title": "Raid Settings",

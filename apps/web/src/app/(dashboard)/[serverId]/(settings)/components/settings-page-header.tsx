@@ -1,5 +1,6 @@
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useTranslation } from "react-i18next";
 
 import { useServerSettings } from "../contexts/server-settings-context";
 
@@ -10,6 +11,7 @@ interface SettingsPageHeaderProps {
 }
 
 export function SettingsPageHeader({ title, description, icon }: SettingsPageHeaderProps) {
+  const { t } = useTranslation();
   const { hasUnsavedChanges, isSaving } = useServerSettings();
 
   return (
@@ -33,7 +35,7 @@ export function SettingsPageHeader({ title, description, icon }: SettingsPageHea
         {hasUnsavedChanges && (
           <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-orange-50 to-amber-50 px-3 py-2 text-orange-700 shadow-lg sm:gap-3 sm:px-4 sm:py-3 dark:from-orange-900/20 dark:to-amber-900/20 dark:text-orange-400">
             <FontAwesomeIcon icon={faCircle} className="h-3 w-3 animate-pulse" />
-            <span className="text-xs font-semibold sm:text-sm">Unsaved Changes</span>
+            <span className="text-xs font-semibold sm:text-sm">{t("common.unsavedChanges")}</span>
           </div>
         )}
 
@@ -41,7 +43,7 @@ export function SettingsPageHeader({ title, description, icon }: SettingsPageHea
         {isSaving && (
           <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-2 text-blue-700 shadow-lg sm:gap-3 sm:px-4 sm:py-3 dark:from-blue-900/20 dark:to-indigo-900/20 dark:text-blue-400">
             <div className="h-3 w-3 animate-pulse rounded-full bg-blue-500"></div>
-            <span className="text-xs font-semibold sm:text-sm">Saving...</span>
+            <span className="text-xs font-semibold sm:text-sm">{t("common.saving")}</span>
           </div>
         )}
       </div>

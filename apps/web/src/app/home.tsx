@@ -46,7 +46,7 @@ export function Home() {
                 <img
                   src={getUserPictureUrl(user.id, user.avatar)}
                   className="size-12 select-none rounded-full"
-                  alt={user.username || "Unknown user"}
+                  alt={user.username || t("common.unknownUser")}
                 />
               </picture>
             )}
