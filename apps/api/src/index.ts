@@ -4,6 +4,8 @@ import { cleanup, run } from "./app";
 
 async function start() {
   try {
+    process.env.APPLICATION = "api";
+
     logger.info("Starting the API Server.");
 
     const server = await run();

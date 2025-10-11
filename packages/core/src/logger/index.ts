@@ -5,6 +5,7 @@ import { createLogger, format, transports } from "winston";
 import config from "@albion-raid-manager/core/config";
 
 import { formatAxios } from "./format-axios";
+import "./tracer";
 
 const logger = createLogger({
   level: config.logger.level,

@@ -5,6 +5,8 @@ import { parseBool, parseShardList, parseShardsTotal } from "./parsers";
 export const schema = z.object({
   service: z.object({
     name: z.string(),
+    application: z.string(),
+    version: z.string(),
   }),
 
   api: z.object({

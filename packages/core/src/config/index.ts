@@ -5,6 +5,8 @@ const isProd = process.env.NODE_ENV === "production";
 const config = schema.safeParse({
   service: {
     name: process.env.SERVICE ?? "albion-raid-manager",
+    application: process.env.APPLICATION ?? "core",
+    version: process.env.VERSION ?? "0.0.0",
   },
 
   api: {
