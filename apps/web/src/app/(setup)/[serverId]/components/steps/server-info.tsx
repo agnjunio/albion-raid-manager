@@ -1,4 +1,4 @@
-import { APIServer } from "@albion-raid-manager/types/api";
+import { Server } from "@albion-raid-manager/types/entities";
 import { useTranslation } from "react-i18next";
 
 import { ServerInfoCard } from "@/components/discord";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 
 interface ServerInfoProps {
-  server: APIServer;
+  server: Server;
   onNext: () => void;
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { APIChannel, APIChannelType } from "@albion-raid-manager/types/api";
+import { Channel, ChannelType } from "@albion-raid-manager/types/entities";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -9,14 +9,14 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 
 interface Props extends React.ComponentProps<"input"> {
-  channels: APIChannel[];
-  onChannelChange: (channel?: APIChannel) => void;
+  channels: Channel[];
+  onChannelChange: (channel?: Channel) => void;
 }
 
 export const ChannelInput = ({ channels, value, onChannelChange, ...props }: Props) => {
   const { t } = useTranslation();
-  const [matchedChannels, setMatchedChannels] = useState<APIChannel[]>(
-    channels.filter((channel) => channel.type === APIChannelType.TEXT),
+  const [matchedChannels, setMatchedChannels] = useState<Channel[]>(
+    channels.filter((channel) => channel.type === ChannelType.TEXT),
   );
   const [inputText, setInputText] = useState("");
   const [category, setCategory] = useState("");
@@ -32,7 +32,7 @@ export const ChannelInput = ({ channels, value, onChannelChange, ...props }: Pro
     }
   }, [value, channels]);
 
-  const setSelectedChannel = (channel?: APIChannel) => {
+  const setSelectedChannel = (channel?: Channel) => {
     setInputText(channel ? `#${channel.name}` : ``);
     if (channel?.parentId) {
       setCategory(channels.find((c) => c.id === channel.parentId)?.name || "");
@@ -51,7 +51,7 @@ export const ChannelInput = ({ channels, value, onChannelChange, ...props }: Pro
         .filter(
           (channel) =>
             channel.name.toLowerCase().includes(value.replace(/^#/, "").toLowerCase()) &&
-            channel.type === APIChannelType.TEXT,
+            channel.type === ChannelType.TEXT,
         )
         .slice(0, 10),
     );
@@ -68,7 +68,7 @@ export const ChannelInput = ({ channels, value, onChannelChange, ...props }: Pro
     setSelectedChannel();
   };
 
-  const handleMenuOptionClick = (channel: APIChannel) => {
+  const handleMenuOptionClick = (channel: Channel) => {
     if (props.disabled) return;
     setSelectedChannel(channel);
   };

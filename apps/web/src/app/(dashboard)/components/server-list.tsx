@@ -1,4 +1,3 @@
-import { getServerPictureUrl } from "@/lib/discord-utils";
 import { faCrown, faShield, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -10,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Loading from "@/components/ui/loading";
 import { PageError } from "@/components/ui/page";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { getServerPictureUrl } from "@/lib/discord-utils";
 import { useGetServersQuery } from "@/store/servers";
 
 export function ServerList() {
@@ -63,9 +63,9 @@ interface ServerCardProps {
   server: {
     id: string;
     name: string;
-    icon: string | null;
+    icon?: string | null;
     owner?: boolean;
-    admin: boolean;
+    admin?: boolean;
     bot?: boolean;
   };
 }

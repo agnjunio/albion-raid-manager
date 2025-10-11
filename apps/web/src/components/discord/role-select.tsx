@@ -1,4 +1,4 @@
-import { type APIRole } from "@albion-raid-manager/types/api";
+import { type Role } from "@albion-raid-manager/types/entities";
 import { faCheck, faChevronDown, faClose, faPeopleCarryBox } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -9,16 +9,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 
 interface Props {
-  roles: APIRole[];
-  onRolesChange: (roles: APIRole[]) => void;
-  value?: APIRole[];
+  roles: Role[];
+  onRolesChange: (roles: Role[]) => void;
+  value?: Role[];
   disabled?: boolean;
 }
 
 export const RoleSelect = ({ roles, value = [], disabled = false, onRolesChange }: Props) => {
   const { t } = useTranslation();
 
-  const handleRoleSelect = (role: APIRole) => {
+  const handleRoleSelect = (role: Role) => {
     const exists = value.find((r) => r.id === role.id);
     if (exists) {
       const newRoles = value.filter((r) => r.id !== role.id);

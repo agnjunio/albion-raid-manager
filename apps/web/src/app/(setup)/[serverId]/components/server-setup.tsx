@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 
-import { APIErrorType, APIServer, VerifyServer } from "@albion-raid-manager/types/api";
+import { APIErrorType, VerifyServer } from "@albion-raid-manager/types/api";
+import { Server } from "@albion-raid-manager/types/entities";
 import { useTranslation } from "react-i18next";
 
 import Alert from "@/components/ui/alert";
@@ -20,7 +21,7 @@ enum CreateStep {
 }
 
 interface ServerSetupProps {
-  server: APIServer;
+  server: Server;
 }
 
 export function ServerSetup({ server }: ServerSetupProps) {

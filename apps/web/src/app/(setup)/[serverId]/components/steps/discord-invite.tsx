@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { APIServer } from "@albion-raid-manager/types/api";
+import { Server } from "@albion-raid-manager/types/entities";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,7 @@ import { CardContent } from "@/components/ui/card";
 import { getServerInviteUrl } from "@/lib/discord-utils";
 
 interface DiscordInviteProps {
-  server: APIServer;
+  server: Server;
   onStartVerification: () => void;
 }
 
