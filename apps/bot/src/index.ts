@@ -1,7 +1,13 @@
+import { join } from "node:path";
+
 import { logger } from "@albion-raid-manager/core/logger";
+import { readVersion } from "@albion-raid-manager/core/utils";
 
 import bot from "./bot";
 import shard from "./shard";
+
+// Read version from package.json
+const version = readVersion(join(__dirname, "..", "package.json"));
 
 enum Mode {
   BOT = "bot",
@@ -22,6 +28,8 @@ async function start() {
     }[mode];
 
     if (!run) throw new Error("Mode does not expose a run function");
+
+    logger.info(`Starting the Discord Bot v${version} in ${mode} mode`);
 
     if (cleanup) {
       //catches ctrl+c event

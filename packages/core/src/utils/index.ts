@@ -7,3 +7,4 @@ export * from "./objects";
 export * from "./parsers";
 export * from "./strings";
 export * from "./time";
+export * from "./version";

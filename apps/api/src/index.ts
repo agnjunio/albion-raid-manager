@@ -1,12 +1,18 @@
+import { join } from "node:path";
+
 import { logger } from "@albion-raid-manager/core/logger";
+import { readVersion } from "@albion-raid-manager/core/utils";
 
 import { cleanup, run } from "./app";
+
+// Read version from package.json
+const version = readVersion(join(__dirname, "..", "package.json"));
 
 async function start() {
   try {
     process.env.APPLICATION = "api";
 
-    logger.info("Starting the API Server.");
+    logger.info(`Starting the API Server v${version}`);
 
     const server = await run();
 
