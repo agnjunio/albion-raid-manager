@@ -1,5 +1,5 @@
 import { logger } from "@albion-raid-manager/core/logger";
-import { isRaidEvent, RaidEvent, RaidEventSubscriber, Redis } from "@albion-raid-manager/core/redis";
+import { isRaidEvent, RaidEvent, RaidEventSubscriber, RedisSubscriber } from "@albion-raid-manager/core/redis";
 import { Client } from "discord.js";
 
 import { createGuildContext } from "../guild-context";
@@ -17,7 +17,7 @@ interface HandleRaidEventsProps {
 
 export async function initRaidEvents({ discord }: HandleRaidEventsProps) {
   try {
-    const subscriber = new RaidEventSubscriber(Redis.getClient());
+    const subscriber = new RaidEventSubscriber(RedisSubscriber.getClient());
     await subscriber.subscribe(async ({ event, metadata }) => {
       if (!isRaidEvent(event)) return;
       if (!event.serverId) return;

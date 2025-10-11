@@ -1,5 +1,5 @@
 // Main Redis namespace for apps
-export { Redis } from "./@redis";
+export { Redis, RedisSubscriber } from "./@redis";
 
 // Core Redis functionality
 export { RedisEventMessageBuilder } from "./builder";

@@ -1,6 +1,6 @@
 import config from "@albion-raid-manager/core/config";
 import { logger } from "@albion-raid-manager/core/logger";
-import { Redis } from "@albion-raid-manager/core/redis";
+import { Redis, RedisSubscriber } from "@albion-raid-manager/core/redis";
 import { ServersService } from "@albion-raid-manager/core/services";
 import { Client, Events, IntentsBitField, Partials } from "discord.js";
 
@@ -19,6 +19,7 @@ async function run() {
   logger.info("Starting the Bot Client.");
 
   await Redis.initClient();
+  await RedisSubscriber.initClient();
   await initModules({ discord });
   await discord.login(config.discord.token);
 }
