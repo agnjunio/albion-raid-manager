@@ -104,9 +104,7 @@ serverRouter.post(
         tries++;
 
         try {
-          verifiedServer = await ServersService.ensureServerWithAccessToken(serverId, req.session.accessToken, {
-            cache: req.context.cache,
-          });
+          verifiedServer = await ServersService.ensureServerWithAccessToken(serverId, req.session.accessToken);
         } catch {
           continue;
         }
