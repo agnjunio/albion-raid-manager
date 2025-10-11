@@ -32,6 +32,7 @@ export namespace ServersService {
 
     // If the server doesn't exist and data is provided, create a server record
     if (!server && data) {
+      logger.info("Ensuring server with data", { serverId, data });
       server = await prisma.server.upsert({
         where: { id: serverId },
         update: {
@@ -50,6 +51,7 @@ export namespace ServersService {
 
     // If the server doesn't exist and data is not provided, try to fetch data from Discord
     if (!server && !data) {
+      logger.info("Ensuring server with Discord data", { serverId });
       const discordServer = await DiscordService.getGuild(serverId, {
         type: "bot",
         token: config.discord.token,

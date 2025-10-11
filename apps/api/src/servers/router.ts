@@ -104,7 +104,7 @@ serverRouter.post(
         tries++;
 
         try {
-          verifiedServer = await ServersService.ensureServerWithAccessToken(serverId, req.session.accessToken);
+          verifiedServer = await ServersService.ensureServer(serverId);
         } catch (error) {
           logger.warn(`Failed to ensure server with access token try: ${tries}`, {
             serverId,
