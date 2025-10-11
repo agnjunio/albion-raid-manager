@@ -314,32 +314,6 @@ export namespace ServersService {
     return server;
   }
 
-  export async function ensureServerWithAccessToken(
-    serverId: string,
-    accessToken: string,
-    options: ServersServiceOptions = {},
-  ) {
-    logger.debug("Ensuring server with access token", { serverId, accessToken });
-    const discordGuild = await DiscordService.getGuild(serverId, {
-      type: "user",
-      token: accessToken,
-    });
-
-    if (!discordGuild) {
-      logger.warn("Failed to get Discord guild", { serverId, accessToken });
-      throw new Error("Failed to get Discord guild");
-    }
-
-    return await ensureServer(
-      serverId,
-      {
-        name: discordGuild.name,
-        icon: discordGuild.icon,
-      },
-      options,
-    );
-  }
-
   export async function getDiscordGuildMembers(serverId: string, _options: ServersServiceOptions = {}) {
     try {
       return await DiscordService.getGuildMembers(serverId, {

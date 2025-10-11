@@ -1,3 +1,4 @@
+import { logger } from "@albion-raid-manager/core/logger";
 import { DiscordService, ServersService, UsersService } from "@albion-raid-manager/core/services";
 import { PermissionsService } from "@albion-raid-manager/core/services/permissions";
 import { APIErrorType, APIResponse } from "@albion-raid-manager/types/api";
@@ -89,10 +90,11 @@ export const isServerMember = async (req: Request, res: Response, next: NextFunc
         .status(403)
         .json(APIResponse.Error(APIErrorType.NOT_SERVER_MEMBER, "You are not a member of this server"));
     }
-  } catch {
+  } catch (error) {
+    logger.warn("Failed to fetch if you are a member of this server", { serverId, userId, error });
     return res
       .status(403)
-      .json(APIResponse.Error(APIErrorType.NOT_SERVER_MEMBER, "You are not a member of this server"));
+      .json(APIResponse.Error(APIErrorType.NOT_SERVER_MEMBER, "Failed to fetch if you are a member of this server"));
   }
 
   const member = await ServersService.ensureServerMember(serverId, userId, undefined, {
