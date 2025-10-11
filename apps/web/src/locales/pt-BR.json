@@ -730,19 +730,14 @@
         "description": "O ID da guilda do Albion Online que este servidor representa"
       },
       "memberRoleId": {
-        "title": "ID do Cargo de Membro",
-        "placeholder": "ID do cargo do Discord para membros da guilda",
-        "description": "Cargo do Discord que será atribuído a membros verificados da guilda"
-      },
-      "auditChannelId": {
-        "title": "Canal de Auditoria de Registro",
-        "placeholder": "ID do canal para logs de auditoria de registro",
-        "description": "Canal onde os logs de registro de usuários e atribuição de cargos serão publicados"
+        "title": "Cargo de Membro da Guilda",
+        "placeholder": "Clique para buscar",
+        "description": "Cargo do Discord que será atribuído a membros verificados da guilda. Necessita configuração do ID da guilda acima"
       },
       "friendRoleId": {
-        "title": "Cargo de Amigo",
-        "placeholder": "ID do cargo do Discord para amigos/aliados",
-        "description": "Cargo atribuído a amigos e aliados"
+        "title": "Cargo de Jogador Registrado",
+        "placeholder": "Clique para buscar",
+        "description": "Cargo atribuído aos jogadores registrados"
       }
     }
   }

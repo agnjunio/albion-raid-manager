@@ -188,40 +188,50 @@ export function DiscordRoleInput({
               </div>
 
               <div className="grid gap-2">
-                {value.map((roleId, index) => {
-                  const role = roles.find((r) => r.id === roleId);
-                  return (
-                    <div
-                      key={roleId}
-                      className="border-border/50 from-muted/30 to-muted/10 hover:border-border group relative overflow-hidden rounded-lg border bg-gradient-to-r p-3 transition-all duration-200 hover:shadow-sm"
-                      style={{
-                        animationDelay: `${index * 50}ms`,
-                        animation: "fadeInUp 0.3s ease-out forwards",
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <RoleBadge role={role} />
+                {value
+                  .sort((roleAId, roleBId) => {
+                    const roleA = roles.find((r) => r.id === roleAId);
+                    const roleB = roles.find((r) => r.id === roleBId);
+                    if (!roleA || !roleB) {
+                      return 0;
+                    }
 
-                        <Button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveRole(roleId);
-                          }}
-                          disabled={disabled}
-                          variant="ghost"
-                          size="icon"
-                          className="hover:bg-destructive/15 hover:text-destructive h-7 w-7 opacity-0 transition-all duration-200 group-hover:opacity-100"
-                        >
-                          <FontAwesomeIcon icon={faX} className="h-3 w-3" />
-                        </Button>
+                    return roleB.position - roleA.position;
+                  })
+                  .map((roleId, index) => {
+                    const role = roles.find((r) => r.id === roleId);
+                    return (
+                      <div
+                        key={roleId}
+                        className="border-border/50 from-muted/30 to-muted/10 hover:border-border group relative overflow-hidden rounded-lg border bg-gradient-to-r p-3 transition-all duration-200 hover:shadow-sm"
+                        style={{
+                          animationDelay: `${index * 50}ms`,
+                          animation: "fadeInUp 0.3s ease-out forwards",
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <RoleBadge role={role} />
+
+                          <Button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveRole(roleId);
+                            }}
+                            disabled={disabled}
+                            variant="ghost"
+                            size="icon"
+                            className="hover:bg-destructive/15 hover:text-destructive h-7 w-7 opacity-0 transition-all duration-200 group-hover:opacity-100"
+                          >
+                            <FontAwesomeIcon icon={faX} className="h-3 w-3" />
+                          </Button>
+                        </div>
+
+                        {/* Subtle gradient overlay */}
+                        <div className="to-background/5 pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-transparent" />
                       </div>
-
-                      {/* Subtle gradient overlay */}
-                      <div className="to-background/5 pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-transparent" />
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             </div>
           </CardContent>

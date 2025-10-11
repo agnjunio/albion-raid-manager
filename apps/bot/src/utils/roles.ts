@@ -23,33 +23,27 @@ export async function assignRolesBasedOnGuild(
     }
 
     const memberRole = server.memberRoleId ? member.guild.roles.cache.get(server.memberRoleId) : null;
-    const friendRole = server.friendRoleId ? member.guild.roles.cache.get(server.friendRoleId) : null;
+    const registeredRole = server.friendRoleId ? member.guild.roles.cache.get(server.friendRoleId) : null;
 
     // Check if player is in the server's guild
     const isInServerGuild = server.serverGuildId && albionGuildId === server.serverGuildId;
 
+    if (registeredRole) {
+      await member.roles.add(registeredRole);
+
+      logger.info(`Added registered role to user ${member.nickname} in server ${serverId}`, {
+        memberRole,
+        registeredRole,
+        isInServerGuild,
+      });
+    }
+
     if (isInServerGuild && memberRole) {
       await member.roles.add(memberRole);
 
-      if (friendRole) {
-        await member.roles.remove(friendRole);
-      }
-
       logger.info(`Added member role to user ${member.nickname} in server ${serverId}`, {
         memberRole,
-        friendRole,
-        isInServerGuild,
-      });
-    } else if (!isInServerGuild && friendRole) {
-      await member.roles.add(friendRole);
-
-      if (memberRole) {
-        await member.roles.remove(memberRole);
-      }
-
-      logger.info(`Added friend role to user ${member.nickname} in server ${serverId}`, {
-        memberRole,
-        friendRole,
+        registeredRole,
         isInServerGuild,
       });
     }

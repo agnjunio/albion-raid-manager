@@ -724,19 +724,14 @@
         "description": "The guild ID from Albion Online that this server represents"
       },
       "memberRoleId": {
-        "title": "Member Role ID",
-        "placeholder": "Discord role ID for guild members",
-        "description": "Discord role that will be assigned to verified guild members"
-      },
-      "auditChannelId": {
-        "title": "Registration Audit Channel",
-        "placeholder": "Channel ID for registration audit logs",
-        "description": "Channel where user registration and role assignment logs will be posted"
+        "title": "Guild Member Role",
+        "placeholder": "Click to search",
+        "description": "Discord role that will be assigned to verified guild members. Requires the guild ID above"
       },
       "friendRoleId": {
-        "title": "Friend Role",
-        "placeholder": "Discord role ID for friends/allies",
-        "description": "Role assigned to friends and allies"
+        "title": "Registered Player Role",
+        "placeholder": "Click to search",
+        "description": "Role assigned to all registered players"
       }
     }
   }
