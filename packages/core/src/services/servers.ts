@@ -200,12 +200,14 @@ export namespace ServersService {
   ): Promise<ServerMember> {
     const { cache } = options;
 
+    logger.info("Ensuring server member", { serverId, userId });
     let serverMember = await getServerMember(serverId, userId);
 
     if (!serverMember) {
       const user = await UsersService.ensureUser(userId, {});
 
       if (!user) {
+        logger.warn("Failed to ensure user", { serverId, userId });
         throw new ServiceError(
           ServiceErrorCode.CREATE_FAILED,
           `Failed to ensure server member ${userId} in server ${serverId} because user ${userId} does not exist after attempting to create it.`,

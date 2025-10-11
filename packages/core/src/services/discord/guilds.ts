@@ -67,6 +67,7 @@ export async function getGuild(
           with_counts: true,
         },
       });
+      logger.debug("Discord guild retrieved", { guildId, type, token });
       return res.data;
     },
     {

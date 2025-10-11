@@ -24,6 +24,7 @@ export namespace UsersService {
 
     // If the user doesn't exist and data is provided, create a user record
     if (!user && data) {
+      logger.info("Ensuring user with data", { userId, data });
       user = await prisma.user.create({
         data: {
           id: userId,
@@ -36,6 +37,7 @@ export namespace UsersService {
 
     // If the user doesn't exist and data is not provided, try to fetch data from Discord
     if (!user && !data) {
+      logger.info("Ensuring user with bot access token", { userId });
       let discordUser: APIUser = await DiscordService.getUser(userId, {
         type: "bot",
         token: config.discord.token,
