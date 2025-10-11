@@ -2,6 +2,7 @@ import { APIGuildMember, APIUser } from "discord-api-types/v10";
 
 import { memoize } from "@albion-raid-manager/core/cache/memory";
 import config from "@albion-raid-manager/core/config";
+import { logger } from "@albion-raid-manager/core/logger";
 import { getAuthorization } from "@albion-raid-manager/core/utils/discord";
 import { getMilliseconds } from "@albion-raid-manager/core/utils/time";
 
@@ -32,6 +33,7 @@ export async function getCurrentUserGuildMember(
   return memoize<APIGuildMember>(
     `discord.users.${type}.${token}.${guildId}.guildMember`,
     async () => {
+      logger.info("Getting current user guild member", { guildId, type, token });
       const res = await discordApiClient.get<APIGuildMember>(`/users/@me/guilds/${guildId}/member`, {
         headers: {
           Authorization: getAuthorization(type, token),
