@@ -45,7 +45,7 @@ export async function getGuilds({ type = "bot", token = config.discord.token }: 
       return servers;
     },
     {
-      refresh: getMilliseconds(10, "minutes"),
+      refresh: type === "bot" ? getMilliseconds(10, "minutes") : undefined,
     },
   );
 
