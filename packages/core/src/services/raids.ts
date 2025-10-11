@@ -26,7 +26,7 @@ export interface RaidServiceOptions {
 }
 
 export namespace RaidService {
-  const DEFAULT_CACHE_TTL = 60;
+  const DEFAULT_CACHE_TTL = 0; // No caching for raids
 
   export async function createRaid(input: CreateRaidInput, options: RaidServiceOptions = {}): Promise<Raid> {
     const { title, description, date, contentType, location, serverId } = input;

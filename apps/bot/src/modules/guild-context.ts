@@ -1,4 +1,5 @@
 import { logger } from "@albion-raid-manager/core/logger/index";
+import { Redis } from "@albion-raid-manager/core/redis";
 import { ServersService } from "@albion-raid-manager/core/services";
 import { Guild } from "discord.js";
 import { TFunction } from "i18next";
@@ -16,7 +17,7 @@ export async function createGuildContext(guild: Guild): Promise<GuildContext> {
   const detectLanguage = async () => {
     try {
       // Get server configuration
-      const server = await ServersService.getServerById(guild.id);
+      const server = await ServersService.getServerById(guild.id, { cache: Redis.getCache() });
       const serverLanguage = server?.language;
       if (serverLanguage && isLanguageSupported(serverLanguage)) {
         return serverLanguage;

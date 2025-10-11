@@ -15,14 +15,6 @@ export interface PermissionsServiceOptions {
 export namespace PermissionsService {
   const DEFAULT_CACHE_TTL = 300; // 5 minutes cache for permission checks
 
-  /**
-   * Checks if a user has the specified role type in a server
-   * @param serverId - The Discord server ID
-   * @param userId - The Discord user ID
-   * @param type - The role type to check ("admin" or "caller")
-   * @param options - Service options including cache
-   * @returns Promise<boolean> - True if user has the specified role type
-   */
   export async function hasRole(
     serverId: string,
     userId: string,

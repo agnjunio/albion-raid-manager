@@ -19,7 +19,7 @@ export interface ServersServiceOptions {
 }
 
 export namespace ServersService {
-  const DEFAULT_CACHE_TTL = 600;
+  const DEFAULT_CACHE_TTL = 10;
 
   export async function ensureServer(
     serverId: string,

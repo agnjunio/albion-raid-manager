@@ -2,10 +2,12 @@ import type { RedisClientType } from "redis";
 
 import { logger } from "@albion-raid-manager/core/logger";
 
+import { RedisCache } from "./cache";
 import { RedisClient } from "./client";
 
 export namespace Redis {
   let redisClient: RedisClient | null = null;
+  let redisCache: RedisCache | null = null;
 
   export async function initClient(): Promise<void> {
     redisClient = new RedisClient();
@@ -19,6 +21,16 @@ export namespace Redis {
       throw new Error("Redis client not initialized. Call Redis.initClient() first.");
     }
     return redisClient.getClient();
+  }
+
+  export function getCache(): RedisCache {
+    if (!redisClient) {
+      throw new Error("Redis client not initialized. Call Redis.initClient() first.");
+    }
+    if (!redisCache) {
+      redisCache = new RedisCache(redisClient.getClient());
+    }
+    return redisCache;
   }
 
   export function isHealthy(): boolean {
