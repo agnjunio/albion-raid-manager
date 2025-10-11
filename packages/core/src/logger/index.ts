@@ -28,13 +28,13 @@ if (!config.logger.pretty) {
     ({ level, [Symbol.for("level")]: logLevel, message, timestamp, shard, error }) => {
       const printSpace = (count: number) => " ".repeat(Math.max(count, 0));
 
+      const application = `[${config.service.application}${shard ? `#${shard}` : ""}]`;
       const maxLen = "verbose".length;
       const count = maxLen - (logLevel as string).length;
       const spacing = printSpace(count);
-      const shardStr = shard ? `[#${shard}] ` : "";
       const errorStr = error ? `\n${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}` : "";
 
-      return `${timestamp} [${level}] ${spacing}: ${shardStr}${message}${errorStr}`;
+      return `${timestamp} [${level}] ${spacing}: ${application} ${message}${errorStr}`;
     },
   );
 

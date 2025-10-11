@@ -16,8 +16,6 @@ enum Mode {
 
 async function start() {
   try {
-    process.env.APPLICATION = "bot";
-
     const mode = (process.env.MODE || Mode.BOT) as Mode;
     if (!mode) throw new Error("Mode not defined");
     if (!Object.values(Mode).includes(mode)) throw new Error("Mode not supported");

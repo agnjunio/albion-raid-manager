@@ -10,8 +10,6 @@ const version = readVersion(join(__dirname, "..", "package.json"));
 
 async function start() {
   try {
-    process.env.APPLICATION = "api";
-
     logger.info(`Starting the API Server v${version}`);
 
     const server = await run();
