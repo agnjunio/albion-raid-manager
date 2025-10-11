@@ -75,7 +75,7 @@ export function ServerSettingsProvider({ children }: ServerSettingsProviderProps
       // Registration Configuration
       serverGuildId: "",
       memberRoleId: "",
-      friendRoleId: "",
+      registeredRoleId: "",
 
       // Localization
       language: "en",

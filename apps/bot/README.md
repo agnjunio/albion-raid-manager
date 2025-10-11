@@ -35,7 +35,7 @@ The bot provides several configuration commands for server administrators:
 Configure server roles for member management:
 
 - `member-role` (optional): Role for server members (guild members)
-- `friend-role` (optional): Role for friends (non-guild members)
+- `registered-role` (optional): Role for friends (non-guild members)
 
 #### `/config guild`
 

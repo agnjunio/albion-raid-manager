@@ -22,10 +22,10 @@ export const configCommand: Command = {
         .setName("roles")
         .setDescription("Configure server roles")
         .addRoleOption((option: SlashCommandRoleOption) =>
-          option.setName("member-role").setDescription("Role for server members (guild members)").setRequired(false),
+          option.setName("member-role").setDescription("Role for guild members").setRequired(false),
         )
         .addRoleOption((option: SlashCommandRoleOption) =>
-          option.setName("friend-role").setDescription("Role for friends (non-guild members)").setRequired(false),
+          option.setName("registered-role").setDescription("Role for registered players").setRequired(false),
         ),
     )
     .addSubcommand((subcommand) =>
@@ -86,18 +86,18 @@ export const configCommand: Command = {
       switch (subcommand) {
         case "roles": {
           const memberRole = interaction.options.getRole("member-role");
-          const friendRole = interaction.options.getRole("friend-role");
+          const registeredRole = interaction.options.getRole("registered-role");
 
-          if (!memberRole && !friendRole) {
+          if (!memberRole && !registeredRole) {
             await interaction.editReply({
               content: "❌ Please provide at least one role ID to configure.",
             });
             return;
           }
 
-          const updateData: { memberRoleId?: string; friendRoleId?: string } = {};
+          const updateData: { memberRoleId?: string; registeredRoleId?: string } = {};
           if (memberRole) updateData.memberRoleId = memberRole.id;
-          if (friendRole) updateData.friendRoleId = friendRole.id;
+          if (registeredRole) updateData.registeredRoleId = registeredRole.id;
 
           await prisma.server.update({
             where: { id: guild.id },
@@ -106,7 +106,7 @@ export const configCommand: Command = {
 
           const roleConfig = [];
           if (memberRole) roleConfig.push(`• Member Role: ${memberRole}`);
-          if (friendRole) roleConfig.push(`• Friend Role: ${friendRole}`);
+          if (registeredRole) roleConfig.push(`• Registered Role: ${registeredRole}`);
 
           await interaction.editReply({
             content: `✅ Server roles configured successfully!\n\n${roleConfig.join("\n")}`,
@@ -180,7 +180,7 @@ export const configCommand: Command = {
 
           const config = [];
           if (server.memberRoleId) config.push(`• Member Role: <@&${server.memberRoleId}>`);
-          if (server.friendRoleId) config.push(`• Friend Role: <@&${server.friendRoleId}>`);
+          if (server.registeredRoleId) config.push(`• Registered Role: <@&${server.registeredRoleId}>`);
           if (server.serverGuildId) config.push(`• Albion Guild ID: \`${server.serverGuildId}\``);
           if (server.auditChannelId) config.push(`• Audit Channel: <#${server.auditChannelId}>`);
           if (server.raidAnnouncementChannelId) config.push(`• Raid Channel: <#${server.raidAnnouncementChannelId}>`);

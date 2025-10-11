@@ -16,7 +16,7 @@ export function createServerSettings(server: Server): ServerSettings {
     raidAnnouncementChannelId: server.raidAnnouncementChannelId || "",
     serverGuildId: server.serverGuildId || "",
     memberRoleId: server.memberRoleId || "",
-    friendRoleId: server.friendRoleId || "",
+    registeredRoleId: server.registeredRoleId || "",
     language: server.language || "en",
   };
 }

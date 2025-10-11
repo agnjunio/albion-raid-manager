@@ -734,7 +734,7 @@
         "placeholder": "Clique para buscar",
         "description": "Cargo do Discord que será atribuído a membros verificados da guilda. Necessita configuração do ID da guilda acima"
       },
-      "friendRoleId": {
+      "registeredRoleId": {
         "title": "Cargo de Jogador Registrado",
         "placeholder": "Clique para buscar",
         "description": "Cargo atribuído aos jogadores registrados"

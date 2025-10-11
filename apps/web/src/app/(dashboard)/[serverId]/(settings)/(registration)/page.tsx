@@ -79,26 +79,26 @@ export function RegistrationPage() {
 
             <FormField
               control={form.control}
-              name="friendRoleId"
+              name="registeredRoleId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-foreground mb-4 flex items-center gap-3 text-lg font-semibold">
                     <div className="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
                       <FontAwesomeIcon icon={faHandshake} className="text-primary h-4 w-4" />
                     </div>
-                    {t("settings.registration.friendRoleId.title")}
+                    {t("settings.registration.registeredRoleId.title")}
                   </FormLabel>
                   <FormControl>
                     <DiscordRoleArrayInput
                       value={field.value ? [field.value] : []}
                       onChange={(roles) => field.onChange(roles[0] || "")}
-                      placeholder={t("settings.registration.friendRoleId.placeholder")}
+                      placeholder={t("settings.registration.registeredRoleId.placeholder")}
                       className="focus:border-primary/50"
                       singleRole={true}
                     />
                   </FormControl>
                   <FormDescription className="text-muted-foreground mt-3 text-sm">
-                    {t("settings.registration.friendRoleId.description")}
+                    {t("settings.registration.registeredRoleId.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

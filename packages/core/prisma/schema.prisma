@@ -41,9 +41,9 @@ model Server {
   callerRoles               String[] @default([])
 
   // Registration configuration
-  serverGuildId String?
-  memberRoleId  String?
-  friendRoleId  String?
+  serverGuildId    String?
+  memberRoleId     String?
+  registeredRoleId String?
 
   // Localization configuration
   language String?

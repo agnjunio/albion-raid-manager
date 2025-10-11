@@ -23,7 +23,7 @@ export async function assignRolesBasedOnGuild(
     }
 
     const memberRole = server.memberRoleId ? member.guild.roles.cache.get(server.memberRoleId) : null;
-    const registeredRole = server.friendRoleId ? member.guild.roles.cache.get(server.friendRoleId) : null;
+    const registeredRole = server.registeredRoleId ? member.guild.roles.cache.get(server.registeredRoleId) : null;
 
     // Check if player is in the server's guild
     const isInServerGuild = server.serverGuildId && albionGuildId === server.serverGuildId;

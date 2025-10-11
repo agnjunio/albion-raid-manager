@@ -157,7 +157,7 @@ describe("configCommand", () => {
     it("should display audit channel in configuration view", async () => {
       vi.mocked(prisma.server.findUnique).mockResolvedValue({
         memberRoleId: "member-role-id",
-        friendRoleId: "friend-role-id",
+        registeredRoleId: "registered-role-id",
         serverGuildId: "test-guild-id",
         auditChannelId: "audit-channel-id",
       } as Server);
@@ -172,7 +172,7 @@ describe("configCommand", () => {
     it("should display raid channel in configuration view", async () => {
       vi.mocked(prisma.server.findUnique).mockResolvedValue({
         memberRoleId: "member-role-id",
-        friendRoleId: "friend-role-id",
+        registeredRoleId: "registered-role-id",
         serverGuildId: "test-guild-id",
         auditChannelId: "audit-channel-id",
         raidAnnouncementChannelId: "raid-channel-id",
@@ -188,7 +188,7 @@ describe("configCommand", () => {
     it("should not display audit channel when not configured", async () => {
       vi.mocked(prisma.server.findUnique).mockResolvedValue({
         memberRoleId: "member-role-id",
-        friendRoleId: "friend-role-id",
+        registeredRoleId: "registered-role-id",
         serverGuildId: "test-guild-id",
         auditChannelId: null,
       } as Server);
@@ -203,7 +203,7 @@ describe("configCommand", () => {
     it("should not display raid channel when not configured", async () => {
       vi.mocked(prisma.server.findUnique).mockResolvedValue({
         memberRoleId: "member-role-id",
-        friendRoleId: "friend-role-id",
+        registeredRoleId: "registered-role-id",
         serverGuildId: "test-guild-id",
         auditChannelId: "audit-channel-id",
         raidAnnouncementChannelId: null,

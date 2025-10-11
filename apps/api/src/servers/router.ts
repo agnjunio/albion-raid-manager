@@ -238,7 +238,7 @@ serverRouter.put("/:serverId/settings", isServerMember, hasAdminPermission, asyn
       raidAnnouncementChannelId,
       serverGuildId,
       memberRoleId,
-      friendRoleId,
+      registeredRoleId,
       language,
     } = req.body;
 
@@ -256,7 +256,7 @@ serverRouter.put("/:serverId/settings", isServerMember, hasAdminPermission, asyn
         raidAnnouncementChannelId,
         serverGuildId,
         memberRoleId,
-        friendRoleId,
+        registeredRoleId,
         language,
       },
       {

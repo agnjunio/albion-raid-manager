@@ -45,9 +45,9 @@ export const serverSettingsSchema = z.object({
     .regex(/^\d{17,19}$/, { message: "Member role ID must be a valid Discord role ID" })
     .optional()
     .or(z.literal("")),
-  friendRoleId: z
+  registeredRoleId: z
     .string()
-    .regex(/^\d{17,19}$/, { message: "Friend role ID must be a valid Discord role ID" })
+    .regex(/^\d{17,19}$/, { message: "Registered role ID must be a valid Discord role ID" })
     .optional()
     .or(z.literal("")),
 

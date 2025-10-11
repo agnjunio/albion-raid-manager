@@ -101,15 +101,15 @@ export async function sendAuditMessage(
       const memberRole = member.roles.cache.find(
         (role) => role.name.toLowerCase().includes("member") || role.name.toLowerCase().includes("guild"),
       );
-      const friendRole = member.roles.cache.find(
-        (role) => role.name.toLowerCase().includes("friend") || role.name.toLowerCase().includes("ally"),
+      const registeredRole = member.roles.cache.find(
+        (role) => role.name.toLowerCase().includes("registered") || role.name.toLowerCase().includes("ally"),
       );
 
       embed.addFields({
         name: "Assigned Roles",
         value: [
           memberRole ? `✅ ${memberRole.name}` : "❌ No member role",
-          friendRole ? `✅ ${friendRole.name}` : "❌ No friend role",
+          registeredRole ? `✅ ${registeredRole.name}` : "❌ No registered role",
         ].join("\n"),
         inline: false,
       });

@@ -728,7 +728,7 @@
         "placeholder": "Click to search",
         "description": "Discord role that will be assigned to verified guild members. Requires the guild ID above"
       },
-      "friendRoleId": {
+      "registeredRoleId": {
         "title": "Registered Player Role",
         "placeholder": "Click to search",
         "description": "Role assigned to all registered players"

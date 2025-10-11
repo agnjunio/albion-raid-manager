@@ -59,7 +59,7 @@ export const createMockServer = (overrides = {}) => ({
   raidAnnouncementChannelId: "channel123",
   auditChannelId: "audit123",
   memberRoleId: "member123",
-  friendRoleId: "friend123",
+  registeredRoleId: "friend123",
   serverGuildId: "albion123",
   ...overrides,
 });
