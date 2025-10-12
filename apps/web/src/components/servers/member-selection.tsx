@@ -1,8 +1,6 @@
-import type { APIServerMember } from "@albion-raid-manager/types/api";
-
 import { useMemo, useState } from "react";
 
-import { getUserPictureUrl } from "@/lib/discord-utils";
+import { ServerMember } from "@albion-raid-manager/types/entities";
 import { faCheck, faSearch, faTimes, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
@@ -12,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getUserPictureUrl } from "@/lib/discord-utils";
 
 interface MemberSelectionProps {
-  members: APIServerMember[];
+  members: ServerMember[];
   selectedUserId?: string | null;
   onSelect: (userId: string | null) => void;
   placeholder?: string;
@@ -32,12 +31,12 @@ export function MemberSelection({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  const selectedMember = members.find((member) => member.id === selectedUserId);
+  const selectedMember = members.find((member) => member.userId === selectedUserId);
   const filteredMembers = useMemo(
     () =>
       members.filter((member) => {
         const searchTerm = searchValue.toLowerCase();
-        const username = member.username.toLowerCase();
+        const username = member.username?.toLowerCase() || "";
         const nickname = member.nickname?.toLowerCase() || "";
 
         return username.includes(searchTerm) || nickname.includes(searchTerm);
@@ -119,13 +118,13 @@ export function MemberSelection({
               </CommandItem>
               {filteredMembers.map((member) => (
                 <CommandItem
-                  key={member.id}
-                  value={member.id}
-                  onSelect={() => handleSelect(member.id)}
+                  key={member.userId}
+                  value={member.userId}
+                  onSelect={() => handleSelect(member.userId)}
                   className="flex items-center gap-2"
                 >
                   <MemberInfo member={member} />
-                  {selectedUserId === member.id && <FontAwesomeIcon icon={faCheck} className="ml-auto h-4 w-4" />}
+                  {selectedUserId === member.userId && <FontAwesomeIcon icon={faCheck} className="ml-auto h-4 w-4" />}
                 </CommandItem>
               ))}
             </CommandGroup>
@@ -136,21 +135,21 @@ export function MemberSelection({
   );
 }
 
-function MemberInfo({ member }: { member: APIServerMember }) {
+function MemberInfo({ member }: { member: ServerMember }) {
   const { t } = useTranslation();
 
   return (
     <>
       <div className="flex items-center gap-2">
         <Avatar className="h-6 w-6">
-          <AvatarImage src={getUserPictureUrl(member.id, member.avatar)} />
+          <AvatarImage src={getUserPictureUrl(member.userId, member.avatar)} />
           <AvatarFallback className="bg-primary/10">
             <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
           </AvatarFallback>
         </Avatar>
       </div>
       <span className="truncate">{member.nickname || member.username}</span>
-      {member.registered && (
+      {member.albionPlayerId && (
         <Badge variant="secondary" className="text-xs">
           {t("raids.memberSelection.registered")}
         </Badge>

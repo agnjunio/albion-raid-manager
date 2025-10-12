@@ -3,7 +3,7 @@ import type { RaidConfiguration } from "@albion-raid-manager/types/entities";
 
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 
-import { APIServerMember } from "@albion-raid-manager/types/api";
+import { ServerMember } from "@albion-raid-manager/types/api";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -26,7 +26,7 @@ interface RaidContextValue {
   raid: Raid | undefined;
   isLoading: boolean;
   error: unknown;
-  serverMembers: APIServerMember[];
+  serverMembers: ServerMember[];
   hasStatus: (...statuses: RaidStatus[]) => boolean;
   handleCopyRaidLink: () => void;
   handleDeleteRaid: () => void;

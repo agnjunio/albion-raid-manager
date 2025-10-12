@@ -1,21 +1,8 @@
 import type { Channel } from "../entities/server-channels";
+import type { ServerMember } from "../entities/server-members";
 import type { Role } from "../entities/server-roles";
 import type { ServerSettings } from "../entities/server-settings";
 import type { Server } from "../entities/servers";
-
-export type APIServerMember = {
-  id: string;
-  username: string;
-  nickname?: string | null;
-  avatar: string | null;
-  roles?: string[];
-  registered: boolean;
-  albionPlayerId: string | null;
-  albionGuildId: string | null;
-  killFame: number;
-  deathFame: number;
-  lastUpdated: Date | null;
-};
 
 export namespace GetServers {
   export type Response = { servers: Server[] };
@@ -33,7 +20,7 @@ export namespace GetServer {
 
 export namespace GetServerMembers {
   export type Params = { serverId: string };
-  export type Response = { members: APIServerMember[] };
+  export type Response = { members: ServerMember[] };
 }
 
 export namespace GetServerSettings {

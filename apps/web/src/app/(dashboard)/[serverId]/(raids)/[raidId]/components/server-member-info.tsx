@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 
-import { getUserPictureUrl } from "@/lib/discord-utils";
+import { ServerMember } from "@albion-raid-manager/types/entities";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useTranslation } from "react-i18next";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getUserPictureUrl } from "@/lib/discord-utils";
 import { cn } from "@/lib/utils";
 
 import { useRaidContext } from "../contexts/raid-context";
@@ -18,7 +19,10 @@ interface ServerMemberInfoProps {
 export function ServerMemberInfo({ userId, size = "md" }: ServerMemberInfoProps) {
   const { t } = useTranslation();
   const { serverMembers } = useRaidContext();
-  const serverMember = useMemo(() => serverMembers.find((m) => m.id === userId), [serverMembers, userId]);
+  const serverMember: ServerMember | undefined = useMemo(
+    () => serverMembers.find((m) => m.userId === userId),
+    [serverMembers, userId],
+  );
 
   return (
     <div

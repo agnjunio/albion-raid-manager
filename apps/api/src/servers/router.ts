@@ -4,7 +4,6 @@ import { DiscordService, ServersService } from "@albion-raid-manager/core/servic
 import {
   APIErrorType,
   APIResponse,
-  APIServerMember,
   GetServer,
   GetServerChannels,
   GetServerMembers,
@@ -18,9 +17,11 @@ import {
   createServerSettings,
   fromDiscordChannels,
   fromDiscordGuild,
+  fromDiscordMember,
   fromDiscordRoles,
   Role,
   Server,
+  ServerMember,
 } from "@albion-raid-manager/types/entities";
 import { addServerSchema } from "@albion-raid-manager/types/schemas";
 import { isAxiosError } from "axios";
@@ -172,25 +173,13 @@ serverRouter.get(
       });
       const registeredMembersMap = new Map(registeredMembers.map((member) => [member.userId, member]));
 
-      const members: APIServerMember[] = discordMembers
-        .map((discordMember) => {
+      const members: ServerMember[] = discordMembers
+        .map((discordMember): ServerMember | null => {
           const registeredMember = registeredMembersMap.get(discordMember.user.id);
-          const id = discordMember.user.id || registeredMember?.userId;
-          if (!id) return null;
+          const userId = discordMember.user.id || registeredMember?.userId;
+          if (!userId) return null;
 
-          return {
-            id,
-            username: discordMember.user.username || registeredMember?.user?.username || "",
-            nickname: discordMember.nick || registeredMember?.nickname || null,
-            avatar: discordMember.avatar || discordMember.user.avatar,
-            roles: discordMember.roles,
-            registered: registeredMember?.albionPlayerId ? true : false,
-            albionPlayerId: registeredMember?.albionPlayerId || null,
-            albionGuildId: registeredMember?.albionGuildId || null,
-            killFame: registeredMember?.killFame || 0,
-            deathFame: registeredMember?.deathFame || 0,
-            lastUpdated: registeredMember?.lastUpdated || null,
-          };
+          return fromDiscordMember(discordMember, registeredMember);
         })
         .filter((member) => member !== null);
 
