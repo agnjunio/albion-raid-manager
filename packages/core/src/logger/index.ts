@@ -14,6 +14,9 @@ const logger = createLogger({
     get service() {
       return config.service.name;
     },
+    get application() {
+      return config.service.application;
+    },
     get shard() {
       return config.bot.shards.current;
     },
@@ -25,16 +28,16 @@ if (!config.logger.pretty) {
   logger.add(new transports.Console());
 } else {
   const consoleFormat = format.printf(
-    ({ level, [Symbol.for("level")]: logLevel, message, timestamp, shard, error }) => {
+    ({ level, [Symbol.for("level")]: logLevel, application, message, timestamp, shard, error }) => {
       const printSpace = (count: number) => " ".repeat(Math.max(count, 0));
 
-      const application = `[${config.service.application}${shard ? `#${shard}` : ""}]`;
+      const applicationStr = `[${application}${shard ? `#${shard}` : ""}]`;
       const maxLen = "verbose".length;
       const count = maxLen - (logLevel as string).length;
       const spacing = printSpace(count);
       const errorStr = error ? `\n${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}` : "";
 
-      return `${timestamp} [${level}] ${spacing}: ${application} ${message}${errorStr}`;
+      return `${timestamp} [${level}] ${spacing}: ${applicationStr} ${message}${errorStr}`;
     },
   );
 
