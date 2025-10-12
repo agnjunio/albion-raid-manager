@@ -1,9 +1,8 @@
 import type { Raid, RaidSlot, RaidStatus } from "@albion-raid-manager/types";
-import type { RaidConfiguration } from "@albion-raid-manager/types/entities";
+import type { RaidConfiguration, ServerMember } from "@albion-raid-manager/types/entities";
 
 import { createContext, useCallback, useContext, type ReactNode } from "react";
 
-import { ServerMember } from "@albion-raid-manager/types/api";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
