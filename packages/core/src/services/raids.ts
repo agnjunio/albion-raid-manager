@@ -1,4 +1,4 @@
-import type { Cache, RaidEventPublisher } from "@albion-raid-manager/core/redis";
+import type { RaidEventPublisher } from "@albion-raid-manager/core/redis";
 
 import { Raid, RaidSlot } from "@albion-raid-manager/types";
 import { getContentTypeInfo, type RaidConfiguration } from "@albion-raid-manager/types/entities";
@@ -12,25 +12,19 @@ import {
   UpdateRaidSlotInput,
 } from "@albion-raid-manager/types/services";
 
-import { CacheInvalidation } from "@albion-raid-manager/core/cache/redis";
-import { CacheKeys, withCache } from "@albion-raid-manager/core/cache/utils";
 import { prisma, Prisma } from "@albion-raid-manager/core/database";
 import { logger } from "@albion-raid-manager/core/logger";
 
 import { ServersService } from "./servers";
 
 export interface RaidServiceOptions {
-  cache?: Cache;
-  cacheTtl?: number;
   publisher?: RaidEventPublisher | null;
 }
 
 export namespace RaidService {
-  const DEFAULT_CACHE_TTL = 0; // No caching for raids
-
   export async function createRaid(input: CreateRaidInput, options: RaidServiceOptions = {}): Promise<Raid> {
     const { title, description, date, contentType, location, serverId } = input;
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     await ServersService.ensureServer(serverId);
 
@@ -98,12 +92,6 @@ export namespace RaidService {
       return raid;
     });
 
-    if (cache) {
-      CacheInvalidation.invalidateServerRaids(cache, serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, serverId });
-      });
-    }
-
     if (publisher) {
       publisher.publishRaidCreated(raid).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId: raid.id });
@@ -113,63 +101,32 @@ export namespace RaidService {
     return raid;
   }
 
-  export async function findRaidById(
-    id: string,
-    include: Prisma.RaidInclude = {},
-    options: RaidServiceOptions = {},
-  ): Promise<Raid | null> {
-    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
-    const cacheKey = CacheKeys.raid(id, CacheKeys.hashObject(include));
-
-    return withCache(
-      async () => {
-        return await prisma.raid.findUnique({
-          where: { id },
-          include,
-        });
-      },
-      {
-        cache,
-        key: cacheKey,
-        ttl: cacheTtl,
-      },
-    );
+  export async function findRaidById(id: string, include: Prisma.RaidInclude = {}): Promise<Raid | null> {
+    return await prisma.raid.findUnique({
+      where: { id },
+      include,
+    });
   }
 
-  export async function findRaidsByServer(
-    serverId: string,
-    filters: RaidFilters = {},
-    options: RaidServiceOptions = {},
-  ): Promise<Raid[]> {
-    const { cache, cacheTtl = DEFAULT_CACHE_TTL } = options;
+  export async function findRaidsByServer(serverId: string, filters: RaidFilters = {}): Promise<Raid[]> {
     const { status, type, contentType, dateFrom, dateTo } = filters;
-    const cacheKey = CacheKeys.raidsByServer(serverId, CacheKeys.hashObject(filters));
 
-    return withCache(
-      async () => {
-        return await prisma.raid.findMany({
-          where: {
-            serverId,
-            ...(status && { status }),
-            ...(type && { type }),
-            ...(contentType && { contentType }),
-            ...(dateFrom && { date: { gte: dateFrom } }),
-            ...(dateTo && { date: { lte: dateTo } }),
-          },
-          include: {
-            slots: true,
-          },
-          orderBy: {
-            date: "asc",
-          },
-        });
+    return await prisma.raid.findMany({
+      where: {
+        serverId,
+        ...(status && { status }),
+        ...(type && { type }),
+        ...(contentType && { contentType }),
+        ...(dateFrom && { date: { gte: dateFrom } }),
+        ...(dateTo && { date: { lte: dateTo } }),
       },
-      {
-        cache,
-        key: cacheKey,
-        ttl: cacheTtl,
+      include: {
+        slots: true,
       },
-    );
+      orderBy: {
+        date: "asc",
+      },
+    });
   }
 
   export async function updateRaid(
@@ -177,7 +134,7 @@ export namespace RaidService {
     input: UpdateRaidInput,
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     const previousRaid = await findRaidById(id);
 
@@ -207,12 +164,6 @@ export namespace RaidService {
       return updatedRaid;
     });
 
-    if (cache) {
-      CacheInvalidation.invalidateRaid(cache, id, raid.serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, raidId: id });
-      });
-    }
-
     if (publisher) {
       const previous: Record<string, unknown> = {};
       for (const key of Object.keys(input)) {
@@ -229,7 +180,7 @@ export namespace RaidService {
   }
 
   export async function deleteRaid(id: string, options: RaidServiceOptions = {}): Promise<void> {
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     // First, get the raid to check permissions
     const existingRaid = await findRaidById(id);
@@ -268,12 +219,6 @@ export namespace RaidService {
       return raidToDelete;
     });
 
-    if (cache) {
-      CacheInvalidation.invalidateRaid(cache, raid.id, raid.serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, raidId: id });
-      });
-    }
-
     if (publisher) {
       publisher.publishRaidDeleted(raid).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId: id });
@@ -288,7 +233,7 @@ export namespace RaidService {
     configuration: RaidConfiguration,
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     const raid = await prisma.$transaction(async (tx) => {
       // Check if raid exists and get current state
@@ -385,12 +330,6 @@ export namespace RaidService {
       return finalRaid;
     });
 
-    if (cache && raid.serverId) {
-      CacheInvalidation.invalidateRaid(cache, raidId, raid.serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, raidId });
-      });
-    }
-
     if (publisher) {
       publisher.publishRaidUpdated(raid).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId });
@@ -405,7 +344,7 @@ export namespace RaidService {
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
     const { raidId, name, role, comment, weapon, buildId, order, userId: slotUserId } = input;
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     // Verify the raid exists and is in a state where slots can be modified
     const raid = await findRaidById(raidId, { slots: true });
@@ -475,12 +414,6 @@ export namespace RaidService {
 
     logger.verbose(`Raid slot created for raid: ${updatedRaid.id}`, { id: updatedRaid.id, raidId, name, role });
 
-    if (cache) {
-      CacheInvalidation.invalidateRaid(cache, raidId, updatedRaid.serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, raidId });
-      });
-    }
-
     if (publisher) {
       publisher.publishRaidUpdated(updatedRaid).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId });
@@ -495,7 +428,7 @@ export namespace RaidService {
     input: UpdateRaidSlotInput,
     options: RaidServiceOptions = {},
   ): Promise<RaidSlot> {
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     const existingSlot = await prisma.raidSlot.findUnique({
       where: { id: slotId },
@@ -617,11 +550,6 @@ export namespace RaidService {
       return updatedSlot;
     });
 
-    if (cache && slot.raidId) {
-      CacheInvalidation.invalidateRaid(cache, slot.raidId, slot.raid?.serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, raidId: slot.raidId });
-      });
-    }
     if (publisher && slot.raid) {
       publisher.publishRaidUpdated(slot.raid, { slots: previousSlots }).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId: slot.raidId });
@@ -632,7 +560,7 @@ export namespace RaidService {
   }
 
   export async function deleteRaidSlot(slotId: string, options: RaidServiceOptions = {}): Promise<void> {
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     let raidId: string;
     let _serverId: string;
@@ -689,12 +617,6 @@ export namespace RaidService {
       return slotToDelete;
     });
 
-    if (cache && slot.raidId && slot.raid?.serverId) {
-      CacheInvalidation.invalidateRaid(cache, slot.raidId, slot.raid?.serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, raidId });
-      });
-    }
-
     if (publisher && slot.raid) {
       publisher.publishRaidUpdated(slot.raid).catch((error) => {
         logger.warn("Event publishing failed", { error, raidId });
@@ -707,7 +629,7 @@ export namespace RaidService {
     slotIds: string[],
     options: RaidServiceOptions = {},
   ): Promise<Raid> {
-    const { cache, publisher } = options;
+    const { publisher } = options;
 
     // First, get the raid to check permissions
     const existingRaid = await findRaidById(raidId);
@@ -769,12 +691,6 @@ export namespace RaidService {
 
       return updatedRaid;
     });
-
-    if (cache) {
-      CacheInvalidation.invalidateRaid(cache, raidId, raid.serverId).catch((error) => {
-        logger.warn("Cache invalidation failed", { error, raidId });
-      });
-    }
 
     if (publisher) {
       publisher.publishRaidUpdated(raid).catch((error) => {

@@ -60,7 +60,6 @@ serverRaidsRouter.post(
         maxPlayers,
       },
       {
-        cache: req.context.cache,
         publisher: await getRaidEventPublisher(),
       },
     );
@@ -79,9 +78,7 @@ serverRaidsRouter.get(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID is required");
     }
 
-    const raids = await RaidService.findRaidsByServer(serverId, filters, {
-      cache: req.context.cache,
-    });
+    const raids = await RaidService.findRaidsByServer(serverId, filters);
 
     res.json(APIResponse.Success({ raids }));
   },
@@ -97,15 +94,9 @@ serverRaidsRouter.get(
       throw APIResponse.Error(APIErrorType.BAD_REQUEST, "Server ID and Raid ID are required");
     }
 
-    const raid = await RaidService.findRaidById(
-      raidId,
-      {
-        slots: Boolean(slots),
-      },
-      {
-        cache: req.context.cache,
-      },
-    );
+    const raid = await RaidService.findRaidById(raidId, {
+      slots: Boolean(slots),
+    });
 
     if (!raid) {
       return res.status(404).json(APIResponse.Error(APIErrorType.NOT_FOUND, "Raid not found"));
@@ -130,7 +121,6 @@ serverRaidsRouter.put(
 
     const updates = req.body as UpdateRaidInput;
     const raid = await RaidService.updateRaid(raidId, updates, {
-      cache: req.context.cache,
       publisher: await getRaidEventPublisher(),
     });
 
@@ -149,7 +139,6 @@ serverRaidsRouter.delete(
     }
 
     await RaidService.deleteRaid(raidId, {
-      cache: req.context.cache,
       publisher: await getRaidEventPublisher(),
     });
 
@@ -180,7 +169,6 @@ serverRaidsRouter.post(
           weapon: weapon ?? undefined,
         },
         {
-          cache: req.context.cache,
           publisher: await getRaidEventPublisher(),
         },
       );
@@ -205,7 +193,6 @@ serverRaidsRouter.put(
 
     try {
       const raidSlot = await RaidService.updateRaidSlot(slotId, updates, {
-        cache: req.context.cache,
         publisher: await getRaidEventPublisher(),
       });
       res.json(APIResponse.Success({ raidSlot }));
@@ -224,7 +211,6 @@ serverRaidsRouter.delete(
 
     try {
       await RaidService.deleteRaidSlot(slotId, {
-        cache: req.context.cache,
         publisher: await getRaidEventPublisher(),
       });
       res.json(APIResponse.Success({ message: "Slot deleted successfully" }));
@@ -252,7 +238,6 @@ serverRaidsRouter.post(
 
     try {
       const raid = await RaidService.importRaidConfiguration(raidId, configuration, {
-        cache: req.context.cache,
         publisher: await getRaidEventPublisher(),
       });
 
@@ -296,7 +281,6 @@ serverRaidsRouter.put(
 
     try {
       const raid = await RaidService.reorderSlots(raidId, slotIds, {
-        cache: req.context.cache,
         publisher: await getRaidEventPublisher(),
       });
 
