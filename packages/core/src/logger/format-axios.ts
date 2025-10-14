@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 import winston from "winston";
 
 class FilteredAxiosError extends Error {
@@ -33,7 +33,7 @@ function filterAxiosError(error: unknown): unknown {
   }
 
   // If it's not an axios error, return as-is
-  if (!(error as Record<string, unknown>).isAxiosError) {
+  if (!isAxiosError(error)) {
     return error;
   }
 
@@ -74,7 +74,7 @@ function filterAxiosError(error: unknown): unknown {
  */
 export const formatAxios = winston.format((info) => {
   // Filter axios errors in the error object
-  if (info.error && (info.error as Record<string, unknown>).isAxiosError) {
+  if (info.error && isAxiosError(info.error)) {
     info.error = filterAxiosError(info.error);
   }
 
