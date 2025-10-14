@@ -37,6 +37,15 @@ process.on("uncaughtException", async (error) => {
   logger.error(`Uncaught exception: ${error.message}`, { error });
 });
 
+// Handle unhandled promise rejections
+process.on("unhandledRejection", async (reason, promise) => {
+  const error = reason instanceof Error ? reason : new Error(String(reason));
+  logger.error(`Unhandled promise rejection: ${error.message}`, {
+    error,
+    promise: promise.toString(),
+  });
+});
+
 discord.on(Events.ShardReady, async (shardId) => {
   process.env.SHARD = shardId.toString();
   logger.info(`Shard online! Bot user: ${discord.user?.tag}. Guild count: ${discord.guilds.cache.size}`);

@@ -39,7 +39,16 @@ async function start() {
 
     //catches uncaught exceptions
     process.on("uncaughtException", async (error) => {
-      logger.error(`Uncaught exception:`, { error });
+      logger.error(`Uncaught exception: ${error.message}`, { error });
+    });
+
+    // Handle unhandled promise rejections
+    process.on("unhandledRejection", async (reason, promise) => {
+      const error = reason instanceof Error ? reason : new Error(String(reason));
+      logger.error(`Unhandled promise rejection: ${error.message}`, {
+        error,
+        promise: promise.toString(),
+      });
     });
 
     await run();
