@@ -70,7 +70,8 @@
       "signUp": "Sign Up",
       "signUpFull": "Full",
       "leave": "Leave",
-      "viewDetails": "View Details"
+      "viewDetails": "View Details",
+      "viewOnWeb": "View on Web"
     },
     "slots": {
       "slot": "Slot",

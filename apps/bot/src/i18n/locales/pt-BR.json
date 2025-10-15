@@ -70,7 +70,8 @@
       "signUp": "Inscrever-se",
       "signUpFull": "Lotado",
       "leave": "Sair",
-      "viewDetails": "Ver Detalhes"
+      "viewDetails": "Ver Detalhes",
+      "viewOnWeb": "Ver na Web"
     },
     "slots": {
       "slot": "Slot",

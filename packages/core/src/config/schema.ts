@@ -24,6 +24,10 @@ export const schema = z.object({
     }),
   }),
 
+  dashboard: z.object({
+    url: z.string().url().optional(),
+  }),
+
   discord: z.object({
     token: z.string().optional(),
     clientId: z.string().optional(),

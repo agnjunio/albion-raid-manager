@@ -1,4 +1,5 @@
-import { createDiscordTimestamp } from "@albion-raid-manager/core/utils/discord";
+import config from "@albion-raid-manager/core/config";
+import { createDiscordTimestampWithFormat } from "@albion-raid-manager/core/utils/discord";
 import { type Raid, type RaidRole, type RaidSlot } from "@albion-raid-manager/types";
 import { getContentTypeInfo, getRaidRoleEmoji, RAID_STATUS_INFO } from "@albion-raid-manager/types/entities";
 import {
@@ -59,53 +60,59 @@ export const buildRaidAnnouncementMessage = async <T extends MessageCreateOption
     .setTimestamp(new Date(raid.date));
 
   // Add raid date and time with better formatting
-  embed.addFields({
-    name: `📅 **${t("raids.dateTime")}**`,
-    value: createDiscordTimestamp(raid.date),
-    inline: true,
-  });
-
-  // Add content type field with party size info
-  if (raid.contentType && raid.contentType !== "OTHER") {
+  const timestampValue = `${createDiscordTimestampWithFormat(raid.date, "d")} ${createDiscordTimestampWithFormat(raid.date, "t")}`;
+  if (timestampValue && timestampValue.length > 0) {
     embed.addFields({
-      name: `🎯 **${t("raids.contentType")}**`,
-      value: `${contentTypeInfo?.emoji} **${contentTypeInfo?.displayName}**`,
+      name: `📅 **${t("raids.dateTime")}**`,
+      value: timestampValue,
       inline: true,
     });
+  }
+
+  // Add content type field with party size info
+  if (raid.contentType && raid.contentType !== "OTHER" && contentTypeInfo?.displayName) {
+    const contentTypeValue = `${contentTypeInfo.emoji || ""} **${contentTypeInfo.displayName}**`.trim();
+    if (contentTypeValue && contentTypeValue.length > 0) {
+      embed.addFields({
+        name: `🎯 **${t("raids.contentType")}**`,
+        value: contentTypeValue,
+        inline: true,
+      });
+    }
   }
 
   // Add location if available
-  if (raid.location) {
+  if (raid.location && raid.location.trim().length > 0) {
+    const locationValue = raid.location.length > 1024 ? `${raid.location.substring(0, 1020)}...` : raid.location;
     embed.addFields({
       name: `📍 **${t("raids.location")}**`,
-      value: raid.location,
+      value: locationValue,
       inline: true,
     });
   }
 
-  // Add raid composition with enhanced display
+  // Add progress indicator in embed
   if (slots.length > 0) {
-    const compositionText = await buildCompositionText(slots, { discord, context });
-
-    embed.addFields({
-      name: `👥 **${t("raids.composition")}** (${filledSlots}/${totalSlots})`,
-      value: compositionText,
-      inline: false,
-    });
-
-    // Add progress indicator
-    embed.addFields({
-      name: `📊 **${t("raids.progress")}**`,
-      value: `${progressBar} **${fillPercentage}%** ${t("raids.filled")}`,
-      inline: false,
-    });
+    const progressValue = `${progressBar} **${fillPercentage}%** ${t("raids.filled")}`;
+    if (progressValue && progressValue.length > 0) {
+      embed.addFields({
+        name: `📊 **${t("raids.progress")}** (${filledSlots}/${totalSlots})`,
+        value: progressValue,
+        inline: false,
+      });
+    }
   }
 
   // Add note if available with better formatting
-  if (raid.note) {
+  if (raid.note && raid.note.trim().length > 0) {
+    // Discord.js field value max length is 1024, accounting for code block formatting
+    const maxNoteLength = 1024 - 8; // Reserve space for ```\n and \n```
+    const truncatedNote =
+      raid.note.length > maxNoteLength ? `${raid.note.substring(0, maxNoteLength - 3)}...` : raid.note;
+
     embed.addFields({
       name: `📝 **${t("raids.notes")}**`,
-      value: `\`\`\`\n${raid.note}\n\`\`\``,
+      value: `\`\`\`\n${truncatedNote}\n\`\`\``,
       inline: false,
     });
   }
@@ -119,23 +126,31 @@ export const buildRaidAnnouncementMessage = async <T extends MessageCreateOption
       ? `🔴 **${t("raids.statusDetails.full")}** - ${t("raids.statusDetails.fullDescription")}`
       : `🟢 **${t("raids.statusDetails.open")}** - ${t("raids.statusDetails.openDescription")}`;
 
-    embed.addFields({
-      name: `✅ **${t("raids.status")}**`,
-      value: statusMessage,
-      inline: false,
-    });
+    if (statusMessage && statusMessage.length > 0) {
+      embed.addFields({
+        name: `✅ **${t("raids.status")}**`,
+        value: statusMessage.length > 1024 ? `${statusMessage.substring(0, 1020)}...` : statusMessage,
+        inline: false,
+      });
+    }
   } else if (raid.status === "CLOSED") {
-    embed.addFields({
-      name: `❌ **${t("raids.status")}**`,
-      value: `🔴 **${t("raids.statusDetails.closed")}** - ${t("raids.statusDetails.closedDescription")}`,
-      inline: false,
-    });
+    const statusMessage = `🔴 **${t("raids.statusDetails.closed")}** - ${t("raids.statusDetails.closedDescription")}`;
+    if (statusMessage && statusMessage.length > 0) {
+      embed.addFields({
+        name: `❌ **${t("raids.status")}**`,
+        value: statusMessage.length > 1024 ? `${statusMessage.substring(0, 1020)}...` : statusMessage,
+        inline: false,
+      });
+    }
   } else if (raid.status === "ONGOING") {
-    embed.addFields({
-      name: `▶️ **${t("raids.status")}**`,
-      value: `🟡 **${t("raids.statusDetails.ongoing")}** - ${t("raids.statusDetails.ongoingDescription")}`,
-      inline: false,
-    });
+    const statusMessage = `🟡 **${t("raids.statusDetails.ongoing")}** - ${t("raids.statusDetails.ongoingDescription")}`;
+    if (statusMessage && statusMessage.length > 0) {
+      embed.addFields({
+        name: `▶️ **${t("raids.status")}**`,
+        value: statusMessage.length > 1024 ? `${statusMessage.substring(0, 1020)}...` : statusMessage,
+        inline: false,
+      });
+    }
   }
 
   // Create enhanced buttons
@@ -151,18 +166,47 @@ export const buildRaidAnnouncementMessage = async <T extends MessageCreateOption
     .setStyle(ButtonStyle.Danger)
     .setDisabled(raid.status !== "OPEN");
 
-  // Add view details button
-  const viewDetailsButton = new ButtonBuilder()
-    .setCustomId(`${raids.id}:details:${raid.id}`)
-    .setLabel(`📋 ${t("raids.buttons.viewDetails")}`)
-    .setStyle(ButtonStyle.Secondary)
-    .setDisabled(false);
+  // Build action rows with buttons
+  const actionRows = [new ActionRowBuilder<ButtonBuilder>().addComponents(signupButton, signoutButton)];
 
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(signupButton, signoutButton, viewDetailsButton);
+  // Add web link button if dashboard URL is configured
+  if (config.dashboard.url) {
+    const webUrl = `${config.dashboard.url}/dashboard/${raid.serverId}/raids/${raid.id}`;
+    const viewOnWebButton = new ButtonBuilder()
+      .setLabel(`🌐 ${t("raids.buttons.viewOnWeb")}`)
+      .setStyle(ButtonStyle.Link)
+      .setURL(webUrl);
+
+    actionRows.push(new ActionRowBuilder<ButtonBuilder>().addComponents(viewOnWebButton));
+  }
+
+  const row = actionRows[0];
+  const webRow = actionRows[1];
+
+  // Build composition as separate content (not in embed to avoid 1024 char limit)
+  let compositionContent = "";
+  if (slots.length > 0) {
+    const { compositionLines, roleSummary } = await buildCompositionData(slots, { discord, context });
+
+    compositionContent = `## 👥 ${t("raids.composition")} (${filledSlots}/${totalSlots})\n\n`;
+    compositionContent += compositionLines.join("\n");
+
+    if (roleSummary) {
+      compositionContent += `\n\n**${t("raids.slots.roleSummary")}:** ${roleSummary}`;
+    }
+
+    compositionContent += "\n\n"; // Add spacing before embed
+
+    // Discord message limit is 2000 characters, truncate if needed
+    if (compositionContent.length > 1900) {
+      compositionContent = compositionContent.substring(0, 1897) + "...";
+    }
+  }
 
   return {
+    content: compositionContent || undefined,
     embeds: [embed],
-    components: [row],
+    components: webRow ? [row, webRow] : [row],
   } as unknown as T;
 };
 
@@ -177,16 +221,18 @@ function createProgressBar(percentage: number, length: number = 10): string {
   return `\`${filledBar}${emptyBar}\``;
 }
 
-// Helper function to build composition text with better formatting
-async function buildCompositionText(
+async function buildCompositionData(
   slots: RaidSlot[],
   { discord, context }: { discord: Client; context: GuildContext },
-): Promise<string> {
+): Promise<{ compositionLines: string[]; roleSummary: string }> {
   const { t } = context;
 
   if (slots.length === 0) {
-    return t("raids.slots.noSlots");
+    return { compositionLines: [t("raids.slots.noSlots")], roleSummary: "" };
   }
+
+  // Only use mentions for raids with 20 or fewer slots to avoid spam
+  const useMentions = slots.length <= 20;
 
   const compositionLines = [];
   for (let i = 0; i < slots.length; i++) {
@@ -195,7 +241,20 @@ async function buildCompositionText(
     const roleEmoji = await getSlotEmoji(slot, { discord });
 
     if (slot.userId) {
-      compositionLines.push(`${slotNumber}. ${roleEmoji} **${slot.name}** - <@${slot.userId}>`);
+      let userDisplay: string;
+
+      if (useMentions) {
+        userDisplay = `<@${slot.userId}>`;
+      } else {
+        try {
+          const user = await discord.users.fetch(slot.userId);
+          userDisplay = user.displayName || user.username;
+        } catch {
+          userDisplay = `User ${slot.userId.substring(0, 8)}`;
+        }
+      }
+
+      compositionLines.push(`${slotNumber}. ${roleEmoji} **${slot.name}** - ${userDisplay}`);
     } else {
       compositionLines.push(`${slotNumber}. ${roleEmoji} **${slot.name}** - *${t("raids.slots.available")}*`);
     }
@@ -215,5 +274,5 @@ async function buildCompositionText(
     .map(([role, count]) => `${getRaidRoleEmoji(role as RaidRole)} ${count}`)
     .join(" • ");
 
-  return `${compositionLines.join("\n")}\n\n**${t("raids.slots.roleSummary")}:** ${roleSummary}`;
+  return { compositionLines, roleSummary };
 }
