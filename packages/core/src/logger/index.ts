@@ -1,3 +1,5 @@
+import "./tracer";
+
 import path from "path";
 
 import { createLogger, format, transports } from "winston";
@@ -5,11 +7,11 @@ import { createLogger, format, transports } from "winston";
 import config from "@albion-raid-manager/core/config";
 
 import { formatAxios } from "./format-axios";
-import "./tracer";
+import { formatErrors } from "./format-errors";
 
 const logger = createLogger({
   level: config.logger.level,
-  format: format.combine(format.timestamp(), formatAxios(), format.errors({ stack: true }), format.json()),
+  format: format.combine(format.timestamp(), formatAxios(), formatErrors(), format.json()),
   defaultMeta: {
     get service() {
       return config.service.name;
