@@ -16,7 +16,11 @@ const config = schema.safeParse({
       origin:
         process.env.API_CORS_ORIGIN ??
         (isProd
-          ? ["https://albion-raid-manager.com", "https://www.albion-raid-manager.com"]
+          ? [
+              "https://albion-raid-manager.com",
+              "https://www.albion-raid-manager.com",
+              "https://albion-raid-manager.netlify.app",
+            ]
           : ["http://localhost:5173", "http://localhost:5174"]),
     },
   },
